@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace LuYao.Tests;
+namespace LuYao;
 
 [TestClass]
 public class DisposableBaseTests
