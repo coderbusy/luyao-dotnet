@@ -6,6 +6,12 @@
 		<RootNamespace>LuYao</RootNamespace>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="Xml\TestXmlModel.xslt" />
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="Xml\TestXmlModel.xslt" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="MSTest.TestAdapter" Version="3.6.4" />
