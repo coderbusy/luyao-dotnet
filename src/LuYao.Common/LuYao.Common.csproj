@@ -5,6 +5,7 @@
 		<RootNamespace>LuYao</RootNamespace>
 		<Title>LuYao.Common</Title>
 		<LangVersion>latest</LangVersion>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 </Project>
