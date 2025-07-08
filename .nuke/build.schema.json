@@ -47,6 +47,9 @@
           "type": "boolean",
           "description": "Disables displaying the NUKE logo"
         },
+        "NugetApiKey": {
+          "type": "string"
+        },
         "Partition": {
           "type": "string",
           "description": "Partition to use on CI"
@@ -74,10 +77,16 @@
             "enum": [
               "Clean",
               "Compile",
+              "Pack",
+              "Publish",
               "Restore",
               "Test"
             ]
           }
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded"
         },
         "Target": {
           "type": "array",
@@ -87,6 +96,8 @@
             "enum": [
               "Clean",
               "Compile",
+              "Pack",
+              "Publish",
               "Restore",
               "Test"
             ]
