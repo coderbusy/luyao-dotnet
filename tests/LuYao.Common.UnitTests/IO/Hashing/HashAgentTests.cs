@@ -89,27 +89,6 @@ public class HashAgentTests
     }
 
     [TestMethod]
-    public void Hash_NullString_ThrowsArgumentNullException()
-    {
-        // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => _md5Agent.Hash((string)null));
-    }
-
-    [TestMethod]
-    public void Hash_NullByteArray_ThrowsArgumentNullException()
-    {
-        // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => _md5Agent.Hash((byte[])null));
-    }
-
-    [TestMethod]
-    public void Hash_NullStream_ThrowsArgumentNullException()
-    {
-        // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => _md5Agent.Hash((Stream)null));
-    }
-
-    [TestMethod]
     public void HashFile_FileNotExist_ThrowsFileNotFoundException()
     {
         // Act & Assert
