@@ -22,8 +22,8 @@ public class Base32Tests
     {
         byte[] data = { 0x01, 0x23, 0x45, 0x67, 0x89 };
         var result = Base32.ToBase32(data);
-        // 0x01 0x23 0x45 0x67 0x89 => "0408M6Q1"
-        Assert.AreEqual("0408M6Q1", result);
+        // 0x01 0x23 0x45 0x67 0x89 => "04HMASW9"
+        Assert.AreEqual("04HMASW9", result);
     }
 
     [TestMethod]
@@ -36,7 +36,7 @@ public class Base32Tests
     [TestMethod]
     public void FromBase32_SampleString_ReturnsExpectedBytes()
     {
-        string base32 = "0408M6Q1";
+        string base32 = "04HMASW9";
         byte[] expected = { 0x01, 0x23, 0x45, 0x67, 0x89 };
         var result = Base32.FromBase32(base32);
         CollectionAssert.AreEqual(expected, result);
