@@ -50,6 +50,9 @@
         "NugetApiKey": {
           "type": "string"
         },
+        "PackageVersion": {
+          "type": "string"
+        },
         "Partition": {
           "type": "string",
           "description": "Partition to use on CI"

@@ -1,0 +1,57 @@
+name: Publish NuGet Package
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'       # 只在打 tag 时触发
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x  # 替换为你实际的 .NET 版本
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Extract package version from tag
+        id: tag_version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
+          
+      - name: Build and Pack
+        run: ./build.sh Pack --PackageVersion ${{ env.PACKAGE_VERSION }}
+
+      - name: Publish to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: ./build.sh Publish
+        
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload NuGet package to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: $(ls ./output/*.nupkg)
+          asset_name: $(basename $(ls ./output/*.nupkg))
+          asset_content_type: application/zip

@@ -66,7 +66,7 @@ public class EnumerableExtensionsTests
     [ExpectedException(typeof(ArgumentNullException))]
     public void SplitToBatch_NullSource_ThrowsArgumentNullException()
     {
-        List<int> input = null;
+        List<int>? input = null;
         _ = input.SplitToBatch(2).ToList();
     }
 

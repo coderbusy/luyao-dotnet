@@ -15,7 +15,7 @@ public class HttpResponseMessageExtensionsTests
     public async Task ReadAsHtmlAsync_ResponseIsNull_ThrowsArgumentNullException()
     {
         // Arrange
-        HttpResponseMessage response = null;
+        HttpResponseMessage? response = null;
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
@@ -29,7 +29,10 @@ public class HttpResponseMessageExtensionsTests
     {
         // Arrange
         var content = new StringContent("测试内容", Encoding.Unicode);
-        content.Headers.ContentType.CharSet = "utf-16";
+        if (content.Headers.ContentType != null)
+        {
+            content.Headers.ContentType.CharSet = "utf-16";
+        }
         var response = new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = content
