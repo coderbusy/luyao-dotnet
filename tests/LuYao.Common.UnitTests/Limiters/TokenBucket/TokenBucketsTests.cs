@@ -98,4 +98,63 @@ public class TokenBucketsTests
     {
         public void Sleep() { }
     }
+
+    private ITokenBucket Create()
+    {
+        return TokenBuckets.Construct()
+                    .WithCapacity(10) // Burst capacity
+                    .WithFixedIntervalRefillStrategy(5, TimeSpan.FromSeconds(1)) // Rate limit
+                    .Build();
+    }
+
+    [TestMethod]
+    public void Should_Allow_Requests_Within_Limit()
+    {
+        var limiter = Create();
+        // 尝试发送 5 个请求，应该都能成功
+        for (int i = 0; i < 5; i++)
+        {
+            Assert.IsTrue(limiter.TryConsume(1), "Request should be allowed.");
+        }
+    }
+
+    [TestMethod]
+    public void Should_Be_Allowed_To_Burst()
+    {
+        var limiter = Create();
+        // 允许突发请求，尝试发送 10 个请求
+        for (int i = 0; i < 10; i++)
+        {
+            Assert.IsTrue(limiter.TryConsume(1), "Burst request should be allowed.");
+        }
+    }
+
+    [TestMethod]
+    public void Should_Reject_Requests_When_Empty()
+    {
+        var limiter = Create();
+        // 消耗 10 次以耗尽令牌
+        for (int i = 0; i <= 10; i++)
+        {
+            limiter.TryConsume(1);
+        }
+        // 尝试发送第 11 个请求，应该被拒绝
+        Assert.IsFalse(limiter.TryConsume(1), "Request should be rejected when no tokens are available.");
+    }
+
+    [TestMethod]
+    public void Should_Refill_Tokens_Over_Time()
+    {
+        var limiter = Create();
+        // 消耗 5 次以耗尽部分令牌
+        for (int i = 0; i < 5; i++)
+        {
+            limiter.TryConsume(1);
+        }
+
+        // 等待一段时间，令牌应该补充
+        Thread.Sleep(1000); // 等待 1 秒
+                            // 应该能够成功消费 1 个令牌
+        Assert.IsTrue(limiter.TryConsume(1), "Request should be allowed after refill.");
+    }
 }
