@@ -3,9 +3,7 @@ name: Publish NuGet Package
 on:
   push:
     tags:
-      - 'v*.*.*'       # 只匹配 v1.2.3 这类标签
-    branches:
-      - main           # 仅在 main 分支上
+      - 'v*.*.*'       # 只在打 tag 时触发
 
 jobs:
   publish:
