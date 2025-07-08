@@ -13,8 +13,7 @@ public static class AsyncLock
     /// <summary>
     /// 存储字符串键与对应信号量的并发字典
     /// </summary>
-    private static readonly ConcurrentDictionary<string, SemaphoreSlim> _locks =
-        new ConcurrentDictionary<string, SemaphoreSlim>();
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new ConcurrentDictionary<string, SemaphoreSlim>();
 
     /// <summary>
     /// 异步获取指定键的锁
@@ -24,8 +23,7 @@ public static class AsyncLock
     /// <exception cref="ArgumentNullException">当 key 为 null 时抛出</exception>
     public static async Task<IDisposable> LockAsync(string key)
     {
-        if (key == null)
-            throw new ArgumentNullException(nameof(key));
+        if (key == null) throw new ArgumentNullException(nameof(key));
         var semaphore = _locks.GetOrAdd(key, static _ => new SemaphoreSlim(1, 1));
         await semaphore.WaitAsync();
         return new ReleaseSemaphoreOnDispose(semaphore);

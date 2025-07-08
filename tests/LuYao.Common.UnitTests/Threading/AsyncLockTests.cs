@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace LuYao.Threading
 {
@@ -21,7 +23,7 @@ namespace LuYao.Threading
             {
                 // 首次获取锁成功
             }
-            
+
             using (await AsyncLock.LockAsync(key))
             {
                 // 释放后可以再次获取锁
@@ -50,7 +52,7 @@ namespace LuYao.Threading
             var sw = Stopwatch.StartNew();
             await Task.WhenAll(task1, task2);
             sw.Stop();
-            
+
             // 两个任务应该并行执行，总时间应该接近100ms而不是200ms
             Assert.IsTrue(sw.ElapsedMilliseconds < 150);
         }
@@ -59,15 +61,15 @@ namespace LuYao.Threading
         public async Task LockAsync_SameKey_ShouldBlock()
         {
             const string key = "test";
-            var results = new List<int>();
-            
+            var results = new ConcurrentQueue<int>();
+
             var task1 = Task.Run(async () =>
             {
                 using (await AsyncLock.LockAsync(key))
                 {
-                    results.Add(1);
+                    results.Enqueue(1);
                     await Task.Delay(100);
-                    results.Add(2);
+                    results.Enqueue(2);
                 }
             });
 
@@ -75,16 +77,17 @@ namespace LuYao.Threading
             {
                 using (await AsyncLock.LockAsync(key))
                 {
-                    results.Add(3);
+                    results.Enqueue(3);
                     await Task.Delay(100);
-                    results.Add(4);
+                    results.Enqueue(4);
                 }
             });
 
             await Task.WhenAll(task1, task2);
-            
-            // 验证执行顺序，确保同一把锁下的操作是顺序执行的
-            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, results);
+
+            var arr = results.ToArray();
+            bool ok = (arr.SequenceEqual(new[] { 1, 2, 3, 4 }) || arr.SequenceEqual(new[] { 3, 4, 1, 2 }));
+            Assert.IsTrue(ok, $"实际顺序: {string.Join(",", arr)}");
         }
     }
 }
