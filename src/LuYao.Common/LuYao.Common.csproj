@@ -8,4 +8,7 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<ItemGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net461'">
+		<Reference Include="System.Net.Http" />
+	</ItemGroup>
 </Project>
