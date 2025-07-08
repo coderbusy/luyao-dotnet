@@ -21,6 +21,7 @@ public class DisposeAction : IDisposable
         _action = action;
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         _action();
