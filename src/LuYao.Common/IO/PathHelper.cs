@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LuYao.IO;
@@ -8,7 +9,7 @@ namespace LuYao.IO;
 /// </summary>
 public static class PathHelper
 {
-    private static readonly char[] InvalidFileNameChars = new char[]
+    private static readonly HashSet<char> InvalidFileNameChars = new HashSet<char>
     {
         '\"', '<', '>', '|', '\0',
         (char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7, (char)8, (char)9, (char)10,
@@ -26,7 +27,7 @@ public static class PathHelper
     {
         if (string.IsNullOrWhiteSpace(filename)) return string.Empty;
 
-        var safeFileName = string.Concat(filename.Where(c => Array.IndexOf(InvalidFileNameChars, c) == -1));
+        var safeFileName = string.Concat(filename.Where(c => !InvalidFileNameChars.Contains(c)));
 
         return safeFileName;
     }
