@@ -27,8 +27,15 @@ public static class PathHelper
     {
         if (string.IsNullOrWhiteSpace(filename)) return string.Empty;
 
-        var safeFileName = string.Concat(filename.Where(c => !InvalidFileNameChars.Contains(c)));
+        var safeFileName = string.Concat(FilterFileName(filename));
 
         return safeFileName;
+    }
+    private static IEnumerable<Char> FilterFileName(string str)
+    {
+        foreach (var c in str)
+        {
+            if (!InvalidFileNameChars.Contains(c)) yield return c;
+        }
     }
 }
