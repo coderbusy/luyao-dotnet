@@ -3,9 +3,43 @@ using System.Text;
 
 namespace LuYao.Text.Tokenizer.CharacterFilters;
 
+/// <summary>
+/// 去除文本中重音字符的字符过滤器。
+/// 将重音字符替换为对应的基本拉丁字母或其他替代形式。
+/// </summary>
 public class RemoveAccentsCharacterFilter : ICharacterFilter
 {
-    // 定义重音字符到基本拉丁字母的映射字典
+    /// <summary>
+    /// 对输入文本进行过滤处理，去除重音字符并返回处理后的文本。
+    /// </summary>
+    /// <param name="text">要过滤的文本。</param>
+    /// <returns>去除重音字符后的文本。</returns>
+    public string Filter(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+
+        StringBuilder sb = new StringBuilder(text.Length);
+        foreach (char c in text)
+        {
+            // 如果字典中有对应的字符，使用映射值
+            if (accentMap.ContainsKey(c))
+            {
+                sb.Append(accentMap[c]);
+            }
+            else
+            {
+                // 如果没有映射值，保留原字符
+                sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// 定义重音字符到基本拉丁字母的映射字典。
+    /// 包含常见的拉丁字母、汉语拼音声调等字符的映射。
+    /// </summary>
     private static readonly IReadOnlyDictionary<char, string> accentMap = new Dictionary<char, string>()
     {
         // 拉丁字母（法语、西班牙语、德语等语言）
@@ -52,26 +86,4 @@ public class RemoveAccentsCharacterFilter : ICharacterFilter
         {'ū', "u"},  {'ǔ', "u"},
         {'ǖ', "u"}, {'ǘ', "u"}, {'ǚ', "u"}, {'ǜ', "u"},
     };
-
-    public string Filter(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
-
-        StringBuilder sb = new StringBuilder(text.Length);
-        foreach (char c in text)
-        {
-            // 如果字典中有对应的字符，使用映射值
-            if (accentMap.ContainsKey(c))
-            {
-                sb.Append(accentMap[c]);
-            }
-            else
-            {
-                // 如果没有映射值，保留原字符
-                sb.Append(c);
-            }
-        }
-
-        return sb.ToString();
-    }
 }
