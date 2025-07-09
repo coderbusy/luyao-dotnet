@@ -14,6 +14,7 @@ public class ToSbcCaseCharacterFilter : ICharacterFilter
     /// <returns>转换后的文本，其中半角字符已替换为全角字符。</returns>
     public string Filter(string text)
     {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
         // 半角转全角：
         char[] c = text.ToCharArray();
         for (int i = 0; i < c.Length; i++)

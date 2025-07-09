@@ -14,6 +14,7 @@ public class ToDbcCaseCharacterFilter : ICharacterFilter
     /// <returns>转换后的文本，其中全角字符已替换为半角字符。</returns>
     public string Filter(string input)
     {
+        if (string.IsNullOrEmpty(input)) return string.Empty;
         char[] c = input.ToCharArray();
         for (int i = 0; i < c.Length; i++)
         {
