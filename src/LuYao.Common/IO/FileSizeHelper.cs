@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace LuYao.IO;
 
@@ -36,5 +37,37 @@ public static class FileSizeHelper
         }
         var val = FileLengthLimit[x - 1] == 0 ? count : count / Convert.ToDecimal(FileLengthLimit[x - 1]);
         return $"{val:0.00} {FileLengthUnit[x - 1]}";
+    }
+
+    /// <summary>
+    /// 从文件路径获取文件大小。
+    /// </summary>
+    /// <param name="path">文件路径。</param>
+    /// <returns>文件大小（字节数）。如果文件不存在，则返回 0。</returns>
+    public static long ForFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return 0;
+        var info = new FileInfo(path);
+        if (!info.Exists) return 0;
+        return info.Length;
+    }
+
+    /// <summary>
+    /// 从目录路径获取目录大小。
+    /// </summary>
+    /// <param name="path">目录路径。</param>
+    /// <returns>目录大小（字节数）。如果目录不存在，则返回 0。</returns>
+    public static long ForDirectory(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return 0;
+        if (!Directory.Exists(path)) return 0;
+        long totalSize = 0;
+        var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+        foreach (var file in files)
+        {
+            var fileInfo = new FileInfo(file);
+            totalSize += fileInfo.Length;
+        }
+        return totalSize;
     }
 }
