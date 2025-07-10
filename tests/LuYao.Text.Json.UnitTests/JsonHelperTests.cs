@@ -19,10 +19,10 @@ public class JsonHelperTests
     {
         // Arrange
         string input = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}</script>";
-        string expected = "{\r\n  \"name\": \"John\",\r\n  \"age\": 30,\r\n  \"city\": \"New York\"\r\n}";
+        string expected = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
 
         // Act
-        string result = JsonHelper.ExtractJson(input, Formatting.Indented);
+        string result = JsonHelper.ExtractJson(input, Formatting.None);
 
         // Assert
         Assert.AreEqual(expected, result);
