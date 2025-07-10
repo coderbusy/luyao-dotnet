@@ -1,0 +1,23 @@
+<Project>
+	<PropertyGroup>
+		<VersionPrefix>2.6</VersionPrefix>
+		<VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
+		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
+		<FileVersion>$(Version)</FileVersion>
+		<AssemblyVersion>$(Version)</AssemblyVersion>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<!-- Include symbol files (*.pdb) in the built .nupkg -->
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+	</PropertyGroup>
+	<PropertyGroup>
+		<PackageId>$(AssemblyName)</PackageId>
+		<Authors>Soar360</Authors>
+		<PackageProjectUrl>https://www.coderbusy.com/</PackageProjectUrl>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+</Project>
