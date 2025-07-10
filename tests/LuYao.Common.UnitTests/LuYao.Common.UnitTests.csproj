@@ -7,10 +7,10 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Xml\TestXmlModel.xslt" />
+		<None Remove="Xml\TestXmlModel.xslt" />
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Include="Xml\TestXmlModel.xslt" />
+		<EmbeddedResource Include="Xml\TestXmlModel.xslt" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -19,6 +19,10 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+	</ItemGroup>
+	
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\LuYao.Common\LuYao.Common.csproj" />
 	</ItemGroup>
