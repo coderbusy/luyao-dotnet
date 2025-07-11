@@ -12,4 +12,8 @@
 	<ItemGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net461'">
 		<Reference Include="System.Net.Http" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Security\" />
+	</ItemGroup>
 </Project>
