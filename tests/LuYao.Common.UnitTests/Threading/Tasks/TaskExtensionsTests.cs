@@ -25,8 +25,9 @@ public class TaskExtensionsTests
     {
         // Arrange
         var cts = new System.Threading.CancellationTokenSource();
-        var task = Task.Run(() =>
+        var task = Task.Run(async () =>
         {
+            await Task.Delay(100); // 模拟任务执行时间
             cts.Token.ThrowIfCancellationRequested();
         }, cts.Token);
         cts.Cancel();
