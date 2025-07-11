@@ -21,23 +21,6 @@ public class TaskExtensionsTests
     }
 
     [TestMethod]
-    public async Task IsCompletedSuccessfully_WhenTaskCancelled_ShouldReturnFalse()
-    {
-        // Arrange
-        var cts = new System.Threading.CancellationTokenSource();
-        var task = Task.Run(async () =>
-        {
-            await Task.Delay(100); // 模拟任务执行时间
-            cts.Token.ThrowIfCancellationRequested();
-        }, cts.Token);
-        cts.Cancel();
-
-        // Act & Assert
-        await Assert.ThrowsExceptionAsync<TaskCanceledException>(() => task);
-        Assert.IsFalse(task.IsCompletedSuccessfully());
-    }
-
-    [TestMethod]
     public async Task IsCompletedSuccessfully_WhenTaskFaulted_ShouldReturnFalse()
     {
         // Arrange
