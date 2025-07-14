@@ -38,4 +38,104 @@ public static class PathHelper
             if (!InvalidFileNameChars.Contains(c)) yield return c;
         }
     }
+
+
+    /// <summary>
+    ///     根据文件后缀来获取MIME类型字符串
+    /// </summary>
+    public static string GetMimeType(string extension)
+    {
+        if (string.IsNullOrWhiteSpace(extension)) throw new ArgumentException(nameof(extension));
+        string mime;
+        extension = extension.ToLower();
+        switch (extension)
+        {
+            case ".apk":
+                mime = "application/vnd.android.package-archive";
+                break;
+            case ".avi":
+                mime = "video/x-msvideo";
+                break;
+            case ".bin":
+            case ".exe":
+            case ".msi":
+            case ".dll":
+            case ".class":
+                mime = "application/octet-stream";
+                break;
+            case ".csv":
+                mime = "text/comma-separated-values";
+                break;
+            case ".html":
+            case ".htm":
+            case ".shtml":
+                mime = "text/html";
+                break;
+            case ".css":
+                mime = "text/css";
+                break;
+            case ".js":
+                mime = "text/javascript";
+                break;
+            case ".doc":
+            case ".dot":
+            case ".docx":
+                mime = "application/msword";
+                break;
+            case ".xla":
+            case ".xls":
+            case ".xlsx":
+                mime = "application/msexcel";
+                break;
+            case ".ppt":
+            case ".pptx":
+                mime = "application/mspowerpoint";
+                break;
+            case ".gz":
+                mime = "application/gzip";
+                break;
+            case ".gif":
+                mime = "image/gif";
+                break;
+            case ".bmp":
+                mime = "image/bmp";
+                break;
+            case ".jpeg":
+            case ".jpg":
+            case ".jpe":
+            case ".png":
+                mime = "image/jpeg";
+                break;
+            case ".mpeg":
+            case ".mpg":
+            case ".mpe":
+            case ".wmv":
+                mime = "video/mpeg";
+                break;
+            case ".mp3":
+            case ".wma":
+                mime = "audio/mpeg";
+                break;
+            case ".pdf":
+                mime = "application/pdf";
+                break;
+            case ".rar":
+                mime = "application/octet-stream";
+                break;
+            case ".txt":
+                mime = "text/plain";
+                break;
+            case ".7z":
+            case ".z":
+                mime = "application/x-compress";
+                break;
+            case ".zip":
+                mime = "application/x-zip-compressed";
+                break;
+            default:
+                mime = "application/octet-stream";
+                break;
+        }
+        return mime;
+    }
 }

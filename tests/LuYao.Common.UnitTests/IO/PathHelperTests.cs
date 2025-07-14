@@ -63,4 +63,37 @@ public class PathHelperTests
         // Assert
         Assert.AreEqual(expected, result);
     }
+
+    [TestMethod]
+    public void GetMimeType_ShouldReturnCorrectMimeType_ForKnownExtensions()
+    {
+        // Arrange
+        string extension = ".txt";
+        string expectedMimeType = "text/plain";
+        // Act
+        string result = PathHelper.GetMimeType(extension);
+        // Assert
+        Assert.AreEqual(expectedMimeType, result);
+    }
+
+    [TestMethod]
+    public void GetMimeType_ShouldThrowArgumentException_ForNullOrEmptyExtension()
+    {
+        // Arrange
+        string extension = string.Empty;
+        // Act & Assert
+        Assert.ThrowsException<ArgumentException>(() => PathHelper.GetMimeType(extension));
+    }
+
+    [TestMethod]
+    public void GetMimeType_ShouldReturnDefaultMimeType_ForUnknownExtensions()
+    {
+        // Arrange
+        string extension = ".unknown";
+        string expectedMimeType = "application/octet-stream";
+        // Act
+        string result = PathHelper.GetMimeType(extension);
+        // Assert
+        Assert.AreEqual(expectedMimeType, result);
+    }
 }
