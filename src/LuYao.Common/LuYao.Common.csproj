@@ -21,8 +21,4 @@
 	<ItemGroup>
 	  <EmbeddedResource Include="Net\Http\FakeUserAgent\Browsers.dat" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Security\" />
-	</ItemGroup>
 </Project>

@@ -23,7 +23,7 @@ public class UpdatePackage
     /// <summary>
     /// 更新包的描述信息。
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// 更新包的构建时间。
@@ -33,12 +33,12 @@ public class UpdatePackage
     /// <summary>
     /// 更新包的版本号。
     /// </summary>
-    public string Version { get; set; }
+    public string? Version { get; set; }
 
     /// <summary>
     /// 更新包的基础 URL，用于下载更新文件。
     /// </summary>
-    public string BaseUrl { get; set; }
+    public string? BaseUrl { get; set; }
 
     /// <summary>
     /// 更新文件包集合，包含所有需要更新的文件信息。
@@ -54,13 +54,11 @@ public class UpdatePackage
     public async Task<bool> HasUpdate(Assembly assembly, string dir)
     {
         var name = assembly.GetName();
-        if (name.Version != null && name.Version.ToString() == Version)
-            return false;
+        if (name.Version != null && name.Version.ToString() == Version) return false;
         foreach (var pkg in this.UpdateFilePackages)
         {
             var fn = Path.Combine(dir, pkg.FilePath);
-            if (!File.Exists(fn))
-                return true;
+            if (!File.Exists(fn)) return true;
             if (await UpdatePackageHelper.Hash(fn) != pkg.FileHash)
                 return true;
         }
