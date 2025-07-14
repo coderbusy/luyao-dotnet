@@ -16,22 +16,28 @@ public static class IPAddressExtensions
     public static bool IsPrivateIPAddress(this IPAddress ip)
     {
         if (IPAddress.IsLoopback(ip)) return true;
+
         ip = ip.IsIPv4MappedToIPv6 ? ip.MapToIPv4() : ip;
         byte[] bytes = ip.GetAddressBytes();
-        return ip.AddressFamily switch
+
+        if (ip.AddressFamily == AddressFamily.InterNetwork)
         {
-            AddressFamily.InterNetwork when bytes[0] == 10 => true,
-            AddressFamily.InterNetwork when bytes[0] == 100 && bytes[1] >= 64 && bytes[1] <= 127 => true,
-            AddressFamily.InterNetwork when bytes[0] == 169 && bytes[1] == 254 => true,
-            AddressFamily.InterNetwork when bytes[0] == 172 && bytes[1] == 16 => true,
-            AddressFamily.InterNetwork when bytes[0] == 192 && bytes[1] == 88 && bytes[2] == 99 => true,
-            AddressFamily.InterNetwork when bytes[0] == 192 && bytes[1] == 168 => true,
-            AddressFamily.InterNetwork when bytes[0] == 198 && bytes[1] == 18 => true,
-            AddressFamily.InterNetwork when bytes[0] == 198 && bytes[1] == 51 && bytes[2] == 100 => true,
-            AddressFamily.InterNetwork when bytes[0] == 203 && bytes[1] == 0 && bytes[2] == 113 => true,
-            AddressFamily.InterNetwork when bytes[0] >= 233 => true,
-            AddressFamily.InterNetworkV6 when ip.IsIPv6Teredo || ip.IsIPv6LinkLocal || ip.IsIPv6Multicast || ip.IsIPv6SiteLocal || bytes[0] == 0 || bytes[0] >= 252 => true,
-            _ => false
-        };
+            return bytes[0] switch
+            {
+                10 => true,
+                100 when bytes[1] >= 64 && bytes[1] <= 127 => true,
+                169 when bytes[1] == 254 => true,
+                172 when bytes[1] >= 16 && bytes[1] <= 31 => true, // Adjusted for full private range
+                192 when bytes[1] == 168 => true,
+                _ => false
+            };
+        }
+
+        if (ip.AddressFamily == AddressFamily.InterNetworkV6)
+        {
+            return ip.IsIPv6Teredo || ip.IsIPv6LinkLocal || ip.IsIPv6Multicast || ip.IsIPv6SiteLocal || bytes[0] == 0 || bytes[0] >= 252;
+        }
+
+        return false;
     }
 }

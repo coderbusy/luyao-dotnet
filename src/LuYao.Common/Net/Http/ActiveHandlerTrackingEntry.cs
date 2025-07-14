@@ -8,18 +8,13 @@ namespace LuYao.Net.Http;
 // 线程安全性：我们将此类视为不可变的，除了定时器以外。为“过期”池创建新对象大大简化了线程需求。
 internal sealed class ActiveHandlerTrackingEntry
 {
-    private static readonly TimerCallback _timerCallback = (s) =>
-        ((ActiveHandlerTrackingEntry)s!).Timer_Tick();
+    private static readonly TimerCallback _timerCallback = static (s) => ((ActiveHandlerTrackingEntry)s!).Timer_Tick();
     private readonly object _lock;
     private bool _timerInitialized;
-    private Timer _timer;
-    private TimerCallback _callback;
+    private Timer? _timer;
+    private TimerCallback? _callback;
 
-    public ActiveHandlerTrackingEntry(
-        string name,
-        LifetimeTrackingHttpMessageHandler handler,
-        TimeSpan lifetime
-    )
+    public ActiveHandlerTrackingEntry(string name, LifetimeTrackingHttpMessageHandler handler, TimeSpan lifetime)
     {
         Name = name;
         Handler = handler;
@@ -39,8 +34,7 @@ internal sealed class ActiveHandlerTrackingEntry
         if (Lifetime == Timeout.InfiniteTimeSpan)
             return; // 永不过期。
 
-        if (Volatile.Read(ref _timerInitialized))
-            return;
+        if (Volatile.Read(ref _timerInitialized)) return;
 
         StartExpiryTimerSlow(callback);
     }
@@ -51,8 +45,7 @@ internal sealed class ActiveHandlerTrackingEntry
 
         lock (_lock)
         {
-            if (Volatile.Read(ref _timerInitialized))
-                return;
+            if (Volatile.Read(ref _timerInitialized)) return;
 
             _callback = callback;
             _timer = NonCapturingTimer.Create(
@@ -77,7 +70,7 @@ internal sealed class ActiveHandlerTrackingEntry
                 _timer.Dispose();
                 _timer = null;
 
-                _callback(this);
+                _callback?.Invoke(this);
             }
         }
     }

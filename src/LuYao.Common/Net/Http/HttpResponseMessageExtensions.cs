@@ -25,7 +25,7 @@ public static class HttpResponseMessageExtensions
     public static async Task<string> ReadAsHtmlAsync(this HttpResponseMessage response)
     {
         if (response == null) throw new ArgumentNullException(nameof(response));
-        Encoding encoding = null;
+        Encoding? encoding = null;
         var type = response.Content.Headers.ContentType;
         if (type != null && !string.IsNullOrWhiteSpace(type.CharSet)) encoding = GetEncoding(type.CharSet.Trim(' ', '\'', '"'));
         var data = await response.Content.ReadAsByteArrayAsync();
