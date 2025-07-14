@@ -178,6 +178,6 @@ public static class Enum<T>
             default(int),
             (current, flag) => current | Convert.ToInt32(flag)
         );
-        return values.TryGetValue(combined, out T result) ? result : default;
+        return (T)Convert.ChangeType(combined, typeof(T));
     }
 }
