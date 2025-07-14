@@ -137,7 +137,7 @@ public class CSharpStringBuilder
     /// <param name="name">类名。</param>
     /// <param name="modifiers">类修饰符（如 public、internal 等）。</param>
     /// <returns>IDisposable 对象，用于自动关闭类作用域。</returns>
-    public IDisposable ClassScope(string name, string modifiers = null)
+    public IDisposable ClassScope(string name, string? modifiers = null)
     {
         string str = string.Join(" ", modifiers, "class", name);
         this.AppendLine(str.Trim());

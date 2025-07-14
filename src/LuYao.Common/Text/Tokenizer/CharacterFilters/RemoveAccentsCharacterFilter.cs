@@ -14,7 +14,7 @@ public class RemoveAccentsCharacterFilter : ICharacterFilter
     /// </summary>
     /// <param name="text">要过滤的文本。</param>
     /// <returns>去除重音字符后的文本。</returns>
-    public string Filter(string text)
+    public string Filter(string? text)
     {
         if (string.IsNullOrWhiteSpace(text)) return string.Empty;
 
