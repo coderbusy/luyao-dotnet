@@ -29,11 +29,9 @@ internal static class Helpers
         };
     }
 
-    public static Type MakeType(TypeCode type, int dimension)
+    public static Type MakeType(TypeCode type, bool isArray)
     {
         var elementType = ToType(type);
-        if (dimension <= 0) return elementType;
-        if (dimension == 1) return elementType.MakeArrayType();
-        return elementType.MakeArrayType(dimension);
+        return isArray ? elementType.MakeArrayType() : elementType;
     }
 }

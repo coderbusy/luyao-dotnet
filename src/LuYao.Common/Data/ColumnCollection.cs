@@ -70,21 +70,21 @@ public class ColumnCollection : IReadOnlyList<Column>
     /// <param name="name"></param>
     /// <param name="type"></param>
     /// <returns></returns>
-    public Column Add(string name, TypeCode type) => Add(name, type, 0);
+    public Column Add(string name, TypeCode type) => Add(name, type, false);
     /// <summary>
     /// 添加数据列
     /// </summary>
     /// <param name="name"></param>
     /// <param name="type"></param>
-    /// <param name="dimension"></param>
+    /// <param name="isArray"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public Column Add(string name, TypeCode type, int dimension)
+    public Column Add(string name, TypeCode type, bool isArray)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
         Column? col = this.Find(name);
         if (col != null) return col;
-        col = new Column(name, type, dimension, this._capacity, this._table.Cursor);
+        col = new Column(name, type, isArray, this._capacity, this._table.Cursor);
         this._list.Add(col);
         return col;
     }

@@ -9,17 +9,17 @@ public class ColumnTests
         // Arrange
         string name = "TestColumn";
         TypeCode type = TypeCode.Int32;
-        int dimension = 1;
+        bool isArray = true;
         int capacity = 10;
 
         // Act
-        var column = new Column(name, type, dimension, capacity, 0);
+        var column = new Column(name, type, isArray, capacity, 0);
 
         // Assert
         Assert.AreEqual(name, column.Name);
-        Assert.AreEqual(type, column.Type);
-        Assert.AreEqual(dimension, column.Dimension);
-        Assert.AreEqual(typeof(int[]), column.DataType);
+        Assert.AreEqual(type, column.Code);
+        Assert.AreEqual(isArray, column.IsArray);
+        Assert.AreEqual(typeof(int[]), column.Type);
     }
 
     [TestMethod]
@@ -31,20 +31,6 @@ public class ColumnTests
         TypeCode type = TypeCode.Int32;
 
         // Act
-        var column = new Column(name, type, 0, 60, 0);
+        var column = new Column(name, type, false, 60, 0);
     }
-
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void Constructor_NegativeDimension_ThrowsArgumentOutOfRangeException()
-    {
-        // Arrange
-        string name = "TestColumn";
-        TypeCode type = TypeCode.Int32;
-        int dimension = -1;
-
-        // Act
-        var column = new Column(name, type, dimension, 60, 0);
-    }
-
 }

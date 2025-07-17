@@ -5,12 +5,12 @@ namespace LuYao.Data;
 /// <summary>
 /// 表示一个数据列。
 /// </summary>
-public sealed class Column
+public sealed partial class Column
 {
     private Array _data;
     private int _count;
-    private int _dimension = 0;
-    private Type _dataType;
+    private bool _isArray = false;
+    private Type _type;
 
     private int _cursor = 0;
 
@@ -32,22 +32,21 @@ public sealed class Column
     /// 初始化 <see cref="Column"/> 类的新实例。
     /// </summary>
     /// <param name="name">列的名称。</param>
-    /// <param name="type">列的数据类型。</param>
-    /// <param name="dimension">列的维度，默认为 0。</param>
+    /// <param name="code">列的数据类型。</param>
+    /// <param name="isArray">列的维度，默认为 0。</param>
     /// <param name="capacity">列的初始容量，默认为 60。</param>
     /// <param name="cursor"></param>
     /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为 null 时抛出。</exception>
-    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="dimension"/> 小于 0 时抛出。</exception>
-    public Column(string name, TypeCode type, int dimension, int capacity, int cursor)
+    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="isArray"/> 小于 0 时抛出。</exception>
+    public Column(string name, TypeCode code, bool isArray, int capacity, int cursor)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列的名称不能为空或空白");
         this.Name = name;
-        this.Type = type;
-        if (dimension < 0) throw new ArgumentOutOfRangeException(nameof(dimension), "维度不能小于0");
+        this.Code = code;
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
-        this._dimension = dimension;
-        this._dataType = Helpers.MakeType(type, dimension);
-        this._data = Array.CreateInstance(this._dataType, capacity);
+        this._isArray = isArray;
+        this._type = Helpers.MakeType(code, isArray);
+        this._data = Array.CreateInstance(this._type, capacity);
         this._count = 0;
         this._cursor = cursor;
     }
@@ -55,7 +54,7 @@ public sealed class Column
     internal void Extend(int length)
     {
         if (this._data.Length >= length) return;
-        Array tmp = Array.CreateInstance(this._dataType, length);
+        Array tmp = Array.CreateInstance(this._type, length);
         this._data.CopyTo(tmp, 0);
         this._data = tmp;
     }
@@ -68,29 +67,29 @@ public sealed class Column
     /// <summary>
     /// 获取列的数据类型。
     /// </summary>
-    public TypeCode Type { get; }
+    public TypeCode Code { get; }
 
     /// <summary>
-    /// 获取列的维度。
+    /// 获是否数组
     /// </summary>
-    public int Dimension => this._dimension;
+    public bool IsArray => this._isArray;
 
     /// <summary>
     /// 获取列的实际数据类型。
     /// </summary>
-    public Type DataType => this._dataType;
+    public Type Type => this._type;
 
     /// <summary>
     ///  
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
-    public void Set(object? value, int row) => _data.SetValue(From(value), row);
+    public void Set(object? value, int row) => _data.SetValue(Cast(value), row);
     /// <summary>
     /// 
     /// </summary>
     /// <param name="value"></param>
-    public void Set(object? value) => _data.SetValue(From(value), _cursor);
+    public void Set(object? value) => _data.SetValue(Cast(value), _cursor);
 
     /// <summary>
     /// 
@@ -104,12 +103,12 @@ public sealed class Column
     /// <returns></returns>
     public object? Get() => _data.GetValue(_cursor);
 
-    private object? From(object? value)
+    private object? Cast(object? value)
     {
         if (value == null) return null;
         if (Convert.IsDBNull(value)) return null;
-        if (_dataType.IsInstanceOfType(value)) return value;
-        return Convert.ChangeType(value, _dataType);
+        if (_type.IsInstanceOfType(value)) return value;
+        return Convert.ChangeType(value, _type);
     }
 
     /// <summary>
