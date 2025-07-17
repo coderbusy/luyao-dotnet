@@ -104,7 +104,12 @@ public class ColumnCollection : IReadOnlyList<Column>
                 col.Extend(this._capacity);
             }
         }
-        return this._count - 1;
+        var idx = this._count - 1;
+        foreach (Column col in this)
+        {
+            col.Cursor = idx;
+        }
+        return idx;
     }
 
     /// <summary>

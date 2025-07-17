@@ -37,7 +37,12 @@ public partial class ColumnTable
     /// 添加一行
     /// </summary>
     /// <returns></returns>
-    public int AddRow() => _columns.AddRow();
+    public int AddRow()
+    {
+        var idx = _columns.AddRow();
+        this.Cursor = idx;
+        return idx;
+    }
     /// <summary>
     /// 设置指定列的指定行的值
     /// </summary>
