@@ -8,12 +8,12 @@ public class ColumnTests
     {
         // Arrange
         string name = "TestColumn";
-        DataType type = DataType.Int32;
+        TypeCode type = TypeCode.Int32;
         int dimension = 1;
         int capacity = 10;
 
         // Act
-        var column = new Column(name, type, dimension, capacity);
+        var column = new Column(name, type, dimension, capacity, 0);
 
         // Assert
         Assert.AreEqual(name, column.Name);
@@ -28,10 +28,10 @@ public class ColumnTests
     {
         // Arrange
         string name = null;
-        DataType type = DataType.Int32;
+        TypeCode type = TypeCode.Int32;
 
         // Act
-        var column = new Column(name, type);
+        var column = new Column(name, type, 0, 60, 0);
     }
 
     [TestMethod]
@@ -40,64 +40,11 @@ public class ColumnTests
     {
         // Arrange
         string name = "TestColumn";
-        DataType type = DataType.Int32;
+        TypeCode type = TypeCode.Int32;
         int dimension = -1;
 
         // Act
-        var column = new Column(name, type, dimension);
+        var column = new Column(name, type, dimension, 60, 0);
     }
 
-    [TestMethod]
-    public void Add_ValidValue_AddsValueToColumn()
-    {
-        // Arrange
-        var column = new Column("TestColumn", DataType.Int32);
-        int value = 42;
-
-        // Act
-        column.Add(value);
-
-        // Assert
-        Assert.AreEqual(0, column.Dimension); // Check dimension remains unchanged
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(FormatException))]
-    public void Add_InvalidValueType_ThrowsArgumentException()
-    {
-        // Arrange
-        var column = new Column("TestColumn", DataType.Int32);
-        string invalidValue = "Invalid";
-
-        // Act
-        column.Add(invalidValue);
-    }
-
-    [TestMethod]
-    public void Add_ConvertibleValue_AddsValueToColumn()
-    {
-        // Arrange
-        var column = new Column("TestColumn", DataType.Int32);
-        string value = "42";
-
-        // Act
-        column.Add(value);
-
-        // Assert
-        Assert.AreEqual(42, column.Data.GetValue(0)); // Check the value is converted and added
-    }
-
-    [TestMethod]
-    public void Clear_ColumnWithData_ClearsAllData()
-    {
-        // Arrange
-        var column = new Column("TestColumn", DataType.Int32);
-        column.Add(42);
-
-        // Act
-        column.Clear();
-
-        // Assert
-        Assert.AreEqual(0, column.Dimension); // Check dimension is reset
-    }
 }

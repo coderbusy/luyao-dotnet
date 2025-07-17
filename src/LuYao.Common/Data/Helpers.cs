@@ -4,26 +4,32 @@ namespace LuYao.Data;
 
 internal static class Helpers
 {
-    public static Type ToType(DataType type)
+    public static Type ToType(TypeCode type)
     {
         return type switch
         {
-            DataType.Boolean => typeof(bool),
-            DataType.Byte => typeof(byte),
-            DataType.Int32 => typeof(int),
-            DataType.Int64 => typeof(long),
-            DataType.Float => typeof(float),
-            DataType.Double => typeof(double),
-            DataType.DateTime => typeof(DateTime),
-            DataType.DateTimeOffset => typeof(DateTimeOffset),
-            DataType.String => typeof(string),
-            DataType.Bytes => typeof(byte[]),
-            DataType.Object => typeof(object),
-            _ => typeof(Object)
+            TypeCode.Empty => typeof(object),
+            TypeCode.Object => typeof(object),
+            TypeCode.DBNull => typeof(DBNull),
+            TypeCode.Boolean => typeof(bool),
+            TypeCode.Char => typeof(char),
+            TypeCode.SByte => typeof(sbyte),
+            TypeCode.Byte => typeof(byte),
+            TypeCode.Int16 => typeof(short),
+            TypeCode.UInt16 => typeof(ushort),
+            TypeCode.Int32 => typeof(int),
+            TypeCode.UInt32 => typeof(uint),
+            TypeCode.Int64 => typeof(long),
+            TypeCode.UInt64 => typeof(ulong),
+            TypeCode.Single => typeof(float),
+            TypeCode.Double => typeof(double),
+            TypeCode.Decimal => typeof(decimal),
+            TypeCode.DateTime => typeof(DateTime),
+            _ => typeof(object)
         };
     }
 
-    public static Type MakeType(DataType type, int dimension)
+    public static Type MakeType(TypeCode type, int dimension)
     {
         var elementType = ToType(type);
         if (dimension <= 0) return elementType;
