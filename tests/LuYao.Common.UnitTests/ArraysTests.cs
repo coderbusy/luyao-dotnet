@@ -40,4 +40,37 @@ public class ArraysTests
         // Assert
         Assert.AreSame(result1, result2, "多次调用 Empty 方法应返回相同的数组实例。");
     }
+
+    [TestMethod]
+    public void Join_EmptyArray_EmptyString()
+    {
+        // Arrange
+        var emptyArray = Array.Empty<int>();
+        // Act
+        var result = Arrays.Join(emptyArray, ",", 0);
+        // Assert
+        Assert.AreEqual(string.Empty, result, "空数组连接结果应为空字符串。");
+    }
+
+    [TestMethod]
+    public void Join_NullElement_JoinEmptyString()
+    {
+        // Arrange
+        var emptyArray = new[] { "A", string.Empty, "C", null, "D" };
+        // Act
+        var result = Arrays.Join(emptyArray, ",", 0);
+        // Assert
+        Assert.AreEqual("A,,C,,D", result, "包含空字符串的数组连接结果应为空字符串。");
+    }
+
+    [TestMethod]
+    public void Join_WithRange_JoinCorrectly()
+    {
+        // Arrange
+        var array = new[] { "A", "B", "C", "D", "E" };
+        // Act
+        var result = Arrays.Join(array, ",", 1, 3);
+        // Assert
+        Assert.AreEqual("B,C,D", result, "连接指定范围的数组元素应正确返回。");
+    }
 }
