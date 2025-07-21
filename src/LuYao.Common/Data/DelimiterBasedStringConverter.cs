@@ -138,4 +138,18 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
     public void Add(Expression<Func<T, Int32>> propertySelector) => this.Add(propertySelector, Valid.ToString, Valid.ToInt32);
+
+    /// <summary>
+    /// 返回 T 的类型名称以及所有已添加的属性名称。
+    /// </summary>
+    public override string ToString()
+    {
+        // 获取类型名称
+        string typeName = typeof(T).Name;
+        // 获取所有已添加的属性名称
+        var propertyNames = items.Select(item => item.Name);
+        string properties = string.Join(", ", propertyNames);
+        // 返回格式化字符串
+        return $"类型: {typeName}, 属性: [{properties}]";
+    }
 }
