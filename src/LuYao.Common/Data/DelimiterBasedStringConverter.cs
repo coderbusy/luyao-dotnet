@@ -61,29 +61,6 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
         var ret = new T();
         if (!string.IsNullOrWhiteSpace(value))
         {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-            ReadOnlySpan<char> span = value.AsSpan();
-            int count = this.items.Count;
-            int start = 0, end, itemIndex = 0;
-            while (itemIndex < count)
-            {
-                if (itemIndex == count - 1)
-                {
-                    end = span.Length;
-                }
-                else
-                {
-                    end = span.Slice(start).IndexOf(this.Delimiter);
-                    if (end < 0) end = span.Length - start;
-                    else end += start;
-                }
-                var part = span.Slice(start, end - start).ToString();
-                this.items[itemIndex].Writer.Invoke(ret, part);
-                if (end == span.Length) break;
-                start = end + this.Delimiter.Length;
-                itemIndex++;
-            }
-#else
             int count = this.items.Count;
             string[] parts = value.Split(new[] { this.Delimiter }, count, StringSplitOptions.None);
             for (int i = 0; i < count && i < parts.Length; i++)
@@ -91,7 +68,6 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
                 Item item = this.items[i];
                 item.Writer.Invoke(ret, parts[i]);
             }
-#endif
         }
         return ret;
     }

@@ -60,4 +60,39 @@ public class DelimiterBasedStringConverterTests
         Assert.AreEqual(123, deserialized.Int32);
         Assert.IsTrue(deserialized.Boolean);
     }
+
+    [TestMethod]
+    public void Deserialize_TooManyItems_ShouldIgnoreExtra()
+    {
+        var converter = new DelimiterBasedStringConverter<TestItem>("|");
+        converter.Add(x => x.Str);
+        converter.Add(x => x.Int32);
+        converter.Add(x => x.Boolean);
+        // 多出一项
+        var serialized = "Hello|123|1|Extra";
+        var deserialized = converter.Deserialize(serialized);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual("Hello", deserialized.Str);
+        Assert.AreEqual(123, deserialized.Int32);
+        Assert.IsTrue(deserialized.Boolean);
+        // 多余项被忽略，不报错
+    }
+
+    [TestMethod]
+    public void Deserialize_TooFewItems_ShouldSetDefaults()
+    {
+        var converter = new DelimiterBasedStringConverter<TestItem>("|");
+        converter.Add(x => x.Str);
+        converter.Add(x => x.Int32);
+        converter.Add(x => x.Boolean);
+        // 少一项
+        var serialized = "Hello|123";
+        var deserialized = converter.Deserialize(serialized);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual("Hello", deserialized.Str);
+        Assert.AreEqual(123, deserialized.Int32);
+        Assert.IsFalse(deserialized.Boolean); // bool 默认值为 false
+    }
 }
