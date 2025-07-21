@@ -12,11 +12,18 @@ namespace LuYao.Data;
 /// </summary>
 public partial class DelimiterBasedStringConverter<T> where T : class, new()
 {
+    /// <summary>
+    /// 使用指定分隔符初始化 <see cref="DelimiterBasedStringConverter{T}"/> 实例。
+    /// </summary>
+    /// <param name="delimiter">分隔符字符串。</param>
     public DelimiterBasedStringConverter(string delimiter)
     {
         this.Delimiter = delimiter;
     }
 
+    /// <summary>
+    /// 使用默认分隔符 '|' 初始化 <see cref="DelimiterBasedStringConverter{T}"/> 实例。
+    /// </summary>
     public DelimiterBasedStringConverter() : this("|")
     {
 
@@ -28,13 +35,42 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     public string Delimiter { get; }
 
     /// <summary>
-    /// 序列化
+    /// 将对象序列化为分隔字符串。
     /// </summary>
-    public string Serialize(T value) => throw new NotImplementedException();
+    /// <param name="value">要序列化的对象。</param>
+    /// <returns>序列化后的分隔字符串。</returns>
+    public string Serialize(T value)
+    {
+        if (value is null) return string.Empty;
+        var sb = new StringBuilder();
+        for (int i = 0; i < this.items.Count; i++)
+        {
+            if (i > 0) sb.Append(this.Delimiter);
+            Item item = this.items[i];
+            sb.Append(item.Reader.Invoke(value));
+        }
+        return sb.ToString();
+    }
+
     /// <summary>
-    /// 反序列化
+    /// 从分隔字符串反序列化为对象。
     /// </summary>
-    public T Deserialize(string value) => throw new NotImplementedException();
+    /// <param name="value">分隔字符串。</param>
+    /// <returns>反序列化后的对象。</returns>
+    public T Deserialize(string value)
+    {
+        var ret = new T();
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            string[] parts = value.Split(new[] { this.Delimiter }, StringSplitOptions.None);
+            for (int i = 0; i < this.items.Count && i < parts.Length; i++)
+            {
+                Item item = this.items[i];
+                item.Writer.Invoke(ret, parts[i]);
+            }
+        }
+        return ret;
+    }
 
     private struct Item
     {
@@ -43,6 +79,14 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
         public Action<T, String> Writer { get; set; }
     }
     private List<Item> items = new List<Item>();
+
+    /// <summary>
+    /// 添加属性的自定义序列化与反序列化方法。
+    /// </summary>
+    /// <typeparam name="TValue">属性类型。</typeparam>
+    /// <param name="propertySelector">属性选择表达式。</param>
+    /// <param name="toString">属性值转字符串的方法。</param>
+    /// <param name="toValue">字符串转属性值的方法。</param>
     public void Add<TValue>(Expression<Func<T, TValue>> propertySelector, Func<TValue, String> toString, Func<String, TValue> toValue)
     {
         // 1. 获取属性名称
@@ -77,9 +121,21 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
         });
     }
 
+    /// <summary>
+    /// 添加字符串类型属性的序列化与反序列化方法。
+    /// </summary>
+    /// <param name="propertySelector">属性选择表达式。</param>
     public void Add(Expression<Func<T, String>> propertySelector) => this.Add(propertySelector, static str => str, static str => str);
 
+    /// <summary>
+    /// 添加布尔类型属性的序列化与反序列化方法。
+    /// </summary>
+    /// <param name="propertySelector">属性选择表达式。</param>
     public void Add(Expression<Func<T, bool>> propertySelector) => this.Add(propertySelector, Valid.ToString, Valid.ToBoolean);
 
+    /// <summary>
+    /// 添加整型属性的序列化与反序列化方法。
+    /// </summary>
+    /// <param name="propertySelector">属性选择表达式。</param>
     public void Add(Expression<Func<T, Int32>> propertySelector) => this.Add(propertySelector, Valid.ToString, Valid.ToInt32);
 }
