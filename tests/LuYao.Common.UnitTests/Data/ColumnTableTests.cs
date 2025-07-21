@@ -10,7 +10,35 @@ namespace LuYao.Data;
 [TestClass]
 public class ColumnTableTests
 {
-    public ColumnTableTests()
+    [TestMethod]
+    public void Constructor_ValidParameters_InitializesCorrectly()
     {
+        // Arrange
+        var dt = new ColumnTable();
+
+        // Assert
+        Assert.AreEqual(0, dt.Count);
+        Assert.IsNotNull(dt.Columns);
+        Assert.AreEqual(0, dt.Columns.Count);
+    }
+
+    [TestMethod]
+    public void AddRowAndSetColumnValue_WorksCorrectly()
+    {
+        // Arrange
+        var table = new ColumnTable();
+        var colId = table.Columns.Add("Id", TypeCode.Int32);
+        var colName = table.Columns.Add("Name", TypeCode.String);
+
+        // Act
+        table.AddRow();
+        colId.Set(1);
+        colName.Set("Test");
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(2, table.Columns.Count);
+        Assert.AreEqual(1, colId.Get());
+        Assert.AreEqual("Test", colName.Get());
     }
 }
