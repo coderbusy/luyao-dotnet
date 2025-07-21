@@ -3,7 +3,7 @@
 partial class Valid
 {
     /// <summary>
-    /// 转换字符串为 Int32。
+    /// 将字符串转换为 Int32。如果字符串为 null、空或无法解析，则返回 0。
     /// </summary>
     public static int ToInt32(string? value)
     {
@@ -11,4 +11,114 @@ partial class Valid
         if (int.TryParse(value, out int result)) return result;
         return 0;
     }
+
+    /// <summary>
+    /// 将字符转换为 Int32。
+    /// </summary>
+    public static int ToInt32(char c) => (int)c;
+
+    /// <summary>
+    /// 将布尔值转换为 Int32。true 返回 1，false 返回 0。
+    /// </summary>
+    public static int ToInt32(bool value) => value ? 1 : 0;
+
+    /// <summary>
+    /// 将字节类型转换为 Int32。
+    /// </summary>
+    public static int ToInt32(byte value) => (int)value;
+
+    /// <summary>
+    /// 将有符号字节类型转换为 Int32。
+    /// </summary>
+    public static int ToInt32(sbyte value) => (int)value;
+
+    /// <summary>
+    /// 将短整型转换为 Int32。
+    /// </summary>
+    public static int ToInt32(short value) => (int)value;
+
+    /// <summary>
+    /// 将无符号短整型转换为 Int32。
+    /// </summary>
+    public static int ToInt32(ushort value) => (int)value;
+
+    /// <summary>
+    /// 返回自身（Int32）。
+    /// </summary>
+    public static int ToInt32(int value) => value;
+
+    /// <summary>
+    /// 将无符号整型转换为 Int32。
+    /// </summary>
+    public static int ToInt32(uint value) => (int)value;
+
+    /// <summary>
+    /// 将长整型转换为 Int32。
+    /// </summary>
+    public static int ToInt32(long value) => (int)value;
+
+    /// <summary>
+    /// 将无符号长整型转换为 Int32。
+    /// </summary>
+    public static int ToInt32(ulong value) => (int)value;
+
+    /// <summary>
+    /// 将十进制类型转换为 Int32。
+    /// </summary>
+    public static int ToInt32(decimal value) => decimal.ToInt32(value);
+
+    /// <summary>
+    /// 将可空字符类型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(char? c) => c.HasValue ? ToInt32(c.Value) : 0;
+
+    /// <summary>
+    /// 将可空布尔类型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(bool? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空字节类型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(byte? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空有符号字节类型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(sbyte? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空短整型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(short? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空无符号短整型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(ushort? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空整型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(int? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空无符号整型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(uint? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空长整型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(long? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空无符号长整型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(ulong? value) => value.HasValue ? ToInt32(value.Value) : 0;
+
+    /// <summary>
+    /// 将可空十进制类型转换为 Int32。null 返回 0。
+    /// </summary>
+    public static int ToInt32(decimal? value) => value.HasValue ? ToInt32(value.Value) : 0;
 }
