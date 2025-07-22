@@ -9,57 +9,57 @@ internal abstract class ColumnData
     public T GetValue<T>(int index) => (T)this.GetValue(index)!;
     public abstract void Extend(int length);
     public abstract void Clear();
-    public virtual Boolean ToBoolean(int index) => throw new NotImplementedException();
-    public virtual void Set(Boolean value, int index) => throw new NotImplementedException();
+    public abstract Boolean ToBoolean(int index);
+    public abstract void Set(Boolean value, int index);
 
-    public virtual Byte ToByte(int index) => throw new NotImplementedException();
-    public virtual void Set(Byte value, int index) => throw new NotImplementedException();
+    public abstract Byte ToByte(int index);
+    public abstract void Set(Byte value, int index);
 
-    public virtual Char ToChar(int index) => throw new NotImplementedException();
-    public virtual void Set(Char value, int index) => throw new NotImplementedException();
+    public abstract Char ToChar(int index);
+    public abstract void Set(Char value, int index);
 
-    public virtual DateTime ToDateTime(int index) => throw new NotImplementedException();
-    public virtual void Set(DateTime value, int index) => throw new NotImplementedException();
+    public abstract DateTime ToDateTime(int index);
+    public abstract void Set(DateTime value, int index);
 
-    public virtual Decimal ToDecimal(int index) => throw new NotImplementedException();
-    public virtual void Set(Decimal value, int index) => throw new NotImplementedException();
+    public abstract Decimal ToDecimal(int index);
+    public abstract void Set(Decimal value, int index);
 
-    public virtual Double ToDouble(int index) => throw new NotImplementedException();
-    public virtual void Set(Double value, int index) => throw new NotImplementedException();
+    public abstract Double ToDouble(int index);
+    public abstract void Set(Double value, int index);
 
-    public virtual Int16 ToInt16(int index) => throw new NotImplementedException();
-    public virtual void Set(Int16 value, int index) => throw new NotImplementedException();
+    public abstract Int16 ToInt16(int index);
+    public abstract void Set(Int16 value, int index);
 
-    public virtual Int32 ToInt32(int index) => throw new NotImplementedException();
-    public virtual void Set(Int32 value, int index) => throw new NotImplementedException();
+    public abstract Int32 ToInt32(int index);
+    public abstract void Set(Int32 value, int index);
 
-    public virtual Int64 ToInt64(int index) => throw new NotImplementedException();
-    public virtual void Set(Int64 value, int index) => throw new NotImplementedException();
+    public abstract Int64 ToInt64(int index);
+    public abstract void Set(Int64 value, int index);
 
-    public virtual SByte ToSByte(int index) => throw new NotImplementedException();
-    public virtual void Set(SByte value, int index) => throw new NotImplementedException();
+    public abstract SByte ToSByte(int index);
+    public abstract void Set(SByte value, int index);
 
-    public virtual Single ToSingle(int index) => throw new NotImplementedException();
-    public virtual void Set(Single value, int index) => throw new NotImplementedException();
+    public abstract Single ToSingle(int index);
+    public abstract void Set(Single value, int index);
 
-    public virtual String ToString(int index) => throw new NotImplementedException();
-    public virtual void Set(String value, int index) => throw new NotImplementedException();
+    public abstract String ToString(int index);
+    public abstract void Set(String value, int index);
 
-    public virtual UInt16 ToUInt16(int index) => throw new NotImplementedException();
-    public virtual void Set(UInt16 value, int index) => throw new NotImplementedException();
+    public abstract UInt16 ToUInt16(int index);
+    public abstract void Set(UInt16 value, int index);
 
-    public virtual UInt32 ToUInt32(int index) => throw new NotImplementedException();
-    public virtual void Set(UInt32 value, int index) => throw new NotImplementedException();
+    public abstract UInt32 ToUInt32(int index);
+    public abstract void Set(UInt32 value, int index);
 
-    public virtual UInt64 ToUInt64(int index) => throw new NotImplementedException();
-    public virtual void Set(UInt64 value, int index) => throw new NotImplementedException();
+    public abstract UInt64 ToUInt64(int index);
+    public abstract void Set(UInt64 value, int index);
 
 
 }
 
-internal class ColumnData<T> : ColumnData
+internal abstract class ColumnData<T> : ColumnData
 {
-    private T[] _data;
+    protected T[] _data;
     public ColumnData(int capacity) => _data = new T[capacity];
 
     public override void Clear() => Array.Clear(_data, 0, _data.Length);
