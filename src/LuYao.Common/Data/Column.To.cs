@@ -13,4 +13,14 @@ partial class Column
     {
         return string.Empty;
     }
+
+    ///<inheritdoc/>
+    public Int32 ToInt32(int row)
+    {
+        switch (this.Code)
+        {
+            case TypeCode.Boolean: return Valid.ToInt32(this.Data.GetValue<Boolean>(row));
+            default: return default(Int32);
+        }
+    }
 }

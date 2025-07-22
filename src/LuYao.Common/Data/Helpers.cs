@@ -1,9 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LuYao.Data;
 
 internal static class Helpers
 {
+    public static IEnumerable<TypeCode> ListTypeCode()
+    {
+        yield return TypeCode.Boolean;
+        yield return TypeCode.Byte;
+        yield return TypeCode.Char;
+        yield return TypeCode.DateTime;
+        yield return TypeCode.Decimal;
+        yield return TypeCode.Double;
+        yield return TypeCode.Int16;
+        yield return TypeCode.Int32;
+        yield return TypeCode.Int64;
+        yield return TypeCode.SByte;
+        yield return TypeCode.Single;
+        yield return TypeCode.String;
+        yield return TypeCode.UInt16;
+        yield return TypeCode.UInt32;
+        yield return TypeCode.UInt64;
+    }
     public static Type ToType(TypeCode type)
     {
         return type switch
