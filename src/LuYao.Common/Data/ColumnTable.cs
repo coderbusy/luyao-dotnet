@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace LuYao.Data;
@@ -6,7 +7,7 @@ namespace LuYao.Data;
 /// <summary>
 /// 列存储数据表
 /// </summary>
-public partial class ColumnTable
+public partial class ColumnTable : IEnumerable<RowRef>
 {
     /// <summary>
     /// 表名称
@@ -50,10 +51,10 @@ public partial class ColumnTable
     /// 添加一行数据。
     /// </summary>
     /// <returns>新添加行的索引。</returns>
-    public int AddRow()
+    public RowRef AddRow()
     {
-        var idx = _columns.AddRow();
-        return idx;
+        var row = _columns.AddRow();
+        return new RowRef(this, row);
     }
 
     /// <summary>
@@ -70,9 +71,43 @@ public partial class ColumnTable
     }
 
     /// <summary>
+    /// 获取指定列的指定行的值。
+    /// </summary>
+    public object? Get(string column, int row)
+    {
+        Column? col = _columns.Find(column);
+        if (col == null) throw new KeyNotFoundException();
+        return col.Get(row);
+    }
+    /// <summary>
     /// 判断是否包含指定列。
     /// </summary>
     /// <param name="column">列名称。</param>
     /// <returns>如果包含指定列则返回 true，否则返回 false。</returns>
     public bool Contains(string column) => _columns.Contains(column);
+
+    #region IEnumerable
+    ///<inheritdoc/>
+    public IEnumerator<RowRef> GetEnumerator()
+    {
+        for (int i = 0; i < this.Count; i++)
+        {
+            yield return new RowRef(this, i);
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+    #endregion
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public RowRef GetRow(int rowIndex)
+    {
+        if (rowIndex < 0 || rowIndex >= this.Count) throw new ArgumentOutOfRangeException(nameof(rowIndex));
+        return new RowRef(this, rowIndex);
+    }
 }

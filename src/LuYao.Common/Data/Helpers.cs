@@ -8,9 +8,6 @@ internal static class Helpers
     {
         return type switch
         {
-            TypeCode.Empty => typeof(object),
-            TypeCode.Object => typeof(object),
-            TypeCode.DBNull => typeof(DBNull),
             TypeCode.Boolean => typeof(bool),
             TypeCode.Char => typeof(char),
             TypeCode.SByte => typeof(sbyte),
@@ -25,13 +22,8 @@ internal static class Helpers
             TypeCode.Double => typeof(double),
             TypeCode.Decimal => typeof(decimal),
             TypeCode.DateTime => typeof(DateTime),
-            _ => typeof(object)
+            TypeCode.String => typeof(string),
+            _ => throw new NotSupportedException()
         };
-    }
-
-    public static Type MakeType(TypeCode type, bool isArray)
-    {
-        var elementType = ToType(type);
-        return isArray ? elementType.MakeArrayType() : elementType;
     }
 }

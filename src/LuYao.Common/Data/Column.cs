@@ -7,9 +7,9 @@ namespace LuYao.Data;
 /// </summary>
 public sealed partial class Column
 {
+    private ColumnTable _table;
     private Array _data;
     private int _count;
-    private bool _isArray = false;
     private Type _type;
 
     /// <summary>
@@ -20,20 +20,20 @@ public sealed partial class Column
     /// <summary>
     /// 初始化 <see cref="Column"/> 类的新实例。
     /// </summary>
+    /// <param name="table"></param>
     /// <param name="name">列的名称。</param>
     /// <param name="code">列的数据类型。</param>
-    /// <param name="isArray">列的维度，默认为 0。</param>
     /// <param name="capacity">列的初始容量，默认为 60。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为 null 时抛出。</exception>
-    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="isArray"/> 小于 0 时抛出。</exception>
-    public Column(string name, TypeCode code, bool isArray, int capacity)
+    public Column(ColumnTable table, string name, TypeCode code, int capacity)
     {
+        if (table == null) throw new ArgumentNullException(nameof(table), "表不能为空");
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列的名称不能为空或空白");
+        this._table = table;
         this.Name = name;
         this.Code = code;
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
-        this._isArray = isArray;
-        this._type = Helpers.MakeType(code, isArray);
+        this._type = Helpers.ToType(code);
         this._data = Array.CreateInstance(this._type, capacity);
         this._count = 0;
     }
@@ -57,11 +57,6 @@ public sealed partial class Column
     public TypeCode Code { get; }
 
     /// <summary>
-    /// 获是否数组
-    /// </summary>
-    public bool IsArray => this._isArray;
-
-    /// <summary>
     /// 获取列的实际数据类型。
     /// </summary>
     public Type Type => this._type;
@@ -71,14 +66,28 @@ public sealed partial class Column
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
-    public void Set(object? value, int row) => _data.SetValue(Cast(value), row);
-
+    public void Set(object? value, int row)
+    {
+        _data.SetValue(Cast(value), row);
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="row"></param>
+    public void Set(object? value, RowRef row)
+    {
+        Set(value, row.RowIndex);
+    }
     /// <summary>
     /// 
     /// </summary>
     /// <param name="row"></param>
     /// <returns></returns>
     public object? Get(int row) => _data.GetValue(row);
+
+    ///<inheritdoc/>
+    public object? Get(RowRef row) => Get(row.RowIndex);
 
     private object? Cast(object? value)
     {

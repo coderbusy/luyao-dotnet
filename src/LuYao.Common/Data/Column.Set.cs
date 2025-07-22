@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace LuYao.Data;
 
-partial class ColumnTable
+partial class Column
 {
+    public void Set(int value, int index)
+    {
+    }
 }

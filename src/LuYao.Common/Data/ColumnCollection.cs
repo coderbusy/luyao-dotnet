@@ -64,27 +64,20 @@ public class ColumnCollection : IReadOnlyList<Column>
         if (idx >= 0) return this[idx];
         return null;
     }
+
     /// <summary>
     /// 添加数据列
     /// </summary>
     /// <param name="name"></param>
     /// <param name="type"></param>
-    /// <returns></returns>
-    public Column Add(string name, TypeCode type) => Add(name, type, false);
-    /// <summary>
-    /// 添加数据列
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="type"></param>
-    /// <param name="isArray"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public Column Add(string name, TypeCode type, bool isArray)
+    public Column Add(string name, TypeCode type)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
         Column? col = this.Find(name);
         if (col != null) return col;
-        col = new Column(name, type, isArray, this._capacity);
+        col = new Column(this._table, name, type, this._capacity);
         this._list.Add(col);
         return col;
     }
