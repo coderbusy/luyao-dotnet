@@ -58,7 +58,7 @@ public sealed partial class Column
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
-    public void Set(object? value, int row)
+    public void SetValue(object? value, int row)
     {
         _data.SetValue(Cast(value), row);
     }
@@ -67,16 +67,16 @@ public sealed partial class Column
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
-    public void Set(object? value, RowRef row) => Set(value, row.RowIndex);
+    public void SetValue(object? value, RowRef row) => SetValue(value, row.RowIndex);
     /// <summary>
     /// 
     /// </summary>
     /// <param name="row"></param>
     /// <returns></returns>
-    public object? Get(int row) => _data.GetValue(row);
+    public object? GetValue(int row) => _data.GetValue(row);
 
     ///<inheritdoc/>
-    public object? Get(RowRef row) => Get(row.RowIndex);
+    public object? GetValue(RowRef row) => GetValue(row.RowIndex);
 
     private object? Cast(object? value)
     {

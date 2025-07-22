@@ -67,7 +67,7 @@ public partial class ColumnTable : IEnumerable<RowRef>
     {
         Column? col = _columns.Find(column);
         if (col == null) throw new KeyNotFoundException();
-        col.Set(value, row);
+        col.SetValue(value, row);
     }
 
     /// <summary>
@@ -77,7 +77,7 @@ public partial class ColumnTable : IEnumerable<RowRef>
     {
         Column? col = _columns.Find(column);
         if (col == null) throw new KeyNotFoundException();
-        return col.Get(row);
+        return col.GetValue(row);
     }
     /// <summary>
     /// 判断是否包含指定列。

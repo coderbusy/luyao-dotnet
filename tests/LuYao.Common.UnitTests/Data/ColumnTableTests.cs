@@ -32,13 +32,13 @@ public class ColumnTableTests
 
         // Act
         var row = table.AddRow();
-        colId.Set(1, row);
-        colName.Set("Test", row);
+        row.Set(1, colId);
+        row.Set("Test", colName);
 
         // Assert
         Assert.AreEqual(1, table.Count);
         Assert.AreEqual(2, table.Columns.Count);
-        Assert.AreEqual(1, colId.Get(row));
-        Assert.AreEqual("Test", colName.Get(row));
+        Assert.AreEqual(1, colId.GetValue(row));
+        Assert.AreEqual("Test", colName.GetValue(row));
     }
 }
