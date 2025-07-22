@@ -84,7 +84,7 @@ public class ColumnCollection : IReadOnlyList<Column>
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
         Column? col = this.Find(name);
         if (col != null) return col;
-        col = new Column(name, type, isArray, this._capacity, this._table.Cursor);
+        col = new Column(name, type, isArray, this._capacity);
         this._list.Add(col);
         return col;
     }
@@ -105,10 +105,6 @@ public class ColumnCollection : IReadOnlyList<Column>
             }
         }
         var idx = this._count - 1;
-        foreach (Column col in this)
-        {
-            col.Cursor = idx;
-        }
         return idx;
     }
 

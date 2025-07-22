@@ -13,7 +13,7 @@ public class ColumnTests
         int capacity = 10;
 
         // Act
-        var column = new Column(name, type, isArray, capacity, 0);
+        var column = new Column(name, type, isArray, capacity);
 
         // Assert
         Assert.AreEqual(name, column.Name);
@@ -31,6 +31,6 @@ public class ColumnTests
         TypeCode type = TypeCode.Int32;
 
         // Act
-        var column = new Column(name, type, false, 60, 0);
+        var column = new Column(name, type, false, 60);
     }
 }

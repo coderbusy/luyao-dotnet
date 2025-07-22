@@ -31,14 +31,14 @@ public class ColumnTableTests
         var colName = table.Columns.Add("Name", TypeCode.String);
 
         // Act
-        table.AddRow();
-        colId.Set(1);
-        colName.Set("Test");
+        var row = table.AddRow();
+        colId.Set(1, row);
+        colName.Set("Test", row);
 
         // Assert
         Assert.AreEqual(1, table.Count);
         Assert.AreEqual(2, table.Columns.Count);
-        Assert.AreEqual(1, colId.Get());
-        Assert.AreEqual("Test", colName.Get());
+        Assert.AreEqual(1, colId.Get(row));
+        Assert.AreEqual("Test", colName.Get(row));
     }
 }

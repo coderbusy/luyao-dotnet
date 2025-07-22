@@ -53,7 +53,6 @@ public partial class ColumnTable
     public int AddRow()
     {
         var idx = _columns.AddRow();
-        this.Cursor = idx;
         return idx;
     }
 

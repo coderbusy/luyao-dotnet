@@ -12,17 +12,6 @@ public sealed partial class Column
     private bool _isArray = false;
     private Type _type;
 
-    private int _cursor = 0;
-
-    /// <summary>
-    /// 访问游标位置
-    /// </summary>
-    public int Cursor
-    {
-        get => _cursor;
-        set => _cursor = value;
-    }
-
     /// <summary>
     /// 数据
     /// </summary>
@@ -35,10 +24,9 @@ public sealed partial class Column
     /// <param name="code">列的数据类型。</param>
     /// <param name="isArray">列的维度，默认为 0。</param>
     /// <param name="capacity">列的初始容量，默认为 60。</param>
-    /// <param name="cursor"></param>
     /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为 null 时抛出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="isArray"/> 小于 0 时抛出。</exception>
-    public Column(string name, TypeCode code, bool isArray, int capacity, int cursor)
+    public Column(string name, TypeCode code, bool isArray, int capacity)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列的名称不能为空或空白");
         this.Name = name;
@@ -48,7 +36,6 @@ public sealed partial class Column
         this._type = Helpers.MakeType(code, isArray);
         this._data = Array.CreateInstance(this._type, capacity);
         this._count = 0;
-        this._cursor = cursor;
     }
 
     internal void Extend(int length)
@@ -85,11 +72,6 @@ public sealed partial class Column
     /// <param name="value"></param>
     /// <param name="row"></param>
     public void Set(object? value, int row) => _data.SetValue(Cast(value), row);
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="value"></param>
-    public void Set(object? value) => _data.SetValue(Cast(value), _cursor);
 
     /// <summary>
     /// 
@@ -97,11 +79,6 @@ public sealed partial class Column
     /// <param name="row"></param>
     /// <returns></returns>
     public object? Get(int row) => _data.GetValue(row);
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public object? Get() => _data.GetValue(_cursor);
 
     private object? Cast(object? value)
     {
@@ -119,8 +96,4 @@ public sealed partial class Column
         Array.Clear(_data, 0, _data.Length);
         _count = 0;
     }
-    /// <summary>
-    /// 获取指定游标位置的列。
-    /// </summary>
-    public Column this[int index] { get { this._cursor = index; return this; } }
 }
