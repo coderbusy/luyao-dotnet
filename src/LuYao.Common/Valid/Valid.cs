@@ -8,9 +8,6 @@ namespace LuYao;
 public static partial class Valid
 {
     /// <inheritdoc/>
-    public static Byte ToByte(object value) => Convert.ToByte(value);
-
-    /// <inheritdoc/>
     public static Char ToChar(object value) => Convert.ToChar(value);
 
     /// <inheritdoc/>
