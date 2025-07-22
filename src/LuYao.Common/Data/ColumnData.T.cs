@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LuYao.Data;
 
 #region Boolean
-class BooleanColumnData : ColumnData<Boolean>
+sealed class BooleanColumnData : ColumnData<Boolean>
 {
     public BooleanColumnData(int capacity) : base(capacity) { }
 
@@ -59,7 +59,7 @@ class BooleanColumnData : ColumnData<Boolean>
 #endregion
 
 #region Byte
-class ByteColumnData : ColumnData<Byte>
+sealed class ByteColumnData : ColumnData<Byte>
 {
     public ByteColumnData(int capacity) : base(capacity) { }
 
@@ -111,7 +111,7 @@ class ByteColumnData : ColumnData<Byte>
 #endregion
 
 #region Char
-class CharColumnData : ColumnData<Char>
+sealed class CharColumnData : ColumnData<Char>
 {
     public CharColumnData(int capacity) : base(capacity) { }
 
@@ -163,7 +163,7 @@ class CharColumnData : ColumnData<Char>
 #endregion
 
 #region DateTime
-class DateTimeColumnData : ColumnData<DateTime>
+sealed class DateTimeColumnData : ColumnData<DateTime>
 {
     public DateTimeColumnData(int capacity) : base(capacity) { }
 
@@ -215,7 +215,7 @@ class DateTimeColumnData : ColumnData<DateTime>
 #endregion
 
 #region Decimal
-class DecimalColumnData : ColumnData<Decimal>
+sealed class DecimalColumnData : ColumnData<Decimal>
 {
     public DecimalColumnData(int capacity) : base(capacity) { }
 
@@ -267,7 +267,7 @@ class DecimalColumnData : ColumnData<Decimal>
 #endregion
 
 #region Double
-class DoubleColumnData : ColumnData<Double>
+sealed class DoubleColumnData : ColumnData<Double>
 {
     public DoubleColumnData(int capacity) : base(capacity) { }
 
@@ -319,7 +319,7 @@ class DoubleColumnData : ColumnData<Double>
 #endregion
 
 #region Int16
-class Int16ColumnData : ColumnData<Int16>
+sealed class Int16ColumnData : ColumnData<Int16>
 {
     public Int16ColumnData(int capacity) : base(capacity) { }
 
@@ -371,7 +371,7 @@ class Int16ColumnData : ColumnData<Int16>
 #endregion
 
 #region Int32
-class Int32ColumnData : ColumnData<Int32>
+sealed class Int32ColumnData : ColumnData<Int32>
 {
     public Int32ColumnData(int capacity) : base(capacity) { }
 
@@ -423,7 +423,7 @@ class Int32ColumnData : ColumnData<Int32>
 #endregion
 
 #region Int64
-class Int64ColumnData : ColumnData<Int64>
+sealed class Int64ColumnData : ColumnData<Int64>
 {
     public Int64ColumnData(int capacity) : base(capacity) { }
 
@@ -475,7 +475,7 @@ class Int64ColumnData : ColumnData<Int64>
 #endregion
 
 #region SByte
-class SByteColumnData : ColumnData<SByte>
+sealed class SByteColumnData : ColumnData<SByte>
 {
     public SByteColumnData(int capacity) : base(capacity) { }
 
@@ -527,7 +527,7 @@ class SByteColumnData : ColumnData<SByte>
 #endregion
 
 #region Single
-class SingleColumnData : ColumnData<Single>
+sealed class SingleColumnData : ColumnData<Single>
 {
     public SingleColumnData(int capacity) : base(capacity) { }
 
@@ -579,7 +579,7 @@ class SingleColumnData : ColumnData<Single>
 #endregion
 
 #region String
-class StringColumnData : ColumnData<String>
+sealed class StringColumnData : ColumnData<String>
 {
     public StringColumnData(int capacity) : base(capacity) { }
 
@@ -631,7 +631,7 @@ class StringColumnData : ColumnData<String>
 #endregion
 
 #region UInt16
-class UInt16ColumnData : ColumnData<UInt16>
+sealed class UInt16ColumnData : ColumnData<UInt16>
 {
     public UInt16ColumnData(int capacity) : base(capacity) { }
 
@@ -683,7 +683,7 @@ class UInt16ColumnData : ColumnData<UInt16>
 #endregion
 
 #region UInt32
-class UInt32ColumnData : ColumnData<UInt32>
+sealed class UInt32ColumnData : ColumnData<UInt32>
 {
     public UInt32ColumnData(int capacity) : base(capacity) { }
 
@@ -735,7 +735,7 @@ class UInt32ColumnData : ColumnData<UInt32>
 #endregion
 
 #region UInt64
-class UInt64ColumnData : ColumnData<UInt64>
+sealed class UInt64ColumnData : ColumnData<UInt64>
 {
     public UInt64ColumnData(int capacity) : base(capacity) { }
 

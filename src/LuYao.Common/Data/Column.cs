@@ -67,10 +67,7 @@ public sealed partial class Column
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
-    public void Set(object? value, RowRef row)
-    {
-        Set(value, row.RowIndex);
-    }
+    public void Set(object? value, RowRef row) => Set(value, row.RowIndex);
     /// <summary>
     /// 
     /// </summary>
@@ -96,4 +93,7 @@ public sealed partial class Column
     {
         _data.Clear();
     }
+
+    ///<inheritdoc/>
+    public override string ToString() => $"{this.Name},{this.Code}";
 }
