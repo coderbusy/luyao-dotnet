@@ -23,6 +23,7 @@ internal static class Helpers
         yield return TypeCode.UInt32;
         yield return TypeCode.UInt64;
     }
+
     public static Type ToType(TypeCode type)
     {
         return type switch
@@ -48,25 +49,24 @@ internal static class Helpers
 
     public static ColumnData MakeData(TypeCode type, int capacity)
     {
-        throw new NotImplementedException();
-        //return type switch
-        //{
-        //    TypeCode.Boolean => new ColumnData<bool>(capacity),
-        //    TypeCode.Byte => new ColumnData<byte>(capacity),
-        //    TypeCode.Char => new ColumnData<char>(capacity),
-        //    TypeCode.DateTime => new ColumnData<DateTime>(capacity),
-        //    TypeCode.Decimal => new ColumnData<decimal>(capacity),
-        //    TypeCode.Double => new ColumnData<double>(capacity),
-        //    TypeCode.Int16 => new ColumnData<short>(capacity),
-        //    TypeCode.Int32 => new ColumnData<int>(capacity),
-        //    TypeCode.Int64 => new ColumnData<long>(capacity),
-        //    TypeCode.SByte => new ColumnData<sbyte>(capacity),
-        //    TypeCode.Single => new ColumnData<float>(capacity),
-        //    TypeCode.String => new ColumnData<string>(capacity),
-        //    TypeCode.UInt16 => new ColumnData<ushort>(capacity),
-        //    TypeCode.UInt32 => new ColumnData<uint>(capacity),
-        //    TypeCode.UInt64 => new ColumnData<ulong>(capacity),
-        //    _ => throw new NotSupportedException()
-        //};
+        return type switch
+        {
+            TypeCode.Boolean => new BooleanColumnData(capacity),
+            TypeCode.Byte => new ByteColumnData(capacity),
+            TypeCode.Char => new CharColumnData(capacity),
+            TypeCode.DateTime => new DateTimeColumnData(capacity),
+            TypeCode.Decimal => new DecimalColumnData(capacity),
+            TypeCode.Double => new DoubleColumnData(capacity),
+            TypeCode.Int16 => new Int16ColumnData(capacity),
+            TypeCode.Int32 => new Int32ColumnData(capacity),
+            TypeCode.Int64 => new Int64ColumnData(capacity),
+            TypeCode.SByte => new SByteColumnData(capacity),
+            TypeCode.Single => new SingleColumnData(capacity),
+            TypeCode.String => new StringColumnData(capacity),
+            TypeCode.UInt16 => new UInt16ColumnData(capacity),
+            TypeCode.UInt32 => new UInt32ColumnData(capacity),
+            TypeCode.UInt64 => new UInt64ColumnData(capacity),
+            _ => throw new NotSupportedException()
+        };
     }
 }
