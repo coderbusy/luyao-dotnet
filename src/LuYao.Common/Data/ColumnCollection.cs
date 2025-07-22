@@ -119,4 +119,12 @@ public class ColumnCollection : IReadOnlyList<Column>
     /// 判断指定的列名是否存在
     /// </summary>
     public bool Contains(string name) => this.IndexOf(name) >= 0;
+
+    /// <summary>
+    /// 删除一个列
+    /// </summary>
+    public bool Remove(Column column)
+    {
+        return this._list.Remove(column);
+    }
 }

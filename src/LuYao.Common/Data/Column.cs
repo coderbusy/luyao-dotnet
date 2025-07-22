@@ -8,14 +8,13 @@ namespace LuYao.Data;
 public sealed partial class Column
 {
     private ColumnTable _table;
-    private Array _data;
-    private int _count;
+    private ColumnData _data;
     private Type _type;
 
     /// <summary>
     /// 数据
     /// </summary>
-    internal Array Data => _data;
+    internal ColumnData Data => _data;
 
     /// <summary>
     /// 初始化 <see cref="Column"/> 类的新实例。
@@ -34,17 +33,10 @@ public sealed partial class Column
         this.Code = code;
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
         this._type = Helpers.ToType(code);
-        this._data = Array.CreateInstance(this._type, capacity);
-        this._count = 0;
+        this._data = Helpers.MakeData(code, capacity);
     }
 
-    internal void Extend(int length)
-    {
-        if (this._data.Length >= length) return;
-        Array tmp = Array.CreateInstance(this._type, length);
-        this._data.CopyTo(tmp, 0);
-        this._data = tmp;
-    }
+    internal void Extend(int length) => this._data.Extend(length);
 
     /// <summary>
     /// 获取列的名称。
@@ -102,7 +94,6 @@ public sealed partial class Column
     /// </summary>
     public void Clear()
     {
-        Array.Clear(_data, 0, _data.Length);
-        _count = 0;
+        _data.Clear();
     }
 }
