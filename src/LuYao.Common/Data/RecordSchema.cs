@@ -1,4 +1,5 @@
 ﻿using LuYao.Text;
+using System;
 
 namespace LuYao.Data;
 
@@ -21,6 +22,7 @@ public class RecordSchema
     /// <param name="re">记录对象。</param>
     public RecordSchema(Record re)
     {
+        if (re == null) throw new ArgumentNullException(nameof(re));
         this.Name = re.Name;
         this.Columns = re.Columns.Count;
         this.Count = re.Count;

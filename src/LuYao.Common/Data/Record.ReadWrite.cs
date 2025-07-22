@@ -19,7 +19,9 @@ partial class Record
         foreach (var col in this.Columns)
         {
             writer.Write(col.Name);//写入列名
-            writer.Write((int)col.Code);//写入列代码
+            writer.Write((byte)col.Code);//写入列代码
+            string ext = string.Empty;
+            writer.Write(ext); //写入扩展信息（目前为空）
         }
 
         //按行写入数据
@@ -66,7 +68,8 @@ partial class Record
         for (int i = 0; i < header.Columns; i++)
         {
             string n = reader.ReadString();
-            TypeCode code = (TypeCode)reader.ReadInt32();
+            TypeCode code = (TypeCode)reader.ReadByte();
+            string ext = reader.ReadString(); //读取扩展信息（目前为空）
             this.Columns.Add(n, code);
         }
 
@@ -77,21 +80,21 @@ partial class Record
             {
                 switch (col.Code)
                 {
-                    case TypeCode.Boolean: col.Data.SetValue(reader.ReadBoolean(), r); break;
-                    case TypeCode.Byte: col.Data.SetValue(reader.ReadByte(), r); break;
-                    case TypeCode.Char: col.Data.SetValue(reader.ReadChar(), r); break;
-                    case TypeCode.DateTime: col.Data.SetValue(reader.ReadInt64(), r); break;
-                    case TypeCode.Decimal: col.Data.SetValue(reader.ReadDecimal(), r); break;
-                    case TypeCode.Double: col.Data.SetValue(reader.ReadDouble(), r); break;
-                    case TypeCode.Int16: col.Data.SetValue(reader.ReadInt16(), r); break;
-                    case TypeCode.Int32: col.Data.SetValue(reader.ReadInt32(), r); break;
-                    case TypeCode.Int64: col.Data.SetValue(reader.ReadInt64(), r); break;
-                    case TypeCode.SByte: col.Data.SetValue(reader.ReadSByte(), r); break;
-                    case TypeCode.Single: col.Data.SetValue(reader.ReadSingle(), r); break;
-                    case TypeCode.String: col.Data.SetValue(reader.ReadString(), r); break;
-                    case TypeCode.UInt16: col.Data.SetValue(reader.ReadUInt16(), r); break;
-                    case TypeCode.UInt32: col.Data.SetValue(reader.ReadUInt32(), r); break;
-                    case TypeCode.UInt64: col.Data.SetValue(reader.ReadUInt64(), r); break;
+                    case TypeCode.Boolean: col.Data.Set(reader.ReadBoolean(), r); break;
+                    case TypeCode.Byte: col.Data.Set(reader.ReadByte(), r); break;
+                    case TypeCode.Char: col.Data.Set(reader.ReadChar(), r); break;
+                    case TypeCode.DateTime: col.Data.Set(reader.ReadInt64(), r); break;
+                    case TypeCode.Decimal: col.Data.Set(reader.ReadDecimal(), r); break;
+                    case TypeCode.Double: col.Data.Set(reader.ReadDouble(), r); break;
+                    case TypeCode.Int16: col.Data.Set(reader.ReadInt16(), r); break;
+                    case TypeCode.Int32: col.Data.Set(reader.ReadInt32(), r); break;
+                    case TypeCode.Int64: col.Data.Set(reader.ReadInt64(), r); break;
+                    case TypeCode.SByte: col.Data.Set(reader.ReadSByte(), r); break;
+                    case TypeCode.Single: col.Data.Set(reader.ReadSingle(), r); break;
+                    case TypeCode.String: col.Data.Set(reader.ReadString(), r); break;
+                    case TypeCode.UInt16: col.Data.Set(reader.ReadUInt16(), r); break;
+                    case TypeCode.UInt32: col.Data.Set(reader.ReadUInt32(), r); break;
+                    case TypeCode.UInt64: col.Data.Set(reader.ReadUInt64(), r); break;
                 }
             }
         }
