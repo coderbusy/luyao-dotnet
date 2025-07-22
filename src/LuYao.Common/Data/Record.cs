@@ -7,19 +7,19 @@ namespace LuYao.Data;
 /// <summary>
 /// 列存储数据表
 /// </summary>
-public partial class ColumnTable : IEnumerable<RowRef>
+public partial class Record : IEnumerable<RecordRow>
 {
     /// <summary>
     /// 表名称
     /// </summary>
     public string Name { get; set; } = string.Empty;
 
-    private readonly ColumnCollection _columns;
+    private readonly RecordColumnCollection _columns;
 
     /// <summary>
     /// 表列集合
     /// </summary>
-    public ColumnCollection Columns => _columns;
+    public RecordColumnCollection Columns => _columns;
 
     /// <summary>
     /// 数据条数
@@ -27,34 +27,34 @@ public partial class ColumnTable : IEnumerable<RowRef>
     public int Count => _columns.Rows;
 
     /// <summary>
-    /// 初始化 <see cref="ColumnTable"/> 类的新实例。
+    /// 初始化 <see cref="Record"/> 类的新实例。
     /// </summary>
-    public ColumnTable() : this(null, 0)
+    public Record() : this(null, 0)
     {
 
     }
 
     /// <summary>
-    /// 使用指定的表名和行数初始化 <see cref="ColumnTable"/> 类的新实例。
+    /// 使用指定的表名和行数初始化 <see cref="Record"/> 类的新实例。
     /// </summary>
     /// <param name="name">表名称。</param>
     /// <param name="rows">初始行数。</param>
-    public ColumnTable(string? name, int rows)
+    public Record(string? name, int rows)
     {
         if (!string.IsNullOrWhiteSpace(name)) this.Name = name!;
         int c = rows;
         if (c < 20) c = 20;
-        _columns = new ColumnCollection(this, c);
+        _columns = new RecordColumnCollection(this, c);
     }
 
     /// <summary>
     /// 添加一行数据。
     /// </summary>
     /// <returns>新添加行的索引。</returns>
-    public RowRef AddRow()
+    public RecordRow AddRow()
     {
         var row = _columns.AddRow();
-        return new RowRef(this, row);
+        return new RecordRow(this, row);
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public partial class ColumnTable : IEnumerable<RowRef>
     /// <param name="value">要设置的值。</param>
     public void Set(string column, int row, object? value)
     {
-        Column? col = _columns.Find(column);
+        RecordColumn? col = _columns.Find(column);
         if (col == null) throw new KeyNotFoundException();
         col.SetValue(value, row);
     }
@@ -75,7 +75,7 @@ public partial class ColumnTable : IEnumerable<RowRef>
     /// </summary>
     public object? Get(string column, int row)
     {
-        Column? col = _columns.Find(column);
+        RecordColumn? col = _columns.Find(column);
         if (col == null) throw new KeyNotFoundException();
         return col.GetValue(row);
     }
@@ -88,11 +88,11 @@ public partial class ColumnTable : IEnumerable<RowRef>
 
     #region IEnumerable
     ///<inheritdoc/>
-    public IEnumerator<RowRef> GetEnumerator()
+    public IEnumerator<RecordRow> GetEnumerator()
     {
         for (int i = 0; i < this.Count; i++)
         {
-            yield return new RowRef(this, i);
+            yield return new RecordRow(this, i);
         }
     }
 
@@ -105,9 +105,9 @@ public partial class ColumnTable : IEnumerable<RowRef>
     /// <summary>
     /// 
     /// </summary>
-    public RowRef GetRow(int rowIndex)
+    public RecordRow GetRow(int rowIndex)
     {
         if (rowIndex < 0 || rowIndex >= this.Count) throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        return new RowRef(this, rowIndex);
+        return new RecordRow(this, rowIndex);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LuYao.Data;
 
-partial class Column
+partial class RecordColumn
 {
     /// <inheritdoc/>
     public void Set(Boolean value, int index)

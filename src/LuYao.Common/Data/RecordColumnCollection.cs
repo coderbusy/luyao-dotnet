@@ -7,9 +7,9 @@ namespace LuYao.Data;
 /// <summary>
 /// 列集合
 /// </summary>
-public class ColumnCollection : IReadOnlyList<Column>
+public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 {
-    private readonly List<Column> _list = new List<Column>();
+    private readonly List<RecordColumn> _list = new List<RecordColumn>();
 
     #region IReadOnlyList
 
@@ -17,15 +17,15 @@ public class ColumnCollection : IReadOnlyList<Column>
     public int Count => _list.Count;
 
     /// <inheritdoc/>
-    public Column this[int index] => _list[index];
+    public RecordColumn this[int index] => _list[index];
 
     /// <inheritdoc/>
-    public IEnumerator<Column> GetEnumerator() => _list.GetEnumerator();
+    public IEnumerator<RecordColumn> GetEnumerator() => _list.GetEnumerator();
 
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     #endregion
-    private ColumnTable _table;
+    private Record _table;
     private int _capacity;
     private int _count;
     /// <summary>
@@ -37,7 +37,7 @@ public class ColumnCollection : IReadOnlyList<Column>
     /// </summary>
     public int Rows => _count;
 
-    internal ColumnCollection(ColumnTable table, int capacity)
+    internal RecordColumnCollection(Record table, int capacity)
     {
         this._table = table ?? throw new ArgumentNullException(nameof(table), "表不能为空");
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
@@ -47,7 +47,7 @@ public class ColumnCollection : IReadOnlyList<Column>
     /// <summary>
     /// 根据列名查找列
     /// </summary>
-    public Column? Find(string name)
+    public RecordColumn? Find(string name)
     {
         var idx = this.IndexOf(name);
         if (idx >= 0) return this[idx];
@@ -61,60 +61,60 @@ public class ColumnCollection : IReadOnlyList<Column>
     /// <param name="type"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public Column Add(string name, TypeCode type)
+    public RecordColumn Add(string name, TypeCode type)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
-        Column? col = this.Find(name);
+        RecordColumn? col = this.Find(name);
         if (col != null) return col;
-        col = new Column(this._table, name, type, this._capacity);
+        col = new RecordColumn(this._table, name, type, this._capacity);
         this._list.Add(col);
         return col;
     }
 
     /// <summary>添加数据列</summary>
-    public Column AddBoolean(string name) => this.Add(name, TypeCode.Boolean);
+    public RecordColumn AddBoolean(string name) => this.Add(name, TypeCode.Boolean);
 
     /// <summary>添加数据列</summary>
-    public Column AddByte(string name) => this.Add(name, TypeCode.Byte);
+    public RecordColumn AddByte(string name) => this.Add(name, TypeCode.Byte);
 
     /// <summary>添加数据列</summary>
-    public Column AddChar(string name) => this.Add(name, TypeCode.Char);
+    public RecordColumn AddChar(string name) => this.Add(name, TypeCode.Char);
 
     /// <summary>添加数据列</summary>
-    public Column AddDateTime(string name) => this.Add(name, TypeCode.DateTime);
+    public RecordColumn AddDateTime(string name) => this.Add(name, TypeCode.DateTime);
 
     /// <summary>添加数据列</summary>
-    public Column AddDecimal(string name) => this.Add(name, TypeCode.Decimal);
+    public RecordColumn AddDecimal(string name) => this.Add(name, TypeCode.Decimal);
 
     /// <summary>添加数据列</summary>
-    public Column AddDouble(string name) => this.Add(name, TypeCode.Double);
+    public RecordColumn AddDouble(string name) => this.Add(name, TypeCode.Double);
 
     /// <summary>添加数据列</summary>
-    public Column AddInt16(string name) => this.Add(name, TypeCode.Int16);
+    public RecordColumn AddInt16(string name) => this.Add(name, TypeCode.Int16);
 
     /// <summary>添加数据列</summary>
-    public Column AddInt32(string name) => this.Add(name, TypeCode.Int32);
+    public RecordColumn AddInt32(string name) => this.Add(name, TypeCode.Int32);
 
     /// <summary>添加数据列</summary>
-    public Column AddInt64(string name) => this.Add(name, TypeCode.Int64);
+    public RecordColumn AddInt64(string name) => this.Add(name, TypeCode.Int64);
 
     /// <summary>添加数据列</summary>
-    public Column AddSByte(string name) => this.Add(name, TypeCode.SByte);
+    public RecordColumn AddSByte(string name) => this.Add(name, TypeCode.SByte);
 
     /// <summary>添加数据列</summary>
-    public Column AddSingle(string name) => this.Add(name, TypeCode.Single);
+    public RecordColumn AddSingle(string name) => this.Add(name, TypeCode.Single);
 
     /// <summary>添加数据列</summary>
-    public Column AddString(string name) => this.Add(name, TypeCode.String);
+    public RecordColumn AddString(string name) => this.Add(name, TypeCode.String);
 
     /// <summary>添加数据列</summary>
-    public Column AddUInt16(string name) => this.Add(name, TypeCode.UInt16);
+    public RecordColumn AddUInt16(string name) => this.Add(name, TypeCode.UInt16);
 
     /// <summary>添加数据列</summary>
-    public Column AddUInt32(string name) => this.Add(name, TypeCode.UInt32);
+    public RecordColumn AddUInt32(string name) => this.Add(name, TypeCode.UInt32);
 
     /// <summary>添加数据列</summary>
-    public Column AddUInt64(string name) => this.Add(name, TypeCode.UInt64);
+    public RecordColumn AddUInt64(string name) => this.Add(name, TypeCode.UInt64);
     #endregion
 
     /// <summary>
@@ -127,7 +127,7 @@ public class ColumnCollection : IReadOnlyList<Column>
         if (this._capacity < this._count)
         {
             this._capacity *= 2;
-            foreach (Column col in this)
+            foreach (RecordColumn col in this)
             {
                 col.Extend(this._capacity);
             }
@@ -144,7 +144,7 @@ public class ColumnCollection : IReadOnlyList<Column>
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
         for (int i = 0; i < this.Count; i++)
         {
-            Column col = this[i];
+            RecordColumn col = this[i];
             if (col.Name == name) return i;
         }
         return -1;
@@ -158,7 +158,7 @@ public class ColumnCollection : IReadOnlyList<Column>
     /// <summary>
     /// 删除一个列
     /// </summary>
-    public bool Remove(Column column)
+    public bool Remove(RecordColumn column)
     {
         return this._list.Remove(column);
     }

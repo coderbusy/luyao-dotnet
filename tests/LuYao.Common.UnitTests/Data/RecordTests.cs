@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace LuYao.Data;
 
 [TestClass]
-public class ColumnTableTests
+public class RecordTests
 {
     [TestMethod]
     public void Constructor_ValidParameters_InitializesCorrectly()
     {
         // Arrange
-        var dt = new ColumnTable();
+        var dt = new Record();
 
         // Assert
         Assert.AreEqual(0, dt.Count);
@@ -26,7 +26,7 @@ public class ColumnTableTests
     public void AddRowAndSetColumnValue_WorksCorrectly()
     {
         // Arrange
-        var table = new ColumnTable();
+        var table = new Record();
         var colId = table.Columns.Add("Id", TypeCode.Int32);
         var colName = table.Columns.Add("Name", TypeCode.String);
 

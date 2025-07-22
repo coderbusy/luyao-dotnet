@@ -1,6 +1,6 @@
 ﻿namespace LuYao.Data;
 
 [TestClass]
-public class ColumnTests
+public class RecordColumnTests
 {
 }
