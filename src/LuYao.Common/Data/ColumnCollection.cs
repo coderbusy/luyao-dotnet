@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LuYao.Data;
 
@@ -41,14 +37,7 @@ public class ColumnCollection : IReadOnlyList<Column>
     /// </summary>
     public int Rows => _count;
 
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="table"></param>
-    /// <param name="capacity"></param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public ColumnCollection(ColumnTable table, int capacity)
+    internal ColumnCollection(ColumnTable table, int capacity)
     {
         this._table = table ?? throw new ArgumentNullException(nameof(table), "表不能为空");
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
@@ -65,9 +54,9 @@ public class ColumnCollection : IReadOnlyList<Column>
         return null;
     }
 
-    /// <summary>
-    /// 添加数据列
-    /// </summary>
+    #region Add
+
+    /// <summary>添加数据列</summary>
     /// <param name="name"></param>
     /// <param name="type"></param>
     /// <returns></returns>
@@ -82,11 +71,57 @@ public class ColumnCollection : IReadOnlyList<Column>
         return col;
     }
 
+    /// <summary>添加数据列</summary>
+    public Column AddBoolean(string name) => this.Add(name, TypeCode.Boolean);
+
+    /// <summary>添加数据列</summary>
+    public Column AddByte(string name) => this.Add(name, TypeCode.Byte);
+
+    /// <summary>添加数据列</summary>
+    public Column AddChar(string name) => this.Add(name, TypeCode.Char);
+
+    /// <summary>添加数据列</summary>
+    public Column AddDateTime(string name) => this.Add(name, TypeCode.DateTime);
+
+    /// <summary>添加数据列</summary>
+    public Column AddDecimal(string name) => this.Add(name, TypeCode.Decimal);
+
+    /// <summary>添加数据列</summary>
+    public Column AddDouble(string name) => this.Add(name, TypeCode.Double);
+
+    /// <summary>添加数据列</summary>
+    public Column AddInt16(string name) => this.Add(name, TypeCode.Int16);
+
+    /// <summary>添加数据列</summary>
+    public Column AddInt32(string name) => this.Add(name, TypeCode.Int32);
+
+    /// <summary>添加数据列</summary>
+    public Column AddInt64(string name) => this.Add(name, TypeCode.Int64);
+
+    /// <summary>添加数据列</summary>
+    public Column AddSByte(string name) => this.Add(name, TypeCode.SByte);
+
+    /// <summary>添加数据列</summary>
+    public Column AddSingle(string name) => this.Add(name, TypeCode.Single);
+
+    /// <summary>添加数据列</summary>
+    public Column AddString(string name) => this.Add(name, TypeCode.String);
+
+    /// <summary>添加数据列</summary>
+    public Column AddUInt16(string name) => this.Add(name, TypeCode.UInt16);
+
+    /// <summary>添加数据列</summary>
+    public Column AddUInt32(string name) => this.Add(name, TypeCode.UInt32);
+
+    /// <summary>添加数据列</summary>
+    public Column AddUInt64(string name) => this.Add(name, TypeCode.UInt64);
+    #endregion
+
     /// <summary>
     /// 添加一行
     /// </summary>
     /// <returns>行号</returns>
-    public int AddRow()
+    internal int AddRow()
     {
         this._count++;
         if (this._capacity < this._count)

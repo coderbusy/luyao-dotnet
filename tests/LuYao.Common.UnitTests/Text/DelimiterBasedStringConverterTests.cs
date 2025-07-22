@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LuYao.Data;
+namespace LuYao.Text;
 
 [TestClass]
 public class DelimiterBasedStringConverterTests

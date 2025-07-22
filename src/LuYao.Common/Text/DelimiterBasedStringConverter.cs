@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LuYao.Data;
+namespace LuYao.Text;
 
 /// <summary>
 /// 基于分隔符的字符串转换器，用于将对象序列化为分隔字符串或从分隔字符串反序列化。
@@ -18,7 +18,7 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     /// <param name="delimiter">分隔符字符串。</param>
     public DelimiterBasedStringConverter(string delimiter)
     {
-        this.Delimiter = delimiter;
+        Delimiter = delimiter;
     }
 
     /// <summary>
@@ -43,10 +43,10 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     {
         if (value is null) return string.Empty;
         var sb = new StringBuilder();
-        for (int i = 0; i < this.items.Count; i++)
+        for (int i = 0; i < items.Count; i++)
         {
-            if (i > 0) sb.Append(this.Delimiter);
-            Item item = this.items[i];
+            if (i > 0) sb.Append(Delimiter);
+            Item item = items[i];
             sb.Append(item.Reader.Invoke(value));
         }
         return sb.ToString();
@@ -61,11 +61,11 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
         var ret = new T();
         if (!string.IsNullOrWhiteSpace(value))
         {
-            int count = this.items.Count;
-            string[] parts = value.Split(new[] { this.Delimiter }, count, StringSplitOptions.None);
+            int count = items.Count;
+            string[] parts = value.Split(new[] { Delimiter }, count, StringSplitOptions.None);
             for (int i = 0; i < count && i < parts.Length; i++)
             {
-                Item item = this.items[i];
+                Item item = items[i];
                 item.Writer.Invoke(ret, parts[i]);
             }
         }
@@ -75,8 +75,8 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     private struct Item
     {
         public string Name { get; set; }
-        public Func<T, String> Reader { get; set; }
-        public Action<T, String> Writer { get; set; }
+        public Func<T, string> Reader { get; set; }
+        public Action<T, string> Writer { get; set; }
     }
     private List<Item> items = new List<Item>();
 
@@ -87,7 +87,7 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     /// <param name="propertySelector">属性选择表达式。</param>
     /// <param name="toString">属性值转字符串的方法。</param>
     /// <param name="toValue">字符串转属性值的方法。</param>
-    public void Add<TValue>(Expression<Func<T, TValue>> propertySelector, Func<TValue, String> toString, Func<String, TValue> toValue)
+    public void Add<TValue>(Expression<Func<T, TValue>> propertySelector, Func<TValue, string> toString, Func<string, TValue> toValue)
     {
         // 1. 获取属性名称
         if (propertySelector.Body is not MemberExpression memberExpr)
@@ -125,19 +125,19 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     /// 添加字符串类型属性的序列化与反序列化方法。
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
-    public void Add(Expression<Func<T, String>> propertySelector) => this.Add(propertySelector, static str => str, static str => str);
+    public void Add(Expression<Func<T, string>> propertySelector) => Add(propertySelector, static str => str, static str => str);
 
     /// <summary>
     /// 添加布尔类型属性的序列化与反序列化方法。
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
-    public void Add(Expression<Func<T, bool>> propertySelector) => this.Add(propertySelector, Valid.ToString, Valid.ToBoolean);
+    public void Add(Expression<Func<T, bool>> propertySelector) => Add(propertySelector, Valid.ToString, Valid.ToBoolean);
 
     /// <summary>
     /// 添加整型属性的序列化与反序列化方法。
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
-    public void Add(Expression<Func<T, Int32>> propertySelector) => this.Add(propertySelector, Valid.ToString, Valid.ToInt32);
+    public void Add(Expression<Func<T, int>> propertySelector) => Add(propertySelector, Valid.ToString, Valid.ToInt32);
 
     /// <summary>
     /// 返回 T 的类型名称以及所有已添加的属性名称。
