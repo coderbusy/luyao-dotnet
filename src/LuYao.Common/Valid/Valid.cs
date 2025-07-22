@@ -14,9 +14,6 @@ public static partial class Valid
     public static Char ToChar(object value) => Convert.ToChar(value);
 
     /// <inheritdoc/>
-    public static DateTime ToDateTime(object value) => Convert.ToDateTime(value);
-
-    /// <inheritdoc/>
     public static Decimal ToDecimal(object value) => Convert.ToDecimal(value);
 
     /// <inheritdoc/>
@@ -24,9 +21,6 @@ public static partial class Valid
 
     /// <inheritdoc/>
     public static Int16 ToInt16(object value) => Convert.ToInt16(value);
-
-    /// <inheritdoc/>
-    public static Int64 ToInt64(object value) => Convert.ToInt64(value);
 
     /// <inheritdoc/>
     public static SByte ToSByte(object value) => Convert.ToSByte(value);

@@ -63,7 +63,7 @@ public partial class Record : IEnumerable<RecordRow>
     /// <param name="column">列名称。</param>
     /// <param name="row">行索引。</param>
     /// <param name="value">要设置的值。</param>
-    public void Set(string column, int row, object? value)
+    public void SetValue(string column, int row, object? value)
     {
         RecordColumn? col = _columns.Find(column);
         if (col == null) throw new KeyNotFoundException();
@@ -73,12 +73,13 @@ public partial class Record : IEnumerable<RecordRow>
     /// <summary>
     /// 获取指定列的指定行的值。
     /// </summary>
-    public object? Get(string column, int row)
+    public object? GetValue(string column, int row)
     {
         RecordColumn? col = _columns.Find(column);
         if (col == null) throw new KeyNotFoundException();
         return col.GetValue(row);
     }
+
     /// <summary>
     /// 判断是否包含指定列。
     /// </summary>

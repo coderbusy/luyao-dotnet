@@ -9,29 +9,36 @@ namespace LuYao.Data;
 /// </summary>
 public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 {
-    private readonly List<RecordColumn> _list = new List<RecordColumn>();
+    private readonly List<RecordColumn> _columns = new List<RecordColumn>();
 
     #region IReadOnlyList
 
     /// <inheritdoc/>
-    public int Count => _list.Count;
+    public int Count => _columns.Count;
 
     /// <inheritdoc/>
-    public RecordColumn this[int index] => _list[index];
+    public RecordColumn this[int index] => _columns[index];
 
     /// <inheritdoc/>
-    public IEnumerator<RecordColumn> GetEnumerator() => _list.GetEnumerator();
+    public IEnumerator<RecordColumn> GetEnumerator() => _columns.GetEnumerator();
 
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     #endregion
-    private Record _table;
+
+    private Record _re;
     private int _capacity;
     private int _count;
     /// <summary>
     /// 容量
     /// </summary>
     public int Capacity => _capacity;
+    internal void SetCapacity(int capacity)
+    {
+        if (this._columns.Count > 0) throw new InvalidOperationException("不能在已有列的情况下设置容量");
+        if (capacity < 1) capacity = 1;
+        this._capacity = capacity;
+    }
     /// <summary>
     /// 数据行数
     /// </summary>
@@ -39,7 +46,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 
     internal RecordColumnCollection(Record table, int capacity)
     {
-        this._table = table ?? throw new ArgumentNullException(nameof(table), "表不能为空");
+        this._re = table ?? throw new ArgumentNullException(nameof(table), "表不能为空");
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
         this._capacity = capacity;
     }
@@ -66,8 +73,8 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
         RecordColumn? col = this.Find(name);
         if (col != null) return col;
-        col = new RecordColumn(this._table, name, type, this._capacity);
-        this._list.Add(col);
+        col = new RecordColumn(this._re, name, type, this._capacity);
+        this._columns.Add(col);
         return col;
     }
 
@@ -158,8 +165,10 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <summary>
     /// 删除一个列
     /// </summary>
-    public bool Remove(RecordColumn column)
-    {
-        return this._list.Remove(column);
-    }
+    public bool Remove(RecordColumn column) => this._columns.Remove(column);
+
+    /// <summary>
+    /// 清理所有列
+    /// </summary>
+    public void Clear() => this._columns.Clear();
 }

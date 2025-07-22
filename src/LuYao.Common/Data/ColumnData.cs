@@ -6,9 +6,11 @@ internal abstract class ColumnData
 {
     public abstract void SetValue(object? value, int index);
     public abstract object? GetValue(int index);
-    public T GetValue<T>(int index) => (T)this.GetValue(index)!;
     public abstract void Extend(int length);
     public abstract void Clear();
+
+    public virtual object? ToObject(int index) => this.GetValue(index);
+
     public abstract Boolean ToBoolean(int index);
     public abstract void Set(Boolean value, int index);
 

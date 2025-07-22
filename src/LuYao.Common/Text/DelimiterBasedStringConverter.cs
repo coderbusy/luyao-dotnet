@@ -87,7 +87,7 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     /// <param name="propertySelector">属性选择表达式。</param>
     /// <param name="toString">属性值转字符串的方法。</param>
     /// <param name="toValue">字符串转属性值的方法。</param>
-    public void Add<TValue>(Expression<Func<T, TValue>> propertySelector, Func<TValue, string> toString, Func<string, TValue> toValue)
+    public DelimiterBasedStringConverter<T> Add<TValue>(Expression<Func<T, TValue>> propertySelector, Func<TValue, string> toString, Func<string, TValue> toValue)
     {
         // 1. 获取属性名称
         if (propertySelector.Body is not MemberExpression memberExpr)
@@ -119,25 +119,27 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
             Reader = reader,
             Writer = writer
         });
+
+        return this;
     }
 
     /// <summary>
     /// 添加字符串类型属性的序列化与反序列化方法。
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
-    public void Add(Expression<Func<T, string>> propertySelector) => Add(propertySelector, static str => str, static str => str);
+    public DelimiterBasedStringConverter<T> Add(Expression<Func<T, string>> propertySelector) => Add(propertySelector, static str => str, static str => str);
 
     /// <summary>
     /// 添加布尔类型属性的序列化与反序列化方法。
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
-    public void Add(Expression<Func<T, bool>> propertySelector) => Add(propertySelector, Valid.ToString, Valid.ToBoolean);
+    public DelimiterBasedStringConverter<T> Add(Expression<Func<T, bool>> propertySelector) => Add(propertySelector, Valid.ToString, Valid.ToBoolean);
 
     /// <summary>
     /// 添加整型属性的序列化与反序列化方法。
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
-    public void Add(Expression<Func<T, int>> propertySelector) => Add(propertySelector, Valid.ToString, Valid.ToInt32);
+    public DelimiterBasedStringConverter<T> Add(Expression<Func<T, int>> propertySelector) => Add(propertySelector, Valid.ToString, Valid.ToInt32);
 
     /// <summary>
     /// 返回 T 的类型名称以及所有已添加的属性名称。
