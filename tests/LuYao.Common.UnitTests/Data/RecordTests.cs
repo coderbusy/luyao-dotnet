@@ -763,4 +763,71 @@ public class RecordTests
         Assert.AreEqual(1, record.Count);
         Assert.AreEqual(1, record.GetValue("Id", 0));
     }
+
+
+    [TestMethod]
+    public void ToString_EmptyRecord_ReturnsDefaultString()
+    {
+        var record = new Record();
+        var result = record.ToString();
+        Assert.IsTrue(result.Contains("None"));
+        Assert.IsTrue(result.Contains("count 0"));
+    }
+
+    [TestMethod]
+    public void ToString_OneRowMultipleColumns_ReturnsColumnValues()
+    {
+        var record = new Record("TestTable", 1);
+        record.Columns.AddString("Name");
+        record.Columns.AddInt32("Age");
+        record.AddRow();
+        record.SetValue("Name", 0, "Alice");
+        record.SetValue("Age", 0, 30);
+
+        var result = record.ToString();
+        Assert.IsTrue(result.Contains("TestTable"));
+        Assert.IsTrue(result.Contains("Name"));
+        Assert.IsTrue(result.Contains("Alice"));
+        Assert.IsTrue(result.Contains("Age"));
+        Assert.IsTrue(result.Contains("30"));
+    }
+
+    [TestMethod]
+    public void ToString_MultipleRowsMultipleColumns_ReturnsTableFormat()
+    {
+        var record = new Record("People", 2);
+        record.Columns.AddString("Name");
+        record.Columns.AddInt32("Age");
+        record.AddRow();
+        record.AddRow();
+        record.SetValue("Name", 0, "Bob");
+        record.SetValue("Age", 0, 25);
+        record.SetValue("Name", 1, "Carol");
+        record.SetValue("Age", 1, 28);
+
+        var result = record.ToString();
+        Assert.IsTrue(result.Contains("People"));
+        Assert.IsTrue(result.Contains("Name"));
+        Assert.IsTrue(result.Contains("Age"));
+        Assert.IsTrue(result.Contains("Bob"));
+        Assert.IsTrue(result.Contains("Carol"));
+        Assert.IsTrue(result.Contains("25"));
+        Assert.IsTrue(result.Contains("28"));
+        Assert.IsTrue(result.Contains("|"));
+    }
+
+    [TestMethod]
+    public void ToString_LongStringValue_TruncatesWithEllipsis()
+    {
+        var record = new Record("LongStringTest", 1);
+        record.Columns.AddString("Name");
+        record.Columns.AddString("Description");
+        record.AddRow();
+        record.AddRow();
+        string longValue = new string('A', 100);
+        record.SetValue("Description", 0, longValue);
+
+        var result = record.ToString();
+        Assert.IsTrue(result.Contains(".."));
+    }
 }

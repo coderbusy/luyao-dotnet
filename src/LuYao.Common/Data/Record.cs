@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace LuYao.Data;
 
@@ -134,5 +136,102 @@ public partial class Record : IEnumerable<RecordRow>
         }
         this.Columns.Rows--;
         return true;
+    }
+
+    ///<inheritdoc/>
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.Append(string.IsNullOrWhiteSpace(this.Name) ? "None" : this.Name);
+        sb.AppendFormat(" count {0} column {1}", this.Count, this.Columns.Count);
+        sb.AppendLine();
+        if (this.Count == 1)
+        {
+            //只有一行数据时，输出每列的值
+            int max = this.Columns.Max(f => f.Name.Length);
+            foreach (RecordColumn col in this.Columns)
+            {
+                sb.AppendFormat("{0} | {1}", col.Name.PadRight(max), col.GetValue(0));
+                sb.AppendLine();
+            }
+        }
+        else
+        {
+            //多行时，输出表格
+            const int MAX_LENGTH = 40;
+            int[] heads = new int[this.Columns.Count];
+            string[,] arr = new string[Count, this.Columns.Count];
+            for (int k = 0; k < Columns.Count; k++)
+            {
+                RecordColumn col = Columns[k];
+                int max = col.Name.Length;
+
+                for (int i = 0; i < Count; i++)
+                {
+                    string s = col.ToString(i);
+                    int len = bLength(s);
+                    if (len > MAX_LENGTH)
+                    {
+                        s = bSubstring(s, MAX_LENGTH + 2) + "..";
+                        len = MAX_LENGTH;
+                    }
+                    arr[i, k] = s;
+
+                    if (len > max) max = len;
+                }
+
+                heads[k] = max;
+            }
+
+            //写表头
+            for (int k = 0; k < this.Columns.Count; k++)
+            {
+                if (k > 0) sb.Append(" | ");
+                sb.Append(this.Columns[k].Name.PadRight(heads[k]));
+            }
+
+            //写数据行
+            for (int i = 0; i < Count; i++)
+            {
+                sb.AppendLine();
+                for (int k = 0; k < this.Columns.Count; k++)
+                {
+                    if (k > 0) sb.Append(" | ");
+
+                    string s = arr[i, k];
+                    int len = bLength(s);
+                    int max = heads[k];
+                    sb.Append(s);
+                    if (max > len) sb.Append(new string(' ', max - len));
+                }
+            }
+        }
+        return sb.ToString();
+    }
+
+    static string bSubstring(string s, int len)
+    {
+        string ret = string.Empty;
+        char[] chars = s.ToCharArray();
+        for (int i = 0, idx = 0; i < s.Length; ++i, ++idx)
+        {
+            if (Encoding.UTF8.GetByteCount(chars, i, 1) > 1) ++idx;
+            if (idx >= len) break;
+            ret += s[i];
+        }
+
+        return ret;
+    }
+
+    static int bLength(string s) // 单字节长度
+    {
+        if (s == null) return 0;
+        int len = 0;
+        foreach (char c in s)
+        {
+            if (Encoding.UTF8.GetBytes(new char[] { c }).Length > 1) len += 2;
+            else len++;
+        }
+        return len;
     }
 }
