@@ -7,15 +7,15 @@ namespace LuYao;
 public class ValidStringTests
 {
     [TestMethod]
-    public void ToString_ObjectIsNull_ReturnsEmpty()
+    public void ToString_ObjectIsNull_ReturnsNull()
     {
-        Assert.AreEqual(string.Empty, Valid.ToString((object)null));
+        Assert.IsNull(Valid.ToString((object)null));
     }
 
     [TestMethod]
-    public void ToString_ObjectIsDBNull_ReturnsEmpty()
+    public void ToString_ObjectIsDBNull_ReturnsNull()
     {
-        Assert.AreEqual(string.Empty, Valid.ToString(DBNull.Value));
+        Assert.IsNull(Valid.ToString(DBNull.Value));
     }
 
     [TestMethod]

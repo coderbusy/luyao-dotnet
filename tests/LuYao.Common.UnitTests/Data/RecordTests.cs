@@ -576,7 +576,7 @@ public class RecordTests
         var row = table.AddRow();
 
         // Act - Set string value that can be converted to int
-        intCol.SetValue("123", row);
+        intCol.Set("123", row);
 
         // Assert
         Assert.AreEqual(123, intCol.GetValue(row));
@@ -711,5 +711,60 @@ public class RecordTests
         Assert.AreEqual(20, table1.Columns.Capacity); // Default minimum
         Assert.AreEqual(50, table2.Columns.Capacity);
         Assert.AreEqual(20, table3.Columns.Capacity); // Minimum enforced
+    }
+
+    [TestMethod]
+    public void Delete_RowIndexLessThanZero_ReturnsFalse()
+    {
+        var record = new Record("Test", 2);
+        var result = record.Delete(-1);
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void Delete_RowIndexGreaterThanOrEqualCount_ReturnsFalse()
+    {
+        var record = new Record("Test", 2);
+        record.AddRow();
+        var result = record.Delete(1); // Only 1 row, index 1 is out of range
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void Delete_ValidRowIndex_RowIsDeleted()
+    {
+        var record = new Record("Test", 0);
+        record.Columns.AddInt32("Id");
+        record.Columns.AddString("Name");
+        record.AddRow();
+        record.SetValue("Id", 0, 1);
+        record.SetValue("Name", 0, "A");
+        record.AddRow();
+        record.SetValue("Id", 1, 2);
+        record.SetValue("Name", 1, "B");
+
+        var result = record.Delete(0);
+
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, record.Count);
+        Assert.AreEqual(2, record.GetValue("Id", 0));
+        Assert.AreEqual("B", record.GetValue("Name", 0));
+    }
+
+    [TestMethod]
+    public void Delete_LastRow_RowIsDeleted()
+    {
+        var record = new Record("Test", 0);
+        record.Columns.AddInt32("Id");
+        record.AddRow();
+        record.SetValue("Id", 0, 1);
+        record.AddRow();
+        record.SetValue("Id", 1, 2);
+
+        var result = record.Delete(1);
+
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, record.Count);
+        Assert.AreEqual(1, record.GetValue("Id", 0));
     }
 }

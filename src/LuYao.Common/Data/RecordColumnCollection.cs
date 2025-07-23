@@ -42,7 +42,15 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <summary>
     /// 数据行数
     /// </summary>
-    public int Rows => _count;
+    public int Rows
+    {
+        get => _count;
+        internal set
+        {
+            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "行数不能小于0");
+            _count = value;
+        }
+    }
 
     internal RecordColumnCollection(Record table, int capacity)
     {

@@ -73,6 +73,9 @@ public partial class Record : IEnumerable<RecordRow>
     /// <summary>
     /// 获取指定列的指定行的值。
     /// </summary>
+    /// <param name="column">列名称。</param>
+    /// <param name="row">行索引。</param>
+    /// <returns>指定单元格的值。</returns>
     public object? GetValue(string column, int row)
     {
         RecordColumn? col = _columns.Find(column);
@@ -88,7 +91,10 @@ public partial class Record : IEnumerable<RecordRow>
     public bool Contains(string column) => _columns.Contains(column);
 
     #region IEnumerable
-    ///<inheritdoc/>
+    /// <summary>
+    /// 返回一个循环访问集合的枚举器。
+    /// </summary>
+    /// <returns>用于遍历集合的枚举器。</returns>
     public IEnumerator<RecordRow> GetEnumerator()
     {
         for (int i = 0; i < this.Count; i++)
@@ -97,6 +103,10 @@ public partial class Record : IEnumerable<RecordRow>
         }
     }
 
+    /// <summary>
+    /// 返回一个循环访问集合的枚举器（非泛型）。
+    /// </summary>
+    /// <returns>用于遍历集合的枚举器。</returns>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
@@ -104,11 +114,28 @@ public partial class Record : IEnumerable<RecordRow>
     #endregion
 
     /// <summary>
-    /// 
+    /// 获取指定索引的行。
     /// </summary>
+    /// <param name="rowIndex">行索引。</param>
+    /// <returns>指定索引的 <see cref="RecordRow"/> 实例。</returns>
     public RecordRow GetRow(int rowIndex)
     {
         if (rowIndex < 0 || rowIndex >= this.Count) throw new ArgumentOutOfRangeException(nameof(rowIndex));
         return new RecordRow(this, rowIndex);
+    }
+
+    /// <summary>
+    /// 删除指定索引的行。
+    /// </summary>
+    public bool Delete(int row)
+    {
+        if (row < 0 || row >= this.Count) return false;
+        foreach (RecordColumn col in this.Columns)
+        {
+            var data = col.Data;
+            for (int i = row; i < Count - 1; i++) data.SetValue(data.GetValue(i + 1), i);
+        }
+        this.Columns.Rows--;
+        return true;
     }
 }

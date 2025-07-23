@@ -10,11 +10,11 @@ partial class Valid
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static string ToString(object? value)
+    public static string? ToString(object? value)
     {
-        if (value is null) return string.Empty;
-        if (Convert.IsDBNull(value)) return string.Empty;
-        return value.ToString() ?? string.Empty;
+        if (value is null) return null;
+        if (Convert.IsDBNull(value)) return null;
+        return value.ToString();
     }
 
     /// <summary>

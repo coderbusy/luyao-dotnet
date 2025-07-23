@@ -58,10 +58,7 @@ public sealed partial class RecordColumn
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
-    public void SetValue(object? value, int row)
-    {
-        _data.SetValue(Cast(value), row);
-    }
+    public void SetValue(object? value, int row) => _data.SetValue(value, row);
     /// <summary>
     /// 
     /// </summary>
@@ -77,14 +74,6 @@ public sealed partial class RecordColumn
 
     ///<inheritdoc/>
     public object? GetValue(RecordRow row) => GetValue(row.RowIndex);
-
-    private object? Cast(object? value)
-    {
-        if (value == null) return null;
-        if (Convert.IsDBNull(value)) return null;
-        if (_type.IsInstanceOfType(value)) return value;
-        return Convert.ChangeType(value, _type);
-    }
 
     /// <summary>
     /// 清空列中的所有数据。
