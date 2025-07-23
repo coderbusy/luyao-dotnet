@@ -8,6 +8,8 @@
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Nullable>enable</Nullable>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\docs\luyao.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net461'">
@@ -15,10 +17,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Net\Http\FakeUserAgent\Browsers.dat" />
+		<None Remove="Net\Http\FakeUserAgent\Browsers.dat" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Net\Http\FakeUserAgent\Browsers.dat" />
+		<Compile Include="..\Assembly.cs" Link="Assembly.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Net\Http\FakeUserAgent\Browsers.dat" />
 	</ItemGroup>
 </Project>

@@ -6,7 +6,14 @@
 		<TargetFrameworks>net45;net461;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\docs\luyao.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
+	
+	<ItemGroup>
+		<Compile Include="..\Assembly.cs" Link="Assembly.cs" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
