@@ -17,30 +17,26 @@ public class IniFile
     private static readonly Regex KeyValueRegex = new Regex(@"^\s*(?<key>[^=]+?)\s*=\s*(?<value>.*?)\s*(?<comment>[;#].*)?$");
     private static readonly Regex CommentRegex = new Regex(@"^\s*(?<comment>[;#].*)$");
 
+    private readonly RecordColumn _Section;
+    private readonly RecordColumn _Key;
+    private readonly RecordColumn _Value;
+    private readonly RecordColumn _Comment;
+
     /// <summary>
     /// 获取包含 INI 数据的 Record 对象。
     /// 包含四列：Section、Key、Value、Comment
     /// </summary>
     public Record Data { get; }
-
     /// <summary>
     /// 初始化 IniFile 的新实例。
     /// </summary>
     public IniFile()
     {
         Data = new Record("IniData", 20);
-        InitializeColumns();
-    }
-
-    /// <summary>
-    /// 初始化数据记录的列结构。
-    /// </summary>
-    private void InitializeColumns()
-    {
-        Data.Columns.AddString("Section");
-        Data.Columns.AddString("Key");
-        Data.Columns.AddString("Value");
-        Data.Columns.AddString("Comment");
+        this._Section = Data.Columns.AddString("Section");
+        this._Key = Data.Columns.AddString("Key");
+        this._Value = Data.Columns.AddString("Value");
+        this._Comment = Data.Columns.AddString("Comment");
     }
 
     /// <summary>
@@ -115,10 +111,10 @@ public class IniFile
     private void AddRow(string section, string key, string value, string comment)
     {
         var row = Data.AddRow();
-        row.Set(section ?? string.Empty, Data.Columns[0]);
-        row.Set(key ?? string.Empty, Data.Columns[1]);
-        row.Set(value ?? string.Empty, Data.Columns[2]);
-        row.Set(comment ?? string.Empty, Data.Columns[3]);
+        row.Set(section, _Section);
+        row.Set(key, _Key);
+        row.Set(value, _Value);
+        row.Set(comment, _Comment);
     }
 
     /// <summary>
@@ -129,15 +125,13 @@ public class IniFile
     /// <returns>键值，未找到返回 null</returns>
     public string? GetValue(string sectionName, string keyName)
     {
-        for (int i = 0; i < Data.Count; i++)
+        foreach (var row in this.Data)
         {
-            var section = Data.GetValue("Section", i)?.ToString() ?? string.Empty;
-            var key = Data.GetValue("Key", i)?.ToString() ?? string.Empty;
-
-            if (string.Equals(section, sectionName, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(key, keyName, StringComparison.OrdinalIgnoreCase))
+            string section = row.ToString(_Section);
+            string key = row.ToString(_Key);
+            if (section == sectionName && key == keyName)
             {
-                return Data.GetValue("Value", i)?.ToString();
+                return row.ToString(_Value);
             }
         }
         return null;
@@ -152,15 +146,13 @@ public class IniFile
     public void SetValue(string sectionName, string keyName, string value)
     {
         // 查找现有键值对
-        for (int i = 0; i < Data.Count; i++)
+        foreach (var row in this.Data)
         {
-            var section = Data.GetValue("Section", i)?.ToString() ?? string.Empty;
-            var key = Data.GetValue("Key", i)?.ToString() ?? string.Empty;
-
-            if (string.Equals(section, sectionName, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(key, keyName, StringComparison.OrdinalIgnoreCase))
+            string section = row.ToString(_Section);
+            string key = row.ToString(_Key);
+            if (section == sectionName && key == keyName)
             {
-                Data.SetValue("Value", i, value);
+                row.Set(value, _Value);
                 return;
             }
         }

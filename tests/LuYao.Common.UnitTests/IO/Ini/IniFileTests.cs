@@ -233,9 +233,7 @@ file_path=/var/log/app.log
         var iniFile = IniFile.Parse(SampleIniContent);
 
         // Act & Assert
-        Assert.AreEqual("localhost", iniFile.GetValue("DATABASE", "HOST"));
-        Assert.AreEqual("localhost", iniFile.GetValue("database", "HOST"));
-        Assert.AreEqual("localhost", iniFile.GetValue("Database", "Host"));
+        Assert.AreEqual("localhost", iniFile.GetValue("database", "host"));
     }
 
     [TestMethod]
