@@ -23,6 +23,28 @@ internal static class Helpers
         yield return TypeCode.UInt32;
         yield return TypeCode.UInt64;
     }
+    public static bool IsExists(TypeCode type)
+    {
+        return type switch
+        {
+            TypeCode.Boolean => true,
+            TypeCode.Byte => true,
+            TypeCode.Char => true,
+            TypeCode.DateTime => true,
+            TypeCode.Decimal => true,
+            TypeCode.Double => true,
+            TypeCode.Int16 => true,
+            TypeCode.Int32 => true,
+            TypeCode.Int64 => true,
+            TypeCode.SByte => true,
+            TypeCode.Single => true,
+            TypeCode.String => true,
+            TypeCode.UInt16 => true,
+            TypeCode.UInt32 => true,
+            TypeCode.UInt64 => true,
+            _ => false
+        };
+    }
 
     public static Type ToType(TypeCode type)
     {

@@ -34,7 +34,15 @@ public readonly struct RecordRow
     /// <returns>该行的索引。</returns>
     public static implicit operator int(RecordRow rowRef) => rowRef._rowIndex;
 
+    ///<inheritdoc/>
+    public void SetValue(Object value, RecordColumn column) => column.SetValue(value, this._rowIndex);
+
+    ///<inheritdoc/>
+    public object? GetValue(RecordColumn column) => column.GetValue(this._rowIndex);
+
     #region Data
+
+
     ///<inheritdoc/>
     public Boolean ToBoolean(RecordColumn column) => column.ToBoolean(this._rowIndex);
     ///<inheritdoc/>

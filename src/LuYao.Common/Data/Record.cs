@@ -107,10 +107,7 @@ public partial class Record : IEnumerable<RecordRow>
     /// 返回一个循环访问集合的枚举器（非泛型）。
     /// </summary>
     /// <returns>用于遍历集合的枚举器。</returns>
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     #endregion
 
     /// <summary>

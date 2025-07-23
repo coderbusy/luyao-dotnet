@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Common;
 using System.IO;
 
 namespace LuYao.Data;
@@ -95,6 +96,60 @@ partial class Record
                     case TypeCode.UInt16: col.Data.Set(reader.ReadUInt16(), r); break;
                     case TypeCode.UInt32: col.Data.Set(reader.ReadUInt32(), r); break;
                     case TypeCode.UInt64: col.Data.Set(reader.ReadUInt64(), r); break;
+                }
+            }
+        }
+    }
+
+
+
+    /// <summary>
+    /// 从指定的 <see cref="DbDataReader"/> 读取数据并填充到当前 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <param name="reader">用于读取数据的 <see cref="DbDataReader"/> 实例。</param>
+    public void Read(DbDataReader reader)
+    {
+        RecordColumn[] columns = new RecordColumn[reader.FieldCount];
+        for (int i = 0; i < reader.FieldCount; i++)
+        {
+            string name = reader.GetName(i);
+            Type type = reader.GetFieldType(i);
+            TypeCode code = Type.GetTypeCode(type);
+            if (Helpers.IsExists(code)) continue;
+            int idx = this.Columns.IndexOf(name);
+            if (idx >= 0)
+            {
+                columns[i] = this.Columns[idx];
+            }
+            else
+            {
+                columns[i] = this.Columns.Add(name, code);
+            }
+        }
+        while (reader.Read())
+        {
+            var row = this.AddRow();
+            for (int i = 0; i < columns.Length; i++)
+            {
+                RecordColumn? col = columns[i];
+                if (col == null) continue;
+                switch (col.Code)
+                {
+                    case TypeCode.Boolean: row.Set(reader.GetBoolean(i), col); break;
+                    case TypeCode.Byte: row.Set(reader.GetByte(i), col); break;
+                    case TypeCode.Char: row.Set(reader.GetChar(i), col); break;
+                    case TypeCode.DateTime: row.Set(reader.GetDateTime(i), col); break;
+                    case TypeCode.Decimal: row.Set(reader.GetDecimal(i), col); break;
+                    case TypeCode.Double: row.Set(reader.GetDouble(i), col); break;
+                    case TypeCode.Int16: row.Set(reader.GetInt16(i), col); break;
+                    case TypeCode.Int32: row.Set(reader.GetInt32(i), col); break;
+                    case TypeCode.Int64: row.Set(reader.GetInt64(i), col); break;
+                    case TypeCode.SByte: row.SetValue(reader.GetValue(i), col); break;
+                    case TypeCode.Single: row.Set(reader.GetFloat(i), col); break;
+                    case TypeCode.String: row.Set(reader.GetString(i), col); break;
+                    case TypeCode.UInt16: row.SetValue(reader.GetValue(i), col); break;
+                    case TypeCode.UInt32: row.SetValue(reader.GetValue(i), col); break;
+                    case TypeCode.UInt64: row.SetValue(reader.GetValue(i), col); break;
                 }
             }
         }
