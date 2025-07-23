@@ -170,17 +170,14 @@ public class IniFile
     {
         var result = new Dictionary<string, string>();
 
-        for (int i = 0; i < Data.Count; i++)
+        foreach (var row in this.Data)
         {
-            var section = Data.GetValue("Section", i)?.ToString() ?? string.Empty;
-            var key = Data.GetValue("Key", i)?.ToString() ?? string.Empty;
-            var value = Data.GetValue("Value", i)?.ToString() ?? string.Empty;
-
-            if (string.Equals(section, sectionName, StringComparison.OrdinalIgnoreCase) &&
-                !string.IsNullOrEmpty(key))
-            {
-                result[key] = value;
-            }
+            string section = row.ToString(_Section);
+            if (section != sectionName) continue;
+            string key = row.ToString(_Key);
+            if (string.IsNullOrEmpty(key)) continue;
+            string value = row.ToString(_Value);
+            result[key] = value;
         }
 
         return result;
@@ -192,18 +189,16 @@ public class IniFile
     /// <returns>节名称集合</returns>
     public IEnumerable<string> GetSectionNames()
     {
-        var sections = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var sections = new SortedSet<string>();
 
-        for (int i = 0; i < Data.Count; i++)
+        foreach (var row in this.Data)
         {
-            var section = Data.GetValue("Section", i)?.ToString() ?? string.Empty;
-            if (!string.IsNullOrEmpty(section))
-            {
-                sections.Add(section);
-            }
+            string section = row.ToString(_Section);
+            if (string.IsNullOrWhiteSpace(section)) continue;
+            sections.Add(section);
         }
 
-        return sections.OrderBy(s => s);
+        return sections;
     }
 
     /// <summary>
