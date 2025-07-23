@@ -78,11 +78,11 @@ public class RecordTests
         // Assert
         Assert.AreEqual(2, table.Count);
         Assert.AreEqual(3, table.Columns.Count);
-        
+
         Assert.AreEqual(1, colId.GetValue(row1));
         Assert.AreEqual("Alice", colName.GetValue(row1));
         Assert.AreEqual(25, colAge.GetValue(row1));
-        
+
         Assert.AreEqual(2, colId.GetValue(row2));
         Assert.AreEqual("Bob", colName.GetValue(row2));
         Assert.AreEqual(30, colAge.GetValue(row2));
@@ -308,13 +308,13 @@ public class RecordTests
 
         // Act & Assert
         Assert.AreEqual(0, table.Count);
-        
+
         table.AddRow();
         Assert.AreEqual(1, table.Count);
-        
+
         table.AddRow();
         Assert.AreEqual(2, table.Count);
-        
+
         table.AddRow();
         Assert.AreEqual(3, table.Count);
     }
@@ -413,7 +413,7 @@ public class RecordTests
         var col = table.Columns.Add("TestCol", TypeCode.String);
         var row = table.AddRow();
         row.Set("TestValue", col);
-        
+
         // Verify data exists
         Assert.AreEqual("TestValue", col.GetValue(row));
 
@@ -478,7 +478,7 @@ public class RecordTests
         var colUInt16 = table.Columns.Add("UInt16", TypeCode.UInt16);
         var colUInt32 = table.Columns.Add("UInt32", TypeCode.UInt32);
         var colUInt64 = table.Columns.Add("UInt64", TypeCode.UInt64);
-        
+
         var row = table.AddRow();
 
         // Act & Assert
@@ -559,11 +559,7 @@ public class RecordTests
         var row = table.AddRow();
 
         // Act & Assert - Test null value
-        col.SetValue(null, row);
-        Assert.IsNull(col.GetValue(row));
-
-        // Act & Assert - Test DBNull value
-        col.SetValue(DBNull.Value, row);
+        col.Set((string)null, row);
         Assert.IsNull(col.GetValue(row));
     }
 

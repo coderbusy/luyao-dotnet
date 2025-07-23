@@ -7,8 +7,6 @@ sealed class BooleanColumnData : ColumnData<Boolean>
 {
     public BooleanColumnData(int capacity) : base(capacity) { }
 
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToBoolean(value);
-
     public override void Set(Boolean value, int index) => _data[index] = value;
     public override Boolean ToBoolean(int index) => this._data[index];
 
@@ -60,8 +58,6 @@ sealed class BooleanColumnData : ColumnData<Boolean>
 sealed class ByteColumnData : ColumnData<Byte>
 {
     public ByteColumnData(int capacity) : base(capacity) { }
-
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToByte(value);
 
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToByte(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
@@ -115,8 +111,6 @@ sealed class CharColumnData : ColumnData<Char>
 {
     public CharColumnData(int capacity) : base(capacity) { }
 
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToChar(value);
-
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToChar(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
 
@@ -168,8 +162,6 @@ sealed class CharColumnData : ColumnData<Char>
 sealed class DateTimeColumnData : ColumnData<DateTime>
 {
     public DateTimeColumnData(int capacity) : base(capacity) { }
-
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToDateTime(value);
 
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToDateTime(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
@@ -223,8 +215,6 @@ sealed class DecimalColumnData : ColumnData<Decimal>
 {
     public DecimalColumnData(int capacity) : base(capacity) { }
 
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToDecimal(value);
-
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToDecimal(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
 
@@ -276,8 +266,6 @@ sealed class DecimalColumnData : ColumnData<Decimal>
 sealed class DoubleColumnData : ColumnData<Double>
 {
     public DoubleColumnData(int capacity) : base(capacity) { }
-
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToDouble(value);
 
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToDouble(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
@@ -331,8 +319,6 @@ sealed class Int16ColumnData : ColumnData<Int16>
 {
     public Int16ColumnData(int capacity) : base(capacity) { }
 
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToInt16(value);
-
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToInt16(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
 
@@ -384,8 +370,6 @@ sealed class Int16ColumnData : ColumnData<Int16>
 sealed class Int32ColumnData : ColumnData<Int32>
 {
     public Int32ColumnData(int capacity) : base(capacity) { }
-
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToInt32(value);
 
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToInt32(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
@@ -439,8 +423,6 @@ sealed class Int64ColumnData : ColumnData<Int64>
 {
     public Int64ColumnData(int capacity) : base(capacity) { }
 
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToInt64(value);
-
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToInt64(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
 
@@ -492,8 +474,6 @@ sealed class Int64ColumnData : ColumnData<Int64>
 sealed class SByteColumnData : ColumnData<SByte>
 {
     public SByteColumnData(int capacity) : base(capacity) { }
-
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToSByte(value);
 
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToSByte(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
@@ -547,8 +527,6 @@ sealed class SingleColumnData : ColumnData<Single>
 {
     public SingleColumnData(int capacity) : base(capacity) { }
 
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToSingle(value);
-
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToSingle(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
 
@@ -600,8 +578,6 @@ sealed class SingleColumnData : ColumnData<Single>
 sealed class StringColumnData : ColumnData<String>
 {
     public StringColumnData(int capacity) : base(capacity) { }
-
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToString(value);
 
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToString(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
@@ -655,8 +631,6 @@ sealed class UInt16ColumnData : ColumnData<UInt16>
 {
     public UInt16ColumnData(int capacity) : base(capacity) { }
 
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToUInt16(value);
-
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToUInt16(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
 
@@ -709,8 +683,6 @@ sealed class UInt32ColumnData : ColumnData<UInt32>
 {
     public UInt32ColumnData(int capacity) : base(capacity) { }
 
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToUInt32(value);
-
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToUInt32(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
 
@@ -762,8 +734,6 @@ sealed class UInt32ColumnData : ColumnData<UInt32>
 sealed class UInt64ColumnData : ColumnData<UInt64>
 {
     public UInt64ColumnData(int capacity) : base(capacity) { }
-
-    public override void SetValue(object? value, int index) => this._data[index] = Valid.ToUInt64(value);
 
     public override void Set(Boolean value, int index) => _data[index] = Valid.ToUInt64(value);
     public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
