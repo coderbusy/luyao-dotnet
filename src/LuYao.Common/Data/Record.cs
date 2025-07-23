@@ -16,17 +16,17 @@ public partial class Record : IEnumerable<RecordRow>
     /// </summary>
     public string Name { get; set; } = string.Empty;
 
-    private readonly RecordColumnCollection _columns;
+    private readonly RecordColumnCollection _cols;
 
     /// <summary>
     /// 表列集合
     /// </summary>
-    public RecordColumnCollection Columns => _columns;
+    public RecordColumnCollection Columns => _cols;
 
     /// <summary>
     /// 数据条数
     /// </summary>
-    public int Count => _columns.Rows;
+    public int Count => _cols.Rows;
 
     /// <summary>
     /// 初始化 <see cref="Record"/> 类的新实例。
@@ -46,7 +46,7 @@ public partial class Record : IEnumerable<RecordRow>
         if (!string.IsNullOrWhiteSpace(name)) this.Name = name!;
         int c = rows;
         if (c < 20) c = 20;
-        _columns = new RecordColumnCollection(this, c);
+        _cols = new RecordColumnCollection(this, c);
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public partial class Record : IEnumerable<RecordRow>
     /// <returns>新添加行的索引。</returns>
     public RecordRow AddRow()
     {
-        var row = _columns.AddRow();
+        var row = _cols.AddRow();
         return new RecordRow(this, row);
     }
 
@@ -67,7 +67,7 @@ public partial class Record : IEnumerable<RecordRow>
     /// <param name="value">要设置的值。</param>
     public void SetValue(string column, int row, object? value)
     {
-        RecordColumn? col = _columns.Find(column);
+        RecordColumn? col = _cols.Find(column);
         if (col == null) throw new KeyNotFoundException();
         col.SetValue(value, row);
     }
@@ -80,7 +80,7 @@ public partial class Record : IEnumerable<RecordRow>
     /// <returns>指定单元格的值。</returns>
     public object? GetValue(string column, int row)
     {
-        RecordColumn? col = _columns.Find(column);
+        RecordColumn? col = _cols.Find(column);
         if (col == null) throw new KeyNotFoundException();
         return col.GetValue(row);
     }
@@ -90,7 +90,7 @@ public partial class Record : IEnumerable<RecordRow>
     /// </summary>
     /// <param name="column">列名称。</param>
     /// <returns>如果包含指定列则返回 true，否则返回 false。</returns>
-    public bool Contains(string column) => _columns.Contains(column);
+    public bool Contains(string column) => _cols.Contains(column);
 
     #region IEnumerable
     /// <summary>
@@ -129,12 +129,12 @@ public partial class Record : IEnumerable<RecordRow>
     public bool Delete(int row)
     {
         if (row < 0 || row >= this.Count) return false;
-        foreach (RecordColumn col in this.Columns)
+        foreach (RecordColumn col in this._cols)
         {
             var data = col.Data;
             for (int i = row; i < Count - 1; i++) data.SetValue(data.GetValue(i + 1), i);
         }
-        this.Columns.Rows--;
+        this._cols.Rows--;
         return true;
     }
 
@@ -143,13 +143,13 @@ public partial class Record : IEnumerable<RecordRow>
     {
         var sb = new StringBuilder();
         sb.Append(string.IsNullOrWhiteSpace(this.Name) ? "None" : this.Name);
-        sb.AppendFormat(" count {0} column {1}", this.Count, this.Columns.Count);
+        sb.AppendFormat(" count {0} column {1}", this.Count, this._cols.Count);
         sb.AppendLine();
         if (this.Count == 1)
         {
             //只有一行数据时，输出每列的值
-            int max = this.Columns.Max(f => f.Name.Length);
-            foreach (RecordColumn col in this.Columns)
+            int max = this._cols.Max(f => f.Name.Length);
+            foreach (RecordColumn col in this._cols)
             {
                 sb.AppendFormat("{0} | {1}", col.Name.PadRight(max), col.GetValue(0));
                 sb.AppendLine();
@@ -159,11 +159,11 @@ public partial class Record : IEnumerable<RecordRow>
         {
             //多行时，输出表格
             const int MAX_LENGTH = 40;
-            int[] heads = new int[this.Columns.Count];
-            string[,] arr = new string[Count, this.Columns.Count];
-            for (int k = 0; k < Columns.Count; k++)
+            int[] heads = new int[this._cols.Count];
+            string[,] arr = new string[Count, this._cols.Count];
+            for (int k = 0; k < this._cols.Count; k++)
             {
-                RecordColumn col = Columns[k];
+                RecordColumn col = this._cols[k];
                 int max = col.Name.Length;
 
                 for (int i = 0; i < Count; i++)
@@ -184,17 +184,17 @@ public partial class Record : IEnumerable<RecordRow>
             }
 
             //写表头
-            for (int k = 0; k < this.Columns.Count; k++)
+            for (int k = 0; k < this._cols.Count; k++)
             {
                 if (k > 0) sb.Append(" | ");
-                sb.Append(this.Columns[k].Name.PadRight(heads[k]));
+                sb.Append(this._cols[k].Name.PadRight(heads[k]));
             }
 
             //写数据行
             for (int i = 0; i < Count; i++)
             {
                 sb.AppendLine();
-                for (int k = 0; k < this.Columns.Count; k++)
+                for (int k = 0; k < this._cols.Count; k++)
                 {
                     if (k > 0) sb.Append(" | ");
 
@@ -227,9 +227,10 @@ public partial class Record : IEnumerable<RecordRow>
     {
         if (s == null) return 0;
         int len = 0;
-        foreach (char c in s)
+        char[] chars = s.ToCharArray();
+        for (int i = 0; i < s.Length; i++)
         {
-            if (Encoding.UTF8.GetBytes(new char[] { c }).Length > 1) len += 2;
+            if (Encoding.UTF8.GetByteCount(chars, i, 1) > 1) len += 2;
             else len++;
         }
         return len;
