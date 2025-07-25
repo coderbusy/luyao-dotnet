@@ -87,22 +87,6 @@ partial class Valid
     /// <returns>返回格式为 yyyyMMdd 的整数。</returns>
     public static int ToInt32(DateTime d) { return d.Year * 10000 + d.Month * 100 + d.Day; }
 
-    /// <summary>
-    /// 将对象转换为 Int32。如果对象为 null、DBNull 或无法转换，则返回 0。
-    /// </summary>
-    /// <param name="value">要转换的对象。</param>
-    /// <returns>转换后的 Int32 值，无法转换时返回 0。</returns>
-    public static int ToInt32(object value)
-    {
-        if (value == null || Convert.IsDBNull(value) || !(value is IConvertible convertible)) return 0;
-        if (value is string str) return ToInt32(str);
-        try { return System.Convert.ToInt32(convertible); }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(value.ToString() + " 转成 int 有误！\r\n" + ex.StackTrace);
-            return 0;
-        }
-    }
 
     /// <summary>
     /// 将可空字符类型转换为 Int32。null 返回 0。

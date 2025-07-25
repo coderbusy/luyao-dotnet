@@ -11,29 +11,6 @@ partial class Valid
     };
 
     /// <summary>
-    /// 将对象转换为布尔值。支持 null、DBNull、bool 类型及其字符串表示。
-    /// </summary>
-    /// <param name="value">要转换的对象。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(object? value)
-    {
-        if (value is null || Convert.IsDBNull(value)) return default;
-        if (Nullable.GetUnderlyingType(value.GetType()) != null)
-        {
-            // 如果是可空类型，递归调用 ToBoolean
-        }
-        switch (value)
-        {
-            case string v1: return ToBoolean(v1);
-            case char v2: return ToBoolean(v2);
-            case double v3: return ToBoolean(v3);
-            case bool v4: return v4;
-            default:
-                break;
-        }
-        return ToBoolean(value.ToString());
-    }
-    /// <summary>
     /// 将字符串转换为布尔值。常见的表示“假”的字符串（如 "0", "false", "no", "off", "n", "f", "null"）会被识别为 false，其余情况为 true。
     /// </summary>
     /// <param name="value">要转换的字符串。</param>

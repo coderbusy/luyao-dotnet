@@ -8,34 +8,6 @@ partial class Valid
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public static string ToString(object? value)
-    {
-        switch (value)
-        {
-            case Boolean v1: return ToString(v1);
-            case Byte v2: return ToString(v2);
-            case Char v3: return ToString(v3);
-            case DateTime v4: return ToString(v4);
-            case Decimal v5: return ToString(v5);
-            case Double v6: return ToString(v6);
-            case Int16 v7: return ToString(v7);
-            case Int32 v8: return ToString(v8);
-            case Int64 v9: return ToString(v9);
-            case SByte v10: return ToString(v10);
-            case Single v11: return ToString(v11);
-            case String v12: return ToString(v12);
-            case UInt16 v13: return ToString(v13);
-            case UInt32 v14: return ToString(v14);
-            case UInt64 v15: return ToString(v15);
-            default: return value?.ToString() ?? string.Empty;
-        }
-    }
-
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
     public static string ToString(bool? value) => value == true ? "1" : "0";
 
     /// <summary>
