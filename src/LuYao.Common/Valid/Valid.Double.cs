@@ -5,31 +5,33 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Double ToDouble(Boolean value) => value ? 1 : 0;
+    public static Boolean ToBoolean(Double value) => Convert.ToBoolean(value);
     /// <inheritdoc/>
-    public static Double ToDouble(Char value) => Convert.ToDouble(value);
+    public static Char ToChar(Double value) => Convert.ToChar(value);
     /// <inheritdoc/>
-    public static Double ToDouble(SByte value) => Convert.ToDouble(value);
+    public static SByte ToSByte(Double value) => Convert.ToSByte(value);
     /// <inheritdoc/>
-    public static Double ToDouble(Byte value) => Convert.ToDouble(value);
+    public static Byte ToByte(Double value) => Convert.ToByte(value);
     /// <inheritdoc/>
-    public static Double ToDouble(Int16 value) => Convert.ToDouble(value);
+    public static Int16 ToInt16(Double value) => Convert.ToInt16(value);
     /// <inheritdoc/>
-    public static Double ToDouble(UInt16 value) => Convert.ToDouble(value);
+    public static UInt16 ToUInt16(Double value) => Convert.ToUInt16(value);
     /// <inheritdoc/>
-    public static Double ToDouble(Int32 value) => Convert.ToDouble(value);
+    public static Int32 ToInt32(Double value) => Convert.ToInt32(value);
     /// <inheritdoc/>
-    public static Double ToDouble(UInt32 value) => Convert.ToDouble(value);
+    public static UInt32 ToUInt32(Double value) => Convert.ToUInt32(value);
     /// <inheritdoc/>
-    public static Double ToDouble(Int64 value) => Convert.ToDouble(value);
+    public static Int64 ToInt64(Double value) => Convert.ToInt64(value);
     /// <inheritdoc/>
-    public static Double ToDouble(UInt64 value) => Convert.ToDouble(value);
+    public static UInt64 ToUInt64(Double value) => Convert.ToUInt64(value);
     /// <inheritdoc/>
-    public static Double ToDouble(Single value) => Convert.ToDouble(value);
+    public static Single ToSingle(Double value) => Convert.ToSingle(value);
     /// <inheritdoc/>
     public static Double ToDouble(Double value) => value;
     /// <inheritdoc/>
-    public static Double ToDouble(Decimal value) => Convert.ToDouble(value);
+    public static Decimal ToDecimal(Double value) => Convert.ToDecimal(value);
     /// <inheritdoc/>
-    public static Double ToDouble(DateTime value) => Convert.ToDouble(value);
+    public static DateTime ToDateTime(Double value) => Convert.ToDateTime(value);
+    /// <inheritdoc/>
+    public static String ToString(Double value) => Convert.ToString(value);
 }

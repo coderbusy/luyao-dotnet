@@ -5,110 +5,33 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Char ToChar(Boolean value) => default;
-
+    public static Boolean ToBoolean(Char value) => Convert.ToBoolean(value);
     /// <inheritdoc/>
     public static Char ToChar(Char value) => value;
-
     /// <inheritdoc/>
-    public static Char ToChar(SByte value)
-    {
-        // System.Convert: Only 0~65535 valid
-        return value >= 0 ? (char)value : (char)0;
-    }
-
+    public static SByte ToSByte(Char value) => Convert.ToSByte(value);
     /// <inheritdoc/>
-    public static Char ToChar(Byte value)
-    {
-        // System.Convert: 0~255 always valid
-        return (char)value;
-    }
-
+    public static Byte ToByte(Char value) => Convert.ToByte(value);
     /// <inheritdoc/>
-    public static Char ToChar(Int16 value)
-    {
-        // System.Convert: Only 0~65535 valid
-        return value >= 0 ? (char)value : (char)0;
-    }
-
+    public static Int16 ToInt16(Char value) => Convert.ToInt16(value);
     /// <inheritdoc/>
-    public static Char ToChar(UInt16 value)
-    {
-        // System.Convert: 0~65535 always valid
-        return (char)value;
-    }
-
+    public static UInt16 ToUInt16(Char value) => Convert.ToUInt16(value);
     /// <inheritdoc/>
-    public static Char ToChar(Int32 value)
-    {
-        // System.Convert: Only 0~65535 valid
-        return value >= Char.MinValue && value <= Char.MaxValue ? (char)value : (char)0;
-    }
-
+    public static Int32 ToInt32(Char value) => Convert.ToInt32(value);
     /// <inheritdoc/>
-    public static Char ToChar(UInt32 value)
-    {
-        // System.Convert: Only 0~65535 valid
-        return value <= Char.MaxValue ? (char)value : (char)0;
-    }
-
+    public static UInt32 ToUInt32(Char value) => Convert.ToUInt32(value);
     /// <inheritdoc/>
-    public static Char ToChar(Int64 value)
-    {
-        // System.Convert: Only 0~65535 valid
-        return value >= Char.MinValue && value <= Char.MaxValue ? (char)value : (char)0;
-    }
-
+    public static Int64 ToInt64(Char value) => Convert.ToInt64(value);
     /// <inheritdoc/>
-    public static Char ToChar(UInt64 value)
-    {
-        // System.Convert: Only 0~65535 valid
-        return value <= Char.MaxValue ? (char)value : (char)0;
-    }
-
+    public static UInt64 ToUInt64(Char value) => Convert.ToUInt64(value);
     /// <inheritdoc/>
-    public static Char ToChar(Single value)
-    {
-        // System.Convert: Only 0~65535, not NaN/Infinity, must be whole number
-        if (Single.IsNaN(value) || Single.IsInfinity(value))
-            return (char)0;
-        if (value < Char.MinValue || value > Char.MaxValue)
-            return (char)0;
-        var intValue = (int)value;
-        if (intValue != value)
-            return (char)0;
-        return (char)intValue;
-    }
-
+    public static Single ToSingle(Char value) => Convert.ToSingle(value);
     /// <inheritdoc/>
-    public static Char ToChar(Double value)
-    {
-        // System.Convert: Only 0~65535, not NaN/Infinity, must be whole number
-        if (Double.IsNaN(value) || Double.IsInfinity(value))
-            return (char)0;
-        if (value < Char.MinValue || value > Char.MaxValue)
-            return (char)0;
-        var intValue = (int)value;
-        if (intValue != value)
-            return (char)0;
-        return (char)intValue;
-    }
-
+    public static Double ToDouble(Char value) => Convert.ToDouble(value);
     /// <inheritdoc/>
-    public static Char ToChar(Decimal value)
-    {
-        // System.Convert: Only 0~65535, must be whole number
-        if (value < Char.MinValue || value > Char.MaxValue)
-            return (char)0;
-        if (Decimal.Truncate(value) != value)
-            return (char)0;
-        return (char)value;
-    }
-
+    public static Decimal ToDecimal(Char value) => Convert.ToDecimal(value);
     /// <inheritdoc/>
-    public static Char ToChar(DateTime value)
-    {
-        // System.Convert: Not supported, always throws
-        return (char)0;
-    }
+    public static DateTime ToDateTime(Char value) => Convert.ToDateTime(value);
+    /// <inheritdoc/>
+    public static String ToString(Char value) => Convert.ToString(value);
 }

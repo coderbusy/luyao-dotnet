@@ -5,31 +5,33 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Int64 ToInt64(DateTime value) => value.ToBinary();
+    public static Boolean ToBoolean(Int64 value) => Convert.ToBoolean(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(Boolean value) => value ? 1 : 0;
+    public static Char ToChar(Int64 value) => Convert.ToChar(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(Char value) => Convert.ToInt64(value);
+    public static SByte ToSByte(Int64 value) => Convert.ToSByte(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(SByte value) => Convert.ToInt64(value);
+    public static Byte ToByte(Int64 value) => Convert.ToByte(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(Byte value) => Convert.ToInt64(value);
+    public static Int16 ToInt16(Int64 value) => Convert.ToInt16(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(Int16 value) => Convert.ToInt64(value);
+    public static UInt16 ToUInt16(Int64 value) => Convert.ToUInt16(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(UInt16 value) => Convert.ToInt64(value);
+    public static Int32 ToInt32(Int64 value) => Convert.ToInt32(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(Int32 value) => Convert.ToInt64(value);
-    /// <inheritdoc/>
-    public static Int64 ToInt64(UInt32 value) => Convert.ToInt64(value);
+    public static UInt32 ToUInt32(Int64 value) => Convert.ToUInt32(value);
     /// <inheritdoc/>
     public static Int64 ToInt64(Int64 value) => value;
     /// <inheritdoc/>
-    public static Int64 ToInt64(UInt64 value) => Convert.ToInt64(value);
+    public static UInt64 ToUInt64(Int64 value) => Convert.ToUInt64(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(Single value) => Convert.ToInt64(value);
+    public static Single ToSingle(Int64 value) => Convert.ToSingle(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(Double value) => Convert.ToInt64(value);
+    public static Double ToDouble(Int64 value) => Convert.ToDouble(value);
     /// <inheritdoc/>
-    public static Int64 ToInt64(Decimal value) => Convert.ToInt64(value);
+    public static Decimal ToDecimal(Int64 value) => Convert.ToDecimal(value);
+    /// <inheritdoc/>
+    public static DateTime ToDateTime(Int64 value) => Convert.ToDateTime(value);
+    /// <inheritdoc/>
+    public static String ToString(Int64 value) => Convert.ToString(value);
 }

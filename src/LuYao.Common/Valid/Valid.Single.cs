@@ -5,31 +5,33 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Single ToSingle(Boolean value) => value ? 1 : 0;
+    public static Boolean ToBoolean(Single value) => Convert.ToBoolean(value);
     /// <inheritdoc/>
-    public static Single ToSingle(Char value) => Convert.ToSingle(value);
+    public static Char ToChar(Single value) => Convert.ToChar(value);
     /// <inheritdoc/>
-    public static Single ToSingle(SByte value) => Convert.ToSingle(value);
+    public static SByte ToSByte(Single value) => Convert.ToSByte(value);
     /// <inheritdoc/>
-    public static Single ToSingle(Byte value) => Convert.ToSingle(value);
+    public static Byte ToByte(Single value) => Convert.ToByte(value);
     /// <inheritdoc/>
-    public static Single ToSingle(Int16 value) => Convert.ToSingle(value);
+    public static Int16 ToInt16(Single value) => Convert.ToInt16(value);
     /// <inheritdoc/>
-    public static Single ToSingle(UInt16 value) => Convert.ToSingle(value);
+    public static UInt16 ToUInt16(Single value) => Convert.ToUInt16(value);
     /// <inheritdoc/>
-    public static Single ToSingle(Int32 value) => Convert.ToSingle(value);
+    public static Int32 ToInt32(Single value) => Convert.ToInt32(value);
     /// <inheritdoc/>
-    public static Single ToSingle(UInt32 value) => Convert.ToSingle(value);
+    public static UInt32 ToUInt32(Single value) => Convert.ToUInt32(value);
     /// <inheritdoc/>
-    public static Single ToSingle(Int64 value) => Convert.ToSingle(value);
+    public static Int64 ToInt64(Single value) => Convert.ToInt64(value);
     /// <inheritdoc/>
-    public static Single ToSingle(UInt64 value) => Convert.ToSingle(value);
+    public static UInt64 ToUInt64(Single value) => Convert.ToUInt64(value);
     /// <inheritdoc/>
     public static Single ToSingle(Single value) => value;
     /// <inheritdoc/>
-    public static Single ToSingle(Double value) => Convert.ToSingle(value);
+    public static Double ToDouble(Single value) => Convert.ToDouble(value);
     /// <inheritdoc/>
-    public static Single ToSingle(Decimal value) => Convert.ToSingle(value);
+    public static Decimal ToDecimal(Single value) => Convert.ToDecimal(value);
     /// <inheritdoc/>
-    public static Single ToSingle(DateTime value) => Convert.ToSingle(value);
+    public static DateTime ToDateTime(Single value) => Convert.ToDateTime(value);
+    /// <inheritdoc/>
+    public static String ToString(Single value) => Convert.ToString(value);
 }

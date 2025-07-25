@@ -5,31 +5,33 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static SByte ToSByte(Boolean value) => value ? ((sbyte)1) : ((sbyte)0);
+    public static Boolean ToBoolean(SByte value) => Convert.ToBoolean(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(Char value) => Convert.ToSByte(value);
+    public static Char ToChar(SByte value) => Convert.ToChar(value);
     /// <inheritdoc/>
     public static SByte ToSByte(SByte value) => value;
     /// <inheritdoc/>
-    public static SByte ToSByte(Byte value) => Convert.ToSByte(value);
+    public static Byte ToByte(SByte value) => Convert.ToByte(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(Int16 value) => Convert.ToSByte(value);
+    public static Int16 ToInt16(SByte value) => Convert.ToInt16(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(UInt16 value) => Convert.ToSByte(value);
+    public static UInt16 ToUInt16(SByte value) => Convert.ToUInt16(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(Int32 value) => Convert.ToSByte(value);
+    public static Int32 ToInt32(SByte value) => Convert.ToInt32(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(UInt32 value) => Convert.ToSByte(value);
+    public static UInt32 ToUInt32(SByte value) => Convert.ToUInt32(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(Int64 value) => Convert.ToSByte(value);
+    public static Int64 ToInt64(SByte value) => Convert.ToInt64(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(UInt64 value) => Convert.ToSByte(value);
+    public static UInt64 ToUInt64(SByte value) => Convert.ToUInt64(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(Single value) => Convert.ToSByte(value);
+    public static Single ToSingle(SByte value) => Convert.ToSingle(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(Double value) => Convert.ToSByte(value);
+    public static Double ToDouble(SByte value) => Convert.ToDouble(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(Decimal value) => Convert.ToSByte(value);
+    public static Decimal ToDecimal(SByte value) => Convert.ToDecimal(value);
     /// <inheritdoc/>
-    public static SByte ToSByte(DateTime value) => Convert.ToSByte(value);
+    public static DateTime ToDateTime(SByte value) => Convert.ToDateTime(value);
+    /// <inheritdoc/>
+    public static String ToString(SByte value) => Convert.ToString(value);
 }

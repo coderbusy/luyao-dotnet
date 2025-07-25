@@ -1,63 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace LuYao;
 
 partial class Valid
 {
-    private static readonly ISet<string> TRUE_STRINGS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
-        "1", "true", "yes", "on", "y", "t"
-    };
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(string? value)
-    {
-        if (value == null || string.IsNullOrWhiteSpace(value)) return false;
-        if (TRUE_STRINGS.Contains(value)) return true;
-        string str = value.Trim();
-        return TRUE_STRINGS.Contains(str) ? true : false;
-    }
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(char value) => false;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(byte value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(sbyte value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(short value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(ushort value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(int value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(uint value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(long value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(ulong value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(float value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(double value) => value != 0;
-
-    /// <inheritdoc/>
-    public static bool ToBoolean(decimal value) => value != 0;
-
-    /// <inheritdoc/>
-    public static Boolean ToBoolean(DateTime value) => false;
-
     /// <inheritdoc/>
     public static Boolean ToBoolean(Boolean value) => value;
+    /// <inheritdoc/>
+    public static Char ToChar(Boolean value) => Convert.ToChar(value);
+    /// <inheritdoc/>
+    public static SByte ToSByte(Boolean value) => Convert.ToSByte(value);
+    /// <inheritdoc/>
+    public static Byte ToByte(Boolean value) => Convert.ToByte(value);
+    /// <inheritdoc/>
+    public static Int16 ToInt16(Boolean value) => Convert.ToInt16(value);
+    /// <inheritdoc/>
+    public static UInt16 ToUInt16(Boolean value) => Convert.ToUInt16(value);
+    /// <inheritdoc/>
+    public static Int32 ToInt32(Boolean value) => Convert.ToInt32(value);
+    /// <inheritdoc/>
+    public static UInt32 ToUInt32(Boolean value) => Convert.ToUInt32(value);
+    /// <inheritdoc/>
+    public static Int64 ToInt64(Boolean value) => Convert.ToInt64(value);
+    /// <inheritdoc/>
+    public static UInt64 ToUInt64(Boolean value) => Convert.ToUInt64(value);
+    /// <inheritdoc/>
+    public static Single ToSingle(Boolean value) => Convert.ToSingle(value);
+    /// <inheritdoc/>
+    public static Double ToDouble(Boolean value) => Convert.ToDouble(value);
+    /// <inheritdoc/>
+    public static Decimal ToDecimal(Boolean value) => Convert.ToDecimal(value);
+    /// <inheritdoc/>
+    public static DateTime ToDateTime(Boolean value) => Convert.ToDateTime(value);
+    /// <inheritdoc/>
+    public static String ToString(Boolean value) => Convert.ToString(value);
 }

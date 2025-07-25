@@ -1,89 +1,37 @@
 ﻿using System;
-using System.Diagnostics;
 
 namespace LuYao;
 
 partial class Valid
 {
-    /// <summary>
-    /// 将字符串转换为 Int32。如果字符串为 null、空或无法解析，则返回 0。
-    /// </summary>
-    public static int ToInt32(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value)) return 0;
-        if (int.TryParse(value, out int result)) return result;
-        return 0;
-    }
-
-    /// <summary>
-    /// 将字符转换为 Int32。
-    /// </summary>
-    public static int ToInt32(char c) => (int)c;
-
-    /// <summary>
-    /// 将布尔值转换为 Int32。true 返回 1，false 返回 0。
-    /// </summary>
-    public static int ToInt32(bool value) => value ? 1 : 0;
-
-    /// <summary>
-    /// 将字节类型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(byte value) => (int)value;
-
-    /// <summary>
-    /// 将有符号字节类型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(sbyte value) => (int)value;
-
-    /// <summary>
-    /// 将短整型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(short value) => (int)value;
-
-    /// <summary>
-    /// 将无符号短整型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(ushort value) => (int)value;
-
-    /// <summary>
-    /// 返回自身（Int32）。
-    /// </summary>
-    public static int ToInt32(int value) => value;
-
-    /// <summary>
-    /// 将无符号整型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(uint value) => (int)value;
-
-    /// <summary>
-    /// 将长整型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(long value) => (int)value;
-
-    /// <summary>
-    /// 将无符号长整型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(ulong value) => (int)value;
-
-    /// <summary>
-    /// 将十进制类型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(decimal value) => decimal.ToInt32(value);
-
-    /// <summary>
-    /// 将单精度浮点数类型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(float value) => (int)value;
-
-    /// <summary>
-    /// 将双精度浮点数类型转换为 Int32。
-    /// </summary>
-    public static int ToInt32(double value) => (int)value;
-
-    /// <summary>
-    /// 将 <see cref="DateTime"/> 类型转换为 Int32，格式为 yyyyMMdd。
-    /// </summary>
-    /// <param name="d">要转换的日期。</param>
-    /// <returns>返回格式为 yyyyMMdd 的整数。</returns>
-    public static int ToInt32(DateTime d) { return d.Year * 10000 + d.Month * 100 + d.Day; }
+    /// <inheritdoc/>
+    public static Boolean ToBoolean(Int32 value) => Convert.ToBoolean(value);
+    /// <inheritdoc/>
+    public static Char ToChar(Int32 value) => Convert.ToChar(value);
+    /// <inheritdoc/>
+    public static SByte ToSByte(Int32 value) => Convert.ToSByte(value);
+    /// <inheritdoc/>
+    public static Byte ToByte(Int32 value) => Convert.ToByte(value);
+    /// <inheritdoc/>
+    public static Int16 ToInt16(Int32 value) => Convert.ToInt16(value);
+    /// <inheritdoc/>
+    public static UInt16 ToUInt16(Int32 value) => Convert.ToUInt16(value);
+    /// <inheritdoc/>
+    public static Int32 ToInt32(Int32 value) => value;
+    /// <inheritdoc/>
+    public static UInt32 ToUInt32(Int32 value) => Convert.ToUInt32(value);
+    /// <inheritdoc/>
+    public static Int64 ToInt64(Int32 value) => Convert.ToInt64(value);
+    /// <inheritdoc/>
+    public static UInt64 ToUInt64(Int32 value) => Convert.ToUInt64(value);
+    /// <inheritdoc/>
+    public static Single ToSingle(Int32 value) => Convert.ToSingle(value);
+    /// <inheritdoc/>
+    public static Double ToDouble(Int32 value) => Convert.ToDouble(value);
+    /// <inheritdoc/>
+    public static Decimal ToDecimal(Int32 value) => Convert.ToDecimal(value);
+    /// <inheritdoc/>
+    public static DateTime ToDateTime(Int32 value) => Convert.ToDateTime(value);
+    /// <inheritdoc/>
+    public static String ToString(Int32 value) => Convert.ToString(value);
 }

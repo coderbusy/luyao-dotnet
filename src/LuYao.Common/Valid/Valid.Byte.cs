@@ -5,54 +5,33 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Byte ToByte(Boolean value) => value ? (byte)1 : default;
-
+    public static Boolean ToBoolean(Byte value) => Convert.ToBoolean(value);
     /// <inheritdoc/>
-    public static Byte ToByte(Char value) => value <= (char)byte.MaxValue ? (byte)value : default;
-
+    public static Char ToChar(Byte value) => Convert.ToChar(value);
     /// <inheritdoc/>
-    public static Byte ToByte(SByte value) => value >= 0 ? (byte)value : default;
-
+    public static SByte ToSByte(Byte value) => Convert.ToSByte(value);
     /// <inheritdoc/>
     public static Byte ToByte(Byte value) => value;
-
     /// <inheritdoc/>
-    public static Byte ToByte(Int16 value) => value >= byte.MinValue && value <= byte.MaxValue ? (byte)value : default;
-
+    public static Int16 ToInt16(Byte value) => Convert.ToInt16(value);
     /// <inheritdoc/>
-    public static Byte ToByte(UInt16 value) => value <= byte.MaxValue ? (byte)value : default;
-
+    public static UInt16 ToUInt16(Byte value) => Convert.ToUInt16(value);
     /// <inheritdoc/>
-    public static Byte ToByte(Int32 value) => value >= byte.MinValue && value <= byte.MaxValue ? (byte)value : default;
-
+    public static Int32 ToInt32(Byte value) => Convert.ToInt32(value);
     /// <inheritdoc/>
-    public static Byte ToByte(UInt32 value) => value <= byte.MaxValue ? (byte)value : default;
-
+    public static UInt32 ToUInt32(Byte value) => Convert.ToUInt32(value);
     /// <inheritdoc/>
-    public static Byte ToByte(Int64 value) => value >= byte.MinValue && value <= byte.MaxValue ? (byte)value : default;
-
+    public static Int64 ToInt64(Byte value) => Convert.ToInt64(value);
     /// <inheritdoc/>
-    public static Byte ToByte(UInt64 value) => value <= byte.MaxValue ? (byte)value : default;
-
+    public static UInt64 ToUInt64(Byte value) => Convert.ToUInt64(value);
     /// <inheritdoc/>
-    public static Byte ToByte(Single value)
-    {
-        if (float.IsNaN(value) || float.IsInfinity(value)) return 0;
-        if (value < byte.MinValue || value > byte.MaxValue) return 0;
-        return (byte)value;
-    }
-
+    public static Single ToSingle(Byte value) => Convert.ToSingle(value);
     /// <inheritdoc/>
-    public static Byte ToByte(Double value)
-    {
-        if (double.IsNaN(value) || double.IsInfinity(value)) return 0;
-        if (value < byte.MinValue || value > byte.MaxValue) return 0;
-        return (byte)value;
-    }
-
+    public static Double ToDouble(Byte value) => Convert.ToDouble(value);
     /// <inheritdoc/>
-    public static Byte ToByte(Decimal value) => value >= byte.MinValue && value <= byte.MaxValue ? (byte)value : default;
-
+    public static Decimal ToDecimal(Byte value) => Convert.ToDecimal(value);
     /// <inheritdoc/>
-    public static Byte ToByte(DateTime value) => 0;
+    public static DateTime ToDateTime(Byte value) => Convert.ToDateTime(value);
+    /// <inheritdoc/>
+    public static String ToString(Byte value) => Convert.ToString(value);
 }
