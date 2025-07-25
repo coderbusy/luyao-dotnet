@@ -63,9 +63,9 @@ public class ValidBooleanTests
     [TestMethod]
     public void ToBoolean_CharValues_ReturnsExpected()
     {
-        Assert.IsFalse(Valid.ToBoolean((char)0));
-        Assert.IsTrue(Valid.ToBoolean((char)1));
-        Assert.IsTrue(Valid.ToBoolean('A'));
+        Assert.IsFalse(Valid.ToBoolean('f'));
+        Assert.IsTrue(Valid.ToBoolean('t'));
+        Assert.IsFalse(Valid.ToBoolean('A'));
     }
 
     [TestMethod]
@@ -73,7 +73,9 @@ public class ValidBooleanTests
     {
         Assert.IsFalse(Valid.ToBoolean((char?)null));
         Assert.IsFalse(Valid.ToBoolean((char?)0));
-        Assert.IsTrue(Valid.ToBoolean((char?)'B'));
+        Assert.IsTrue(Valid.ToBoolean((char?)'T'));
+        Assert.IsTrue(Valid.ToBoolean((char?)'t'));
+        Assert.IsFalse(Valid.ToBoolean((char?)'a'));
     }
 
     [TestMethod]
@@ -104,7 +106,7 @@ public class ValidBooleanTests
     {
         Assert.IsFalse(Valid.ToBoolean((sbyte)0));
         Assert.IsTrue(Valid.ToBoolean((sbyte)1));
-        Assert.IsFalse(Valid.ToBoolean((sbyte)-1));
+        Assert.IsTrue(Valid.ToBoolean((sbyte)-1));
     }
 
     [TestMethod]
@@ -120,7 +122,7 @@ public class ValidBooleanTests
     {
         Assert.IsFalse(Valid.ToBoolean((short)0));
         Assert.IsTrue(Valid.ToBoolean((short)1));
-        Assert.IsFalse(Valid.ToBoolean((short)-1));
+        Assert.IsTrue(Valid.ToBoolean((short)-1));
     }
 
     [TestMethod]
@@ -151,7 +153,7 @@ public class ValidBooleanTests
     {
         Assert.IsFalse(Valid.ToBoolean(0));
         Assert.IsTrue(Valid.ToBoolean(1));
-        Assert.IsFalse(Valid.ToBoolean(-1));
+        Assert.IsTrue(Valid.ToBoolean(-1));
     }
 
     [TestMethod]
@@ -182,7 +184,7 @@ public class ValidBooleanTests
     {
         Assert.IsFalse(Valid.ToBoolean((long)0));
         Assert.IsTrue(Valid.ToBoolean((long)1));
-        Assert.IsFalse(Valid.ToBoolean((long)-1));
+        Assert.IsTrue(Valid.ToBoolean((long)-1));
     }
 
     [TestMethod]
@@ -213,7 +215,7 @@ public class ValidBooleanTests
     {
         Assert.IsFalse(Valid.ToBoolean(0f));
         Assert.IsTrue(Valid.ToBoolean(1.1f));
-        Assert.IsFalse(Valid.ToBoolean(-1.1f));
+        Assert.IsTrue(Valid.ToBoolean(-1.1f));
     }
 
     [TestMethod]
@@ -229,7 +231,7 @@ public class ValidBooleanTests
     {
         Assert.IsFalse(Valid.ToBoolean(0d));
         Assert.IsTrue(Valid.ToBoolean(1.2d));
-        Assert.IsFalse(Valid.ToBoolean(-1.2d));
+        Assert.IsTrue(Valid.ToBoolean(-1.2d));
     }
 
     [TestMethod]
@@ -245,7 +247,7 @@ public class ValidBooleanTests
     {
         Assert.IsFalse(Valid.ToBoolean(0m));
         Assert.IsTrue(Valid.ToBoolean(1.3m));
-        Assert.IsFalse(Valid.ToBoolean(-1.3m));
+        Assert.IsTrue(Valid.ToBoolean(-1.3m));
     }
 
     [TestMethod]
