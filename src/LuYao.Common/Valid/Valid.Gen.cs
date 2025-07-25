@@ -335,34 +335,6 @@ namespace LuYao
             return Convert.ToSByte(value);
         }
         /// <inheritdoc/>
-        public static SByte ToSByte(Boolean value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(Char value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(SByte value) => value;
-        /// <inheritdoc/>
-        public static SByte ToSByte(Byte value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(Int16 value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(UInt16 value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(Int32 value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(UInt32 value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(Int64 value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(UInt64 value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(Single value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(Double value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(Decimal value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
-        public static SByte ToSByte(DateTime value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
         public static SByte ToSByte(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -605,34 +577,6 @@ namespace LuYao
             return Convert.ToInt16(value);
         }
         /// <inheritdoc/>
-        public static Int16 ToInt16(Boolean value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(Char value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(SByte value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(Byte value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(Int16 value) => value;
-        /// <inheritdoc/>
-        public static Int16 ToInt16(UInt16 value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(Int32 value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(UInt32 value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(Int64 value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(UInt64 value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(Single value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(Double value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(Decimal value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
-        public static Int16 ToInt16(DateTime value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
         public static Int16 ToInt16(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -753,34 +697,6 @@ namespace LuYao
             if (value is null) return default;
             return Convert.ToUInt16(value);
         }
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Boolean value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Char value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(SByte value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Byte value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Int16 value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(UInt16 value) => value;
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Int32 value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(UInt32 value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Int64 value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(UInt64 value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Single value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Double value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(Decimal value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
-        public static UInt16 ToUInt16(DateTime value) => Convert.ToUInt16(value);
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Object? value)
         {
@@ -1018,34 +934,6 @@ namespace LuYao
             return Convert.ToUInt32(value);
         }
         /// <inheritdoc/>
-        public static UInt32 ToUInt32(Boolean value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(Char value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(SByte value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(Byte value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(Int16 value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(UInt16 value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(Int32 value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(UInt32 value) => value;
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(Int64 value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(UInt64 value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(Single value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(Double value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(Decimal value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
-        public static UInt32 ToUInt32(DateTime value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
         public static UInt32 ToUInt32(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1166,32 +1054,6 @@ namespace LuYao
             if (value is null) return default;
             return Convert.ToInt64(value);
         }
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Boolean value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Char value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(SByte value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Byte value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Int16 value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(UInt16 value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Int32 value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(UInt32 value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Int64 value) => value;
-        /// <inheritdoc/>
-        public static Int64 ToInt64(UInt64 value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Single value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Double value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
-        public static Int64 ToInt64(Decimal value) => Convert.ToInt64(value);
         /// <inheritdoc/>
         public static Int64 ToInt64(Object? value)
         {
@@ -1314,34 +1176,6 @@ namespace LuYao
             return Convert.ToUInt64(value);
         }
         /// <inheritdoc/>
-        public static UInt64 ToUInt64(Boolean value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(Char value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(SByte value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(Byte value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(Int16 value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(UInt16 value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(Int32 value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(UInt32 value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(Int64 value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(UInt64 value) => value;
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(Single value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(Double value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(Decimal value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
-        public static UInt64 ToUInt64(DateTime value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
         public static UInt64 ToUInt64(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1462,34 +1296,6 @@ namespace LuYao
             if (value is null) return default;
             return Convert.ToSingle(value);
         }
-        /// <inheritdoc/>
-        public static Single ToSingle(Boolean value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(Char value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(SByte value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(Byte value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(Int16 value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(UInt16 value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(Int32 value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(UInt32 value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(Int64 value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(UInt64 value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(Single value) => value;
-        /// <inheritdoc/>
-        public static Single ToSingle(Double value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(Decimal value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
-        public static Single ToSingle(DateTime value) => Convert.ToSingle(value);
         /// <inheritdoc/>
         public static Single ToSingle(Object? value)
         {
@@ -1612,34 +1418,6 @@ namespace LuYao
             return Convert.ToDouble(value);
         }
         /// <inheritdoc/>
-        public static Double ToDouble(Boolean value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(Char value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(SByte value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(Byte value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(Int16 value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(UInt16 value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(Int32 value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(UInt32 value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(Int64 value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(UInt64 value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(Single value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(Double value) => value;
-        /// <inheritdoc/>
-        public static Double ToDouble(Decimal value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
-        public static Double ToDouble(DateTime value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
         public static Double ToDouble(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1760,34 +1538,6 @@ namespace LuYao
             if (value is null) return default;
             return Convert.ToDecimal(value);
         }
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Boolean value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Char value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(SByte value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Byte value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Int16 value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(UInt16 value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Int32 value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(UInt32 value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Int64 value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(UInt64 value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Single value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Double value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(Decimal value) => value;
-        /// <inheritdoc/>
-        public static Decimal ToDecimal(DateTime value) => Convert.ToDecimal(value);
         /// <inheritdoc/>
         public static Decimal ToDecimal(Object? value)
         {
