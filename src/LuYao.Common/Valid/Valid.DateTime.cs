@@ -33,31 +33,31 @@ partial class Valid
     /// <inheritdoc/>
     public static string ToString(DateTime value) => value.ToString("O");
     /// <inheritdoc/>
-    public static Boolean ToBoolean(DateTime value) => Convert.ToBoolean(value);
+    public static Boolean ToBoolean(DateTime value) => false;
     /// <inheritdoc/>
-    public static Char ToChar(DateTime value) => Convert.ToChar(value);
+    public static Char ToChar(DateTime value) => default;
     /// <inheritdoc/>
-    public static SByte ToSByte(DateTime value) => Convert.ToSByte(value);
+    public static SByte ToSByte(DateTime value) => default;
     /// <inheritdoc/>
-    public static Byte ToByte(DateTime value) => Convert.ToByte(value);
+    public static Byte ToByte(DateTime value) => default;
     /// <inheritdoc/>
-    public static Int16 ToInt16(DateTime value) => Convert.ToInt16(value);
+    public static Int16 ToInt16(DateTime value) => default;
     /// <inheritdoc/>
-    public static UInt16 ToUInt16(DateTime value) => Convert.ToUInt16(value);
+    public static UInt16 ToUInt16(DateTime value) => default;
     /// <inheritdoc/>
-    public static Int32 ToInt32(DateTime value) => Convert.ToInt32(value);
+    public static Int32 ToInt32(DateTime value) => default;
     /// <inheritdoc/>
-    public static UInt32 ToUInt32(DateTime value) => Convert.ToUInt32(value);
+    public static UInt32 ToUInt32(DateTime value) => default;
     /// <inheritdoc/>
-    public static Int64 ToInt64(DateTime value) => Convert.ToInt64(value);
+    public static Int64 ToInt64(DateTime value) => default;
     /// <inheritdoc/>
-    public static UInt64 ToUInt64(DateTime value) => Convert.ToUInt64(value);
+    public static UInt64 ToUInt64(DateTime value) => default;
     /// <inheritdoc/>
-    public static Single ToSingle(DateTime value) => Convert.ToSingle(value);
+    public static Single ToSingle(DateTime value) => default;
     /// <inheritdoc/>
-    public static Double ToDouble(DateTime value) => Convert.ToDouble(value);
+    public static Double ToDouble(DateTime value) => default;
     /// <inheritdoc/>
-    public static Decimal ToDecimal(DateTime value) => Convert.ToDecimal(value);
+    public static Decimal ToDecimal(DateTime value) => default;
     /// <inheritdoc/>
     public static DateTime ToDateTime(DateTime value) => value;
 }

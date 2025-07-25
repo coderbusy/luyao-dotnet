@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LuYao;
 
 partial class Valid
 {
+    private static readonly ISet<string> TRUE_STRINGS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "1", "true", "yes", "on", "y", "t"
+    };
     /// <inheritdoc/>
     public static Boolean ToBoolean(String? value)
     {
-        if (value is null) return default;
-        return Convert.ToBoolean(value);
+        if (value == null || string.IsNullOrWhiteSpace(value)) return false;
+        if (TRUE_STRINGS.Contains(value)) return true;
+        string str = value.Trim();
+        return TRUE_STRINGS.Contains(str) ? true : false;
     }
     /// <inheritdoc/>
     public static Char ToChar(String? value)
@@ -86,12 +93,10 @@ partial class Valid
     public static DateTime ToDateTime(String? value)
     {
         if (value is null) return default;
-        return Convert.ToDateTime(value);
+        if (DateTime.TryParse(value, out var dt)) return dt;
+        return default;
     }
+
     /// <inheritdoc/>
-    public static String ToString(String? value)
-    {
-        if (value is null) return String.Empty;
-        return Convert.ToString(value);
-    }
+    public static String ToString(String? value) => value ?? string.Empty;
 }
