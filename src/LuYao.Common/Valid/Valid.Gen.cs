@@ -10,7 +10,7 @@ namespace LuYao
         public static Boolean ToBoolean(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToBoolean(value);
+            return ToBoolean(value.Value);
         }
         /// <inheritdoc/>
         public static Boolean ToBoolean(Boolean value) => value;
@@ -51,85 +51,85 @@ namespace LuYao
         public static Char ToChar(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToChar(value);
+            return ToChar(value.Value);
         }
         /// <inheritdoc/>
         public static Char ToChar(String? value)
@@ -200,85 +200,85 @@ namespace LuYao
         public static SByte ToSByte(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToSByte(value);
+            return ToSByte(value.Value);
         }
         /// <inheritdoc/>
         public static SByte ToSByte(String? value)
@@ -349,85 +349,85 @@ namespace LuYao
         public static Byte ToByte(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToByte(value);
+            return ToByte(value.Value);
         }
         /// <inheritdoc/>
         public static Byte ToByte(String? value)
@@ -498,85 +498,85 @@ namespace LuYao
         public static Int16 ToInt16(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToInt16(value);
+            return ToInt16(value.Value);
         }
         /// <inheritdoc/>
         public static Int16 ToInt16(String? value)
@@ -647,85 +647,85 @@ namespace LuYao
         public static UInt16 ToUInt16(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt16(value);
+            return ToUInt16(value.Value);
         }
         /// <inheritdoc/>
         public static UInt16 ToUInt16(String? value)
@@ -796,7 +796,7 @@ namespace LuYao
         public static Int32 ToInt32(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToInt32(value);
+            return ToInt32(value.Value);
         }
         /// <inheritdoc/>
         public static Int32 ToInt32(Object? value)
@@ -833,85 +833,85 @@ namespace LuYao
         public static UInt32 ToUInt32(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt32(value);
+            return ToUInt32(value.Value);
         }
         /// <inheritdoc/>
         public static UInt32 ToUInt32(String? value)
@@ -982,85 +982,85 @@ namespace LuYao
         public static Int64 ToInt64(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToInt64(value);
+            return ToInt64(value.Value);
         }
         /// <inheritdoc/>
         public static Int64 ToInt64(String? value)
@@ -1129,85 +1129,85 @@ namespace LuYao
         public static UInt64 ToUInt64(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToUInt64(value);
+            return ToUInt64(value.Value);
         }
         /// <inheritdoc/>
         public static UInt64 ToUInt64(String? value)
@@ -1278,85 +1278,85 @@ namespace LuYao
         public static Single ToSingle(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToSingle(value);
+            return ToSingle(value.Value);
         }
         /// <inheritdoc/>
         public static Single ToSingle(String? value)
@@ -1427,85 +1427,85 @@ namespace LuYao
         public static Double ToDouble(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToDouble(value);
+            return ToDouble(value.Value);
         }
         /// <inheritdoc/>
         public static Double ToDouble(String? value)
@@ -1576,85 +1576,85 @@ namespace LuYao
         public static Decimal ToDecimal(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToDecimal(value);
+            return ToDecimal(value.Value);
         }
         /// <inheritdoc/>
         public static Decimal ToDecimal(String? value)
@@ -1725,85 +1725,85 @@ namespace LuYao
         public static DateTime ToDateTime(Boolean? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(Char? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(SByte? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(Byte? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(Int16? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(UInt16? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(Int32? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(UInt32? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(Int64? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(UInt64? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(Single? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(Double? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(Decimal? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(DateTime? value)
         {
             if (value is null) return default;
-            return Convert.ToDateTime(value);
+            return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
         public static DateTime ToDateTime(String? value)
