@@ -114,4 +114,6 @@ partial class Valid
 
     /// <inheritdoc/>
     public static Boolean ToBoolean(DateTime value) => value > DateTime.MinValue;
+    /// <inheritdoc/>
+    public static Boolean ToBoolean(Boolean value) => value;
 }

@@ -91,14 +91,12 @@ namespace LuYao
             return ToBoolean(value.Value);
         }
         /// <inheritdoc/>
-        public static Boolean ToBoolean(Boolean value) => value;
-        /// <inheritdoc/>
         public static Boolean ToBoolean(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
             switch (value)
             {
-                case Boolean vBoolean: return ToBoolean(vBoolean);
+                case Boolean vBoolean: return vBoolean;
                 case Char vChar: return ToBoolean(vChar);
                 case SByte vSByte: return ToBoolean(vSByte);
                 case Byte vByte: return ToBoolean(vByte);
@@ -220,7 +218,7 @@ namespace LuYao
             switch (value)
             {
                 case Boolean vBoolean: return ToChar(vBoolean);
-                case Char vChar: return ToChar(vChar);
+                case Char vChar: return vChar;
                 case SByte vSByte: return ToChar(vSByte);
                 case Byte vByte: return ToChar(vByte);
                 case Int16 vInt16: return ToChar(vInt16);
@@ -342,7 +340,7 @@ namespace LuYao
             {
                 case Boolean vBoolean: return ToSByte(vBoolean);
                 case Char vChar: return ToSByte(vChar);
-                case SByte vSByte: return ToSByte(vSByte);
+                case SByte vSByte: return vSByte;
                 case Byte vByte: return ToSByte(vByte);
                 case Int16 vInt16: return ToSByte(vInt16);
                 case UInt16 vUInt16: return ToSByte(vUInt16);
@@ -464,7 +462,7 @@ namespace LuYao
                 case Boolean vBoolean: return ToByte(vBoolean);
                 case Char vChar: return ToByte(vChar);
                 case SByte vSByte: return ToByte(vSByte);
-                case Byte vByte: return ToByte(vByte);
+                case Byte vByte: return vByte;
                 case Int16 vInt16: return ToByte(vInt16);
                 case UInt16 vUInt16: return ToByte(vUInt16);
                 case Int32 vInt32: return ToByte(vInt32);
@@ -586,7 +584,7 @@ namespace LuYao
                 case Char vChar: return ToInt16(vChar);
                 case SByte vSByte: return ToInt16(vSByte);
                 case Byte vByte: return ToInt16(vByte);
-                case Int16 vInt16: return ToInt16(vInt16);
+                case Int16 vInt16: return vInt16;
                 case UInt16 vUInt16: return ToInt16(vUInt16);
                 case Int32 vInt32: return ToInt16(vInt32);
                 case UInt32 vUInt32: return ToInt16(vUInt32);
@@ -708,7 +706,7 @@ namespace LuYao
                 case SByte vSByte: return ToUInt16(vSByte);
                 case Byte vByte: return ToUInt16(vByte);
                 case Int16 vInt16: return ToUInt16(vInt16);
-                case UInt16 vUInt16: return ToUInt16(vUInt16);
+                case UInt16 vUInt16: return vUInt16;
                 case Int32 vInt32: return ToUInt16(vInt32);
                 case UInt32 vUInt32: return ToUInt16(vUInt32);
                 case Int64 vInt64: return ToUInt16(vInt64);
@@ -824,7 +822,7 @@ namespace LuYao
                 case Byte vByte: return ToInt32(vByte);
                 case Int16 vInt16: return ToInt32(vInt16);
                 case UInt16 vUInt16: return ToInt32(vUInt16);
-                case Int32 vInt32: return ToInt32(vInt32);
+                case Int32 vInt32: return vInt32;
                 case UInt32 vUInt32: return ToInt32(vUInt32);
                 case Int64 vInt64: return ToInt32(vInt64);
                 case UInt64 vUInt64: return ToInt32(vUInt64);
@@ -946,7 +944,7 @@ namespace LuYao
                 case Int16 vInt16: return ToUInt32(vInt16);
                 case UInt16 vUInt16: return ToUInt32(vUInt16);
                 case Int32 vInt32: return ToUInt32(vInt32);
-                case UInt32 vUInt32: return ToUInt32(vUInt32);
+                case UInt32 vUInt32: return vUInt32;
                 case Int64 vInt64: return ToUInt32(vInt64);
                 case UInt64 vUInt64: return ToUInt32(vUInt64);
                 case Single vSingle: return ToUInt32(vSingle);
@@ -1068,7 +1066,7 @@ namespace LuYao
                 case UInt16 vUInt16: return ToInt64(vUInt16);
                 case Int32 vInt32: return ToInt64(vInt32);
                 case UInt32 vUInt32: return ToInt64(vUInt32);
-                case Int64 vInt64: return ToInt64(vInt64);
+                case Int64 vInt64: return vInt64;
                 case UInt64 vUInt64: return ToInt64(vUInt64);
                 case Single vSingle: return ToInt64(vSingle);
                 case Double vDouble: return ToInt64(vDouble);
@@ -1190,7 +1188,7 @@ namespace LuYao
                 case Int32 vInt32: return ToUInt64(vInt32);
                 case UInt32 vUInt32: return ToUInt64(vUInt32);
                 case Int64 vInt64: return ToUInt64(vInt64);
-                case UInt64 vUInt64: return ToUInt64(vUInt64);
+                case UInt64 vUInt64: return vUInt64;
                 case Single vSingle: return ToUInt64(vSingle);
                 case Double vDouble: return ToUInt64(vDouble);
                 case Decimal vDecimal: return ToUInt64(vDecimal);
@@ -1312,7 +1310,7 @@ namespace LuYao
                 case UInt32 vUInt32: return ToSingle(vUInt32);
                 case Int64 vInt64: return ToSingle(vInt64);
                 case UInt64 vUInt64: return ToSingle(vUInt64);
-                case Single vSingle: return ToSingle(vSingle);
+                case Single vSingle: return vSingle;
                 case Double vDouble: return ToSingle(vDouble);
                 case Decimal vDecimal: return ToSingle(vDecimal);
                 case DateTime vDateTime: return ToSingle(vDateTime);
@@ -1434,7 +1432,7 @@ namespace LuYao
                 case Int64 vInt64: return ToDouble(vInt64);
                 case UInt64 vUInt64: return ToDouble(vUInt64);
                 case Single vSingle: return ToDouble(vSingle);
-                case Double vDouble: return ToDouble(vDouble);
+                case Double vDouble: return vDouble;
                 case Decimal vDecimal: return ToDouble(vDecimal);
                 case DateTime vDateTime: return ToDouble(vDateTime);
                 case String vString: return ToDouble(vString);
@@ -1556,7 +1554,7 @@ namespace LuYao
                 case UInt64 vUInt64: return ToDecimal(vUInt64);
                 case Single vSingle: return ToDecimal(vSingle);
                 case Double vDouble: return ToDecimal(vDouble);
-                case Decimal vDecimal: return ToDecimal(vDecimal);
+                case Decimal vDecimal: return vDecimal;
                 case DateTime vDateTime: return ToDecimal(vDateTime);
                 case String vString: return ToDecimal(vString);
             }
@@ -1672,7 +1670,7 @@ namespace LuYao
                 case Single vSingle: return ToDateTime(vSingle);
                 case Double vDouble: return ToDateTime(vDouble);
                 case Decimal vDecimal: return ToDateTime(vDecimal);
-                case DateTime vDateTime: return ToDateTime(vDateTime);
+                case DateTime vDateTime: return vDateTime;
                 case String vString: return ToDateTime(vString);
             }
             try { if (value is IConvertible conv) return conv.ToDateTime(null); }
@@ -1794,7 +1792,7 @@ namespace LuYao
                 case Double vDouble: return ToString(vDouble);
                 case Decimal vDecimal: return ToString(vDecimal);
                 case DateTime vDateTime: return ToString(vDateTime);
-                case String vString: return ToString(vString);
+                case String vString: return vString;
             }
             return Convert.ToString(value) ?? String.Empty;
         }
