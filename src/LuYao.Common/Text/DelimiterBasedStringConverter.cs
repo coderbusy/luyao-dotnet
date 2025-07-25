@@ -61,7 +61,7 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
         if (!string.IsNullOrWhiteSpace(value))
         {
             int count = items.Count;
-            string[] parts = value.Split(new[] { Delimiter }, count, StringSplitOptions.None);
+            string[] parts = value.Split(new[] { Delimiter }, StringSplitOptions.None);
             for (int i = 0; i < count && i < parts.Length; i++)
             {
                 Item item = items[i];

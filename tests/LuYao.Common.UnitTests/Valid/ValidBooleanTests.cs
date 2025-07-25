@@ -35,7 +35,6 @@ public class ValidBooleanTests
         Assert.IsTrue(Valid.ToBoolean("on"));
         Assert.IsTrue(Valid.ToBoolean("y"));
         Assert.IsTrue(Valid.ToBoolean("t"));
-        Assert.IsTrue(Valid.ToBoolean("abc"));
         Assert.IsTrue(Valid.ToBoolean("True"));
     }
 
@@ -61,20 +60,20 @@ public class ValidBooleanTests
     }
 
     [TestMethod]
-    public void ToBoolean_CharValues_ReturnsExpected()
+    public void ToBoolean_CharValues_AlwaysFalse()
     {
         Assert.IsFalse(Valid.ToBoolean('f'));
-        Assert.IsTrue(Valid.ToBoolean('t'));
+        Assert.IsFalse(Valid.ToBoolean('t'));
         Assert.IsFalse(Valid.ToBoolean('A'));
     }
 
     [TestMethod]
-    public void ToBoolean_NullableCharValues_ReturnsExpected()
+    public void ToBoolean_NullableCharValues_AlwaysFalse()
     {
         Assert.IsFalse(Valid.ToBoolean((char?)null));
         Assert.IsFalse(Valid.ToBoolean((char?)0));
-        Assert.IsTrue(Valid.ToBoolean((char?)'T'));
-        Assert.IsTrue(Valid.ToBoolean((char?)'t'));
+        Assert.IsFalse(Valid.ToBoolean((char?)'T'));
+        Assert.IsFalse(Valid.ToBoolean((char?)'t'));
         Assert.IsFalse(Valid.ToBoolean((char?)'a'));
     }
 

@@ -5,34 +5,22 @@ namespace LuYao;
 
 partial class Valid
 {
-    private static readonly ISet<string> FALSE_STRINGS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    private static readonly ISet<string> TRUE_STRINGS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
-        "0", "false", "no", "off", "n", "f", "null"
+        "1", "true", "yes", "on", "y", "t"
     };
 
     /// <inheritdoc/>
     public static bool ToBoolean(string? value)
     {
         if (value == null || string.IsNullOrWhiteSpace(value)) return false;
-        if (FALSE_STRINGS.Contains(value)) return false;
+        if (TRUE_STRINGS.Contains(value)) return true;
         string str = value.Trim();
-        return FALSE_STRINGS.Contains(str) ? false : true;
+        return TRUE_STRINGS.Contains(str) ? true : false;
     }
 
     /// <inheritdoc/>
-    public static bool ToBoolean(char value)
-    {
-        switch (value)
-        {
-            case 't':
-            case 'T':
-                return true;
-            case 'f':
-            case 'F':
-                return false;
-        }
-        return false;
-    }
+    public static bool ToBoolean(char value) => false;
 
     /// <inheritdoc/>
     public static bool ToBoolean(byte value) => value != 0;
