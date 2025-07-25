@@ -123,12 +123,6 @@ partial class Valid
     /// </summary>
     public static string ToString(Decimal value) => value.ToString("0.00##", CultureInfo.InvariantCulture);
 
-
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(string value) => value ?? string.Empty;
-
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>

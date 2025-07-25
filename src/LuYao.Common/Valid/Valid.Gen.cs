@@ -38,7 +38,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToBoolean(vDateTime);
                 case String vString: return ToBoolean(vString);
             }
-            return Convert.ToBoolean(value);
+            try { if (value is IConvertible conv) return conv.ToBoolean(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToBoolean(tmp);
         }
         #endregion
 
@@ -128,6 +132,12 @@ namespace LuYao
             return Convert.ToChar(value);
         }
         /// <inheritdoc/>
+        public static Char ToChar(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToChar(value);
+        }
+        /// <inheritdoc/>
         public static Char ToChar(Boolean value) => Convert.ToChar(value);
         /// <inheritdoc/>
         public static Char ToChar(Char value) => value;
@@ -156,8 +166,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static Char ToChar(DateTime value) => Convert.ToChar(value);
         /// <inheritdoc/>
-        public static Char ToChar(String value) => Convert.ToChar(value);
-        /// <inheritdoc/>
         public static Char ToChar(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -179,7 +187,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToChar(vDateTime);
                 case String vString: return ToChar(vString);
             }
-            return Convert.ToChar(value);
+            try { if (value is IConvertible conv) return conv.ToChar(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToChar(tmp);
         }
         #endregion
 
@@ -269,6 +281,12 @@ namespace LuYao
             return Convert.ToSByte(value);
         }
         /// <inheritdoc/>
+        public static SByte ToSByte(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToSByte(value);
+        }
+        /// <inheritdoc/>
         public static SByte ToSByte(Boolean value) => Convert.ToSByte(value);
         /// <inheritdoc/>
         public static SByte ToSByte(Char value) => Convert.ToSByte(value);
@@ -297,8 +315,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static SByte ToSByte(DateTime value) => Convert.ToSByte(value);
         /// <inheritdoc/>
-        public static SByte ToSByte(String value) => Convert.ToSByte(value);
-        /// <inheritdoc/>
         public static SByte ToSByte(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -320,7 +336,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToSByte(vDateTime);
                 case String vString: return ToSByte(vString);
             }
-            return Convert.ToSByte(value);
+            try { if (value is IConvertible conv) return conv.ToSByte(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToSByte(tmp);
         }
         #endregion
 
@@ -410,6 +430,12 @@ namespace LuYao
             return Convert.ToByte(value);
         }
         /// <inheritdoc/>
+        public static Byte ToByte(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToByte(value);
+        }
+        /// <inheritdoc/>
         public static Byte ToByte(Boolean value) => Convert.ToByte(value);
         /// <inheritdoc/>
         public static Byte ToByte(Char value) => Convert.ToByte(value);
@@ -438,8 +464,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static Byte ToByte(DateTime value) => Convert.ToByte(value);
         /// <inheritdoc/>
-        public static Byte ToByte(String value) => Convert.ToByte(value);
-        /// <inheritdoc/>
         public static Byte ToByte(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -461,7 +485,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToByte(vDateTime);
                 case String vString: return ToByte(vString);
             }
-            return Convert.ToByte(value);
+            try { if (value is IConvertible conv) return conv.ToByte(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToByte(tmp);
         }
         #endregion
 
@@ -551,6 +579,12 @@ namespace LuYao
             return Convert.ToInt16(value);
         }
         /// <inheritdoc/>
+        public static Int16 ToInt16(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToInt16(value);
+        }
+        /// <inheritdoc/>
         public static Int16 ToInt16(Boolean value) => Convert.ToInt16(value);
         /// <inheritdoc/>
         public static Int16 ToInt16(Char value) => Convert.ToInt16(value);
@@ -579,8 +613,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static Int16 ToInt16(DateTime value) => Convert.ToInt16(value);
         /// <inheritdoc/>
-        public static Int16 ToInt16(String value) => Convert.ToInt16(value);
-        /// <inheritdoc/>
         public static Int16 ToInt16(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -602,7 +634,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToInt16(vDateTime);
                 case String vString: return ToInt16(vString);
             }
-            return Convert.ToInt16(value);
+            try { if (value is IConvertible conv) return conv.ToInt16(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToInt16(tmp);
         }
         #endregion
 
@@ -692,6 +728,12 @@ namespace LuYao
             return Convert.ToUInt16(value);
         }
         /// <inheritdoc/>
+        public static UInt16 ToUInt16(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToUInt16(value);
+        }
+        /// <inheritdoc/>
         public static UInt16 ToUInt16(Boolean value) => Convert.ToUInt16(value);
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Char value) => Convert.ToUInt16(value);
@@ -720,8 +762,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static UInt16 ToUInt16(DateTime value) => Convert.ToUInt16(value);
         /// <inheritdoc/>
-        public static UInt16 ToUInt16(String value) => Convert.ToUInt16(value);
-        /// <inheritdoc/>
         public static UInt16 ToUInt16(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -743,7 +783,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToUInt16(vDateTime);
                 case String vString: return ToUInt16(vString);
             }
-            return Convert.ToUInt16(value);
+            try { if (value is IConvertible conv) return conv.ToUInt16(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToUInt16(tmp);
         }
         #endregion
 
@@ -776,7 +820,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToInt32(vDateTime);
                 case String vString: return ToInt32(vString);
             }
-            return Convert.ToInt32(value);
+            try { if (value is IConvertible conv) return conv.ToInt32(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToInt32(tmp);
         }
         #endregion
 
@@ -866,6 +914,12 @@ namespace LuYao
             return Convert.ToUInt32(value);
         }
         /// <inheritdoc/>
+        public static UInt32 ToUInt32(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToUInt32(value);
+        }
+        /// <inheritdoc/>
         public static UInt32 ToUInt32(Boolean value) => Convert.ToUInt32(value);
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Char value) => Convert.ToUInt32(value);
@@ -894,8 +948,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static UInt32 ToUInt32(DateTime value) => Convert.ToUInt32(value);
         /// <inheritdoc/>
-        public static UInt32 ToUInt32(String value) => Convert.ToUInt32(value);
-        /// <inheritdoc/>
         public static UInt32 ToUInt32(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -917,7 +969,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToUInt32(vDateTime);
                 case String vString: return ToUInt32(vString);
             }
-            return Convert.ToUInt32(value);
+            try { if (value is IConvertible conv) return conv.ToUInt32(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToUInt32(tmp);
         }
         #endregion
 
@@ -1007,6 +1063,12 @@ namespace LuYao
             return Convert.ToInt64(value);
         }
         /// <inheritdoc/>
+        public static Int64 ToInt64(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToInt64(value);
+        }
+        /// <inheritdoc/>
         public static Int64 ToInt64(Boolean value) => Convert.ToInt64(value);
         /// <inheritdoc/>
         public static Int64 ToInt64(Char value) => Convert.ToInt64(value);
@@ -1033,8 +1095,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static Int64 ToInt64(Decimal value) => Convert.ToInt64(value);
         /// <inheritdoc/>
-        public static Int64 ToInt64(String value) => Convert.ToInt64(value);
-        /// <inheritdoc/>
         public static Int64 ToInt64(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1056,7 +1116,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToInt64(vDateTime);
                 case String vString: return ToInt64(vString);
             }
-            return Convert.ToInt64(value);
+            try { if (value is IConvertible conv) return conv.ToInt64(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToInt64(tmp);
         }
         #endregion
 
@@ -1146,6 +1210,12 @@ namespace LuYao
             return Convert.ToUInt64(value);
         }
         /// <inheritdoc/>
+        public static UInt64 ToUInt64(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToUInt64(value);
+        }
+        /// <inheritdoc/>
         public static UInt64 ToUInt64(Boolean value) => Convert.ToUInt64(value);
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Char value) => Convert.ToUInt64(value);
@@ -1174,8 +1244,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static UInt64 ToUInt64(DateTime value) => Convert.ToUInt64(value);
         /// <inheritdoc/>
-        public static UInt64 ToUInt64(String value) => Convert.ToUInt64(value);
-        /// <inheritdoc/>
         public static UInt64 ToUInt64(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1197,7 +1265,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToUInt64(vDateTime);
                 case String vString: return ToUInt64(vString);
             }
-            return Convert.ToUInt64(value);
+            try { if (value is IConvertible conv) return conv.ToUInt64(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToUInt64(tmp);
         }
         #endregion
 
@@ -1287,6 +1359,12 @@ namespace LuYao
             return Convert.ToSingle(value);
         }
         /// <inheritdoc/>
+        public static Single ToSingle(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToSingle(value);
+        }
+        /// <inheritdoc/>
         public static Single ToSingle(Boolean value) => Convert.ToSingle(value);
         /// <inheritdoc/>
         public static Single ToSingle(Char value) => Convert.ToSingle(value);
@@ -1315,8 +1393,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static Single ToSingle(DateTime value) => Convert.ToSingle(value);
         /// <inheritdoc/>
-        public static Single ToSingle(String value) => Convert.ToSingle(value);
-        /// <inheritdoc/>
         public static Single ToSingle(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1338,7 +1414,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToSingle(vDateTime);
                 case String vString: return ToSingle(vString);
             }
-            return Convert.ToSingle(value);
+            try { if (value is IConvertible conv) return conv.ToSingle(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToSingle(tmp);
         }
         #endregion
 
@@ -1428,6 +1508,12 @@ namespace LuYao
             return Convert.ToDouble(value);
         }
         /// <inheritdoc/>
+        public static Double ToDouble(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToDouble(value);
+        }
+        /// <inheritdoc/>
         public static Double ToDouble(Boolean value) => Convert.ToDouble(value);
         /// <inheritdoc/>
         public static Double ToDouble(Char value) => Convert.ToDouble(value);
@@ -1456,8 +1542,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static Double ToDouble(DateTime value) => Convert.ToDouble(value);
         /// <inheritdoc/>
-        public static Double ToDouble(String value) => Convert.ToDouble(value);
-        /// <inheritdoc/>
         public static Double ToDouble(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1479,7 +1563,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToDouble(vDateTime);
                 case String vString: return ToDouble(vString);
             }
-            return Convert.ToDouble(value);
+            try { if (value is IConvertible conv) return conv.ToDouble(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToDouble(tmp);
         }
         #endregion
 
@@ -1569,6 +1657,12 @@ namespace LuYao
             return Convert.ToDecimal(value);
         }
         /// <inheritdoc/>
+        public static Decimal ToDecimal(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToDecimal(value);
+        }
+        /// <inheritdoc/>
         public static Decimal ToDecimal(Boolean value) => Convert.ToDecimal(value);
         /// <inheritdoc/>
         public static Decimal ToDecimal(Char value) => Convert.ToDecimal(value);
@@ -1597,8 +1691,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static Decimal ToDecimal(DateTime value) => Convert.ToDecimal(value);
         /// <inheritdoc/>
-        public static Decimal ToDecimal(String value) => Convert.ToDecimal(value);
-        /// <inheritdoc/>
         public static Decimal ToDecimal(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1620,7 +1712,11 @@ namespace LuYao
                 case DateTime vDateTime: return ToDecimal(vDateTime);
                 case String vString: return ToDecimal(vString);
             }
-            return Convert.ToDecimal(value);
+            try { if (value is IConvertible conv) return conv.ToDecimal(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToDecimal(tmp);
         }
         #endregion
 
@@ -1710,6 +1806,12 @@ namespace LuYao
             return Convert.ToDateTime(value);
         }
         /// <inheritdoc/>
+        public static DateTime ToDateTime(String? value)
+        {
+            if (value is null) return default;
+            return Convert.ToDateTime(value);
+        }
+        /// <inheritdoc/>
         public static DateTime ToDateTime(Boolean value) => Convert.ToDateTime(value);
         /// <inheritdoc/>
         public static DateTime ToDateTime(Char value) => Convert.ToDateTime(value);
@@ -1736,8 +1838,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static DateTime ToDateTime(DateTime value) => value;
         /// <inheritdoc/>
-        public static DateTime ToDateTime(String value) => Convert.ToDateTime(value);
-        /// <inheritdoc/>
         public static DateTime ToDateTime(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
@@ -1759,11 +1859,21 @@ namespace LuYao
                 case DateTime vDateTime: return ToDateTime(vDateTime);
                 case String vString: return ToDateTime(vString);
             }
-            return Convert.ToDateTime(value);
+            try { if (value is IConvertible conv) return conv.ToDateTime(null); }
+            catch { }
+            string? tmp = value.ToString();
+            if (string.IsNullOrWhiteSpace(tmp)) return default;
+            return ToDateTime(tmp);
         }
         #endregion
 
         #region String
+        /// <inheritdoc/>
+        public static String ToString(String? value)
+        {
+            if (value is null) return String.Empty;
+            return Convert.ToString(value);
+        }
         /// <inheritdoc/>
         public static String ToString(Object? value)
         {
