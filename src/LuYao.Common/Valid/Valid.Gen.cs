@@ -214,34 +214,6 @@ namespace LuYao
             return Convert.ToChar(value);
         }
         /// <inheritdoc/>
-        public static Char ToChar(Boolean value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(Char value) => value;
-        /// <inheritdoc/>
-        public static Char ToChar(SByte value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(Byte value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(Int16 value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(UInt16 value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(Int32 value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(UInt32 value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(Int64 value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(UInt64 value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(Single value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(Double value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(Decimal value) => Convert.ToChar(value);
-        /// <inheritdoc/>
-        public static Char ToChar(DateTime value) => Convert.ToChar(value);
-        /// <inheritdoc/>
         public static Char ToChar(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
