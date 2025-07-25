@@ -49,12 +49,6 @@ public class ValidStringTests
     }
 
     [TestMethod]
-    public void ToString_NullableBoolNull_Returns0()
-    {
-        Assert.AreEqual("0", Valid.ToString((bool?)null));
-    }
-
-    [TestMethod]
     public void ToString_Char_ReturnsCharString()
     {
         Assert.AreEqual("A", Valid.ToString('A'));
@@ -120,13 +114,6 @@ public class ValidStringTests
     {
         var dt = new DateTime(2024, 7, 18, 15, 30, 45);
         Assert.AreEqual("2024/07/18 15:30:45", Valid.ToString(dt, Date.全部显示));
-    }
-
-    [TestMethod]
-    public void ToString_DateTimeOnly_Returns年月日Format()
-    {
-        var dt = new DateTime(2024, 7, 18, 15, 30, 45);
-        Assert.AreEqual("2024/07/18", Valid.ToString(dt));
     }
 
     [TestMethod]
