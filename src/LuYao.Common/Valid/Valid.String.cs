@@ -94,4 +94,7 @@ partial class Valid
     /// 将值转换为字符串。
     /// </summary>
     public static string ToString(DateTime? value, Date format) => ToString(value ?? DateTime.MinValue, format);
+
+    /// <inheritdoc/>
+    public static string ToString(DateTime value) => value.ToString("O");
 }

@@ -1962,12 +1962,6 @@ namespace LuYao
             return ToDateTime(value.Value);
         }
         /// <inheritdoc/>
-        public static DateTime ToDateTime(String? value)
-        {
-            if (value is null) return default;
-            return Convert.ToDateTime(value);
-        }
-        /// <inheritdoc/>
         public static DateTime ToDateTime(Boolean value) => Convert.ToDateTime(value);
         /// <inheritdoc/>
         public static DateTime ToDateTime(Char value) => Convert.ToDateTime(value);
@@ -2114,8 +2108,6 @@ namespace LuYao
             if (value is null) return String.Empty;
             return Convert.ToString(value);
         }
-        /// <inheritdoc/>
-        public static String ToString(DateTime value) => Convert.ToString(value);
         /// <inheritdoc/>
         public static String ToString(Object? value)
         {
