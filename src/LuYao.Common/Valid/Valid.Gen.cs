@@ -871,6 +871,84 @@ namespace LuYao
 
         #region Int32
         /// <inheritdoc/>
+        public static Int32 ToInt32(Boolean? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(Char? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(SByte? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(Byte? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(Int16? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(UInt16? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(Int32? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(UInt32? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(Int64? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(UInt64? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(Single? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(Double? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Int32 ToInt32(Decimal? value)
+        {
+            if (value is null) return default;
+            return ToInt32(value.Value);
+        }
+        /// <inheritdoc/>
         public static Int32 ToInt32(DateTime? value)
         {
             if (value is null) return default;
