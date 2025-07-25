@@ -512,34 +512,6 @@ namespace LuYao
             return Convert.ToByte(value);
         }
         /// <inheritdoc/>
-        public static Byte ToByte(Boolean value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(Char value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(SByte value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(Byte value) => value;
-        /// <inheritdoc/>
-        public static Byte ToByte(Int16 value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(UInt16 value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(Int32 value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(UInt32 value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(Int64 value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(UInt64 value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(Single value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(Double value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(Decimal value) => Convert.ToByte(value);
-        /// <inheritdoc/>
-        public static Byte ToByte(DateTime value) => Convert.ToByte(value);
-        /// <inheritdoc/>
         public static Byte ToByte(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
