@@ -111,4 +111,7 @@ partial class Valid
     /// <param name="value">要转换的高精度浮点数。</param>
     /// <returns>转换后的布尔值。</returns>
     public static bool ToBoolean(decimal value) => value > 0;
+
+    /// <inheritdoc/>
+    public static Boolean ToBoolean(DateTime value) => value > DateTime.MinValue;
 }

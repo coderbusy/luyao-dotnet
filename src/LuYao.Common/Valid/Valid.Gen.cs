@@ -93,8 +93,6 @@ namespace LuYao
         /// <inheritdoc/>
         public static Boolean ToBoolean(Boolean value) => value;
         /// <inheritdoc/>
-        public static Boolean ToBoolean(DateTime value) => Convert.ToBoolean(value);
-        /// <inheritdoc/>
         public static Boolean ToBoolean(Object? value)
         {
             if (value is null || Convert.IsDBNull(value)) return default;
