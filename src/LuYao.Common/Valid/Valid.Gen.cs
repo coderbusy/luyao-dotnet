@@ -2025,11 +2025,97 @@ namespace LuYao
 
         #region String
         /// <inheritdoc/>
+        public static String ToString(Boolean? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(Char? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(SByte? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(Byte? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(Int16? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(UInt16? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(Int32? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(UInt32? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(Int64? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(UInt64? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(Single? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(Double? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(Decimal? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
+        public static String ToString(DateTime? value)
+        {
+            if (value is null) return String.Empty;
+            return ToString(value.Value);
+        }
+        /// <inheritdoc/>
         public static String ToString(String? value)
         {
             if (value is null) return String.Empty;
             return Convert.ToString(value);
         }
+        /// <inheritdoc/>
+        public static String ToString(DateTime value) => Convert.ToString(value);
         /// <inheritdoc/>
         public static String ToString(Object? value)
         {

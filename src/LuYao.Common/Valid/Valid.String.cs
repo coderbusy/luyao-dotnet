@@ -5,10 +5,6 @@ namespace LuYao;
 
 partial class Valid
 {
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(bool? value) => value == true ? "1" : "0";
 
     /// <summary>
     /// 将值转换为字符串。
@@ -18,16 +14,8 @@ partial class Valid
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
-    public static string ToString(Char? value) => value?.ToString() ?? string.Empty;
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
     public static string ToString(Char value) => value.ToString();
 
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(SByte? value) => value?.ToString() ?? string.Empty;
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
@@ -36,16 +24,8 @@ partial class Valid
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
-    public static string ToString(Byte? value) => value?.ToString() ?? string.Empty;
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
     public static string ToString(Byte value) => value.ToString();
 
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(Int16? value) => value?.ToString() ?? string.Empty;
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
@@ -54,16 +34,8 @@ partial class Valid
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
-    public static string ToString(UInt16? value) => value?.ToString() ?? string.Empty;
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
     public static string ToString(UInt16 value) => value.ToString();
 
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(Int32? value) => value?.ToString() ?? string.Empty;
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
@@ -72,16 +44,8 @@ partial class Valid
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
-    public static string ToString(UInt32? value) => value?.ToString() ?? string.Empty;
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
     public static string ToString(UInt32 value) => value.ToString();
 
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(Int64? value) => value?.ToString() ?? string.Empty;
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
@@ -90,16 +54,8 @@ partial class Valid
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
-    public static string ToString(UInt64? value) => value?.ToString() ?? string.Empty;
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
     public static string ToString(UInt64 value) => value.ToString();
 
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(Single? value) => value?.ToString() ?? string.Empty;
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
@@ -108,16 +64,8 @@ partial class Valid
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
-    public static string ToString(Double? value) => value?.ToString() ?? string.Empty;
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
     public static string ToString(Double value) => value.ToString();
 
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(Decimal? value) => value != null ? ToString(value.Value) : string.Empty;
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
@@ -142,14 +90,6 @@ partial class Valid
         }
     }
 
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(DateTime value) => ToString(value, Date.年月日);
-    /// <summary>
-    /// 将值转换为字符串。
-    /// </summary>
-    public static string ToString(DateTime? value) => ToString(value ?? DateTime.MinValue, Date.年月日);
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>

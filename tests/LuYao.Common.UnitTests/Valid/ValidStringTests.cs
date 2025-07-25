@@ -136,13 +136,6 @@ public class ValidStringTests
     }
 
     [TestMethod]
-    public void ToString_NullableDateTimeValue_Returns年月日Format()
-    {
-        var dt = new DateTime(2024, 7, 18, 15, 30, 45);
-        Assert.AreEqual("2024/07/18", Valid.ToString((DateTime?)dt));
-    }
-
-    [TestMethod]
     public void ToString_NullableDateTimeValue全部显示_ReturnsFullFormat()
     {
         var dt = new DateTime(2024, 7, 18, 15, 30, 45);
