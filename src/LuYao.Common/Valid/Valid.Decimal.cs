@@ -5,7 +5,7 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Decimal ToDecimal(Boolean value) => Convert.ToDecimal(value);
+    public static Decimal ToDecimal(Boolean value) => value ? 1 : 0;
     /// <inheritdoc/>
     public static Decimal ToDecimal(Char value) => Convert.ToDecimal(value);
     /// <inheritdoc/>

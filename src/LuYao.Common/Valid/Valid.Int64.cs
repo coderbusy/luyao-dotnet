@@ -7,7 +7,7 @@ partial class Valid
     /// <inheritdoc/>
     public static Int64 ToInt64(DateTime value) => value.ToBinary();
     /// <inheritdoc/>
-    public static Int64 ToInt64(Boolean value) => Convert.ToInt64(value);
+    public static Int64 ToInt64(Boolean value) => value ? 1 : 0;
     /// <inheritdoc/>
     public static Int64 ToInt64(Char value) => Convert.ToInt64(value);
     /// <inheritdoc/>

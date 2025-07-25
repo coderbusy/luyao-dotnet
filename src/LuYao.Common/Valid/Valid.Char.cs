@@ -5,17 +5,10 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Char ToChar(Boolean value)
-    {
-        // System.Convert: true->1, false->0
-        return value ? (char)1 : (char)0;
-    }
+    public static Char ToChar(Boolean value) => default;
 
     /// <inheritdoc/>
-    public static Char ToChar(Char value)
-    {
-        return value;
-    }
+    public static Char ToChar(Char value) => value;
 
     /// <inheritdoc/>
     public static Char ToChar(SByte value)

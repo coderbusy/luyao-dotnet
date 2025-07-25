@@ -5,7 +5,7 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Single ToSingle(Boolean value) => Convert.ToSingle(value);
+    public static Single ToSingle(Boolean value) => value ? 1 : 0;
     /// <inheritdoc/>
     public static Single ToSingle(Char value) => Convert.ToSingle(value);
     /// <inheritdoc/>

@@ -5,7 +5,7 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Double ToDouble(Boolean value) => Convert.ToDouble(value);
+    public static Double ToDouble(Boolean value) => value ? 1 : 0;
     /// <inheritdoc/>
     public static Double ToDouble(Char value) => Convert.ToDouble(value);
     /// <inheritdoc/>

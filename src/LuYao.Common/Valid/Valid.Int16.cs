@@ -5,7 +5,7 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Int16 ToInt16(Boolean value) => Convert.ToInt16(value);
+    public static Int16 ToInt16(Boolean value) => value ? ((short)1) : ((short)0);
     /// <inheritdoc/>
     public static Int16 ToInt16(Char value) => Convert.ToInt16(value);
     /// <inheritdoc/>

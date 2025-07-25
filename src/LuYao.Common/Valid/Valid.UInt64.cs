@@ -5,7 +5,7 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static UInt64 ToUInt64(Boolean value) => Convert.ToUInt64(value);
+    public static UInt64 ToUInt64(Boolean value) => value ? 1u : 0u;
     /// <inheritdoc/>
     public static UInt64 ToUInt64(Char value) => Convert.ToUInt64(value);
     /// <inheritdoc/>
