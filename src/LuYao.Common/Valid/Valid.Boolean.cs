@@ -32,32 +32,12 @@ partial class Valid
     public static bool ToBoolean(char value) => value > 0;
 
     /// <summary>
-    /// 将可空字符转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空字符。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(char? value) => value.HasValue && ToBoolean(value.Value);
-
-    /// <summary>
-    /// 将可空布尔值转换为布尔值。值存在且为 true 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空布尔值。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(bool? value) => value.HasValue && value.Value;
-
-    /// <summary>
     /// 将字节转换为布尔值。大于 0 时返回 true，否则返回 false。
     /// </summary>
     /// <param name="value">要转换的字节。</param>
     /// <returns>转换后的布尔值。</returns>
     public static bool ToBoolean(byte value) => value > 0;
 
-    /// <summary>
-    /// 将可空字节转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空字节。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(byte? value) => value.HasValue && ToBoolean(value.Value);
 
     /// <summary>
     /// 将有符号字节转换为布尔值。大于 0 时返回 true，否则返回 false。
@@ -66,12 +46,6 @@ partial class Valid
     /// <returns>转换后的布尔值。</returns>
     public static bool ToBoolean(sbyte value) => value > 0;
 
-    /// <summary>
-    /// 将可空有符号字节转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空有符号字节。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(sbyte? value) => value.HasValue && ToBoolean(value.Value);
 
     /// <summary>
     /// 将短整型转换为布尔值。大于 0 时返回 true，否则返回 false。
@@ -80,12 +54,6 @@ partial class Valid
     /// <returns>转换后的布尔值。</returns>
     public static bool ToBoolean(short value) => value > 0;
 
-    /// <summary>
-    /// 将可空短整型转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空短整型。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(short? value) => value.HasValue && ToBoolean(value.Value);
 
     /// <summary>
     /// 将无符号短整型转换为布尔值。大于 0 时返回 true，否则返回 false。
@@ -94,12 +62,6 @@ partial class Valid
     /// <returns>转换后的布尔值。</returns>
     public static bool ToBoolean(ushort value) => value > 0;
 
-    /// <summary>
-    /// 将可空无符号短整型转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空无符号短整型。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(ushort? value) => value.HasValue && ToBoolean(value.Value);
 
     /// <summary>
     /// 将整型转换为布尔值。大于 0 时返回 true，否则返回 false。
@@ -109,25 +71,11 @@ partial class Valid
     public static bool ToBoolean(int value) => value > 0;
 
     /// <summary>
-    /// 将可空整型转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空整型。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(int? value) => value.HasValue && ToBoolean(value.Value);
-
-    /// <summary>
     /// 将无符号整型转换为布尔值。大于 0 时返回 true，否则返回 false。
     /// </summary>
     /// <param name="value">要转换的无符号整型。</param>
     /// <returns>转换后的布尔值。</returns>
     public static bool ToBoolean(uint value) => value > 0;
-
-    /// <summary>
-    /// 将可空无符号整型转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空无符号整型。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(uint? value) => value.HasValue && ToBoolean(value.Value);
 
     /// <summary>
     /// 将长整型转换为布尔值。大于 0 时返回 true，否则返回 false。
@@ -137,25 +85,11 @@ partial class Valid
     public static bool ToBoolean(long value) => value > 0;
 
     /// <summary>
-    /// 将可空长整型转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空长整型。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(long? value) => value.HasValue && ToBoolean(value.Value);
-
-    /// <summary>
     /// 将无符号长整型转换为布尔值。大于 0 时返回 true，否则返回 false。
     /// </summary>
     /// <param name="value">要转换的无符号长整型。</param>
     /// <returns>转换后的布尔值。</returns>
     public static bool ToBoolean(ulong value) => value > 0;
-
-    /// <summary>
-    /// 将可空无符号长整型转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空无符号长整型。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(ulong? value) => value.HasValue && ToBoolean(value.Value);
 
     /// <summary>
     /// 将单精度浮点数转换为布尔值。大于 0 时返回 true，否则返回 false。
@@ -165,13 +99,6 @@ partial class Valid
     public static bool ToBoolean(float value) => value > 0;
 
     /// <summary>
-    /// 将可空单精度浮点数转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空单精度浮点数。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(float? value) => value.HasValue && ToBoolean(value.Value);
-
-    /// <summary>
     /// 将双精度浮点数转换为布尔值。大于 0 时返回 true，否则返回 false。
     /// </summary>
     /// <param name="value">要转换的双精度浮点数。</param>
@@ -179,23 +106,9 @@ partial class Valid
     public static bool ToBoolean(double value) => value > 0;
 
     /// <summary>
-    /// 将可空双精度浮点数转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空双精度浮点数。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(double? value) => value.HasValue && ToBoolean(value.Value);
-
-    /// <summary>
     /// 将高精度浮点数转换为布尔值。大于 0 时返回 true，否则返回 false。
     /// </summary>
     /// <param name="value">要转换的高精度浮点数。</param>
     /// <returns>转换后的布尔值。</returns>
     public static bool ToBoolean(decimal value) => value > 0;
-
-    /// <summary>
-    /// 将可空高精度浮点数转换为布尔值。值存在且大于 0 时返回 true，否则返回 false。
-    /// </summary>
-    /// <param name="value">要转换的可空高精度浮点数。</param>
-    /// <returns>转换后的布尔值。</returns>
-    public static bool ToBoolean(decimal? value) => value.HasValue && ToBoolean(value.Value);
 }

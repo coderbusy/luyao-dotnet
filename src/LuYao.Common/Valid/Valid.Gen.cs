@@ -7,6 +7,84 @@ namespace LuYao
 
         #region Boolean
         /// <inheritdoc/>
+        public static Boolean ToBoolean(Boolean? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(Char? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(SByte? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(Byte? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(Int16? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(UInt16? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(Int32? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(UInt32? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(Int64? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(UInt64? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(Single? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(Double? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
+        public static Boolean ToBoolean(Decimal? value)
+        {
+            if (value is null) return default;
+            return ToBoolean(value.Value);
+        }
+        /// <inheritdoc/>
         public static Boolean ToBoolean(DateTime? value)
         {
             if (value is null) return default;
