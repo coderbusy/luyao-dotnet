@@ -5,7 +5,7 @@ namespace LuYao;
 partial class Valid
 {
     /// <inheritdoc/>
-    public static Boolean ToBoolean(Byte value) => Convert.ToBoolean(value);
+    public static Boolean ToBoolean(Byte value) => value != 0;
     /// <inheritdoc/>
     public static Char ToChar(Byte value) => Convert.ToChar(value);
     /// <inheritdoc/>
