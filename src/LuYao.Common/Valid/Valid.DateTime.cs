@@ -5,7 +5,6 @@ namespace LuYao;
 
 partial class Valid
 {
-
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
@@ -28,36 +27,50 @@ partial class Valid
     /// <summary>
     /// 将值转换为字符串。
     /// </summary>
-    public static string ToString(DateTime? value, Date format) => ToString(value ?? DateTime.MinValue, format);
+    public static string ToString(DateTime? value, Date format) => ToString(value ?? default, format);
 
     /// <inheritdoc/>
     public static string ToString(DateTime value) => value.ToString("O");
+
     /// <inheritdoc/>
-    public static Boolean ToBoolean(DateTime value) => false;
+    public static bool ToBoolean(DateTime value) => false;
+
     /// <inheritdoc/>
-    public static Char ToChar(DateTime value) => default;
+    public static char ToChar(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static SByte ToSByte(DateTime value) => default;
+    public static sbyte ToSByte(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static Byte ToByte(DateTime value) => default;
+    public static byte ToByte(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static Int16 ToInt16(DateTime value) => default;
+    public static short ToInt16(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static UInt16 ToUInt16(DateTime value) => default;
+    public static ushort ToUInt16(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static Int32 ToInt32(DateTime value) => default;
+    public static int ToInt32(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static UInt32 ToUInt32(DateTime value) => default;
+    public static uint ToUInt32(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static Int64 ToInt64(DateTime value) => default;
+    public static long ToInt64(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static UInt64 ToUInt64(DateTime value) => default;
+    public static ulong ToUInt64(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static Single ToSingle(DateTime value) => default;
+    public static float ToSingle(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static Double ToDouble(DateTime value) => default;
+    public static double ToDouble(DateTime value) => default;
+
     /// <inheritdoc/>
-    public static Decimal ToDecimal(DateTime value) => default;
+    public static decimal ToDecimal(DateTime value) => default;
+
     /// <inheritdoc/>
     public static DateTime ToDateTime(DateTime value) => value;
 }
