@@ -7,7 +7,7 @@ partial class Valid
     /// <inheritdoc/>
     public static Boolean ToBoolean(Byte value) => value != 0;
     /// <inheritdoc/>
-    public static Char ToChar(Byte value) => Convert.ToChar(value);
+    public static Char ToChar(Byte value) => (Char)value;
     /// <inheritdoc/>
     public static SByte ToSByte(Byte value) => Convert.ToSByte(value);
     /// <inheritdoc/>
@@ -31,7 +31,7 @@ partial class Valid
     /// <inheritdoc/>
     public static Decimal ToDecimal(Byte value) => Convert.ToDecimal(value);
     /// <inheritdoc/>
-    public static DateTime ToDateTime(Byte value) => Convert.ToDateTime(value);
+    public static DateTime ToDateTime(Byte value) => default;
     /// <inheritdoc/>
     public static String ToString(Byte value) => Convert.ToString(value);
 }
