@@ -5,25 +5,6 @@ namespace LuYao.Data;
 
 internal static class Helpers
 {
-    public static IEnumerable<RecordDataType> ListTypeCode()
-    {
-        yield return RecordDataType.Boolean;
-        yield return RecordDataType.Byte;
-        yield return RecordDataType.Char;
-        yield return RecordDataType.DateTime;
-        yield return RecordDataType.Decimal;
-        yield return RecordDataType.Double;
-        yield return RecordDataType.Int16;
-        yield return RecordDataType.Int32;
-        yield return RecordDataType.Int64;
-        yield return RecordDataType.SByte;
-        yield return RecordDataType.Single;
-        yield return RecordDataType.String;
-        yield return RecordDataType.UInt16;
-        yield return RecordDataType.UInt32;
-        yield return RecordDataType.UInt64;
-    }
-
     public static Type ToType(RecordDataType type)
     {
         return type switch
