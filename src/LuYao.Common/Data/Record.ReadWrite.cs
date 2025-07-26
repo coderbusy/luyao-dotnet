@@ -69,7 +69,9 @@ partial class Record
         for (int i = 0; i < header.Columns; i++)
         {
             string n = reader.ReadString();
-            RecordDataType code = (RecordDataType)reader.ReadByte();
+            byte codeValue = reader.ReadByte();
+            if (!Enum.IsDefined(typeof(RecordDataType), codeValue)) throw new InvalidDataException($"Invalid RecordDataType value: {codeValue}");
+            RecordDataType code = (RecordDataType)codeValue;
             string ext = reader.ReadString(); //读取扩展信息（目前为空）
             this.Columns.Add(n, code);
         }
