@@ -1865,7 +1865,7 @@ namespace LuYao
         /// <inheritdoc/>
         public static Boolean ToBoolean(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return vBoolean;
@@ -1884,17 +1884,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToBoolean(vDateTime);
                 case String vString: return ToBoolean(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToBoolean(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToBoolean(tmp);
+            return Convert.ToBoolean(value);
         }
 
         /// <inheritdoc/>
         public static Char ToChar(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToChar(vBoolean);
@@ -1913,17 +1909,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToChar(vDateTime);
                 case String vString: return ToChar(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToChar(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToChar(tmp);
+            return Convert.ToChar(value);
         }
 
         /// <inheritdoc/>
         public static SByte ToSByte(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToSByte(vBoolean);
@@ -1942,17 +1934,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToSByte(vDateTime);
                 case String vString: return ToSByte(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToSByte(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToSByte(tmp);
+            return Convert.ToSByte(value);
         }
 
         /// <inheritdoc/>
         public static Byte ToByte(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToByte(vBoolean);
@@ -1971,17 +1959,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToByte(vDateTime);
                 case String vString: return ToByte(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToByte(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToByte(tmp);
+            return Convert.ToByte(value);
         }
 
         /// <inheritdoc/>
         public static Int16 ToInt16(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToInt16(vBoolean);
@@ -2000,17 +1984,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToInt16(vDateTime);
                 case String vString: return ToInt16(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToInt16(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToInt16(tmp);
+            return Convert.ToInt16(value);
         }
 
         /// <inheritdoc/>
         public static UInt16 ToUInt16(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToUInt16(vBoolean);
@@ -2029,17 +2009,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToUInt16(vDateTime);
                 case String vString: return ToUInt16(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToUInt16(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToUInt16(tmp);
+            return Convert.ToUInt16(value);
         }
 
         /// <inheritdoc/>
         public static Int32 ToInt32(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToInt32(vBoolean);
@@ -2058,17 +2034,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToInt32(vDateTime);
                 case String vString: return ToInt32(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToInt32(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToInt32(tmp);
+            return Convert.ToInt32(value);
         }
 
         /// <inheritdoc/>
         public static UInt32 ToUInt32(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToUInt32(vBoolean);
@@ -2087,17 +2059,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToUInt32(vDateTime);
                 case String vString: return ToUInt32(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToUInt32(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToUInt32(tmp);
+            return Convert.ToUInt32(value);
         }
 
         /// <inheritdoc/>
         public static Int64 ToInt64(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToInt64(vBoolean);
@@ -2116,17 +2084,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToInt64(vDateTime);
                 case String vString: return ToInt64(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToInt64(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToInt64(tmp);
+            return Convert.ToInt64(value);
         }
 
         /// <inheritdoc/>
         public static UInt64 ToUInt64(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToUInt64(vBoolean);
@@ -2145,17 +2109,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToUInt64(vDateTime);
                 case String vString: return ToUInt64(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToUInt64(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToUInt64(tmp);
+            return Convert.ToUInt64(value);
         }
 
         /// <inheritdoc/>
         public static Single ToSingle(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToSingle(vBoolean);
@@ -2174,17 +2134,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToSingle(vDateTime);
                 case String vString: return ToSingle(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToSingle(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToSingle(tmp);
+            return Convert.ToSingle(value);
         }
 
         /// <inheritdoc/>
         public static Double ToDouble(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToDouble(vBoolean);
@@ -2203,17 +2159,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToDouble(vDateTime);
                 case String vString: return ToDouble(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToDouble(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToDouble(tmp);
+            return Convert.ToDouble(value);
         }
 
         /// <inheritdoc/>
         public static Decimal ToDecimal(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToDecimal(vBoolean);
@@ -2232,17 +2184,13 @@ namespace LuYao
                 case DateTime vDateTime: return ToDecimal(vDateTime);
                 case String vString: return ToDecimal(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToDecimal(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToDecimal(tmp);
+            return Convert.ToDecimal(value);
         }
 
         /// <inheritdoc/>
         public static DateTime ToDateTime(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return default;
+            if (value is null) return default;
             switch (value)
             {
                 case Boolean vBoolean: return ToDateTime(vBoolean);
@@ -2261,17 +2209,13 @@ namespace LuYao
                 case DateTime vDateTime: return vDateTime;
                 case String vString: return ToDateTime(vString);
             }
-            try { if (value is IConvertible conv) return conv.ToDateTime(null); }
-            catch { }
-            string? tmp = value.ToString();
-            if (string.IsNullOrWhiteSpace(tmp)) return default;
-            return ToDateTime(tmp);
+            return Convert.ToDateTime(value);
         }
 
         /// <inheritdoc/>
         public static String ToString(Object? value)
         {
-            if (value is null || Convert.IsDBNull(value)) return String.Empty;
+            if (value is null) return String.Empty;
             switch (value)
             {
                 case Boolean vBoolean: return ToString(vBoolean);
