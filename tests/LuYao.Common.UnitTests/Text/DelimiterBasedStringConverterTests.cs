@@ -31,7 +31,7 @@ public class DelimiterBasedStringConverterTests
         };
         var serialized = converter.Serialize(item);
 
-        Assert.AreEqual("Hello|123|1", serialized);
+        Assert.AreEqual("Hello|123|True", serialized);
     }
 
     [TestMethod]
@@ -52,7 +52,7 @@ public class DelimiterBasedStringConverterTests
         converter.Add(x => x.Str);
         converter.Add(x => x.Int32);
         converter.Add(x => x.Boolean);
-        var serialized = "Hello|123|1";
+        var serialized = "Hello|123|True";
         var deserialized = converter.Deserialize(serialized);
 
         Assert.IsNotNull(deserialized);
@@ -69,7 +69,7 @@ public class DelimiterBasedStringConverterTests
         converter.Add(x => x.Int32);
         converter.Add(x => x.Boolean);
         // 多出一项
-        var serialized = "Hello|123|1|Extra";
+        var serialized = "Hello|123|True|Extra";
         var deserialized = converter.Deserialize(serialized);
 
         Assert.IsNotNull(deserialized);
