@@ -27,8 +27,8 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colId = table.Columns.Add("Id", TypeCode.Int32);
-        var colName = table.Columns.Add("Name", TypeCode.String);
+        var colId = table.Columns.Add("Id", RecordDataType.Int32);
+        var colName = table.Columns.Add("Name", RecordDataType.String);
 
         // Act
         var row = table.AddRow();
@@ -60,9 +60,9 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colId = table.Columns.Add("Id", TypeCode.Int32);
-        var colName = table.Columns.Add("Name", TypeCode.String);
-        var colAge = table.Columns.Add("Age", TypeCode.Int32);
+        var colId = table.Columns.Add("Id", RecordDataType.Int32);
+        var colName = table.Columns.Add("Name", RecordDataType.String);
+        var colAge = table.Columns.Add("Age", RecordDataType.Int32);
 
         // Act
         var row1 = table.AddRow();
@@ -93,8 +93,8 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        table.Columns.Add("Id", TypeCode.Int32);
-        table.Columns.Add("Name", TypeCode.String);
+        table.Columns.Add("Id", RecordDataType.Int32);
+        table.Columns.Add("Name", RecordDataType.String);
         table.AddRow();
 
         // Act
@@ -111,8 +111,8 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colId = table.Columns.Add("Id", TypeCode.Int32);
-        var colName = table.Columns.Add("Name", TypeCode.String);
+        var colId = table.Columns.Add("Id", RecordDataType.Int32);
+        var colName = table.Columns.Add("Name", RecordDataType.String);
         var row = table.AddRow();
         row.Set(123, colId);
         row.Set("TestValue", colName);
@@ -127,8 +127,8 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        table.Columns.Add("Id", TypeCode.Int32);
-        table.Columns.Add("Name", TypeCode.String);
+        table.Columns.Add("Id", RecordDataType.Int32);
+        table.Columns.Add("Name", RecordDataType.String);
 
         // Act & Assert
         Assert.IsTrue(table.Contains("Id"));
@@ -163,7 +163,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colId = table.Columns.Add("Id", TypeCode.Int32);
+        var colId = table.Columns.Add("Id", RecordDataType.Int32);
         table.AddRow();
         table.AddRow();
         table.SetValue("Id", 0, 10);
@@ -197,7 +197,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colId = table.Columns.Add("Id", TypeCode.Int32);
+        var colId = table.Columns.Add("Id", RecordDataType.Int32);
         table.AddRow();
         table.AddRow();
         table.AddRow();
@@ -227,15 +227,15 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colBool = table.Columns.Add("Bool", TypeCode.Boolean);
-        var colByte = table.Columns.Add("Byte", TypeCode.Byte);
-        var colDateTime = table.Columns.Add("DateTime", TypeCode.DateTime);
-        var colDecimal = table.Columns.Add("Decimal", TypeCode.Decimal);
-        var colDouble = table.Columns.Add("Double", TypeCode.Double);
-        var colInt16 = table.Columns.Add("Int16", TypeCode.Int16);
-        var colInt32 = table.Columns.Add("Int32", TypeCode.Int32);
-        var colInt64 = table.Columns.Add("Int64", TypeCode.Int64);
-        var colString = table.Columns.Add("String", TypeCode.String);
+        var colBool = table.Columns.Add("Bool", RecordDataType.Boolean);
+        var colByte = table.Columns.Add("Byte", RecordDataType.Byte);
+        var colDateTime = table.Columns.Add("DateTime", RecordDataType.DateTime);
+        var colDecimal = table.Columns.Add("Decimal", RecordDataType.Decimal);
+        var colDouble = table.Columns.Add("Double", RecordDataType.Double);
+        var colInt16 = table.Columns.Add("Int16", RecordDataType.Int16);
+        var colInt32 = table.Columns.Add("Int32", RecordDataType.Int32);
+        var colInt64 = table.Columns.Add("Int64", RecordDataType.Int64);
+        var colString = table.Columns.Add("String", RecordDataType.String);
 
         var row = table.AddRow();
         var testDate = new DateTime(2023, 12, 25);
@@ -284,9 +284,9 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colInt = table.Columns.Add("Int", TypeCode.Int32);
-        var colString = table.Columns.Add("String", TypeCode.String);
-        var colBool = table.Columns.Add("Bool", TypeCode.Boolean);
+        var colInt = table.Columns.Add("Int", RecordDataType.Int32);
+        var colString = table.Columns.Add("String", RecordDataType.String);
+        var colBool = table.Columns.Add("Bool", RecordDataType.Boolean);
         var row = table.AddRow();
 
         // Act & Assert
@@ -326,8 +326,8 @@ public class RecordTests
         var table = new Record();
 
         // Act
-        var col1 = table.Columns.Add("TestColumn", TypeCode.String);
-        var col2 = table.Columns.Add("TestColumn", TypeCode.String);
+        var col1 = table.Columns.Add("TestColumn", RecordDataType.String);
+        var col2 = table.Columns.Add("TestColumn", RecordDataType.String);
 
         // Assert
         Assert.AreSame(col1, col2);
@@ -339,7 +339,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var originalCol = table.Columns.Add("TestColumn", TypeCode.Int32);
+        var originalCol = table.Columns.Add("TestColumn", RecordDataType.Int32);
 
         // Act
         var foundCol = table.Columns.Find("TestColumn");
@@ -354,7 +354,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        table.Columns.Add("TestColumn", TypeCode.Int32);
+        table.Columns.Add("TestColumn", RecordDataType.Int32);
 
         // Act
         var foundCol = table.Columns.Find("NonExistent");
@@ -387,21 +387,21 @@ public class RecordTests
         var colUInt64 = table.Columns.AddUInt64("UInt64Col");
 
         // Assert
-        Assert.AreEqual(TypeCode.Boolean, colBool.Code);
-        Assert.AreEqual(TypeCode.Byte, colByte.Code);
-        Assert.AreEqual(TypeCode.Char, colChar.Code);
-        Assert.AreEqual(TypeCode.DateTime, colDateTime.Code);
-        Assert.AreEqual(TypeCode.Decimal, colDecimal.Code);
-        Assert.AreEqual(TypeCode.Double, colDouble.Code);
-        Assert.AreEqual(TypeCode.Int16, colInt16.Code);
-        Assert.AreEqual(TypeCode.Int32, colInt32.Code);
-        Assert.AreEqual(TypeCode.Int64, colInt64.Code);
-        Assert.AreEqual(TypeCode.SByte, colSByte.Code);
-        Assert.AreEqual(TypeCode.Single, colSingle.Code);
-        Assert.AreEqual(TypeCode.String, colString.Code);
-        Assert.AreEqual(TypeCode.UInt16, colUInt16.Code);
-        Assert.AreEqual(TypeCode.UInt32, colUInt32.Code);
-        Assert.AreEqual(TypeCode.UInt64, colUInt64.Code);
+        Assert.AreEqual(RecordDataType.Boolean, colBool.Code);
+        Assert.AreEqual(RecordDataType.Byte, colByte.Code);
+        Assert.AreEqual(RecordDataType.Char, colChar.Code);
+        Assert.AreEqual(RecordDataType.DateTime, colDateTime.Code);
+        Assert.AreEqual(RecordDataType.Decimal, colDecimal.Code);
+        Assert.AreEqual(RecordDataType.Double, colDouble.Code);
+        Assert.AreEqual(RecordDataType.Int16, colInt16.Code);
+        Assert.AreEqual(RecordDataType.Int32, colInt32.Code);
+        Assert.AreEqual(RecordDataType.Int64, colInt64.Code);
+        Assert.AreEqual(RecordDataType.SByte, colSByte.Code);
+        Assert.AreEqual(RecordDataType.Single, colSingle.Code);
+        Assert.AreEqual(RecordDataType.String, colString.Code);
+        Assert.AreEqual(RecordDataType.UInt16, colUInt16.Code);
+        Assert.AreEqual(RecordDataType.UInt32, colUInt32.Code);
+        Assert.AreEqual(RecordDataType.UInt64, colUInt64.Code);
         Assert.AreEqual(15, table.Columns.Count);
     }
 
@@ -410,7 +410,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var col = table.Columns.Add("TestCol", TypeCode.String);
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
         var row = table.AddRow();
         row.Set("TestValue", col);
 
@@ -430,7 +430,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var col = table.Columns.Add("TestColumn", TypeCode.String);
+        var col = table.Columns.Add("TestColumn", RecordDataType.String);
 
         // Act
         var result = col.ToString();
@@ -444,7 +444,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var col = table.Columns.Add("TestCol", TypeCode.Int32);
+        var col = table.Columns.Add("TestCol", RecordDataType.Int32);
         var row1 = table.AddRow();
         var row2 = table.AddRow();
 
@@ -472,12 +472,12 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colChar = table.Columns.Add("Char", TypeCode.Char);
-        var colSByte = table.Columns.Add("SByte", TypeCode.SByte);
-        var colSingle = table.Columns.Add("Single", TypeCode.Single);
-        var colUInt16 = table.Columns.Add("UInt16", TypeCode.UInt16);
-        var colUInt32 = table.Columns.Add("UInt32", TypeCode.UInt32);
-        var colUInt64 = table.Columns.Add("UInt64", TypeCode.UInt64);
+        var colChar = table.Columns.Add("Char", RecordDataType.Char);
+        var colSByte = table.Columns.Add("SByte", RecordDataType.SByte);
+        var colSingle = table.Columns.Add("Single", RecordDataType.Single);
+        var colUInt16 = table.Columns.Add("UInt16", RecordDataType.UInt16);
+        var colUInt32 = table.Columns.Add("UInt32", RecordDataType.UInt32);
+        var colUInt64 = table.Columns.Add("UInt64", RecordDataType.UInt64);
 
         var row = table.AddRow();
 
@@ -506,9 +506,9 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        table.Columns.Add("First", TypeCode.String);
-        table.Columns.Add("Second", TypeCode.Int32);
-        table.Columns.Add("Third", TypeCode.Boolean);
+        table.Columns.Add("First", RecordDataType.String);
+        table.Columns.Add("Second", RecordDataType.Int32);
+        table.Columns.Add("Third", RecordDataType.Boolean);
 
         // Act & Assert
         Assert.AreEqual(0, table.Columns.IndexOf("First"));
@@ -522,8 +522,8 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var col1 = table.Columns.Add("Col1", TypeCode.String);
-        var col2 = table.Columns.Add("Col2", TypeCode.Int32);
+        var col1 = table.Columns.Add("Col1", RecordDataType.String);
+        var col2 = table.Columns.Add("Col2", RecordDataType.Int32);
 
         // Act
         var removed = table.Columns.Remove(col1);
@@ -539,9 +539,9 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        table.Columns.Add("Col1", TypeCode.String);
-        table.Columns.Add("Col2", TypeCode.Int32);
-        table.Columns.Add("Col3", TypeCode.Boolean);
+        table.Columns.Add("Col1", RecordDataType.String);
+        table.Columns.Add("Col2", RecordDataType.Int32);
+        table.Columns.Add("Col3", RecordDataType.Boolean);
 
         // Act
         table.Columns.Clear();
@@ -555,7 +555,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var col = table.Columns.Add("TestCol", TypeCode.String);
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
         var row = table.AddRow();
 
         // Act & Assert - Test null value
@@ -568,7 +568,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var intCol = table.Columns.Add("IntCol", TypeCode.Int32);
+        var intCol = table.Columns.Add("IntCol", RecordDataType.Int32);
         var row = table.AddRow();
 
         // Act - Set string value that can be converted to int
@@ -596,8 +596,8 @@ public class RecordTests
     {
         // Arrange
         var table = new Record("TestTable", 10);
-        table.Columns.Add("Col1", TypeCode.String);
-        table.Columns.Add("Col2", TypeCode.Int32);
+        table.Columns.Add("Col1", RecordDataType.String);
+        table.Columns.Add("Col2", RecordDataType.Int32);
         table.AddRow();
         table.AddRow();
 
@@ -648,7 +648,7 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var col = table.Columns.Add("TestColumnName", TypeCode.String);
+        var col = table.Columns.Add("TestColumnName", RecordDataType.String);
 
         // Act & Assert
         Assert.AreEqual("TestColumnName", col.Name);
@@ -659,9 +659,9 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var stringCol = table.Columns.Add("StringCol", TypeCode.String);
-        var intCol = table.Columns.Add("IntCol", TypeCode.Int32);
-        var boolCol = table.Columns.Add("BoolCol", TypeCode.Boolean);
+        var stringCol = table.Columns.Add("StringCol", RecordDataType.String);
+        var intCol = table.Columns.Add("IntCol", RecordDataType.Int32);
+        var boolCol = table.Columns.Add("BoolCol", RecordDataType.Boolean);
 
         // Act & Assert
         Assert.AreEqual(typeof(string), stringCol.Type);
@@ -687,8 +687,8 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var col1 = table.Columns.Add("First", TypeCode.String);
-        var col2 = table.Columns.Add("Second", TypeCode.Int32);
+        var col1 = table.Columns.Add("First", RecordDataType.String);
+        var col2 = table.Columns.Add("Second", RecordDataType.Int32);
 
         // Act & Assert
         Assert.AreSame(col1, table.Columns[0]);

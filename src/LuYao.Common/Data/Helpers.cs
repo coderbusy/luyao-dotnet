@@ -5,89 +5,67 @@ namespace LuYao.Data;
 
 internal static class Helpers
 {
-    public static IEnumerable<TypeCode> ListTypeCode()
+    public static IEnumerable<RecordDataType> ListTypeCode()
     {
-        yield return TypeCode.Boolean;
-        yield return TypeCode.Byte;
-        yield return TypeCode.Char;
-        yield return TypeCode.DateTime;
-        yield return TypeCode.Decimal;
-        yield return TypeCode.Double;
-        yield return TypeCode.Int16;
-        yield return TypeCode.Int32;
-        yield return TypeCode.Int64;
-        yield return TypeCode.SByte;
-        yield return TypeCode.Single;
-        yield return TypeCode.String;
-        yield return TypeCode.UInt16;
-        yield return TypeCode.UInt32;
-        yield return TypeCode.UInt64;
-    }
-    public static bool IsExists(TypeCode type)
-    {
-        return type switch
-        {
-            TypeCode.Boolean => true,
-            TypeCode.Byte => true,
-            TypeCode.Char => true,
-            TypeCode.DateTime => true,
-            TypeCode.Decimal => true,
-            TypeCode.Double => true,
-            TypeCode.Int16 => true,
-            TypeCode.Int32 => true,
-            TypeCode.Int64 => true,
-            TypeCode.SByte => true,
-            TypeCode.Single => true,
-            TypeCode.String => true,
-            TypeCode.UInt16 => true,
-            TypeCode.UInt32 => true,
-            TypeCode.UInt64 => true,
-            _ => false
-        };
+        yield return RecordDataType.Boolean;
+        yield return RecordDataType.Byte;
+        yield return RecordDataType.Char;
+        yield return RecordDataType.DateTime;
+        yield return RecordDataType.Decimal;
+        yield return RecordDataType.Double;
+        yield return RecordDataType.Int16;
+        yield return RecordDataType.Int32;
+        yield return RecordDataType.Int64;
+        yield return RecordDataType.SByte;
+        yield return RecordDataType.Single;
+        yield return RecordDataType.String;
+        yield return RecordDataType.UInt16;
+        yield return RecordDataType.UInt32;
+        yield return RecordDataType.UInt64;
     }
 
-    public static Type ToType(TypeCode type)
+    public static Type ToType(RecordDataType type)
     {
         return type switch
         {
-            TypeCode.Boolean => typeof(bool),
-            TypeCode.Byte => typeof(byte),
-            TypeCode.Char => typeof(char),
-            TypeCode.DateTime => typeof(DateTime),
-            TypeCode.Decimal => typeof(decimal),
-            TypeCode.Double => typeof(double),
-            TypeCode.Int16 => typeof(short),
-            TypeCode.Int32 => typeof(int),
-            TypeCode.Int64 => typeof(long),
-            TypeCode.SByte => typeof(sbyte),
-            TypeCode.Single => typeof(float),
-            TypeCode.String => typeof(string),
-            TypeCode.UInt16 => typeof(ushort),
-            TypeCode.UInt32 => typeof(uint),
-            TypeCode.UInt64 => typeof(ulong),
+            RecordDataType.Boolean => typeof(bool),
+            RecordDataType.Byte => typeof(byte),
+            RecordDataType.Char => typeof(char),
+            RecordDataType.DateTime => typeof(DateTime),
+            RecordDataType.Decimal => typeof(decimal),
+            RecordDataType.Double => typeof(double),
+            RecordDataType.Int16 => typeof(short),
+            RecordDataType.Int32 => typeof(int),
+            RecordDataType.Int64 => typeof(long),
+            RecordDataType.SByte => typeof(sbyte),
+            RecordDataType.Single => typeof(float),
+            RecordDataType.String => typeof(string),
+            RecordDataType.UInt16 => typeof(ushort),
+            RecordDataType.UInt32 => typeof(uint),
+            RecordDataType.UInt64 => typeof(ulong),
             _ => throw new NotSupportedException()
         };
     }
 
-    public static ColumnData MakeData(TypeCode type, int capacity)
+    public static ColumnData MakeData(RecordDataType type, int capacity)
     {
         return type switch
         {
-            TypeCode.Boolean => new BooleanColumnData(capacity),
-            TypeCode.Byte => new ByteColumnData(capacity),
-            TypeCode.Char => new CharColumnData(capacity),
-            TypeCode.DateTime => new DateTimeColumnData(capacity),
-            TypeCode.Decimal => new DecimalColumnData(capacity),
-            TypeCode.Double => new DoubleColumnData(capacity),
-            TypeCode.Int16 => new Int16ColumnData(capacity),
-            TypeCode.Int32 => new Int32ColumnData(capacity),
-            TypeCode.Int64 => new Int64ColumnData(capacity),
-            TypeCode.SByte => new SByteColumnData(capacity),
-            TypeCode.Single => new SingleColumnData(capacity),
-            TypeCode.String => new StringColumnData(capacity),
-            TypeCode.UInt16 => new UInt16ColumnData(capacity),
-            TypeCode.UInt32 => new UInt32ColumnData(capacity),
-            TypeCode.UInt64 => new UInt64ColumnData(capacity),
+            RecordDataType.Boolean => new BooleanColumnData(capacity),
+            RecordDataType.Byte => new ByteColumnData(capacity),
+            RecordDataType.Char => new CharColumnData(capacity),
+            RecordDataType.DateTime => new DateTimeColumnData(capacity),
+            RecordDataType.Decimal => new DecimalColumnData(capacity),
+            RecordDataType.Double => new DoubleColumnData(capacity),
+            RecordDataType.Int16 => new Int16ColumnData(capacity),
+            RecordDataType.Int32 => new Int32ColumnData(capacity),
+            RecordDataType.Int64 => new Int64ColumnData(capacity),
+            RecordDataType.SByte => new SByteColumnData(capacity),
+            RecordDataType.Single => new SingleColumnData(capacity),
+            RecordDataType.String => new StringColumnData(capacity),
+            RecordDataType.UInt16 => new UInt16ColumnData(capacity),
+            RecordDataType.UInt32 => new UInt32ColumnData(capacity),
+            RecordDataType.UInt64 => new UInt64ColumnData(capacity),
             _ => throw new NotSupportedException()
         };
     }
