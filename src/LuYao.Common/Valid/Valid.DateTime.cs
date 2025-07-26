@@ -25,5 +25,5 @@ partial class Valid
     }
 
     /// <inheritdoc/>
-    public static string ToString(DateTime value) => value.ToString("O");
+    public static string ToString(DateTime value) => value.ToString("yyyy/MM/dd", DateTimeFormatInfo.InvariantInfo);
 }
