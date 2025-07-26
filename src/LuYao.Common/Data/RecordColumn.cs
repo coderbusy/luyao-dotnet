@@ -24,7 +24,7 @@ public sealed partial class RecordColumn
     /// <param name="code">列的数据类型。</param>
     /// <param name="capacity">列的初始容量，默认为 60。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为 null 时抛出。</exception>
-    public RecordColumn(Record table, string name, TypeCode code, int capacity)
+    public RecordColumn(Record table, string name, RecordDataType code, int capacity)
     {
         if (table == null) throw new ArgumentNullException(nameof(table), "表不能为空");
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列的名称不能为空或空白");
@@ -46,7 +46,7 @@ public sealed partial class RecordColumn
     /// <summary>
     /// 获取列的数据类型。
     /// </summary>
-    public TypeCode Code { get; }
+    public RecordDataType Code { get; }
 
     /// <summary>
     /// 获取列的实际数据类型。

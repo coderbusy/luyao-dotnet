@@ -5,7 +5,7 @@ namespace LuYao.Data;
 /// <summary>
 /// 表示记录数据类型的代码，映射到 <see cref="TypeCode"/> 枚举。
 /// </summary>
-public enum RecordDataTypeCode
+public enum RecordDataType
 {
     /// <summary>
     /// 布尔类型。对应 <see cref="TypeCode.Boolean"/>
