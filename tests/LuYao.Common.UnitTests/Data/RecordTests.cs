@@ -176,8 +176,8 @@ public class RecordTests
         // Assert
         Assert.AreEqual(0, row0.RowIndex);
         Assert.AreEqual(1, row1.RowIndex);
-        Assert.AreEqual(10, colId.GetValue(row0));
-        Assert.AreEqual(20, colId.GetValue(row1));
+        Assert.AreEqual(10, row0.ToInt32(colId));
+        Assert.AreEqual(20, row1.ToInt32(colId));
     }
 
     [TestMethod]
