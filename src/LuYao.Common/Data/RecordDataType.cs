@@ -7,6 +7,10 @@ namespace LuYao.Data;
 /// </summary>
 public enum RecordDataType
 {
+    ///<summary>
+    /// 对象类型。对应 <see cref="TypeCode.Object"/>
+    /// </summary>
+    Object = TypeCode.Object,
     /// <summary>
     /// 布尔类型。对应 <see cref="TypeCode.Boolean"/>
     /// </summary>
@@ -66,5 +70,5 @@ public enum RecordDataType
     /// <summary>
     /// 64 位无符号整数类型。对应 <see cref="TypeCode.UInt64"/>
     /// </summary>
-    UInt64 = TypeCode.UInt64,
+    UInt64 = TypeCode.UInt64
 }

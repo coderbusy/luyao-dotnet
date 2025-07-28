@@ -2,6 +2,62 @@
 
 namespace LuYao.Data;
 
+
+#region Object
+sealed class ObjectColumnData : ColumnData<Object>
+{
+    public ObjectColumnData(int capacity) : base(capacity)
+    {
+    }
+
+    public override void Set(Boolean value, int index) => _data[index] = value;
+    public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
+
+    public override void Set(Byte value, int index) => _data[index] = value;
+    public override Byte ToByte(int index) => Valid.ToByte(this._data[index]);
+
+    public override void Set(Char value, int index) => _data[index] = value;
+    public override Char ToChar(int index) => Valid.ToChar(this._data[index]);
+
+    public override void Set(DateTime value, int index) => _data[index] = value;
+    public override DateTime ToDateTime(int index) => Valid.ToDateTime(this._data[index]);
+
+    public override void Set(Decimal value, int index) => _data[index] = value;
+    public override Decimal ToDecimal(int index) => Valid.ToDecimal(this._data[index]);
+
+    public override void Set(Double value, int index) => _data[index] = value;
+    public override Double ToDouble(int index) => Valid.ToDouble(this._data[index]);
+
+    public override void Set(Int16 value, int index) => _data[index] = value;
+    public override Int16 ToInt16(int index) => Valid.ToInt16(this._data[index]);
+
+    public override void Set(Int32 value, int index) => _data[index] = value;
+    public override Int32 ToInt32(int index) => Valid.ToInt32(this._data[index]);
+
+    public override void Set(Int64 value, int index) => _data[index] = value;
+    public override Int64 ToInt64(int index) => Valid.ToInt64(this._data[index]);
+
+    public override void Set(SByte value, int index) => _data[index] = value;
+    public override SByte ToSByte(int index) => Valid.ToSByte(this._data[index]);
+
+    public override void Set(Single value, int index) => _data[index] = value;
+    public override Single ToSingle(int index) => Valid.ToSingle(this._data[index]);
+
+    public override void Set(String value, int index) => _data[index] = value;
+    public override String ToString(int index) => Valid.ToString(this._data[index]);
+
+    public override void Set(UInt16 value, int index) => _data[index] = value;
+    public override UInt16 ToUInt16(int index) => Valid.ToUInt16(this._data[index]);
+
+    public override void Set(UInt32 value, int index) => _data[index] = value;
+    public override UInt32 ToUInt32(int index) => Valid.ToUInt32(this._data[index]);
+
+    public override void Set(UInt64 value, int index) => _data[index] = value;
+    public override UInt64 ToUInt64(int index) => Valid.ToUInt64(this._data[index]);
+}
+
+#endregion
+
 #region Boolean
 sealed class BooleanColumnData : ColumnData<Boolean>
 {

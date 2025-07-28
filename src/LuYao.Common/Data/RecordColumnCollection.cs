@@ -71,65 +71,103 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 
     #region Add
 
-    /// <summary>添加数据列</summary>
-    /// <param name="name"></param>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public RecordColumn Add(string name, RecordDataType type)
+    internal RecordColumn AddInternal(string name, RecordDataType type)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
-        RecordColumn? col = this.Find(name);
-        if (col != null) return col;
-        col = new RecordColumn(this._re, name, type, this._capacity);
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentNullException(nameof(name), "列名不能为空");
+
+        if (this.Contains(name))
+            throw new InvalidOperationException($"列 '{name}' 已存在");
+
+        var col = new RecordColumn(this._re, name, type, this._capacity);
+        this._columns.Add(col);
+        return col;
+    }
+
+    internal RecordColumn AddInternal(string name, Type type)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentNullException(nameof(name), "列名不能为空");
+
+        if (this.Contains(name))
+            throw new InvalidOperationException($"列 '{name}' 已存在");
+
+        var col = new RecordColumn(this._re, name, type, this._capacity);
         this._columns.Add(col);
         return col;
     }
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddBoolean(string name) => this.Add(name, RecordDataType.Boolean);
+    public RecordColumn AddBoolean(string name) => this.AddInternal(name, RecordDataType.Boolean);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddByte(string name) => this.Add(name, RecordDataType.Byte);
+    public RecordColumn AddByte(string name) => this.AddInternal(name, RecordDataType.Byte);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddChar(string name) => this.Add(name, RecordDataType.Char);
+    public RecordColumn AddChar(string name) => this.AddInternal(name, RecordDataType.Char);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddDateTime(string name) => this.Add(name, RecordDataType.DateTime);
+    public RecordColumn AddDateTime(string name) => this.AddInternal(name, RecordDataType.DateTime);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddDecimal(string name) => this.Add(name, RecordDataType.Decimal);
+    public RecordColumn AddDecimal(string name) => this.AddInternal(name, RecordDataType.Decimal);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddDouble(string name) => this.Add(name, RecordDataType.Double);
+    public RecordColumn AddDouble(string name) => this.AddInternal(name, RecordDataType.Double);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddInt16(string name) => this.Add(name, RecordDataType.Int16);
+    public RecordColumn AddInt16(string name) => this.AddInternal(name, RecordDataType.Int16);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddInt32(string name) => this.Add(name, RecordDataType.Int32);
+    public RecordColumn AddInt32(string name) => this.AddInternal(name, RecordDataType.Int32);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddInt64(string name) => this.Add(name, RecordDataType.Int64);
+    public RecordColumn AddInt64(string name) => this.AddInternal(name, RecordDataType.Int64);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddSByte(string name) => this.Add(name, RecordDataType.SByte);
+    public RecordColumn AddSByte(string name) => this.AddInternal(name, RecordDataType.SByte);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddSingle(string name) => this.Add(name, RecordDataType.Single);
+    public RecordColumn AddSingle(string name) => this.AddInternal(name, RecordDataType.Single);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddString(string name) => this.Add(name, RecordDataType.String);
+    public RecordColumn AddString(string name) => this.AddInternal(name, RecordDataType.String);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddUInt16(string name) => this.Add(name, RecordDataType.UInt16);
+    public RecordColumn AddUInt16(string name) => this.AddInternal(name, RecordDataType.UInt16);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddUInt32(string name) => this.Add(name, RecordDataType.UInt32);
+    public RecordColumn AddUInt32(string name) => this.AddInternal(name, RecordDataType.UInt32);
 
     /// <summary>添加数据列</summary>
-    public RecordColumn AddUInt64(string name) => this.Add(name, RecordDataType.UInt64);
+    public RecordColumn AddUInt64(string name) => this.AddInternal(name, RecordDataType.UInt64);
+
+    /// <summary>添加数据列</summary>
+    public RecordColumn Add<T>(string name) => Add(name, typeof(T));
+
+    /// <summary>添加数据列</summary>
+    public RecordColumn Add(string name, Type type)
+    {
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.Boolean: return this.AddBoolean(name);
+            case TypeCode.Byte: return this.AddByte(name);
+            case TypeCode.Char: return this.AddChar(name);
+            case TypeCode.DateTime: return this.AddDateTime(name);
+            case TypeCode.Decimal: return this.AddDecimal(name);
+            case TypeCode.Double: return this.AddDouble(name);
+            case TypeCode.Int16: return this.AddInt16(name);
+            case TypeCode.Int32: return this.AddInt32(name);
+            case TypeCode.Int64: return this.AddInt64(name);
+            case TypeCode.SByte: return this.AddSByte(name);
+            case TypeCode.Single: return this.AddSingle(name);
+            case TypeCode.String: return this.AddString(name);
+            case TypeCode.UInt16: return this.AddUInt16(name);
+            case TypeCode.UInt32: return this.AddUInt32(name);
+            case TypeCode.UInt64: return this.AddUInt64(name);
+        }
+        return AddInternal(name, type);
+    }
     #endregion
 
     /// <summary>
