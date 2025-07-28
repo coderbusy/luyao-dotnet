@@ -13,14 +13,14 @@ partial class Record
     public void Write(BinaryWriter writer)
     {
         //字符串化的文件头
-        string header = new RecordSchema(this).SerializeToString();
-        writer.Write(header);
+        var header = new RecordHeader(this);
+        header.Save(writer);
 
         //写入列
         foreach (var col in this.Columns)
         {
             writer.Write(col.Name);//写入列名
-            writer.Write((byte)col.Code);//写入列代码
+            Helpers.WriteDataType(writer, col.Code); //写入列的数据类型
             string ext = string.Empty;
             writer.Write(ext); //写入扩展信息（目前为空）
         }
@@ -59,9 +59,8 @@ partial class Record
     public void Read(BinaryReader reader)
     {
         //读取字符串化的文件头
-        string h = reader.ReadString();
-        var header = RecordSchema.FromString(h);
-        this.Name = header.Name;
+        var header = new RecordHeader();
+        header.Load(reader);
 
         //构建列集合
         this.Columns.Clear();
@@ -69,9 +68,7 @@ partial class Record
         for (int i = 0; i < header.Columns; i++)
         {
             string n = reader.ReadString();
-            byte codeValue = reader.ReadByte();
-            if (!Enum.IsDefined(typeof(RecordDataType), codeValue)) throw new InvalidDataException($"Invalid RecordDataType value: {codeValue}");
-            RecordDataType code = (RecordDataType)codeValue;
+            RecordDataType code = Helpers.ReadDataType(reader);
             string ext = reader.ReadString(); //读取扩展信息（目前为空）
             this.Columns.Add(n, code);
         }

@@ -582,7 +582,7 @@ public class RecordTests
     public void RecordSchema_DefaultConstructor_InitializesCorrectly()
     {
         // Arrange & Act
-        var schema = new RecordSchema();
+        var schema = new RecordHeader();
 
         // Assert
         Assert.AreEqual(1, schema.Version);
@@ -602,7 +602,7 @@ public class RecordTests
         table.AddRow();
 
         // Act
-        var schema = new RecordSchema(table);
+        var schema = new RecordHeader(table);
 
         // Assert
         Assert.AreEqual(1, schema.Version);
@@ -615,33 +615,9 @@ public class RecordTests
     public void RecordSchema_ConstructorWithNull_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => new RecordSchema(null!));
+        Assert.ThrowsException<ArgumentNullException>(() => new RecordHeader(null!));
     }
 
-    [TestMethod]
-    public void RecordSchema_FromString_WithEmptyString_ReturnsDefault()
-    {
-        // Act
-        var schema1 = RecordSchema.FromString("");
-        var schema2 = RecordSchema.FromString(null!);
-        var schema3 = RecordSchema.FromString("   ");
-
-        // Assert
-        Assert.AreEqual(1, schema1.Version);
-        Assert.AreEqual(string.Empty, schema1.Name);
-        Assert.AreEqual(0, schema1.Columns);
-        Assert.AreEqual(0, schema1.Count);
-
-        Assert.AreEqual(1, schema2.Version);
-        Assert.AreEqual(string.Empty, schema2.Name);
-        Assert.AreEqual(0, schema2.Columns);
-        Assert.AreEqual(0, schema2.Count);
-
-        Assert.AreEqual(1, schema3.Version);
-        Assert.AreEqual(string.Empty, schema3.Name);
-        Assert.AreEqual(0, schema3.Columns);
-        Assert.AreEqual(0, schema3.Count);
-    }
 
     [TestMethod]
     public void RecordColumn_Name_ReturnsCorrectName()
