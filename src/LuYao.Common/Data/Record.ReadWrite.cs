@@ -71,7 +71,7 @@ partial class Record
             string n = reader.ReadString();
             RecordDataType code = Helpers.ReadDataType(reader);
             string ext = reader.ReadString(); //读取扩展信息（目前为空）
-            this.Columns.Add(n, code);
+            this.Columns.AddInternal(n, code);
         }
 
         //读取数据行

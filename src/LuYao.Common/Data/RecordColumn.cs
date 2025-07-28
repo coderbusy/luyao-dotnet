@@ -27,6 +27,7 @@ public sealed partial class RecordColumn
     public RecordColumn(Record table, string name, RecordDataType code, int capacity)
     {
         if (table == null) throw new ArgumentNullException(nameof(table), "表不能为空");
+        if (code == RecordDataType.Object) throw new ArgumentException(nameof(code), "列的数据类型不能为 Object,请使用类型重载。");
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列的名称不能为空或空白");
         this._table = table;
         this.Name = name;
@@ -34,6 +35,26 @@ public sealed partial class RecordColumn
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
         this._type = Helpers.ToType(code);
         this._data = Helpers.MakeData(code, capacity);
+    }
+
+    /// <summary>
+    /// 初始化 <see cref="RecordColumn"/> 类的新实例。
+    /// </summary>
+    /// <param name="table"></param>
+    /// <param name="name">列的名称。</param>
+    /// <param name="type">列的数据类型。</param>
+    /// <param name="capacity">列的初始容量，默认为 60。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为 null 时抛出。</exception>
+    public RecordColumn(Record table, string name, Type type, int capacity)
+    {
+        if (table == null) throw new ArgumentNullException(nameof(table), "表不能为空");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列的名称不能为空或空白");
+        this._table = table;
+        this.Name = name;
+        this.Code = RecordDataType.Object;
+        if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
+        this._type = type;
+        this._data = Helpers.MakeData(RecordDataType.Object, capacity);
     }
 
     internal void Extend(int length) => this._data.Extend(length);
@@ -60,18 +81,18 @@ public sealed partial class RecordColumn
     /// <param name="row"></param>
     public void SetValue(object? value, int row)
     {
-        if (row < 0 || row >= _table.Count) 
+        if (row < 0 || row >= _table.Count)
             throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {_table.Count - 1}]");
         _data.SetValue(value, row);
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
     public void SetValue(object? value, RecordRow row) => SetValue(value, row.RowIndex);
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -79,7 +100,7 @@ public sealed partial class RecordColumn
     /// <returns></returns>
     public object? GetValue(int row)
     {
-        if (row < 0 || row >= _table.Count) 
+        if (row < 0 || row >= _table.Count)
             throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {_table.Count - 1}]");
         return _data.GetValue(row);
     }

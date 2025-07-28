@@ -48,6 +48,7 @@ internal static class Helpers
             RecordDataType.UInt16 => new UInt16ColumnData(capacity),
             RecordDataType.UInt32 => new UInt32ColumnData(capacity),
             RecordDataType.UInt64 => new UInt64ColumnData(capacity),
+            RecordDataType.Object => throw new NotSupportedException(),
             _ => throw new NotSupportedException()
         };
     }
