@@ -14,6 +14,8 @@ partial class Record
     /// <param name="dr">用于读取数据的 <see cref="IDataReader"/> 实例。</param>
     public void Read(IDataReader dr)
     {
+        if (dr == null) throw new ArgumentNullException(nameof(dr));
+
         this.Columns.Clear();
         var count = dr.FieldCount;
         if (count <= 0) return;
@@ -30,7 +32,7 @@ partial class Record
             for (int i = 0; i < count; i++)
             {
                 object val = dr.GetValue(i);
-                if (Convert.IsDBNull(val)) continue;
+                if (val == DBNull.Value) continue;
                 row.SetValue(val, this.Columns[i]);
             }
         }
