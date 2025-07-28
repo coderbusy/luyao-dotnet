@@ -61,6 +61,7 @@ partial class Record
         //读取字符串化的文件头
         var header = new RecordHeader();
         header.Load(reader);
+        this.Name = header.Name;
 
         //构建列集合
         this.Columns.Clear();
