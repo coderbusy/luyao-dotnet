@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.Common;
 using System.IO;
 
@@ -6,6 +7,38 @@ namespace LuYao.Data;
 
 partial class Record
 {
+    #region IDataReader
+    /// <summary>
+    /// 从指定的 <see cref="IDataReader"/> 读取数据并填充到当前 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <param name="dr">用于读取数据的 <see cref="IDataReader"/> 实例。</param>
+    public void Read(IDataReader dr)
+    {
+        this.Columns.Clear();
+        var count = dr.FieldCount;
+        if (count <= 0) return;
+        for (int i = 0; i < count; i++)
+        {
+            string n = dr.GetName(i);
+            Type t = dr.GetFieldType(i);
+            this.Columns.AddInternal(n, t);
+        }
+
+        while (dr.Read())
+        {
+            var row = this.AddRow();
+            for (int i = 0; i < count; i++)
+            {
+                object val = dr.GetValue(i);
+                if (Convert.IsDBNull(val)) continue;
+                row.SetValue(val, this.Columns[i]);
+            }
+        }
+    }
+    #endregion
+
+    #region Binary
+
     /// <summary>
     /// 将当前 <see cref="Record"/> 实例的数据以二进制格式写入指定的 <see cref="BinaryWriter"/>。
     /// </summary>
@@ -100,4 +133,6 @@ partial class Record
             }
         }
     }
+
+    #endregion
 }
