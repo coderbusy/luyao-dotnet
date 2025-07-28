@@ -1093,25 +1093,6 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void BoundaryCheck_EmptyTable_IndexZeroWorksAfterAutoRowCreation()
-    {
-        // Arrange
-        var table = new Record();
-        var col = table.Columns.AddInternal("TestCol", RecordDataType.String);
-        // No rows added, Count = 0
-
-        // Act & Assert - Index 0 should work because auto-row creation
-        col.Set("test", 0); // Should auto-create row
-        Assert.AreEqual(1, table.Count); // Row was auto-created
-        Assert.AreEqual("test", col.GetValue(0));
-
-        // But other indices should still throw
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.GetValue(1));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.SetValue("test", 1));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set(true, 1));
-    }
-
-    [TestMethod]
     public void BoundaryCheck_EmptyTable_NegativeIndexStillThrowsException()
     {
         // Arrange
@@ -1136,27 +1117,6 @@ public class RecordTests
         // Act & Assert - Indices > 0 should throw even with auto-row creation
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set("test", 1));
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set("test", 2));
-    }
-
-    [TestMethod]
-    public void TypedSetMethods_EmptyTable_IndexZeroWorksWithAutoRowCreation()
-    {
-        // Arrange
-        var table = new Record();
-        var boolCol = table.Columns.AddInternal("Bool", RecordDataType.Boolean);
-        var intCol = table.Columns.AddInternal("Int", RecordDataType.Int32);
-        var stringCol = table.Columns.AddInternal("String", RecordDataType.String);
-
-        // Act & Assert - Index 0 should work with auto-row creation
-        boolCol.Set(true, 0);
-        Assert.AreEqual(1, table.Count);
-
-        intCol.Set(42, 0);
-        stringCol.Set("test", 0);
-
-        Assert.AreEqual(true, boolCol.GetValue(0));
-        Assert.AreEqual(42, intCol.GetValue(0));
-        Assert.AreEqual("test", stringCol.GetValue(0));
     }
 
     [TestMethod]

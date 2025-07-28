@@ -30,7 +30,7 @@ public static class RecordLoader<T> where T : class, new()
         _mappings = CreateMappings();
     }
 
-    private static PropertyMapping[]? CreateMappings()
+    private static PropertyMapping[] CreateMappings()
     {
         var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.CanRead && p.CanWrite)
