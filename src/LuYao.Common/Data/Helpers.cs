@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace LuYao.Data;
 
@@ -49,5 +50,17 @@ internal static class Helpers
             RecordDataType.UInt64 => new UInt64ColumnData(capacity),
             _ => throw new NotSupportedException()
         };
+    }
+
+    public static RecordDataType ReadDataType(BinaryReader reader)
+    {
+        byte codeValue = reader.ReadByte();
+        if (!Enum.IsDefined(typeof(RecordDataType), codeValue)) throw new InvalidDataException($"Invalid RecordDataType value: {codeValue}");
+        return (RecordDataType)codeValue;
+    }
+
+    public static void WriteDataType(BinaryWriter writer, RecordDataType type)
+    {
+        writer.Write((byte)type);
     }
 }
