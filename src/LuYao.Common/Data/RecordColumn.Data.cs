@@ -242,4 +242,11 @@ partial class RecordColumn
         ValidateReadIndex(index);
         return this.Data.ToUInt64(index);
     }
+
+    /// <inheritdoc/>
+    public T To<T>(int index)
+    {
+        ValidateReadIndex(index);
+        return this.Data.To<T>(index);
+    }
 }

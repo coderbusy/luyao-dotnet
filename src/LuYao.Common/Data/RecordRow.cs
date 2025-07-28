@@ -8,7 +8,7 @@ namespace LuYao.Data;
 /// </summary>
 public readonly struct RecordRow
 {
-    private readonly Record _table;
+    private readonly Record _re;
     private readonly int _rowIndex;
 
     /// <summary>
@@ -18,9 +18,14 @@ public readonly struct RecordRow
     /// <param name="rowIndex">行索引。</param>
     public RecordRow(Record table, int rowIndex)
     {
-        _table = table;
+        _re = table;
         _rowIndex = rowIndex;
     }
+
+    /// <summary>
+    /// 获取所属的 <see cref="Record"/> 实例。
+    /// </summary>
+    public Record Record => _re;
 
     /// <summary>
     /// 行号
@@ -118,4 +123,8 @@ public readonly struct RecordRow
     ///<inheritdoc/>
     public void Set(UInt64 value, RecordColumn column) => column.Set(value, this._rowIndex);
     #endregion
+
+    ///<inheritdoc/>
+
+    public T To<T>(RecordColumn column) => column.To<T>(this._rowIndex);
 }

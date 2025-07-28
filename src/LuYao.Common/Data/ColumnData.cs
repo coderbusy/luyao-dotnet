@@ -56,7 +56,7 @@ internal abstract class ColumnData
     public abstract UInt64 ToUInt64(int index);
     public abstract void Set(UInt64 value, int index);
 
-
+    public abstract TRet To<TRet>(int index);
 }
 
 internal abstract class ColumnData<T> : ColumnData
@@ -86,5 +86,12 @@ internal abstract class ColumnData<T> : ColumnData
         {
             Array.Clear(this._data, index, 1);
         }
+    }
+
+    public override TRet To<TRet>(int index)
+    {
+        object? value = this._data[index];
+        if (value is null) return default!;
+        return (TRet)Convert.ChangeType(value, typeof(TRet))!;
     }
 }
