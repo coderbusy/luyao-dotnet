@@ -73,20 +73,26 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 
     internal RecordColumn AddInternal(string name, RecordDataType type)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
-        RecordColumn? col = this.Find(name);
-        if (col != null) return col;
-        col = new RecordColumn(this._re, name, type, this._capacity);
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentNullException(nameof(name), "列名不能为空");
+
+        if (this.Contains(name))
+            throw new InvalidOperationException($"列 '{name}' 已存在");
+
+        var col = new RecordColumn(this._re, name, type, this._capacity);
         this._columns.Add(col);
         return col;
     }
 
     internal RecordColumn AddInternal(string name, Type type)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
-        RecordColumn? col = this.Find(name);
-        if (col != null) return col;
-        col = new RecordColumn(this._re, name, type, this._capacity);
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentNullException(nameof(name), "列名不能为空");
+
+        if (this.Contains(name))
+            throw new InvalidOperationException($"列 '{name}' 已存在");
+
+        var col = new RecordColumn(this._re, name, type, this._capacity);
         this._columns.Add(col);
         return col;
     }

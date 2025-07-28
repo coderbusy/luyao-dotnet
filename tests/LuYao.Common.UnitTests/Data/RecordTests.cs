@@ -320,21 +320,6 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void Columns_AddDuplicateName_ReturnsSameColumn()
-    {
-        // Arrange
-        var table = new Record();
-
-        // Act
-        var col1 = table.Columns.AddInternal("TestColumn", RecordDataType.String);
-        var col2 = table.Columns.AddInternal("TestColumn", RecordDataType.String);
-
-        // Assert
-        Assert.AreSame(col1, col2);
-        Assert.AreEqual(1, table.Columns.Count);
-    }
-
-    [TestMethod]
     public void Columns_Find_ExistingColumn_ReturnsColumn()
     {
         // Arrange
@@ -1172,5 +1157,29 @@ public class RecordTests
         Assert.AreEqual(true, boolCol.GetValue(0));
         Assert.AreEqual(42, intCol.GetValue(0));
         Assert.AreEqual("test", stringCol.GetValue(0));
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void Columns_AddDuplicateName_ThrowsException()
+    {
+        // Arrange
+        var table = new Record();
+        table.Columns.AddString("TestColumn");
+
+        // Act & Assert
+        table.Columns.AddString("TestColumn"); // 应该抛出异常
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void Columns_AddDuplicateNameDifferentType_ThrowsException()
+    {
+        // Arrange
+        var table = new Record();
+        table.Columns.AddString("TestColumn");
+
+        // Act & Assert
+        table.Columns.AddInt32("TestColumn"); // 应该抛出异常
     }
 }
