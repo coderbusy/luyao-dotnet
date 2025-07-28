@@ -19,8 +19,8 @@ public static class RecordLoader<T> where T : class, new()
         public string ColumnName { get; set; } = null!;
         public Type PropertyType { get; set; } = null!;
 
-        public Action<RecordRow, RecordColumn, T>? WriteEntity { get; set; }
-        public Action<T, RecordRow, RecordColumn>? WriteRow { get; set; }
+        public Action<RecordRow, RecordColumn, T>? PopulateObject { get; set; }
+        public Action<T, RecordRow, RecordColumn>? WriteToRow { get; set; }
     }
 
     private static readonly IDictionary<string, PropertyMapping> _mappings;
@@ -49,10 +49,10 @@ public static class RecordLoader<T> where T : class, new()
             };
 
             // 创建读取委托（从 RecordRow 到实体）
-            mapping.WriteEntity = CreateWriteEntityDelegate(property);
+            mapping.PopulateObject = CreatePopulateObjectDelegate(property);
 
             // 创建写入委托（从实体到 RecordRow）
-            mapping.WriteRow = CreateWriteRowDelegate(property);
+            mapping.WriteToRow = CreateWriteRowDelegate(property);
 
             mappings.Add(mapping);
         }
@@ -66,7 +66,7 @@ public static class RecordLoader<T> where T : class, new()
         return attr?.Name ?? property.Name;
     }
 
-    private static Action<RecordRow, RecordColumn, T> CreateWriteEntityDelegate(PropertyInfo property)
+    private static Action<RecordRow, RecordColumn, T> CreatePopulateObjectDelegate(PropertyInfo property)
     {
         // 参数: (RecordRow row, RecordColumn column, T target)
         var rowParam = Expression.Parameter(typeof(RecordRow), "row");
@@ -219,9 +219,9 @@ public static class RecordLoader<T> where T : class, new()
         Record record = row.Record;
         foreach (var column in record.Columns)
         {
-            if (_mappings.TryGetValue(column.Name, out var mapping) && mapping.WriteEntity != null)
+            if (_mappings.TryGetValue(column.Name, out var mapping) && mapping.PopulateObject != null)
             {
-                mapping.WriteEntity(row, column, target);
+                mapping.PopulateObject(row, column, target);
             }
         }
     }
@@ -235,7 +235,7 @@ public static class RecordLoader<T> where T : class, new()
         foreach (var pair in _mappings)
         {
             var mapping = pair.Value;
-            if (mapping.WriteRow != null)
+            if (mapping.WriteToRow != null)
             {
                 re.Columns.Add(mapping.ColumnName, mapping.PropertyType);
             }
@@ -252,9 +252,9 @@ public static class RecordLoader<T> where T : class, new()
         Record record = row.Record;
         foreach (var column in record.Columns)
         {
-            if (_mappings.TryGetValue(column.Name, out var mapping) && mapping.WriteRow != null)
+            if (_mappings.TryGetValue(column.Name, out var mapping) && mapping.WriteToRow != null)
             {
-                mapping.WriteRow(instance, row, column);
+                mapping.WriteToRow(instance, row, column);
             }
         }
     }
