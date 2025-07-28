@@ -211,10 +211,22 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <summary>
     /// 删除一个列
     /// </summary>
-    public bool Remove(RecordColumn column) => this._columns.Remove(column);
+    public bool Remove(RecordColumn column)
+    {
+        var b = this._columns.Remove(column);
+        if (b && this._columns.Count == 0)
+        {
+            this._count = 0; //如果删除后没有列了，行数也清零
+        }
+        return b;
+    }
 
     /// <summary>
     /// 清理所有列
     /// </summary>
-    public void Clear() => this._columns.Clear();
+    public void Clear()
+    {
+        this._columns.Clear();
+        this._count = 0;
+    }
 }
