@@ -23,12 +23,15 @@ public static class RecordLoader<T> where T : class, new()
         public Action<T, RecordRow, RecordColumn>? WriteToRow { get; set; }
     }
 
-    private static readonly IDictionary<string, PropertyMapping> _mappings;
-
+    private static readonly SortedDictionary<string, PropertyMapping> _mappings;
     static RecordLoader()
     {
         var mappings = CreateMappings();
-        _mappings = mappings.ToDictionary(m => m.ColumnName); // 使用默认的严格比较
+        _mappings = new SortedDictionary<string, PropertyMapping>();
+        foreach (var mapping in mappings)
+        {
+            _mappings.Add(mapping.ColumnName, mapping);
+        }
     }
 
     private static PropertyMapping[] CreateMappings()

@@ -354,4 +354,271 @@ public class RecordLoaderTests
         Assert.IsTrue(record.Columns.Contains("NullableInt"));
         Assert.IsTrue(record.Columns.Contains("NullableDateTime"));
     }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法 - 验证列的数据类型
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_ShouldCreateColumnsWithCorrectTypes()
+    {
+        // Arrange
+        var record = new Record("TestTable", 1);
+
+        // Act
+        RecordLoader<TestEntity>.WriteHeader(record);
+
+        // Assert
+        var idColumn = record.Columns.Find("Id");
+        Assert.IsNotNull(idColumn);
+        Assert.AreEqual(typeof(int), idColumn.Type);
+
+        var nameColumn = record.Columns.Find("Name");
+        Assert.IsNotNull(nameColumn);
+        Assert.AreEqual(typeof(string), nameColumn.Type);
+
+        var createTimeColumn = record.Columns.Find("CreateTime");
+        Assert.IsNotNull(createTimeColumn);
+        Assert.AreEqual(typeof(DateTime), createTimeColumn.Type);
+
+        var isActiveColumn = record.Columns.Find("IsActive");
+        Assert.IsNotNull(isActiveColumn);
+        Assert.AreEqual(typeof(bool), isActiveColumn.Type);
+
+        var scoreColumn = record.Columns.Find("Score");
+        Assert.IsNotNull(scoreColumn);
+        Assert.AreEqual(typeof(double), scoreColumn.Type);
+
+        var customColumn = record.Columns.Find("custom_column");
+        Assert.IsNotNull(customColumn);
+        Assert.AreEqual(typeof(string), customColumn.Type);
+
+        var nullableIntColumn = record.Columns.Find("NullableInt");
+        Assert.IsNotNull(nullableIntColumn);
+        Assert.AreEqual(typeof(int?), nullableIntColumn.Type);
+
+        var nullableDateTimeColumn = record.Columns.Find("NullableDateTime");
+        Assert.IsNotNull(nullableDateTimeColumn);
+        Assert.AreEqual(typeof(DateTime?), nullableDateTimeColumn.Type);
+    }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法 - 验证列的数量
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_ShouldCreateCorrectNumberOfColumns()
+    {
+        // Arrange
+        var record = new Record("TestTable", 1);
+
+        // Act
+        RecordLoader<TestEntity>.WriteHeader(record);
+
+        // Assert
+        // TestEntity 有 8 个可读写属性
+        Assert.AreEqual(8, record.Columns.Count);
+    }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法 - 简单实体类
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_SimpleEntity_ShouldCreateCorrectColumns()
+    {
+        // Arrange
+        var record = new Record("SimpleTable", 1);
+
+        // Act
+        RecordLoader<SimpleEntity>.WriteHeader(record);
+
+        // Assert
+        Assert.AreEqual(2, record.Columns.Count);
+        Assert.IsTrue(record.Columns.Contains("Value"));
+        Assert.IsTrue(record.Columns.Contains("Text"));
+
+        var valueColumn = record.Columns.Find("Value");
+        Assert.IsNotNull(valueColumn);
+        Assert.AreEqual(typeof(int), valueColumn.Type);
+
+        var textColumn = record.Columns.Find("Text");
+        Assert.IsNotNull(textColumn);
+        Assert.AreEqual(typeof(string), textColumn.Type);
+    }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法 - 空 Record
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_EmptyRecord_ShouldPopulateColumns()
+    {
+        // Arrange
+        var record = new Record();
+
+        // Act
+        RecordLoader<TestEntity>.WriteHeader(record);
+
+        // Assert
+        Assert.IsTrue(record.Columns.Count > 0);
+        Assert.IsTrue(record.Columns.Contains("Id"));
+        Assert.IsTrue(record.Columns.Contains("Name"));
+    }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法 - 多次调用不会重复添加列
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_CalledTwice_ShouldThrowException()
+    {
+        // Arrange
+        var record = new Record("TestTable", 1);
+        RecordLoader<TestEntity>.WriteHeader(record);
+
+        // Act & Assert
+        // 第二次调用应该抛出异常，因为列已经存在
+        Assert.ThrowsException<InvalidOperationException>(() =>
+        {
+            RecordLoader<TestEntity>.WriteHeader(record);
+        });
+    }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法 - 列名排序
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_ShouldCreateColumnsInAlphabeticalOrder()
+    {
+        // Arrange
+        var record = new Record("TestTable", 1);
+
+        // Act
+        RecordLoader<TestEntity>.WriteHeader(record);
+
+        // Assert
+        // 由于使用 SortedDictionary，列应该按字母顺序创建
+        var columnNames = record.Columns.Select(c => c.Name).ToList();
+        var expectedOrder = new List<string>
+        {
+            "CreateTime",
+            "custom_column", // RecordColumnNameAttribute 指定的名称
+            "Id",
+            "IsActive",
+            "Name",
+            "NullableDateTime",
+            "NullableInt",
+            "Score"
+        };
+
+        CollectionAssert.AreEqual(expectedOrder, columnNames);
+    }
+
+    /// <summary>
+    /// 测试用的只读属性实体类
+    /// </summary>
+    public class ReadOnlyEntity
+    {
+        public int Id { get; }
+        public string Name { get; set; } = string.Empty;
+        public int WriteOnlyProperty { set { } }
+    }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法 - 只包含可读写属性
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_ReadOnlyEntity_ShouldOnlyIncludeReadWriteProperties()
+    {
+        // Arrange
+        var record = new Record("ReadOnlyTable", 1);
+
+        // Act
+        RecordLoader<ReadOnlyEntity>.WriteHeader(record);
+
+        // Assert
+        // 只有 Name 属性是可读写的
+        Assert.AreEqual(1, record.Columns.Count);
+        Assert.IsTrue(record.Columns.Contains("Name"));
+        Assert.IsFalse(record.Columns.Contains("Id")); // 只读属性
+        Assert.IsFalse(record.Columns.Contains("WriteOnlyProperty")); // 只写属性
+    }
+
+    /// <summary>
+    /// 测试用的复杂类型实体类
+    /// </summary>
+    public class ComplexTypeEntity
+    {
+        public Guid Id { get; set; }
+        public TimeSpan Duration { get; set; }
+        public byte[] Data { get; set; } = Array.Empty<byte>();
+        public object ComplexObject { get; set; } = new object();
+    }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法 - 复杂数据类型
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_ComplexTypeEntity_ShouldHandleComplexTypes()
+    {
+        // Arrange
+        var record = new Record("ComplexTable", 1);
+
+        // Act
+        RecordLoader<ComplexTypeEntity>.WriteHeader(record);
+
+        // Assert
+        Assert.AreEqual(4, record.Columns.Count);
+        Assert.IsTrue(record.Columns.Contains("Id"));
+        Assert.IsTrue(record.Columns.Contains("Duration"));
+        Assert.IsTrue(record.Columns.Contains("Data"));
+        Assert.IsTrue(record.Columns.Contains("ComplexObject"));
+
+        var idColumn = record.Columns.Find("Id");
+        Assert.IsNotNull(idColumn);
+        Assert.AreEqual(typeof(Guid), idColumn.Type);
+
+        var durationColumn = record.Columns.Find("Duration");
+        Assert.IsNotNull(durationColumn);
+        Assert.AreEqual(typeof(TimeSpan), durationColumn.Type);
+
+        var dataColumn = record.Columns.Find("Data");
+        Assert.IsNotNull(dataColumn);
+        Assert.AreEqual(typeof(byte[]), dataColumn.Type);
+
+        var complexColumn = record.Columns.Find("ComplexObject");
+        Assert.IsNotNull(complexColumn);
+        Assert.AreEqual(typeof(object), complexColumn.Type);
+    }
+
+    /// <summary>
+    /// 测试 WriteHeader 方法与 WriteData 方法的兼容性
+    /// </summary>
+    [TestMethod]
+    public void WriteHeader_WithWriteData_ShouldBeCompatible()
+    {
+        // Arrange
+        var record = new Record("CompatibilityTable", 1);
+        var entity = new TestEntity
+        {
+            Id = 123,
+            Name = "兼容性测试",
+            CreateTime = DateTime.Now,
+            IsActive = true,
+            Score = 95.5,
+            CustomField = "自定义值",
+            NullableInt = 456
+        };
+
+        // Act
+        RecordLoader<TestEntity>.WriteHeader(record);
+        var row = record.AddRow();
+        RecordLoader<TestEntity>.WriteData(entity, row);
+
+        // Assert
+        // 验证所有列都能正确写入数据
+        Assert.AreEqual(entity.Id, row.ToInt32(record.Columns.Find("Id")!));
+        Assert.AreEqual(entity.Name, row.ToString(record.Columns.Find("Name")!));
+        Assert.AreEqual(entity.CreateTime, row.ToDateTime(record.Columns.Find("CreateTime")!));
+        Assert.AreEqual(entity.IsActive, row.ToBoolean(record.Columns.Find("IsActive")!));
+        Assert.AreEqual(entity.Score, row.ToDouble(record.Columns.Find("Score")!), 0.001);
+        Assert.AreEqual(entity.CustomField, row.ToString(record.Columns.Find("custom_column")!));
+        Assert.AreEqual(entity.NullableInt, row.ToInt32(record.Columns.Find("NullableInt")!));
+    }
 }
