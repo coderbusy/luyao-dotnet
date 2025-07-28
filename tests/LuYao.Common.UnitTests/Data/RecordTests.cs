@@ -806,4 +806,371 @@ public class RecordTests
         var result = record.ToString();
         Assert.IsTrue(result.Contains(".."));
     }
+
+    // 新增的边界检查测试方法
+
+    [TestMethod]
+    public void GetValue_NegativeRowIndex_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.GetValue(-1));
+        Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void GetValue_RowIndexEqualToCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.GetValue(1));
+        Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void GetValue_RowIndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.GetValue(5));
+        Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void SetValue_NegativeRowIndex_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.SetValue("test", -1));
+        Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void SetValue_RowIndexEqualToCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.SetValue("test", 1));
+        Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void SetValue_RowIndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.SetValue("test", 5));
+        Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void SetBoolean_NegativeIndex_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("BoolCol", RecordDataType.Boolean);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set(true, -1));
+        Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void SetBoolean_IndexEqualToCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("BoolCol", RecordDataType.Boolean);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set(true, 1));
+        Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void SetInt32_IndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("IntCol", RecordDataType.Int32);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set(42, 5));
+        Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void ToBoolean_NegativeIndex_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("BoolCol", RecordDataType.Boolean);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.ToBoolean(-1));
+        Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void ToInt32_IndexEqualToCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("IntCol", RecordDataType.Int32);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.ToInt32(1));
+        Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void ToString_IndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("StringCol", RecordDataType.String);
+        table.AddRow();
+
+        // Act & Assert
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.ToString(10));
+        Assert.IsTrue(exception.Message.Contains("行索引 10 超出有效范围"));
+    }
+
+    [TestMethod]
+    public void BoundaryCheck_ValidIndex_WorksCorrectly()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        table.AddRow();
+        table.AddRow();
+        table.AddRow();
+
+        // Act & Assert - Valid indices should work
+        col.SetValue("value0", 0);
+        col.SetValue("value1", 1);
+        col.SetValue("value2", 2);
+
+        Assert.AreEqual("value0", col.GetValue(0));
+        Assert.AreEqual("value1", col.GetValue(1));
+        Assert.AreEqual("value2", col.GetValue(2));
+    }
+
+    [TestMethod]
+    public void BoundaryCheck_AfterCapacityExpansion_StillEnforcesBounds()
+    {
+        // Arrange
+        var table = new Record("Test", 2); // Small initial capacity
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+
+        // Add rows to trigger capacity expansion
+        table.AddRow(); // Index 0
+        table.AddRow(); // Index 1
+        table.AddRow(); // Index 2 - should trigger expansion
+
+        // Act & Assert - Valid indices work
+        col.SetValue("test0", 0);
+        col.SetValue("test1", 1);
+        col.SetValue("test2", 2);
+
+        Assert.AreEqual("test0", col.GetValue(0));
+        Assert.AreEqual("test1", col.GetValue(1));
+        Assert.AreEqual("test2", col.GetValue(2));
+
+        // Invalid indices should still throw
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.GetValue(3));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.SetValue("invalid", 4));
+    }
+
+    [TestMethod]
+    public void AllTypedSetMethods_InvalidIndex_ThrowArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var boolCol = table.Columns.Add("Bool", RecordDataType.Boolean);
+        var byteCol = table.Columns.Add("Byte", RecordDataType.Byte);
+        var charCol = table.Columns.Add("Char", RecordDataType.Char);
+        var dateTimeCol = table.Columns.Add("DateTime", RecordDataType.DateTime);
+        var decimalCol = table.Columns.Add("Decimal", RecordDataType.Decimal);
+        var doubleCol = table.Columns.Add("Double", RecordDataType.Double);
+        var int16Col = table.Columns.Add("Int16", RecordDataType.Int16);
+        var int32Col = table.Columns.Add("Int32", RecordDataType.Int32);
+        var int64Col = table.Columns.Add("Int64", RecordDataType.Int64);
+        var sbyteCol = table.Columns.Add("SByte", RecordDataType.SByte);
+        var singleCol = table.Columns.Add("Single", RecordDataType.Single);
+        var stringCol = table.Columns.Add("String", RecordDataType.String);
+        var uint16Col = table.Columns.Add("UInt16", RecordDataType.UInt16);
+        var uint32Col = table.Columns.Add("UInt32", RecordDataType.UInt32);
+        var uint64Col = table.Columns.Add("UInt64", RecordDataType.UInt64);
+
+        table.AddRow(); // Only one row, valid index is 0
+
+        // Act & Assert - Test all Set methods with invalid index
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => boolCol.Set(true, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => byteCol.Set((byte)1, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => charCol.Set('A', 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => dateTimeCol.Set(DateTime.Now, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => decimalCol.Set(1.0m, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => doubleCol.Set(1.0, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => int16Col.Set((short)1, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => int32Col.Set(1, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => int64Col.Set(1L, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => sbyteCol.Set((sbyte)1, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => singleCol.Set(1.0f, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => stringCol.Set("test", 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => uint16Col.Set((ushort)1, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => uint32Col.Set(1u, 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => uint64Col.Set(1ul, 1));
+    }
+
+    [TestMethod]
+    public void AllTypedToMethods_InvalidIndex_ThrowArgumentOutOfRangeException()
+    {
+        // Arrange
+        var table = new Record();
+        var boolCol = table.Columns.Add("Bool", RecordDataType.Boolean);
+        var byteCol = table.Columns.Add("Byte", RecordDataType.Byte);
+        var charCol = table.Columns.Add("Char", RecordDataType.Char);
+        var dateTimeCol = table.Columns.Add("DateTime", RecordDataType.DateTime);
+        var decimalCol = table.Columns.Add("Decimal", RecordDataType.Decimal);
+        var doubleCol = table.Columns.Add("Double", RecordDataType.Double);
+        var int16Col = table.Columns.Add("Int16", RecordDataType.Int16);
+        var int32Col = table.Columns.Add("Int32", RecordDataType.Int32);
+        var int64Col = table.Columns.Add("Int64", RecordDataType.Int64);
+        var sbyteCol = table.Columns.Add("SByte", RecordDataType.SByte);
+        var singleCol = table.Columns.Add("Single", RecordDataType.Single);
+        var stringCol = table.Columns.Add("String", RecordDataType.String);
+        var uint16Col = table.Columns.Add("UInt16", RecordDataType.UInt16);
+        var uint32Col = table.Columns.Add("UInt32", RecordDataType.UInt32);
+        var uint64Col = table.Columns.Add("UInt64", RecordDataType.UInt64);
+
+        table.AddRow(); // Only one row, valid index is 0
+
+        // Act & Assert - Test all To methods with invalid index
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => boolCol.ToBoolean(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => byteCol.ToByte(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => charCol.ToChar(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => dateTimeCol.ToDateTime(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => decimalCol.ToDecimal(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => doubleCol.ToDouble(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => int16Col.ToInt16(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => int32Col.ToInt32(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => int64Col.ToInt64(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => sbyteCol.ToSByte(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => singleCol.ToSingle(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => stringCol.ToString(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => uint16Col.ToUInt16(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => uint32Col.ToUInt32(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => uint64Col.ToUInt64(1));
+    }
+
+    [TestMethod]
+    public void BoundaryCheck_EmptyTable_AnyIndexThrowsException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        // No rows added, Count = 0
+
+        // Act & Assert
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.GetValue(0));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.SetValue("test", 0));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.ToBoolean(0));
+    }
+
+    [TestMethod]
+    public void BoundaryCheck_EmptyTable_IndexZeroWorksAfterAutoRowCreation()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        // No rows added, Count = 0
+
+        // Act & Assert - Index 0 should work because auto-row creation
+        col.Set("test", 0); // Should auto-create row
+        Assert.AreEqual(1, table.Count); // Row was auto-created
+        Assert.AreEqual("test", col.GetValue(0));
+
+        // But other indices should still throw
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.GetValue(1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.SetValue("test", 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set(true, 1));
+    }
+
+    [TestMethod]
+    public void BoundaryCheck_EmptyTable_NegativeIndexStillThrowsException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        // No rows added, Count = 0
+
+        // Act & Assert - Negative indices should always throw
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.GetValue(-1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.SetValue("test", -1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set(true, -1));
+    }
+
+    [TestMethod]
+    public void BoundaryCheck_EmptyTable_IndexGreaterThanZeroThrowsException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add("TestCol", RecordDataType.String);
+        // No rows added, Count = 0
+
+        // Act & Assert - Indices > 0 should throw even with auto-row creation
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set("test", 1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => col.Set("test", 2));
+    }
+
+    [TestMethod]
+    public void TypedSetMethods_EmptyTable_IndexZeroWorksWithAutoRowCreation()
+    {
+        // Arrange
+        var table = new Record();
+        var boolCol = table.Columns.Add("Bool", RecordDataType.Boolean);
+        var intCol = table.Columns.Add("Int", RecordDataType.Int32);
+        var stringCol = table.Columns.Add("String", RecordDataType.String);
+
+        // Act & Assert - Index 0 should work with auto-row creation
+        boolCol.Set(true, 0);
+        Assert.AreEqual(1, table.Count);
+
+        intCol.Set(42, 0);
+        stringCol.Set("test", 0);
+
+        Assert.AreEqual(true, boolCol.GetValue(0));
+        Assert.AreEqual(42, intCol.GetValue(0));
+        Assert.AreEqual("test", stringCol.GetValue(0));
+    }
 }
