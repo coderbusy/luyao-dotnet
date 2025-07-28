@@ -58,19 +58,31 @@ public sealed partial class RecordColumn
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
-    public void SetValue(object? value, int row) => _data.SetValue(value, row);
+    public void SetValue(object? value, int row)
+    {
+        if (row < 0 || row >= _table.Count) 
+            throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {_table.Count - 1}]");
+        _data.SetValue(value, row);
+    }
+    
     /// <summary>
     /// 
     /// </summary>
     /// <param name="value"></param>
     /// <param name="row"></param>
     public void SetValue(object? value, RecordRow row) => SetValue(value, row.RowIndex);
+    
     /// <summary>
     /// 
     /// </summary>
     /// <param name="row"></param>
     /// <returns></returns>
-    public object? GetValue(int row) => _data.GetValue(row);
+    public object? GetValue(int row)
+    {
+        if (row < 0 || row >= _table.Count) 
+            throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {_table.Count - 1}]");
+        return _data.GetValue(row);
+    }
 
     ///<inheritdoc/>
     public object? GetValue(RecordRow row) => GetValue(row.RowIndex);
