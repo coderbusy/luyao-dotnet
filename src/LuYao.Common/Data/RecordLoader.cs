@@ -13,7 +13,6 @@ namespace LuYao.Data;
 /// <typeparam name="T">实体类型</typeparam>
 public static class RecordLoader<T> where T : class, new()
 {
-
     private sealed class PropertyMapping
     {
         public PropertyInfo Property { get; set; } = null!;
@@ -24,10 +23,12 @@ public static class RecordLoader<T> where T : class, new()
         public Action<T, RecordRow, RecordColumn>? WriteRow { get; set; }
     }
 
-    private static readonly PropertyMapping[] _mappings;
+    private static readonly IDictionary<string, PropertyMapping> _mappings;
+
     static RecordLoader()
     {
-        _mappings = CreateMappings();
+        var mappings = CreateMappings();
+        _mappings = mappings.ToDictionary(m => m.ColumnName); // 使用默认的严格比较
     }
 
     private static PropertyMapping[] CreateMappings()
@@ -215,13 +216,13 @@ public static class RecordLoader<T> where T : class, new()
     /// <param name="target">要填充数据的目标实体对象。</param>
     public static void Populate(RecordRow row, T target)
     {
-        Record re = row.Record;
-        foreach (var map in _mappings)
+        Record record = row.Record;
+        foreach (var column in record.Columns)
         {
-            if (map.WriteEntity == null) continue;
-            RecordColumn? col = re.Columns.Find(map.ColumnName);
-            if (col == null) continue;
-            map.WriteEntity(row, col, target);
+            if (_mappings.TryGetValue(column.Name, out var mapping) && mapping.WriteEntity != null)
+            {
+                mapping.WriteEntity(row, column, target);
+            }
         }
     }
 
@@ -231,10 +232,13 @@ public static class RecordLoader<T> where T : class, new()
     /// <param name="re">要写入列头的 <see cref="Record"/> 实例。</param>
     public static void WriteHeader(Record re)
     {
-        foreach (var map in _mappings)
+        foreach (var pair in _mappings)
         {
-            if (map.WriteRow == null) continue;
-            re.Columns.Add(map.ColumnName, map.PropertyType);
+            var mapping = pair.Value;
+            if (mapping.WriteRow != null)
+            {
+                re.Columns.Add(mapping.ColumnName, mapping.PropertyType);
+            }
         }
     }
 
@@ -245,13 +249,13 @@ public static class RecordLoader<T> where T : class, new()
     /// <param name="row">要写入数据的 <see cref="RecordRow"/> 实例。</param>
     public static void WriteData(T instance, RecordRow row)
     {
-        Record re = row.Record;
-        foreach (var map in _mappings)
+        Record record = row.Record;
+        foreach (var column in record.Columns)
         {
-            if (map.WriteRow == null) continue;
-            RecordColumn? col = re.Columns.Find(map.ColumnName);
-            if (col == null) continue;
-            map.WriteRow(instance, row, col);
+            if (_mappings.TryGetValue(column.Name, out var mapping) && mapping.WriteRow != null)
+            {
+                mapping.WriteRow(instance, row, column);
+            }
         }
     }
 }
