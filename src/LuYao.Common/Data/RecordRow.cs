@@ -125,6 +125,5 @@ public readonly struct RecordRow
     #endregion
 
     ///<inheritdoc/>
-
     public T To<T>(RecordColumn column) => column.To<T>(this._rowIndex);
 }
