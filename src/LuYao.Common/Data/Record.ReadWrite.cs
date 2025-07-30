@@ -23,7 +23,7 @@ partial class Record
         {
             string n = dr.GetName(i);
             Type t = dr.GetFieldType(i);
-            this.Columns.AddInternal(n, t);
+            this.Columns.Add(n, t);
         }
 
         while (dr.Read())
