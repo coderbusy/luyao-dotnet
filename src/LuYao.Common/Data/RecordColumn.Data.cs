@@ -231,9 +231,9 @@ partial class RecordColumn
     }
 
     /// <inheritdoc/>
-    public T To<T>(int index)
+    public TRet To<TRet>(int index)
     {
         ValidateIndex(index);
-        return this.Data.To<T>(index);
+        return this.Data.To<TRet>(index);
     }
 }

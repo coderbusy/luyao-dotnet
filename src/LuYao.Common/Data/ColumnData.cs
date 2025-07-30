@@ -92,6 +92,31 @@ internal abstract class ColumnData<T> : ColumnData
     {
         object? value = this._data[index];
         if (value is null) return default!;
-        return (TRet)Convert.ChangeType(value, typeof(TRet))!;
+        if (typeof(TRet) == typeof(T)) return (TRet)value;
+        if (value is TRet direct) return direct;
+        return (TRet)To(value, typeof(TRet));
+    }
+    private static object To(Object value, Type type)
+    {
+        Type underlyingType = Nullable.GetUnderlyingType(type) ?? type;
+        switch (Type.GetTypeCode(underlyingType))
+        {
+            case TypeCode.Boolean: return Valid.ToBoolean(value);
+            case TypeCode.Byte: return Valid.ToByte(value);
+            case TypeCode.Char: return Valid.ToChar(value);
+            case TypeCode.DateTime: return Valid.ToDateTime(value);
+            case TypeCode.Decimal: return Valid.ToDecimal(value);
+            case TypeCode.Double: return Valid.ToDouble(value);
+            case TypeCode.Int16: return Valid.ToInt16(value);
+            case TypeCode.Int32: return Valid.ToInt32(value);
+            case TypeCode.Int64: return Valid.ToInt64(value);
+            case TypeCode.SByte: return Valid.ToSByte(value);
+            case TypeCode.Single: return Valid.ToSingle(value);
+            case TypeCode.String: return Valid.ToString(value);
+            case TypeCode.UInt16: return Valid.ToUInt16(value);
+            case TypeCode.UInt32: return Valid.ToUInt32(value);
+            case TypeCode.UInt64: return Valid.ToUInt64(value);
+        }
+        return Convert.ChangeType(value, underlyingType);
     }
 }
