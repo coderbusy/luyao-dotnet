@@ -1142,4 +1142,42 @@ public class RecordTests
         // Act & Assert
         table.Columns.AddInt32("TestColumn"); // 应该抛出异常
     }
+
+
+    public class Student
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    [TestMethod]
+    public void Columns_SetObject_WorksCorrectly()
+    {
+        var re = new Record();
+        var raw = re.Columns.Add<Student>("Raw");
+        var id = re.Columns.AddInt32("Id");
+
+        var row = re.AddRow();
+        row.SetValue(new Student { Id = 1, Name = "John Doe" }, raw);
+        row.Set(1, id);
+
+        // Assert
+
+        var stu = row.To<Student>(raw);
+        Assert.AreEqual(1, stu.Id);
+        Assert.AreEqual("John Doe", stu.Name);
+        Assert.AreEqual(1, row.ToInt32(id));
+    }
+
+    [TestMethod]
+    public void Columns_SetObjectNotMatchType_ThrowsInvalidCastException()
+    {
+        // Arrange
+        var re = new Record();
+        var raw = re.Columns.Add<Student>("Raw");
+        var id = re.Columns.AddInt32("Id");
+        var row = re.AddRow();
+        // Act & Assert
+        Assert.ThrowsException<InvalidCastException>(() => row.SetValue(1, raw));
+    }
 }

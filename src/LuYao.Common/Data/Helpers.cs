@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 
 namespace LuYao.Data;
 
 internal static class Helpers
 {
+    private static readonly ConcurrentDictionary<Type, Func<int, ColumnData>> _factoryCache = new();
+
     public static Type ToType(RecordDataType type)
     {
         return type switch
@@ -55,9 +59,22 @@ internal static class Helpers
 
     private static ColumnData MakeData(int capacity, Type type)
     {
-        var g = typeof(GenericColumnData<>);
-        var dt = g.MakeGenericType(type);
-        return (ColumnData)Activator.CreateInstance(dt, capacity)!;
+        var factory = _factoryCache.GetOrAdd(type, CreateFactory);
+        return factory(capacity);
+    }
+
+    private static Func<int, ColumnData> CreateFactory(Type type)
+    {
+        var genericType = typeof(GenericColumnData<>).MakeGenericType(type);
+        var constructor = genericType.GetConstructor(new[] { typeof(int) });
+
+        if (constructor == null) throw new InvalidOperationException($"Constructor not found for {genericType}");
+
+        var capacityParam = Expression.Parameter(typeof(int), "capacity");
+        var newExpression = Expression.New(constructor, capacityParam);
+        var lambda = Expression.Lambda<Func<int, ColumnData>>(newExpression, capacityParam);
+
+        return lambda.Compile();
     }
 
     public static RecordDataType ReadDataType(BinaryReader reader)
