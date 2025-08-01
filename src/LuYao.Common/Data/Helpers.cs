@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
@@ -8,7 +7,24 @@ namespace LuYao.Data;
 
 internal static class Helpers
 {
-    private static readonly ConcurrentDictionary<Type, Func<int, ColumnData>> _factoryCache = new();
+    private static class FactoryCache<T>
+    {
+        public static readonly Func<int, ColumnData> Factory = CreateFactory();
+
+        private static Func<int, ColumnData> CreateFactory()
+        {
+            var genericType = typeof(GenericColumnData<>).MakeGenericType(typeof(T));
+            var constructor = genericType.GetConstructor(new[] { typeof(int) });
+
+            if (constructor == null) throw new InvalidOperationException($"Constructor not found for {genericType}");
+
+            var capacityParam = Expression.Parameter(typeof(int), "capacity");
+            var newExpression = Expression.New(constructor, capacityParam);
+            var lambda = Expression.Lambda<Func<int, ColumnData>>(newExpression, capacityParam);
+
+            return lambda.Compile();
+        }
+    }
 
     public static Type ToType(RecordDataType type)
     {
@@ -59,22 +75,9 @@ internal static class Helpers
 
     private static ColumnData MakeData(int capacity, Type type)
     {
-        var factory = _factoryCache.GetOrAdd(type, CreateFactory);
+        var factoryMethod = typeof(FactoryCache<>).MakeGenericType(type).GetField("Factory");
+        var factory = (Func<int, ColumnData>)factoryMethod!.GetValue(null)!;
         return factory(capacity);
-    }
-
-    private static Func<int, ColumnData> CreateFactory(Type type)
-    {
-        var genericType = typeof(GenericColumnData<>).MakeGenericType(type);
-        var constructor = genericType.GetConstructor(new[] { typeof(int) });
-
-        if (constructor == null) throw new InvalidOperationException($"Constructor not found for {genericType}");
-
-        var capacityParam = Expression.Parameter(typeof(int), "capacity");
-        var newExpression = Expression.New(constructor, capacityParam);
-        var lambda = Expression.Lambda<Func<int, ColumnData>>(newExpression, capacityParam);
-
-        return lambda.Compile();
     }
 
     public static RecordDataType ReadDataType(BinaryReader reader)
