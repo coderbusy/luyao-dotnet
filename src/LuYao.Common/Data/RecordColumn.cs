@@ -34,7 +34,7 @@ public sealed partial class RecordColumn
         this.Code = code;
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
         this._type = Helpers.ToType(code);
-        this._data = Helpers.MakeData(code, capacity);
+        this._data = Helpers.MakeData(code, capacity, this._type);
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public sealed partial class RecordColumn
         this.Code = RecordDataType.Object;
         if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
         this._type = type;
-        this._data = Helpers.MakeData(RecordDataType.Object, capacity);
+        this._data = Helpers.MakeData(RecordDataType.Object, capacity, type);
     }
 
     internal void Extend(int length) => this._data.Extend(length);

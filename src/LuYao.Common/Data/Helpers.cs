@@ -29,9 +29,9 @@ internal static class Helpers
         };
     }
 
-    public static ColumnData MakeData(RecordDataType type, int capacity)
+    public static ColumnData MakeData(RecordDataType dt, int capacity, Type type)
     {
-        return type switch
+        return dt switch
         {
             RecordDataType.Boolean => new BooleanColumnData(capacity),
             RecordDataType.Byte => new ByteColumnData(capacity),
@@ -48,9 +48,16 @@ internal static class Helpers
             RecordDataType.UInt16 => new UInt16ColumnData(capacity),
             RecordDataType.UInt32 => new UInt32ColumnData(capacity),
             RecordDataType.UInt64 => new UInt64ColumnData(capacity),
-            RecordDataType.Object => new ObjectColumnData(capacity),
+            RecordDataType.Object => MakeData(capacity, type),
             _ => throw new NotSupportedException()
         };
+    }
+
+    private static ColumnData MakeData(int capacity, Type type)
+    {
+        var g = typeof(GenericColumnData<>);
+        var dt = g.MakeGenericType(type);
+        return (ColumnData)Activator.CreateInstance(dt, capacity)!;
     }
 
     public static RecordDataType ReadDataType(BinaryReader reader)
