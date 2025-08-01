@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LuYao.Data;
 
@@ -59,10 +60,10 @@ internal abstract class ColumnData
     public abstract TRet To<TRet>(int index);
 }
 
-internal abstract class ColumnData<T> : ColumnData
+internal abstract class BaseColumnData<T> : ColumnData
 {
     protected T[] _data;
-    public ColumnData(int capacity) => _data = new T[capacity];
+    public BaseColumnData(int capacity) => _data = new T[capacity];
 
     public override void Clear() => Array.Clear(_data, 0, _data.Length);
 
@@ -94,29 +95,135 @@ internal abstract class ColumnData<T> : ColumnData
         if (value is null) return default!;
         if (typeof(TRet) == typeof(T)) return (TRet)value;
         if (value is TRet direct) return direct;
-        return (TRet)To(value, typeof(TRet));
+        return (TRet)Valid.To(value, typeof(TRet));
     }
-    private static object To(Object value, Type type)
+}
+
+sealed class GenericColumnData<T> : BaseColumnData<T>
+{
+    private static readonly Type ElementType = typeof(T);
+
+    public GenericColumnData(int capacity) : base(capacity)
     {
-        Type underlyingType = Nullable.GetUnderlyingType(type) ?? type;
-        switch (Type.GetTypeCode(underlyingType))
-        {
-            case TypeCode.Boolean: return Valid.ToBoolean(value);
-            case TypeCode.Byte: return Valid.ToByte(value);
-            case TypeCode.Char: return Valid.ToChar(value);
-            case TypeCode.DateTime: return Valid.ToDateTime(value);
-            case TypeCode.Decimal: return Valid.ToDecimal(value);
-            case TypeCode.Double: return Valid.ToDouble(value);
-            case TypeCode.Int16: return Valid.ToInt16(value);
-            case TypeCode.Int32: return Valid.ToInt32(value);
-            case TypeCode.Int64: return Valid.ToInt64(value);
-            case TypeCode.SByte: return Valid.ToSByte(value);
-            case TypeCode.Single: return Valid.ToSingle(value);
-            case TypeCode.String: return Valid.ToString(value);
-            case TypeCode.UInt16: return Valid.ToUInt16(value);
-            case TypeCode.UInt32: return Valid.ToUInt32(value);
-            case TypeCode.UInt64: return Valid.ToUInt64(value);
-        }
-        return Convert.ChangeType(value, underlyingType);
     }
+
+    public override void Set(bool value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(byte value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(char value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(DateTime value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(decimal value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(double value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(short value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(int value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(long value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(sbyte value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(float value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(string value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(ushort value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(uint value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override void Set(ulong value, int index)
+    {
+        if (value is T d) this._data[index] = d;
+        else this._data[index] = (T)Valid.To(value, ElementType);
+    }
+
+    public override bool ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
+
+    public override byte ToByte(int index) => Valid.ToByte(this._data[index]);
+
+    public override char ToChar(int index) => Valid.ToChar(this._data[index]);
+
+    public override DateTime ToDateTime(int index) => Valid.ToDateTime(this._data[index]);
+
+    public override decimal ToDecimal(int index) => Valid.ToDecimal(this._data[index]);
+
+    public override double ToDouble(int index) => Valid.ToDouble(this._data[index]);
+
+    public override short ToInt16(int index) => Valid.ToInt16(this._data[index]);
+
+    public override int ToInt32(int index) => Valid.ToInt32(this._data[index]);
+
+    public override long ToInt64(int index) => Valid.ToInt64(this._data[index]);
+
+    public override sbyte ToSByte(int index) => Valid.ToSByte(this._data[index]);
+
+    public override float ToSingle(int index) => Valid.ToSingle(this._data[index]);
+
+    public override string ToString(int index) => Valid.ToString(this._data[index]);
+
+    public override ushort ToUInt16(int index) => Valid.ToUInt16(this._data[index]);
+
+    public override uint ToUInt32(int index) => Valid.ToUInt32(this._data[index]);
+
+    public override ulong ToUInt64(int index) => Valid.ToUInt64(this._data[index]);
 }

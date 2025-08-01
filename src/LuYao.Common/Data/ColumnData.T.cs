@@ -2,64 +2,8 @@
 
 namespace LuYao.Data;
 
-
-#region Object
-sealed class ObjectColumnData : ColumnData<Object>
-{
-    public ObjectColumnData(int capacity) : base(capacity)
-    {
-    }
-
-    public override void Set(Boolean value, int index) => _data[index] = value;
-    public override Boolean ToBoolean(int index) => Valid.ToBoolean(this._data[index]);
-
-    public override void Set(Byte value, int index) => _data[index] = value;
-    public override Byte ToByte(int index) => Valid.ToByte(this._data[index]);
-
-    public override void Set(Char value, int index) => _data[index] = value;
-    public override Char ToChar(int index) => Valid.ToChar(this._data[index]);
-
-    public override void Set(DateTime value, int index) => _data[index] = value;
-    public override DateTime ToDateTime(int index) => Valid.ToDateTime(this._data[index]);
-
-    public override void Set(Decimal value, int index) => _data[index] = value;
-    public override Decimal ToDecimal(int index) => Valid.ToDecimal(this._data[index]);
-
-    public override void Set(Double value, int index) => _data[index] = value;
-    public override Double ToDouble(int index) => Valid.ToDouble(this._data[index]);
-
-    public override void Set(Int16 value, int index) => _data[index] = value;
-    public override Int16 ToInt16(int index) => Valid.ToInt16(this._data[index]);
-
-    public override void Set(Int32 value, int index) => _data[index] = value;
-    public override Int32 ToInt32(int index) => Valid.ToInt32(this._data[index]);
-
-    public override void Set(Int64 value, int index) => _data[index] = value;
-    public override Int64 ToInt64(int index) => Valid.ToInt64(this._data[index]);
-
-    public override void Set(SByte value, int index) => _data[index] = value;
-    public override SByte ToSByte(int index) => Valid.ToSByte(this._data[index]);
-
-    public override void Set(Single value, int index) => _data[index] = value;
-    public override Single ToSingle(int index) => Valid.ToSingle(this._data[index]);
-
-    public override void Set(String value, int index) => _data[index] = value;
-    public override String ToString(int index) => Valid.ToString(this._data[index]);
-
-    public override void Set(UInt16 value, int index) => _data[index] = value;
-    public override UInt16 ToUInt16(int index) => Valid.ToUInt16(this._data[index]);
-
-    public override void Set(UInt32 value, int index) => _data[index] = value;
-    public override UInt32 ToUInt32(int index) => Valid.ToUInt32(this._data[index]);
-
-    public override void Set(UInt64 value, int index) => _data[index] = value;
-    public override UInt64 ToUInt64(int index) => Valid.ToUInt64(this._data[index]);
-}
-
-#endregion
-
 #region Boolean
-sealed class BooleanColumnData : ColumnData<Boolean>
+sealed class BooleanColumnData : BaseColumnData<Boolean>
 {
     public BooleanColumnData(int capacity) : base(capacity) { }
 
@@ -111,7 +55,7 @@ sealed class BooleanColumnData : ColumnData<Boolean>
 #endregion
 
 #region Byte
-sealed class ByteColumnData : ColumnData<Byte>
+sealed class ByteColumnData : BaseColumnData<Byte>
 {
     public ByteColumnData(int capacity) : base(capacity) { }
 
@@ -163,7 +107,7 @@ sealed class ByteColumnData : ColumnData<Byte>
 #endregion
 
 #region Char
-sealed class CharColumnData : ColumnData<Char>
+sealed class CharColumnData : BaseColumnData<Char>
 {
     public CharColumnData(int capacity) : base(capacity) { }
 
@@ -215,7 +159,7 @@ sealed class CharColumnData : ColumnData<Char>
 #endregion
 
 #region DateTime
-sealed class DateTimeColumnData : ColumnData<DateTime>
+sealed class DateTimeColumnData : BaseColumnData<DateTime>
 {
     public DateTimeColumnData(int capacity) : base(capacity) { }
 
@@ -267,7 +211,7 @@ sealed class DateTimeColumnData : ColumnData<DateTime>
 #endregion
 
 #region Decimal
-sealed class DecimalColumnData : ColumnData<Decimal>
+sealed class DecimalColumnData : BaseColumnData<Decimal>
 {
     public DecimalColumnData(int capacity) : base(capacity) { }
 
@@ -319,7 +263,7 @@ sealed class DecimalColumnData : ColumnData<Decimal>
 #endregion
 
 #region Double
-sealed class DoubleColumnData : ColumnData<Double>
+sealed class DoubleColumnData : BaseColumnData<Double>
 {
     public DoubleColumnData(int capacity) : base(capacity) { }
 
@@ -371,7 +315,7 @@ sealed class DoubleColumnData : ColumnData<Double>
 #endregion
 
 #region Int16
-sealed class Int16ColumnData : ColumnData<Int16>
+sealed class Int16ColumnData : BaseColumnData<Int16>
 {
     public Int16ColumnData(int capacity) : base(capacity) { }
 
@@ -423,7 +367,7 @@ sealed class Int16ColumnData : ColumnData<Int16>
 #endregion
 
 #region Int32
-sealed class Int32ColumnData : ColumnData<Int32>
+sealed class Int32ColumnData : BaseColumnData<Int32>
 {
     public Int32ColumnData(int capacity) : base(capacity) { }
 
@@ -475,7 +419,7 @@ sealed class Int32ColumnData : ColumnData<Int32>
 #endregion
 
 #region Int64
-sealed class Int64ColumnData : ColumnData<Int64>
+sealed class Int64ColumnData : BaseColumnData<Int64>
 {
     public Int64ColumnData(int capacity) : base(capacity) { }
 
@@ -527,7 +471,7 @@ sealed class Int64ColumnData : ColumnData<Int64>
 #endregion
 
 #region SByte
-sealed class SByteColumnData : ColumnData<SByte>
+sealed class SByteColumnData : BaseColumnData<SByte>
 {
     public SByteColumnData(int capacity) : base(capacity) { }
 
@@ -579,7 +523,7 @@ sealed class SByteColumnData : ColumnData<SByte>
 #endregion
 
 #region Single
-sealed class SingleColumnData : ColumnData<Single>
+sealed class SingleColumnData : BaseColumnData<Single>
 {
     public SingleColumnData(int capacity) : base(capacity) { }
 
@@ -631,7 +575,7 @@ sealed class SingleColumnData : ColumnData<Single>
 #endregion
 
 #region String
-sealed class StringColumnData : ColumnData<String>
+sealed class StringColumnData : BaseColumnData<String>
 {
     public StringColumnData(int capacity) : base(capacity) { }
 
@@ -683,7 +627,7 @@ sealed class StringColumnData : ColumnData<String>
 #endregion
 
 #region UInt16
-sealed class UInt16ColumnData : ColumnData<UInt16>
+sealed class UInt16ColumnData : BaseColumnData<UInt16>
 {
     public UInt16ColumnData(int capacity) : base(capacity) { }
 
@@ -735,7 +679,7 @@ sealed class UInt16ColumnData : ColumnData<UInt16>
 #endregion
 
 #region UInt32
-sealed class UInt32ColumnData : ColumnData<UInt32>
+sealed class UInt32ColumnData : BaseColumnData<UInt32>
 {
     public UInt32ColumnData(int capacity) : base(capacity) { }
 
@@ -787,7 +731,7 @@ sealed class UInt32ColumnData : ColumnData<UInt32>
 #endregion
 
 #region UInt64
-sealed class UInt64ColumnData : ColumnData<UInt64>
+sealed class UInt64ColumnData : BaseColumnData<UInt64>
 {
     public UInt64ColumnData(int capacity) : base(capacity) { }
 
