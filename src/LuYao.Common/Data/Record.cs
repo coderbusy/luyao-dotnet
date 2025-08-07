@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 
 namespace LuYao.Data;
 
@@ -57,6 +58,11 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// 游标位置
     /// </summary>
     public int Cursor { get; private set; } = 0;
+
+    /// <summary>
+    /// 获取数据是否为空
+    /// </summary>
+    public bool IsEmpty { get { return Count > 0 ? false : true; } }
 
     /// <summary>
     /// 添加一行数据。
@@ -128,11 +134,6 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     }
 
     #endregion
-
-    /// <summary>
-    /// 获取数据是否为空
-    /// </summary>
-    public bool IsEmpty { get { return Count > 0 ? false : true; } }
 
     #region Get
 
@@ -425,5 +426,37 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回64位无符号整数值，否则通过列名获取。</returns>
     public UInt64 GetUInt64(RecordColumn col) => col.Record == this ? col.ToUInt64() : GetUInt64(col.Name);
+    #endregion
+
+    #region IDataReader
+    /// <summary>
+    /// 从指定的 <see cref="IDataReader"/> 读取数据并填充到当前 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <param name="dr">用于读取数据的 <see cref="IDataReader"/> 实例。</param>
+    public void Read(IDataReader dr)
+    {
+        if (dr == null) throw new ArgumentNullException(nameof(dr));
+
+        this.Columns.Clear();
+        var count = dr.FieldCount;
+        if (count <= 0) return;
+        for (int i = 0; i < count; i++)
+        {
+            string n = dr.GetName(i);
+            Type t = dr.GetFieldType(i);
+            this.Columns.Add(n, t);
+        }
+
+        while (dr.Read())
+        {
+            var row = this.AddRow();
+            for (int i = 0; i < count; i++)
+            {
+                object val = dr.GetValue(i);
+                if (val == DBNull.Value) continue;
+                this.Columns[i].SetValue(val, row);
+            }
+        }
+    }
     #endregion
 }

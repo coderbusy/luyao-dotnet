@@ -6,7 +6,6 @@ using System.Linq;
 
 namespace LuYao.Data;
 
-
 /// <summary>
 /// 列集合
 /// </summary>
@@ -18,6 +17,11 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// </summary>
     public Record Record { get; }
 
+    /// <summary>
+    /// 初始化 <see cref="RecordColumnCollection"/> 类的新实例
+    /// </summary>
+    /// <param name="record">关联的记录实例</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出</exception>
     internal RecordColumnCollection(Record record)
     {
         this.Record = record ?? throw new ArgumentNullException(nameof(record));
@@ -34,10 +38,14 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     ///<inheritdoc/>
     public IEnumerator<RecordColumn> GetEnumerator() => _list.GetEnumerator();
 
+    /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     #endregion
 
+    /// <summary>
+    /// 当添加行时调用，用于扩展列的容量以适应新行
+    /// </summary>
     internal void OnAddRow()
     {
         if (this.Count == 0) return;
@@ -53,6 +61,8 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <summary>
     /// 查找指定列名的索引
     /// </summary>
+    /// <param name="name">要查找的列名</param>
+    /// <returns>如果找到列则返回索引，否则返回 -1</returns>
     public int IndexOf(string name)
     {
         for (int i = 0; i < this.Count; i++)
@@ -66,11 +76,15 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <summary>
     /// 判断指定的列名是否存在
     /// </summary>
+    /// <param name="name">要检查的列名</param>
+    /// <returns>如果列名存在则返回 true，否则返回 false</returns>
     public bool Contains(string name) { return this.IndexOf(name) > -1; }
 
     /// <summary>
     /// 根据列名查找列
     /// </summary>
+    /// <param name="name">要查找的列名</param>
+    /// <returns>如果找到列则返回 <see cref="RecordColumn"/> 实例，否则返回 null</returns>
     public RecordColumn? Find(string name)
     {
         int idx = this.IndexOf(name);
@@ -80,6 +94,8 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <summary>
     /// 删除一个列
     /// </summary>
+    /// <param name="name">要删除的列名</param>
+    /// <returns>如果成功删除则返回被删除的 <see cref="RecordColumn"/> 实例，否则返回 null</returns>
     public RecordColumn? Remove(string name)
     {
         RecordColumn? col = null;
@@ -102,6 +118,13 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     }
 
     #region Add
+
+    /// <summary>
+    /// 验证添加列时的列名有效性
+    /// </summary>
+    /// <param name="name">要验证的列名</param>
+    /// <exception cref="ArgumentNullException">当列名为 null 或空白时抛出</exception>
+    /// <exception cref="ArgumentException">当列名已存在时抛出</exception>
     private void OnAdd(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
@@ -330,11 +353,18 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
             case TypeCode.UInt32: return this.AddUInt32(name);
             case TypeCode.UInt64: return this.AddUInt64(name);
         }
+        this.OnAdd(name);
         RecordColumn col = Helpers.MakeRecordColumn(this.Record, name, type);
         this._list.Add(col);
         return col;
     }
 
+    /// <summary>
+    /// 添加指定泛型类型的列
+    /// </summary>
+    /// <typeparam name="T">列的数据类型</typeparam>
+    /// <param name="name">列名</param>
+    /// <returns>添加的 <see cref="RecordColumn{T}"/> 实例</returns>
     public RecordColumn<T> Add<T>(string name) => (RecordColumn<T>)this.Add(name, typeof(T));
     #endregion
 }
