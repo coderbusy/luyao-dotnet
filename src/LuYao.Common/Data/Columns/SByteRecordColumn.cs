@@ -8,7 +8,7 @@ namespace LuYao.Data.Columns;
 public sealed class SByteRecordColumn : RecordColumn<SByte>
 {
     internal SByteRecordColumn(Record record, string name)
-        : base(record, name, RecordDataType.SByte, typeof(SByte))
+        : base(record, name, RecordDataCode.SByte, typeof(SByte))
     {
     }
 

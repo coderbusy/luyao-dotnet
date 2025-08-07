@@ -8,7 +8,7 @@ namespace LuYao.Data.Columns;
 public sealed class DateTimeRecordColumn : RecordColumn<DateTime>
 {
     internal DateTimeRecordColumn(Record record, string name)
-        : base(record, name, RecordDataType.DateTime, typeof(DateTime))
+        : base(record, name, RecordDataCode.DateTime, typeof(DateTime))
     {
     }
 

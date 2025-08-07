@@ -8,7 +8,7 @@ namespace LuYao.Data.Columns;
 public sealed class BooleanRecordColumn : RecordColumn<Boolean>
 {
     internal BooleanRecordColumn(Record record, string name)
-        : base(record, name, RecordDataType.Boolean, typeof(Boolean))
+        : base(record, name, RecordDataCode.Boolean, typeof(Boolean))
     {
     }
 

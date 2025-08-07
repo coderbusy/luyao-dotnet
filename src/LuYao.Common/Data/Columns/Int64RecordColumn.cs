@@ -8,7 +8,7 @@ namespace LuYao.Data.Columns;
 public sealed class Int64RecordColumn : RecordColumn<Int64>
 {
     internal Int64RecordColumn(Record record, string name)
-        : base(record, name, RecordDataType.Int64, typeof(Int64))
+        : base(record, name, RecordDataCode.Int64, typeof(Int64))
     {
     }
 

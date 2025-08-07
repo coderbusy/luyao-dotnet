@@ -14,7 +14,7 @@ public abstract class RecordColumn
     /// <summary>
     /// 创建一个数据列
     /// </summary>
-    internal RecordColumn(Record record, string name, RecordDataType code, Type type)
+    internal RecordColumn(Record record, string name, RecordDataCode code, Type type)
     {
         this.Record = record ?? throw new ArgumentNullException(nameof(record));
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -30,7 +30,7 @@ public abstract class RecordColumn
     /// <summary>
     /// 获取列的数据类型。
     /// </summary>
-    public RecordDataType Code { get; }
+    public RecordDataCode Code { get; }
 
     /// <summary>
     /// 获取列的实际数据类型。

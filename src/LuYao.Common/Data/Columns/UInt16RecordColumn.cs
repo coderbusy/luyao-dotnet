@@ -8,7 +8,7 @@ namespace LuYao.Data.Columns;
 public sealed class UInt16RecordColumn : RecordColumn<UInt16>
 {
     internal UInt16RecordColumn(Record record, string name)
-        : base(record, name, RecordDataType.UInt16, typeof(UInt16))
+        : base(record, name, RecordDataCode.UInt16, typeof(UInt16))
     {
     }
 

@@ -8,7 +8,7 @@ namespace LuYao.Data.Columns;
 public sealed class DecimalRecordColumn : RecordColumn<Decimal>
 {
     internal DecimalRecordColumn(Record record, string name)
-        : base(record, name, RecordDataType.Decimal, typeof(Decimal))
+        : base(record, name, RecordDataCode.Decimal, typeof(Decimal))
     {
     }
 

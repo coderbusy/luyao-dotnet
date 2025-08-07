@@ -8,7 +8,7 @@ namespace LuYao.Data.Columns;
 public sealed class StringRecordColumn : RecordColumn<String>
 {
     internal StringRecordColumn(Record record, string name)
-        : base(record, name, RecordDataType.String, typeof(String))
+        : base(record, name, RecordDataCode.String, typeof(String))
     {
     }
 

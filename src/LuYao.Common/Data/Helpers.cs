@@ -6,10 +6,10 @@ namespace LuYao.Data;
 
 static class Helpers
 {
-    private static readonly ConcurrentDictionary<Type, Func<Record, string, RecordDataType, Type, RecordColumn>> _cache
+    private static readonly ConcurrentDictionary<Type, Func<Record, string, RecordDataCode, Type, RecordColumn>> _cache
         = new();
 
-    private static Func<Record, string, RecordDataType, Type, RecordColumn> GetConstructor(Type type)
+    private static Func<Record, string, RecordDataCode, Type, RecordColumn> GetConstructor(Type type)
     {
         return _cache.GetOrAdd(type, t =>
         {
@@ -17,7 +17,7 @@ static class Helpers
             var ctor = genericType.GetConstructor(new[] {
                 typeof(Record),
                 typeof(string),
-                typeof(RecordDataType),
+                typeof(RecordDataCode),
                 typeof(Type)
             });
 
@@ -25,13 +25,13 @@ static class Helpers
             // Parameters: (object record, string name, RecordDataType dataType, Type type)
             var pRecord = Expression.Parameter(typeof(Record), "record");
             var pName = Expression.Parameter(typeof(string), "name");
-            var pDataType = Expression.Parameter(typeof(RecordDataType), "dataType");
+            var pDataType = Expression.Parameter(typeof(RecordDataCode), "dataType");
             var pType = Expression.Parameter(typeof(Type), "type");
 
             // new RecordColumn<T>(record, name, dataType, type)
             var newExpr = Expression.New(ctor, pRecord, pName, pDataType, pType);
 
-            var lambda = Expression.Lambda<Func<Record, string, RecordDataType, Type, RecordColumn>>(newExpr, pRecord, pName, pDataType, pType);
+            var lambda = Expression.Lambda<Func<Record, string, RecordDataCode, Type, RecordColumn>>(newExpr, pRecord, pName, pDataType, pType);
             return lambda.Compile();
         });
     }
@@ -39,6 +39,6 @@ static class Helpers
     public static RecordColumn MakeRecordColumn(Record re, string name, Type type)
     {
         var ctor = GetConstructor(type);
-        return ctor.Invoke(re, name, RecordDataType.Object, type);
+        return ctor.Invoke(re, name, RecordDataCode.Object, type);
     }
 }

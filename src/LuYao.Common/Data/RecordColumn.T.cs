@@ -16,7 +16,7 @@ public class RecordColumn<T> : RecordColumn
     /// <summary>
     /// 创建一个泛型列
     /// </summary>
-    internal RecordColumn(Record record, string name, RecordDataType code, Type type)
+    public RecordColumn(Record record, string name, RecordDataCode code, Type type)
         : base(record, name, code, type)
     {
         var capacity = record.Capacity;

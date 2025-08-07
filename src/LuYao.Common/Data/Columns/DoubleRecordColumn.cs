@@ -8,7 +8,7 @@ namespace LuYao.Data.Columns;
 public sealed class DoubleRecordColumn : RecordColumn<Double>
 {
     internal DoubleRecordColumn(Record record, string name)
-        : base(record, name, RecordDataType.Double, typeof(Double))
+        : base(record, name, RecordDataCode.Double, typeof(Double))
     {
     }
 
