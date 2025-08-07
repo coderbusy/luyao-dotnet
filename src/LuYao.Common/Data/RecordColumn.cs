@@ -64,6 +64,12 @@ public abstract class RecordColumn
     public abstract object? GetValue(int row);
 
     /// <summary>
+    /// 删除指定行的列值。
+    /// </summary>
+    /// <param name="row">行索引，从 0 开始。</param>
+    public abstract void Delete(int row);
+
+    /// <summary>
     /// 清空列中的所有数据。
     /// </summary>
     public abstract void Clear();

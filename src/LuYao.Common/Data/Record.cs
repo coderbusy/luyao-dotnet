@@ -77,6 +77,22 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     }
 
     /// <summary>
+    /// 删除当前游标位置的行。
+    /// </summary>
+    public void Delete() => this.Delete(this.Cursor);
+
+    /// <summary>
+    /// 删除指定索引的行。
+    /// </summary>
+    public bool Delete(int row)
+    {
+        if (row < 0 || row >= this.Count) return false;
+        foreach (RecordColumn col in this._cols) col.Delete(row);
+        this.Count--;
+        return true;
+    }
+
+    /// <summary>
     /// 读取一行，成功返回 true，失败返回 false。
     /// 当游标位置已经到达最后一行时，重置游标到第一行并返回 false。
     /// </summary>

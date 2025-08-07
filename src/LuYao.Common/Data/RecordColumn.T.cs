@@ -34,6 +34,18 @@ public class RecordColumn<T> : RecordColumn
     }
 
     ///<inheritdoc/>
+    public override void Delete(int row)
+    {
+        OnGet(row);
+        var count = this.Record.Count;
+        for (int i = row; i < count - 1; i++)
+        {
+            //this._data.SetValue(this._data.GetValue(i + 1), i);
+            this._data[i] = this._data[i + 1];
+        }
+    }
+
+    ///<inheritdoc/>
     public override object? GetValue(int row)
     {
         OnGet(row);
@@ -83,5 +95,6 @@ public class RecordColumn<T> : RecordColumn
     }
 
     public void Set(T value) => Set(value, Record.Cursor);
+
     #endregion
 }
