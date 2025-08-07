@@ -1,151 +1,317 @@
-﻿using System;
+﻿using LuYao.Data.Columns;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LuYao.Data;
+
 
 /// <summary>
 /// 列集合
 /// </summary>
 public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 {
-    private readonly List<RecordColumn> _columns = new List<RecordColumn>();
+    private readonly List<RecordColumn> _list = new List<RecordColumn>();
+    /// <summary>
+    /// 关联的记录
+    /// </summary>
+    public Record Record { get; }
+
+    internal RecordColumnCollection(Record record)
+    {
+        this.Record = record ?? throw new ArgumentNullException(nameof(record));
+    }
 
     #region IReadOnlyList
 
-    /// <inheritdoc/>
-    public int Count => _columns.Count;
+    ///<inheritdoc/>
+    public RecordColumn this[int index] => _list[index];
 
-    /// <inheritdoc/>
-    public RecordColumn this[int index] => _columns[index];
+    ///<inheritdoc/>
+    public int Count => _list.Count;
 
-    /// <inheritdoc/>
-    public IEnumerator<RecordColumn> GetEnumerator() => _columns.GetEnumerator();
+    ///<inheritdoc/>
+    public IEnumerator<RecordColumn> GetEnumerator() => _list.GetEnumerator();
 
-    /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
     #endregion
 
-    private Record _re;
-    private int _capacity;
-    private int _count;
-    /// <summary>
-    /// 容量
-    /// </summary>
-    public int Capacity => _capacity;
-    internal void SetCapacity(int capacity)
+    internal void OnAddRow()
     {
-        if (this._columns.Count > 0) throw new InvalidOperationException("不能在已有列的情况下设置容量");
-        if (capacity < 1) capacity = 1;
-        this._capacity = capacity;
-    }
-    /// <summary>
-    /// 数据行数
-    /// </summary>
-    public int Rows
-    {
-        get => _count;
-        internal set
+        if (this.Count == 0) return;
+        int num = this.Record.Count;
+        foreach (RecordColumn col in this)
         {
-            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "行数不能小于0");
-            _count = value;
+            if (col.Capacity >= num) continue;
+            col.Extend(num);
         }
+        this.Record.Capacity = this.Min(f => f.Capacity);
     }
 
-    internal RecordColumnCollection(Record table, int capacity)
+    /// <summary>
+    /// 查找指定列名的索引
+    /// </summary>
+    public int IndexOf(string name)
     {
-        this._re = table ?? throw new ArgumentNullException(nameof(table), "表不能为空");
-        if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity), "容量不能小于1");
-        this._capacity = capacity;
+        for (int i = 0; i < this.Count; i++)
+        {
+            if (this[i].Name == name) return i;
+        }
+        return -1;
     }
+
+
+    /// <summary>
+    /// 判断指定的列名是否存在
+    /// </summary>
+    public bool Contains(string name) { return this.IndexOf(name) > -1; }
 
     /// <summary>
     /// 根据列名查找列
     /// </summary>
     public RecordColumn? Find(string name)
     {
-        var idx = this.IndexOf(name);
-        if (idx >= 0) return this[idx];
-        return null;
+        int idx = this.IndexOf(name);
+        return idx > -1 ? this[idx] : null;
+    }
+
+    /// <summary>
+    /// 删除一个列
+    /// </summary>
+    public RecordColumn? Remove(string name)
+    {
+        RecordColumn? col = null;
+        int idx = this.IndexOf(name);
+        if (idx > -1)
+        {
+            col = this[idx];
+            this._list.RemoveAt(idx);
+        }
+        return col;
+    }
+
+    /// <summary>
+    /// 清理所有列
+    /// </summary>
+    public void Clear()
+    {
+        this._list.Clear();
+        this.Record.OnClear();
     }
 
     #region Add
-
-    internal RecordColumn AddInternal(string name, RecordDataType type)
+    private void OnAdd(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentNullException(nameof(name), "列名不能为空");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
+        if (this.Contains(name)) throw new ArgumentException($"列名 '{name}' 已经存在", nameof(name));
+    }
 
-        if (this.Contains(name))
-            throw new InvalidOperationException($"列 '{name}' 已存在");
-
-        var col = new RecordColumn(this._re, name, type, this._capacity);
-        this._columns.Add(col);
+    /// <summary>
+    /// 添加一个 Boolean 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>BooleanRecordColumn 实例</returns>
+    public BooleanRecordColumn AddBoolean(string name)
+    {
+        this.OnAdd(name);
+        var col = new BooleanRecordColumn(this.Record, name);
+        this._list.Add(col);
         return col;
     }
 
-    internal RecordColumn AddInternal(string name, Type type)
+    /// <summary>
+    /// 添加一个 Byte 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>ByteRecordColumn 实例</returns>
+    public ByteRecordColumn AddByte(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentNullException(nameof(name), "列名不能为空");
-
-        if (this.Contains(name))
-            throw new InvalidOperationException($"列 '{name}' 已存在");
-
-        var col = new RecordColumn(this._re, name, type, this._capacity);
-        this._columns.Add(col);
+        this.OnAdd(name);
+        var col = new ByteRecordColumn(this.Record, name);
+        this._list.Add(col);
         return col;
     }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddBoolean(string name) => this.AddInternal(name, RecordDataType.Boolean);
+    /// <summary>
+    /// 添加一个 Char 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>CharRecordColumn 实例</returns>
+    public CharRecordColumn AddChar(string name)
+    {
+        this.OnAdd(name);
+        var col = new CharRecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddByte(string name) => this.AddInternal(name, RecordDataType.Byte);
+    /// <summary>
+    /// 添加一个 DateTime 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>DateTimeRecordColumn 实例</returns>
+    public DateTimeRecordColumn AddDateTime(string name)
+    {
+        this.OnAdd(name);
+        var col = new DateTimeRecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddChar(string name) => this.AddInternal(name, RecordDataType.Char);
+    /// <summary>
+    /// 添加一个 Decimal 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>DecimalRecordColumn 实例</returns>
+    public DecimalRecordColumn AddDecimal(string name)
+    {
+        this.OnAdd(name);
+        var col = new DecimalRecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddDateTime(string name) => this.AddInternal(name, RecordDataType.DateTime);
+    /// <summary>
+    /// 添加一个 Double 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>DoubleRecordColumn 实例</returns>
+    public DoubleRecordColumn AddDouble(string name)
+    {
+        this.OnAdd(name);
+        var col = new DoubleRecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddDecimal(string name) => this.AddInternal(name, RecordDataType.Decimal);
+    /// <summary>
+    /// 添加一个 Int16 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>Int16RecordColumn 实例</returns>
+    public Int16RecordColumn AddInt16(string name)
+    {
+        this.OnAdd(name);
+        var col = new Int16RecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddDouble(string name) => this.AddInternal(name, RecordDataType.Double);
+    /// <summary>
+    /// 添加一个 Int32 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>Int32RecordColumn 实例</returns>
+    public Int32RecordColumn AddInt32(string name)
+    {
+        this.OnAdd(name);
+        var col = new Int32RecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddInt16(string name) => this.AddInternal(name, RecordDataType.Int16);
+    /// <summary>
+    /// 添加一个 Int64 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>Int64RecordColumn 实例</returns>
+    public Int64RecordColumn AddInt64(string name)
+    {
+        this.OnAdd(name);
+        var col = new Int64RecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddInt32(string name) => this.AddInternal(name, RecordDataType.Int32);
+    /// <summary>
+    /// 添加一个 SByte 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>SByteRecordColumn 实例</returns>
+    public SByteRecordColumn AddSByte(string name)
+    {
+        this.OnAdd(name);
+        var col = new SByteRecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddInt64(string name) => this.AddInternal(name, RecordDataType.Int64);
+    /// <summary>
+    /// 添加一个 Single 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>SingleRecordColumn 实例</returns>
+    public SingleRecordColumn AddSingle(string name)
+    {
+        this.OnAdd(name);
+        var col = new SingleRecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddSByte(string name) => this.AddInternal(name, RecordDataType.SByte);
+    /// <summary>
+    /// 添加一个 String 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>StringRecordColumn 实例</returns>
+    public StringRecordColumn AddString(string name)
+    {
+        this.OnAdd(name);
+        var col = new StringRecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddSingle(string name) => this.AddInternal(name, RecordDataType.Single);
+    /// <summary>
+    /// 添加一个 UInt16 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>UInt16RecordColumn 实例</returns>
+    public UInt16RecordColumn AddUInt16(string name)
+    {
+        this.OnAdd(name);
+        var col = new UInt16RecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddString(string name) => this.AddInternal(name, RecordDataType.String);
+    /// <summary>
+    /// 添加一个 UInt32 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>UInt32RecordColumn 实例</returns>
+    public UInt32RecordColumn AddUInt32(string name)
+    {
+        this.OnAdd(name);
+        var col = new UInt32RecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddUInt16(string name) => this.AddInternal(name, RecordDataType.UInt16);
+    /// <summary>
+    /// 添加一个 UInt64 类型的列
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <returns>UInt64RecordColumn 实例</returns>
+    public UInt64RecordColumn AddUInt64(string name)
+    {
+        this.OnAdd(name);
+        var col = new UInt64RecordColumn(this.Record, name);
+        this._list.Add(col);
+        return col;
+    }
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddUInt32(string name) => this.AddInternal(name, RecordDataType.UInt32);
 
-    /// <summary>添加数据列</summary>
-    public RecordColumn AddUInt64(string name) => this.AddInternal(name, RecordDataType.UInt64);
-
-    /// <summary>添加数据列</summary>
-    public RecordColumn Add<T>(string name) => Add(name, typeof(T));
-
-    /// <summary>添加数据列</summary>
+    ///<summary>
+    /// 根据列名和类型添加一个列。
+    /// </summary>
+    /// <param name="name">列名</param>
+    /// <param name="type">列的数据类型</param>
+    /// <returns>添加的 <see cref="RecordColumn"/> 实例</returns>
     public RecordColumn Add(string name, Type type)
     {
         switch (Type.GetTypeCode(type))
@@ -166,67 +332,12 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
             case TypeCode.UInt32: return this.AddUInt32(name);
             case TypeCode.UInt64: return this.AddUInt64(name);
         }
-        return AddInternal(name, type);
+        var t = typeof(RecordColumn<>).MakeGenericType(type);
+        var col = (RecordColumn)Activator.CreateInstance(t, this.Record, name, RecordDataType.Object, type);
+        this._list.Add(col);
+        return col;
     }
+
+    public RecordColumn<T> Add<T>(string name) => (RecordColumn<T>)this.Add(name, typeof(T));
     #endregion
-
-    /// <summary>
-    /// 添加一行
-    /// </summary>
-    /// <returns>行号</returns>
-    internal int AddRow()
-    {
-        this._count++;
-        if (this._capacity < this._count)
-        {
-            this._capacity *= 2;
-            foreach (RecordColumn col in this)
-            {
-                col.Extend(this._capacity);
-            }
-        }
-        var idx = this._count - 1;
-        return idx;
-    }
-
-    /// <summary>
-    /// 查找指定列名的索引
-    /// </summary>
-    public int IndexOf(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
-        for (int i = 0; i < this.Count; i++)
-        {
-            RecordColumn col = this[i];
-            if (col.Name == name) return i;
-        }
-        return -1;
-    }
-
-    /// <summary>
-    /// 判断指定的列名是否存在
-    /// </summary>
-    public bool Contains(string name) => this.IndexOf(name) >= 0;
-
-    /// <summary>
-    /// 删除一个列
-    /// </summary>
-    public bool Remove(RecordColumn column)
-    {
-        var b = this._columns.Remove(column);
-        if (b && this._columns.Count == 0)
-        {
-            this._count = 0; //如果删除后没有列了，行数也清零
-        }
-        return b;
-    }
-
-    /// <summary>
-    /// 清理所有列
-    /// </summary>
-    public void Clear()
-    {
-        this._columns.Clear();
-        this._count = 0;
-    }
 }

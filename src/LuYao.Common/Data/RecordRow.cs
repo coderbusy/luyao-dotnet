@@ -1,129 +1,162 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace LuYao.Data;
 
 /// <summary>
-/// 代表一个行
+/// 代表一行数据
 /// </summary>
-public readonly struct RecordRow
+public struct RecordRow : IRecordCursor
 {
-    private readonly Record _re;
-    private readonly int _rowIndex;
-
-    /// <summary>
-    /// 初始化 <see cref="RecordRow"/> 的新实例。
-    /// </summary>
-    /// <param name="table">所属的 <see cref="Record"/> 实例。</param>
-    /// <param name="rowIndex">行索引。</param>
-    public RecordRow(Record table, int rowIndex)
+    internal RecordRow(Record record, int row)
     {
-        _re = table;
-        _rowIndex = rowIndex;
+        if (row < 0 || row >= record.Count) throw new ArgumentOutOfRangeException(nameof(row));
+        this.Record = record ?? throw new ArgumentNullException(nameof(record));
+        this.Row = row;
     }
-
     /// <summary>
-    /// 获取所属的 <see cref="Record"/> 实例。
+    /// 集合
     /// </summary>
-    public Record Record => _re;
+    public Record Record { get; }
 
     /// <summary>
     /// 行号
     /// </summary>
-    public int RowIndex => _rowIndex;
+    public int Row { get; }
 
     /// <summary>
     /// 隐式转换为行索引（int）。
     /// </summary>
     /// <param name="rowRef">要转换的 <see cref="RecordRow"/> 实例。</param>
     /// <returns>该行的索引。</returns>
-    public static implicit operator int(RecordRow rowRef) => rowRef._rowIndex;
+    public static implicit operator int(RecordRow rowRef) => rowRef.Row;
 
-    ///<inheritdoc/>
-    public void SetValue(Object value, RecordColumn column) => column.SetValue(value, this._rowIndex);
+    #region IRecordCursor
+    public Boolean GetBoolean(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToBoolean() : default;
+    }
 
-    ///<inheritdoc/>
-    public object? GetValue(RecordColumn column) => column.GetValue(this._rowIndex);
+    public Boolean GetBoolean(RecordColumn col) => col.Record == this.Record ? col.ToBoolean() : GetBoolean(col.Name);
 
-    #region Data
+    public Byte GetByte(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToByte() : default;
+    }
 
+    public Byte GetByte(RecordColumn col) => col.Record == this.Record ? col.ToByte() : GetByte(col.Name);
 
-    ///<inheritdoc/>
-    public Boolean ToBoolean(RecordColumn column) => column.ToBoolean(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Boolean value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Char GetChar(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToChar() : default;
+    }
 
-    ///<inheritdoc/>
-    public Byte ToByte(RecordColumn column) => column.ToByte(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Byte value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Char GetChar(RecordColumn col) => col.Record == this.Record ? col.ToChar() : GetChar(col.Name);
 
-    ///<inheritdoc/>
-    public Char ToChar(RecordColumn column) => column.ToChar(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Char value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public DateTime GetDateTime(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToDateTime() : default;
+    }
 
-    ///<inheritdoc/>
-    public DateTime ToDateTime(RecordColumn column) => column.ToDateTime(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(DateTime value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public DateTime GetDateTime(RecordColumn col) => col.Record == this.Record ? col.ToDateTime() : GetDateTime(col.Name);
 
-    ///<inheritdoc/>
-    public Decimal ToDecimal(RecordColumn column) => column.ToDecimal(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Decimal value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Decimal GetDecimal(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToDecimal() : default;
+    }
 
-    ///<inheritdoc/>
-    public Double ToDouble(RecordColumn column) => column.ToDouble(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Double value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Decimal GetDecimal(RecordColumn col) => col.Record == this.Record ? col.ToDecimal() : GetDecimal(col.Name);
 
-    ///<inheritdoc/>
-    public Int16 ToInt16(RecordColumn column) => column.ToInt16(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Int16 value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Double GetDouble(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToDouble() : default;
+    }
 
-    ///<inheritdoc/>
-    public Int32 ToInt32(RecordColumn column) => column.ToInt32(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Int32 value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Double GetDouble(RecordColumn col) => col.Record == this.Record ? col.ToDouble() : GetDouble(col.Name);
 
-    ///<inheritdoc/>
-    public Int64 ToInt64(RecordColumn column) => column.ToInt64(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Int64 value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Int16 GetInt16(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToInt16() : default;
+    }
 
-    ///<inheritdoc/>
-    public SByte ToSByte(RecordColumn column) => column.ToSByte(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(SByte value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Int16 GetInt16(RecordColumn col) => col.Record == this.Record ? col.ToInt16() : GetInt16(col.Name);
 
-    ///<inheritdoc/>
-    public Single ToSingle(RecordColumn column) => column.ToSingle(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(Single value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Int32 GetInt32(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToInt32() : default;
+    }
 
-    ///<inheritdoc/>
-    public String ToString(RecordColumn column) => column.ToString(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(String value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Int32 GetInt32(RecordColumn col) => col.Record == this.Record ? col.ToInt32() : GetInt32(col.Name);
 
-    ///<inheritdoc/>
-    public UInt16 ToUInt16(RecordColumn column) => column.ToUInt16(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(UInt16 value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Int64 GetInt64(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToInt64() : default;
+    }
 
-    ///<inheritdoc/>
-    public UInt32 ToUInt32(RecordColumn column) => column.ToUInt32(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(UInt32 value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public Int64 GetInt64(RecordColumn col) => col.Record == this.Record ? col.ToInt64() : GetInt64(col.Name);
 
-    ///<inheritdoc/>
-    public UInt64 ToUInt64(RecordColumn column) => column.ToUInt64(this._rowIndex);
-    ///<inheritdoc/>
-    public void Set(UInt64 value, RecordColumn column) => column.Set(value, this._rowIndex);
+    public SByte GetSByte(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToSByte() : default;
+    }
+
+    public SByte GetSByte(RecordColumn col) => col.Record == this.Record ? col.ToSByte() : GetSByte(col.Name);
+
+    public Single GetSingle(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToSingle() : default;
+    }
+
+    public Single GetSingle(RecordColumn col) => col.Record == this.Record ? col.ToSingle() : GetSingle(col.Name);
+
+    public String? GetString(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToString() : default;
+    }
+
+    public String? GetString(RecordColumn col) => col.Record == this.Record ? col.ToString() : GetString(col.Name);
+
+    public UInt16 GetUInt16(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToUInt16() : default;
+    }
+
+    public UInt16 GetUInt16(RecordColumn col) => col.Record == this.Record ? col.ToUInt16() : GetUInt16(col.Name);
+
+    public UInt32 GetUInt32(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToUInt32() : default;
+    }
+
+    public UInt32 GetUInt32(RecordColumn col) => col.Record == this.Record ? col.ToUInt32() : GetUInt32(col.Name);
+
+    public UInt64 GetUInt64(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.ToUInt64() : default;
+    }
+
+    public UInt64 GetUInt64(RecordColumn col) => col.Record == this.Record ? col.ToUInt64() : GetUInt64(col.Name);
+
+    public T? Get<T>(RecordColumn col) => col.Record == this.Record ? col.To<T>() : default;
+    public T? Get<T>(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col != null ? col.To<T>() : default;
+    }
+
     #endregion
-
-    ///<inheritdoc/>
-    public TRet To<TRet>(RecordColumn column) => column.To<TRet>(this._rowIndex);
 }

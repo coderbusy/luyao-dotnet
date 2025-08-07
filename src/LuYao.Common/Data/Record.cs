@@ -1,33 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace LuYao.Data;
 
 /// <summary>
-/// 列存储数据表
+/// 列存储数据集合
 /// </summary>
-public partial class Record : IEnumerable<RecordRow>
+public partial class Record : IEnumerable<RecordRow>, IRecordCursor
 {
-    /// <summary>
-    /// 表名称
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
-
-    private readonly RecordColumnCollection _cols;
-
-    /// <summary>
-    /// 表列集合
-    /// </summary>
-    public RecordColumnCollection Columns => _cols;
-
-    /// <summary>
-    /// 数据条数
-    /// </summary>
-    public int Count => _cols.Rows;
-
     /// <summary>
     /// 初始化 <see cref="Record"/> 类的新实例。
     /// </summary>
@@ -46,193 +27,226 @@ public partial class Record : IEnumerable<RecordRow>
         if (!string.IsNullOrWhiteSpace(name)) this.Name = name!;
         int c = rows;
         if (c < 20) c = 20;
-        _cols = new RecordColumnCollection(this, c);
+        this.Capacity = c;
+        _cols = new RecordColumnCollection(this);
     }
+
+    /// <summary>
+    /// 集合名称
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+
+    private readonly RecordColumnCollection _cols;
+
+    /// <summary>
+    /// 表列集合
+    /// </summary>
+    public RecordColumnCollection Columns => _cols;
+    /// <summary>
+    /// 容量
+    /// </summary>
+    public int Capacity { get; internal set; }
+    /// <summary>
+    /// 数据条数
+    /// </summary>
+    public int Count { get; private set; } = 0;
+    /// <summary>
+    /// 游标位置
+    /// </summary>
+    public int Cursor { get; private set; } = 0;
 
     /// <summary>
     /// 添加一行数据。
     /// </summary>
-    /// <returns>新添加行的索引。</returns>
     public RecordRow AddRow()
     {
-        var row = _cols.AddRow();
-        return new RecordRow(this, row);
+        this.Cursor = this.Count;
+        this.Count++;
+        this.Columns.OnAddRow();
+        return new RecordRow(this, this.Cursor);
     }
 
     /// <summary>
-    /// 设置指定列的指定行的值。
+    /// 读取一行，成功返回 true，失败返回 false。
+    /// 当游标位置已经到达最后一行时，重置游标到第一行并返回 false。
     /// </summary>
-    /// <param name="column">列名称。</param>
-    /// <param name="row">行索引。</param>
-    /// <param name="value">要设置的值。</param>
-    public void SetValue(string column, int row, object? value)
+    public bool Read()
     {
-        RecordColumn? col = _cols.Find(column);
-        if (col == null) throw new KeyNotFoundException();
-        col.SetValue(value, row);
+        if (this.Cursor < this.Count)
+        {
+            this.Cursor++;
+            return true;
+        }
+        this.Cursor = 0;
+        return false;
     }
 
     /// <summary>
-    /// 获取指定列的指定行的值。
+    /// 清楚所有数据。
     /// </summary>
-    /// <param name="column">列名称。</param>
-    /// <param name="row">行索引。</param>
-    /// <returns>指定单元格的值。</returns>
-    public object? GetValue(string column, int row)
+    public void ClearRows()
     {
-        RecordColumn? col = _cols.Find(column);
-        if (col == null) throw new KeyNotFoundException();
-        return col.GetValue(row);
+        this.OnClear();
+        foreach (RecordColumn col in this.Columns)
+        {
+            col.Clear();
+        }
     }
-
-    /// <summary>
-    /// 判断是否包含指定列。
-    /// </summary>
-    /// <param name="column">列名称。</param>
-    /// <returns>如果包含指定列则返回 true，否则返回 false。</returns>
-    public bool Contains(string column) => _cols.Contains(column);
-
+    internal void OnClear()
+    {
+        this.Count = 0;
+        this.Cursor = 0;
+    }
     #region IEnumerable
-    /// <summary>
-    /// 返回一个循环访问集合的枚举器。
-    /// </summary>
-    /// <returns>用于遍历集合的枚举器。</returns>
+
+    ///<inheritdoc/> 
     public IEnumerator<RecordRow> GetEnumerator()
     {
-        for (int i = 0; i < this.Count; i++)
+        for (int i = 0; i < Count; i++)
         {
             yield return new RecordRow(this, i);
         }
     }
 
-    /// <summary>
-    /// 返回一个循环访问集合的枚举器（非泛型）。
-    /// </summary>
-    /// <returns>用于遍历集合的枚举器。</returns>
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+
     #endregion
 
     /// <summary>
-    /// 获取指定索引的行。
+    /// 获取数据是否为空
     /// </summary>
-    /// <param name="rowIndex">行索引。</param>
-    /// <returns>指定索引的 <see cref="RecordRow"/> 实例。</returns>
-    public RecordRow GetRow(int rowIndex)
+    public bool IsEmpty { get { return Count > 0 ? false : true; } }
+
+    #region Get
+    public T? Get<T>(RecordColumn col) => col.Record == this ? col.To<T>() : default;
+    public T? Get<T>(string name)
     {
-        if (rowIndex < 0 || rowIndex >= this.Count) throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        return new RecordRow(this, rowIndex);
+        var col = this.Columns.Find(name);
+        return col != null ? col.To<T>() : default;
     }
 
-    /// <summary>
-    /// 删除指定索引的行。
-    /// </summary>
-    public bool Delete(int row)
+    public Boolean GetBoolean(string name)
     {
-        if (row < 0 || row >= this.Count) return false;
-        foreach (RecordColumn col in this._cols)
-        {
-            var data = col.Data;
-            for (int i = row; i < Count - 1; i++) data.SetValue(data.GetValue(i + 1), i);
-        }
-        this._cols.Rows--;
-        return true;
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToBoolean() : default;
     }
 
-    ///<inheritdoc/>
-    public override string ToString()
+    public Boolean GetBoolean(RecordColumn col) => col.Record == this ? col.ToBoolean() : GetBoolean(col.Name);
+
+    public Byte GetByte(string name)
     {
-        var sb = new StringBuilder();
-        sb.Append(string.IsNullOrWhiteSpace(this.Name) ? "None" : this.Name);
-        sb.AppendFormat(" count {0} column {1}", this.Count, this._cols.Count);
-        sb.AppendLine();
-        if (this.Count == 1)
-        {
-            //只有一行数据时，输出每列的值
-            int max = this._cols.Max(f => f.Name.Length);
-            foreach (RecordColumn col in this._cols)
-            {
-                sb.AppendFormat("{0} | {1}", col.Name.PadRight(max), col.GetValue(0));
-                sb.AppendLine();
-            }
-        }
-        else
-        {
-            //多行时，输出表格
-            const int MAX_LENGTH = 40;
-            int[] heads = new int[this._cols.Count];
-            string[,] arr = new string[Count, this._cols.Count];
-            for (int k = 0; k < this._cols.Count; k++)
-            {
-                RecordColumn col = this._cols[k];
-                int max = col.Name.Length;
-
-                for (int i = 0; i < Count; i++)
-                {
-                    string s = col.ToString(i);
-                    int len = bLength(s);
-                    if (len > MAX_LENGTH)
-                    {
-                        s = bSubstring(s, MAX_LENGTH + 2) + "..";
-                        len = MAX_LENGTH;
-                    }
-                    arr[i, k] = s;
-
-                    if (len > max) max = len;
-                }
-
-                heads[k] = max;
-            }
-
-            //写表头
-            for (int k = 0; k < this._cols.Count; k++)
-            {
-                if (k > 0) sb.Append(" | ");
-                sb.Append(this._cols[k].Name.PadRight(heads[k]));
-            }
-
-            //写数据行
-            for (int i = 0; i < Count; i++)
-            {
-                sb.AppendLine();
-                for (int k = 0; k < this._cols.Count; k++)
-                {
-                    if (k > 0) sb.Append(" | ");
-
-                    string s = arr[i, k];
-                    int len = bLength(s);
-                    int max = heads[k];
-                    sb.Append(s);
-                    if (max > len) sb.Append(new string(' ', max - len));
-                }
-            }
-        }
-        return sb.ToString();
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToByte() : default;
     }
 
-    static string bSubstring(string s, int len)
-    {
-        string ret = string.Empty;
-        char[] chars = s.ToCharArray();
-        for (int i = 0, idx = 0; i < s.Length; ++i, ++idx)
-        {
-            if (Encoding.UTF8.GetByteCount(chars, i, 1) > 1) ++idx;
-            if (idx >= len) break;
-            ret += s[i];
-        }
+    public Byte GetByte(RecordColumn col) => col.Record == this ? col.ToByte() : GetByte(col.Name);
 
-        return ret;
+    public Char GetChar(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToChar() : default;
     }
 
-    static int bLength(string s) // 单字节长度
+    public Char GetChar(RecordColumn col) => col.Record == this ? col.ToChar() : GetChar(col.Name);
+
+    public DateTime GetDateTime(string name)
     {
-        if (s == null) return 0;
-        int len = 0;
-        char[] chars = s.ToCharArray();
-        for (int i = 0; i < s.Length; i++)
-        {
-            if (Encoding.UTF8.GetByteCount(chars, i, 1) > 1) len += 2;
-            else len++;
-        }
-        return len;
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToDateTime() : default;
     }
+
+    public DateTime GetDateTime(RecordColumn col) => col.Record == this ? col.ToDateTime() : GetDateTime(col.Name);
+
+    public Decimal GetDecimal(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToDecimal() : default;
+    }
+
+    public Decimal GetDecimal(RecordColumn col) => col.Record == this ? col.ToDecimal() : GetDecimal(col.Name);
+
+    public Double GetDouble(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToDouble() : default;
+    }
+
+    public Double GetDouble(RecordColumn col) => col.Record == this ? col.ToDouble() : GetDouble(col.Name);
+
+    public Int16 GetInt16(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToInt16() : default;
+    }
+
+    public Int16 GetInt16(RecordColumn col) => col.Record == this ? col.ToInt16() : GetInt16(col.Name);
+
+    public Int32 GetInt32(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToInt32() : default;
+    }
+
+    public Int32 GetInt32(RecordColumn col) => col.Record == this ? col.ToInt32() : GetInt32(col.Name);
+
+    public Int64 GetInt64(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToInt64() : default;
+    }
+
+    public Int64 GetInt64(RecordColumn col) => col.Record == this ? col.ToInt64() : GetInt64(col.Name);
+
+    public SByte GetSByte(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToSByte() : default;
+    }
+
+    public SByte GetSByte(RecordColumn col) => col.Record == this ? col.ToSByte() : GetSByte(col.Name);
+
+    public Single GetSingle(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToSingle() : default;
+    }
+
+    public Single GetSingle(RecordColumn col) => col.Record == this ? col.ToSingle() : GetSingle(col.Name);
+
+    public String? GetString(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToString() : default;
+    }
+
+    public String? GetString(RecordColumn col) => col.Record == this ? col.ToString() : GetString(col.Name);
+
+    public UInt16 GetUInt16(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToUInt16() : default;
+    }
+
+    public UInt16 GetUInt16(RecordColumn col) => col.Record == this ? col.ToUInt16() : GetUInt16(col.Name);
+
+    public UInt32 GetUInt32(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToUInt32() : default;
+    }
+
+    public UInt32 GetUInt32(RecordColumn col) => col.Record == this ? col.ToUInt32() : GetUInt32(col.Name);
+
+    public UInt64 GetUInt64(string name)
+    {
+        var col = this.Columns.Find(name);
+        return col != null ? col.ToUInt64() : default;
+    }
+
+    public UInt64 GetUInt64(RecordColumn col) => col.Record == this ? col.ToUInt64() : GetUInt64(col.Name);
+    #endregion
 }
