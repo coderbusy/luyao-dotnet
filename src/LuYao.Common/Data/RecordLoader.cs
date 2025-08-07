@@ -56,7 +56,7 @@ static class RecordLoader<T> where T : class, new()
             TypeCode.UInt16 => Expression.Call(rowParam, nameof(RecordRow.GetUInt16), null, columnParam),
             TypeCode.UInt32 => Expression.Call(rowParam, nameof(RecordRow.GetUInt32), null, columnParam),
             TypeCode.UInt64 => Expression.Call(rowParam, nameof(RecordRow.GetUInt64), null, columnParam),
-            _ => Expression.Call(rowParam, typeof(RecordRow).GetMethod(nameof(RecordRow.Get))!.MakeGenericMethod(underlyingType), columnParam)
+            _ => MakeObject(rowParam, columnParam, underlyingType)
         };
 
         // 处理可空类型
@@ -77,6 +77,14 @@ static class RecordLoader<T> where T : class, new()
         );
 
         return lambda.Compile();
+    }
+
+    private static MethodCallExpression MakeObject(ParameterExpression rowParam, ParameterExpression columnParam, Type underlyingType)
+    {
+        var method = typeof(RecordRow)
+            .GetMethod(nameof(RecordRow.Get), [typeof(RecordColumn)])!
+            .MakeGenericMethod(underlyingType);
+        return Expression.Call(rowParam, method, columnParam);
     }
 
     private static Action<T, RecordRow, RecordColumn> MakeWriteToRow(PropertyInfo property)
