@@ -3,8 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LuYao.Data;
 
@@ -332,8 +330,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
             case TypeCode.UInt32: return this.AddUInt32(name);
             case TypeCode.UInt64: return this.AddUInt64(name);
         }
-        var t = typeof(RecordColumn<>).MakeGenericType(type);
-        var col = (RecordColumn)Activator.CreateInstance(t, this.Record, name, RecordDataType.Object, type);
+        RecordColumn col = Helpers.MakeRecordColumn(this.Record, name, type);
         this._list.Add(col);
         return col;
     }
