@@ -36,6 +36,9 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     public string Name { get; set; } = string.Empty;
 
+    /// <summary>
+    /// 列集合的私有字段
+    /// </summary>
     private readonly RecordColumnCollection _cols;
 
     /// <summary>
@@ -58,6 +61,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// <summary>
     /// 添加一行数据。
     /// </summary>
+    /// <returns>新添加的行数据。</returns>
     public RecordRow AddRow()
     {
         this.Cursor = this.Count;
@@ -70,6 +74,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// 读取一行，成功返回 true，失败返回 false。
     /// 当游标位置已经到达最后一行时，重置游标到第一行并返回 false。
     /// </summary>
+    /// <returns>如果成功读取到下一行则返回 true，否则返回 false。</returns>
     public bool Read()
     {
         if (this.Cursor < this.Count)
@@ -82,7 +87,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     }
 
     /// <summary>
-    /// 清楚所有数据。
+    /// 清除所有数据。
     /// </summary>
     public void ClearRows()
     {
@@ -92,14 +97,19 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
             col.Clear();
         }
     }
+
+    /// <summary>
+    /// 内部清理方法，重置计数器和游标位置。
+    /// </summary>
     internal void OnClear()
     {
         this.Count = 0;
         this.Cursor = 0;
     }
+
     #region IEnumerable
 
-    ///<inheritdoc/> 
+    /// <inheritdoc/> 
     public IEnumerator<RecordRow> GetEnumerator()
     {
         for (int i = 0; i < Count; i++)
@@ -108,11 +118,14 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
         }
     }
 
+    /// <summary>
+    /// 返回循环访问集合的枚举器。
+    /// </summary>
+    /// <returns>可用于循环访问集合的 <see cref="IEnumerator"/> 对象。</returns>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
-
 
     #endregion
 
@@ -122,131 +135,295 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public bool IsEmpty { get { return Count > 0 ? false : true; } }
 
     #region Get
+
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的泛型类型值。
+    /// </summary>
+    /// <typeparam name="T">要获取的值的类型。</typeparam>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回转换后的值，否则返回默认值。</returns>
     public T? Get<T>(RecordColumn col) => col.Record == this ? col.To<T>() : default;
+
+    /// <summary>
+    /// 根据列名获取当前游标位置的泛型类型值。
+    /// </summary>
+    /// <typeparam name="T">要获取的值的类型。</typeparam>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回转换后的值，否则返回默认值。</returns>
     public T? Get<T>(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.To<T>() : default;
     }
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的布尔值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回布尔值，否则返回默认值。</returns>
     public Boolean GetBoolean(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToBoolean() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的布尔值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回布尔值，否则通过列名获取。</returns>
     public Boolean GetBoolean(RecordColumn col) => col.Record == this ? col.ToBoolean() : GetBoolean(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的字节值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回字节值，否则返回默认值。</returns>
     public Byte GetByte(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToByte() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的字节值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回字节值，否则通过列名获取。</returns>
     public Byte GetByte(RecordColumn col) => col.Record == this ? col.ToByte() : GetByte(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的字符值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回字符值，否则返回默认值。</returns>
     public Char GetChar(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToChar() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的字符值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回字符值，否则通过列名获取。</returns>
     public Char GetChar(RecordColumn col) => col.Record == this ? col.ToChar() : GetChar(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的日期时间值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回日期时间值，否则返回默认值。</returns>
     public DateTime GetDateTime(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToDateTime() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的日期时间值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回日期时间值，否则通过列名获取。</returns>
     public DateTime GetDateTime(RecordColumn col) => col.Record == this ? col.ToDateTime() : GetDateTime(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的十进制数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回十进制数值，否则返回默认值。</returns>
     public Decimal GetDecimal(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToDecimal() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的十进制数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回十进制数值，否则通过列名获取。</returns>
     public Decimal GetDecimal(RecordColumn col) => col.Record == this ? col.ToDecimal() : GetDecimal(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的双精度浮点数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回双精度浮点数值，否则返回默认值。</returns>
     public Double GetDouble(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToDouble() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的双精度浮点数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回双精度浮点数值，否则通过列名获取。</returns>
     public Double GetDouble(RecordColumn col) => col.Record == this ? col.ToDouble() : GetDouble(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的16位有符号整数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回16位有符号整数值，否则返回默认值。</returns>
     public Int16 GetInt16(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToInt16() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的16位有符号整数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回16位有符号整数值，否则通过列名获取。</returns>
     public Int16 GetInt16(RecordColumn col) => col.Record == this ? col.ToInt16() : GetInt16(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的32位有符号整数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回32位有符号整数值，否则返回默认值。</returns>
     public Int32 GetInt32(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToInt32() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的32位有符号整数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回32位有符号整数值，否则通过列名获取。</returns>
     public Int32 GetInt32(RecordColumn col) => col.Record == this ? col.ToInt32() : GetInt32(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的64位有符号整数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回64位有符号整数值，否则返回默认值。</returns>
     public Int64 GetInt64(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToInt64() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的64位有符号整数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回64位有符号整数值，否则通过列名获取。</returns>
     public Int64 GetInt64(RecordColumn col) => col.Record == this ? col.ToInt64() : GetInt64(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的8位有符号整数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回8位有符号整数值，否则返回默认值。</returns>
     public SByte GetSByte(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToSByte() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的8位有符号整数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回8位有符号整数值，否则通过列名获取。</returns>
     public SByte GetSByte(RecordColumn col) => col.Record == this ? col.ToSByte() : GetSByte(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的单精度浮点数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回单精度浮点数值，否则返回默认值。</returns>
     public Single GetSingle(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToSingle() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的单精度浮点数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回单精度浮点数值，否则通过列名获取。</returns>
     public Single GetSingle(RecordColumn col) => col.Record == this ? col.ToSingle() : GetSingle(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的字符串值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回字符串值，否则返回默认值。</returns>
     public String? GetString(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToString() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的字符串值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回字符串值，否则通过列名获取。</returns>
     public String? GetString(RecordColumn col) => col.Record == this ? col.ToString() : GetString(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的16位无符号整数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回16位无符号整数值，否则返回默认值。</returns>
     public UInt16 GetUInt16(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToUInt16() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的16位无符号整数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回16位无符号整数值，否则通过列名获取。</returns>
     public UInt16 GetUInt16(RecordColumn col) => col.Record == this ? col.ToUInt16() : GetUInt16(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的32位无符号整数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回32位无符号整数值，否则返回默认值。</returns>
     public UInt32 GetUInt32(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToUInt32() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的32位无符号整数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回32位无符号整数值，否则通过列名获取。</returns>
     public UInt32 GetUInt32(RecordColumn col) => col.Record == this ? col.ToUInt32() : GetUInt32(col.Name);
 
+    /// <summary>
+    /// 根据列名获取当前游标位置的64位无符号整数值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>如果找到列则返回64位无符号整数值，否则返回默认值。</returns>
     public UInt64 GetUInt64(string name)
     {
         var col = this.Columns.Find(name);
         return col != null ? col.ToUInt64() : default;
     }
 
+    /// <summary>
+    /// 根据指定的列获取当前游标位置的64位无符号整数值。
+    /// </summary>
+    /// <param name="col">要获取值的列。</param>
+    /// <returns>如果列属于此记录则返回64位无符号整数值，否则通过列名获取。</returns>
     public UInt64 GetUInt64(RecordColumn col) => col.Record == this ? col.ToUInt64() : GetUInt64(col.Name);
     #endregion
 }
