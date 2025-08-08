@@ -1,5 +1,6 @@
 ﻿using LuYao.Data.Models;
 using System;
+using System.Collections.Generic;
 using System.Xml;
 
 namespace LuYao.Data.Xml;
@@ -19,6 +20,8 @@ public class XmlRecordSaveAdapter : RecordSaveAdapter
     /// </summary>
     /// <value>用于执行XML写入操作的 <see cref="XmlWriter"/> 对象。</value>
     public XmlWriter Writer { get; }
+
+    public override IReadOnlyList<RecordSection> Layout { get; } = [RecordSection.Head, RecordSection.Columns, RecordSection.Rows];
 
     /// <summary>
     /// 使用指定的XML写入器初始化 <see cref="XmlRecordSaveAdapter"/> 类的新实例。
@@ -144,4 +147,24 @@ public class XmlRecordSaveAdapter : RecordSaveAdapter
     /// 将64位无符号整数值作为属性写入当前行元素。
     /// </remarks>
     public override void WriteUInt64(string name, int index, ulong value) => Writer.WriteAttributeString(name, Valid.ToString(value));
+
+    public override void WriteStart()
+    {
+        this.Writer.WriteStartElement("record");
+    }
+
+    public override void WriteEnd()
+    {
+        this.Writer.WriteEndElement();
+    }
+
+    public override void WriteStartSection(RecordSection section)
+    {
+        this.Writer.WriteStartElement(Valid.ToString(section));
+    }
+
+    public override void WriteEndSection()
+    {
+        this.Writer.WriteEndElement();
+    }
 }

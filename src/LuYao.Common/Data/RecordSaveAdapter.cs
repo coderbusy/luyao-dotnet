@@ -1,5 +1,6 @@
 ﻿using LuYao.Data.Models;
 using System;
+using System.Collections.Generic;
 
 namespace LuYao.Data;
 
@@ -8,6 +9,11 @@ namespace LuYao.Data;
 /// </summary>
 public abstract class RecordSaveAdapter
 {
+    public abstract IReadOnlyList<RecordSection> Layout { get; }
+    public abstract void WriteStart();
+    public abstract void WriteEnd();
+    public abstract void WriteStartSection(RecordSection section);
+    public abstract void WriteEndSection();
     public abstract void WriteHeader(RecordHeader header);
     public abstract void WriteColumn(RecordColumnInfo column);
     public abstract void WriteStarRow();

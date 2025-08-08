@@ -1,5 +1,6 @@
 ﻿using LuYao.Data.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace LuYao.Data.Binary;
@@ -18,6 +19,8 @@ public class BinaryRecordSaveAdapter : RecordSaveAdapter
     /// </summary>
     /// <value>用于执行二进制写入操作的 <see cref="BinaryWriter"/> 对象。</value>
     public BinaryWriter Writer { get; }
+
+    public override IReadOnlyList<RecordSection> Layout { get; } = [RecordSection.Head, RecordSection.Columns, RecordSection.Rows];
 
     /// <summary>
     /// 使用指定的二进制写入器初始化 <see cref="BinaryRecordSaveAdapter"/> 类的新实例。
@@ -134,4 +137,21 @@ public class BinaryRecordSaveAdapter : RecordSaveAdapter
     /// 将64位无符号整数值直接写入二进制流。
     /// </remarks>
     public override void WriteUInt64(string name, int index, ulong value) => Writer.Write(value);
+
+    public override void WriteStart()
+    {
+    }
+
+    public override void WriteEnd()
+    {
+    }
+
+    public override void WriteStartSection(RecordSection section)
+    {
+        this.Writer.Write((int)section);
+    }
+
+    public override void WriteEndSection()
+    {
+    }
 }
