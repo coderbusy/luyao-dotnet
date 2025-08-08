@@ -1,73 +1,73 @@
 namespace LuYao.Text.Json;
 
 /// <summary>
-/// JSON ±ê¼ÇÀàĞÍÃ¶¾Ù
+/// JSON æ ‡è®°ç±»å‹æšä¸¾
 /// </summary>
 public enum JsonTokenType
 {
     /// <summary>
-    /// ÎŞĞ§»òÎ´³õÊ¼»¯µÄ±ê¼Ç
+    /// æ— æ•ˆæˆ–æœªåˆå§‹åŒ–çš„æ ‡è®°
     /// </summary>
     None = 0,
 
     /// <summary>
-    /// ¶ÔÏó¿ªÊ¼ {
+    /// å¯¹è±¡å¼€å§‹ {
     /// </summary>
     StartObject = 1,
 
     /// <summary>
-    /// ¶ÔÏó½áÊø }
+    /// å¯¹è±¡ç»“æŸ }
     /// </summary>
     EndObject = 2,
 
     /// <summary>
-    /// Êı×é¿ªÊ¼ [
+    /// æ•°ç»„å¼€å§‹ [
     /// </summary>
     StartArray = 3,
 
     /// <summary>
-    /// Êı×é½áÊø ]
+    /// æ•°ç»„ç»“æŸ ]
     /// </summary>
     EndArray = 4,
 
     /// <summary>
-    /// ÊôĞÔÃû
+    /// å±æ€§å
     /// </summary>
     PropertyName = 5,
 
     /// <summary>
-    /// ×Ö·û´®Öµ
+    /// å­—ç¬¦ä¸²å€¼
     /// </summary>
     String = 6,
 
     /// <summary>
-    /// Êı×ÖÖµ
+    /// æ•°å­—å€¼
     /// </summary>
     Number = 7,
 
     /// <summary>
-    /// ²¼¶ûÖµ
+    /// å¸ƒå°”å€¼
     /// </summary>
     Boolean = 8,
 
     /// <summary>
-    /// null Öµ
+    /// null å€¼
     /// </summary>
     Null = 9,
 
     /// <summary>
-    /// ×¢ÊÍ
+    /// æ³¨é‡Š
     /// </summary>
     Comment = 10,
 
     /// <summary>
-    /// Ô­Ê¼ JSON
+    /// åŸå§‹ JSON
     /// </summary>
     Raw = 11
 }
 
 /// <summary>
-/// JSON ±ê¼Ç½á¹¹
+/// JSON æ ‡è®°ç»“æ„
 /// </summary>
 public readonly struct JsonToken
 {
@@ -80,22 +80,22 @@ public readonly struct JsonToken
     }
 
     /// <summary>
-    /// ±ê¼ÇÀàĞÍ
+    /// æ ‡è®°ç±»å‹
     /// </summary>
     public JsonTokenType Type { get; }
 
     /// <summary>
-    /// ±ê¼ÇÖµ
+    /// æ ‡è®°å€¼
     /// </summary>
     public object? Value { get; }
 
     /// <summary>
-    /// ÔÚÔ´×Ö·û´®ÖĞµÄÆğÊ¼Î»ÖÃ
+    /// åœ¨æºå­—ç¬¦ä¸²ä¸­çš„èµ·å§‹ä½ç½®
     /// </summary>
     public int StartIndex { get; }
 
     /// <summary>
-    /// ±ê¼Ç³¤¶È
+    /// æ ‡è®°é•¿åº¦
     /// </summary>
     public int Length { get; }
 }

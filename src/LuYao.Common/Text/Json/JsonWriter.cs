@@ -4,8 +4,10 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 
+namespace LuYao.Text.Json;
+
 /// <summary>
-/// ¸ßĞÔÄÜ JSON Ğ´ÈëÆ÷£¬Ê¹ÓÃ¹Ì¶¨´óĞ¡»º³åÇøºÍ Span ÓÅ»¯
+/// é«˜æ€§èƒ½ JSON å†™å…¥å™¨ï¼Œä½¿ç”¨å›ºå®šå¤§å°ç¼“å†²åŒºå’Œ Span ä¼˜åŒ–
 /// </summary>
 public sealed class JsonWriter : IDisposable
 {
@@ -17,23 +19,23 @@ public sealed class JsonWriter : IDisposable
 
     private const int DefaultBufferSize = 4096;
 
-    // JSON ×´Ì¬Õ»£¬ÓÃÓÚ¹ÜÀíÇ¶Ì×½á¹¹
+    // JSON çŠ¶æ€æ ˆï¼Œç”¨äºç®¡ç†åµŒå¥—ç»“æ„
     private JsonWriteState[] _stateStack;
     private int _stackDepth;
 
-    // ¸ñÊ½»¯Ñ¡Ïî
+    // æ ¼å¼åŒ–é€‰é¡¹
     private readonly bool _indented;
     private readonly string _indentString;
     private int _currentIndentLevel;
 
     /// <summary>
-    /// ³õÊ¼»¯ JsonWriter ÊµÀı
+    /// åˆå§‹åŒ– JsonWriter å®ä¾‹
     /// </summary>
-    /// <param name="writer">ÒªĞ´ÈëµÄ TextWriter</param>
-    /// <param name="ownsWriter">ÊÇ·ñÓµÓĞ²¢ÊÍ·Å TextWriter</param>
-    /// <param name="indented">ÊÇ·ñÆôÓÃËõ½ø¸ñÊ½»¯</param>
-    /// <param name="indentString">Ëõ½ø×Ö·û´®</param>
-    /// <param name="bufferSize">»º³åÇø´óĞ¡</param>
+    /// <param name="writer">è¦å†™å…¥çš„ TextWriter</param>
+    /// <param name="ownsWriter">æ˜¯å¦æ‹¥æœ‰å¹¶é‡Šæ”¾ TextWriter</param>
+    /// <param name="indented">æ˜¯å¦å¯ç”¨ç¼©è¿›æ ¼å¼åŒ–</param>
+    /// <param name="indentString">ç¼©è¿›å­—ç¬¦ä¸²</param>
+    /// <param name="bufferSize">ç¼“å†²åŒºå¤§å°</param>
     public JsonWriter(TextWriter writer, bool ownsWriter = false, bool indented = false,
                      string indentString = "  ", int bufferSize = DefaultBufferSize)
     {
@@ -42,15 +44,15 @@ public sealed class JsonWriter : IDisposable
         _indented = indented;
         _indentString = indentString ?? "  ";
         _buffer = new char[Math.Max(bufferSize, 64)];
-        _stateStack = new JsonWriteState[8]; // ³õÊ¼Õ»´óĞ¡
+        _stateStack = new JsonWriteState[8]; // åˆå§‹æ ˆå¤§å°
     }
 
     /// <summary>
-    /// Ê¹ÓÃ StringBuilder ³õÊ¼»¯ JsonWriter ÊµÀı
+    /// ä½¿ç”¨ StringBuilder åˆå§‹åŒ– JsonWriter å®ä¾‹
     /// </summary>
-    /// <param name="sb">ÒªĞ´ÈëµÄ StringBuilder</param>
-    /// <param name="indented">ÊÇ·ñÆôÓÃËõ½ø¸ñÊ½»¯</param>
-    /// <param name="indentString">Ëõ½ø×Ö·û´®</param>
+    /// <param name="sb">è¦å†™å…¥çš„ StringBuilder</param>
+    /// <param name="indented">æ˜¯å¦å¯ç”¨ç¼©è¿›æ ¼å¼åŒ–</param>
+    /// <param name="indentString">ç¼©è¿›å­—ç¬¦ä¸²</param>
     public JsonWriter(StringBuilder sb, bool indented = false, string indentString = "  ")
         : this(new StringWriter(sb), true, indented, indentString)
     {
@@ -66,7 +68,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´Èë¶ÔÏó¿ªÊ¼·û {
+    /// å†™å…¥å¯¹è±¡å¼€å§‹ç¬¦ {
     /// </summary>
     public void WriteStartObject()
     {
@@ -75,23 +77,23 @@ public sealed class JsonWriter : IDisposable
         WriteChar('{');
         PushState(JsonWriteState.Object);
         IncreaseIndent();
-        if (_indented) WriteNewLine(); // ÔÚÔö¼ÓËõ½ø¼¶±ğºóÔÙ»»ĞĞ
+        if (_indented) WriteNewLine(); // åœ¨å¢åŠ ç¼©è¿›çº§åˆ«åå†æ¢è¡Œ
     }
 
     /// <summary>
-    /// Ğ´Èë¶ÔÏó½áÊø·û }
+    /// å†™å…¥å¯¹è±¡ç»“æŸç¬¦ }
     /// </summary>
     public void WriteEndObject()
     {
         PopState(JsonWriteState.Object);
         DecreaseIndent();
-        if (_indented) WriteNewLine(); // ÏÈ»»ĞĞÔÙĞ´Ëõ½ø
+        if (_indented) WriteNewLine(); // å…ˆæ¢è¡Œå†å†™ç¼©è¿›
         WriteIndentIfNeeded();
         WriteChar('}');
     }
 
     /// <summary>
-    /// Ğ´ÈëÊı×é¿ªÊ¼·û [
+    /// å†™å…¥æ•°ç»„å¼€å§‹ç¬¦ [
     /// </summary>
     public void WriteStartArray()
     {
@@ -99,23 +101,23 @@ public sealed class JsonWriter : IDisposable
         WriteChar('[');
         PushState(JsonWriteState.Array);
         IncreaseIndent();
-        if (_indented) WriteNewLine(); // ÔÚÔö¼ÓËõ½ø¼¶±ğºóÔÙ»»ĞĞ
+        if (_indented) WriteNewLine(); // åœ¨å¢åŠ ç¼©è¿›çº§åˆ«åå†æ¢è¡Œ
     }
 
     /// <summary>
-    /// Ğ´ÈëÊı×é½áÊø·û ]
+    /// å†™å…¥æ•°ç»„ç»“æŸç¬¦ ]
     /// </summary>
     public void WriteEndArray()
     {
         PopState(JsonWriteState.Array);
         DecreaseIndent();
-        if (_indented) WriteNewLine(); // ÏÈ»»ĞĞÔÙĞ´Ëõ½ø
+        if (_indented) WriteNewLine(); // å…ˆæ¢è¡Œå†å†™ç¼©è¿›
         WriteIndentIfNeeded();
         WriteChar(']');
     }
 
     /// <summary>
-    /// Ğ´ÈëÊôĞÔÃû
+    /// å†™å…¥å±æ€§å
     /// </summary>
     public void WritePropertyName(string? name)
     {
@@ -132,7 +134,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´Èë×Ö·û´®Öµ
+    /// å†™å…¥å­—ç¬¦ä¸²å€¼
     /// </summary>
     public void WriteValue(string? value)
     {
@@ -151,7 +153,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´ÈëÕûÊıÖµ
+    /// å†™å…¥æ•´æ•°å€¼
     /// </summary>
     public void WriteValue(long value)
     {
@@ -162,7 +164,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´Èë¸¡µãÖµ
+    /// å†™å…¥æµ®ç‚¹å€¼
     /// </summary>
     public void WriteValue(double value)
     {
@@ -182,7 +184,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´Èë²¼¶ûÖµ
+    /// å†™å…¥å¸ƒå°”å€¼
     /// </summary>
     public void WriteValue(bool value)
     {
@@ -193,7 +195,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´Èë null Öµ
+    /// å†™å…¥ null å€¼
     /// </summary>
     public void WriteNull()
     {
@@ -204,7 +206,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´ÈëÔ­Ê¼ JSON
+    /// å†™å…¥åŸå§‹ JSON
     /// </summary>
     public void WriteRaw(string? json)
     {
@@ -218,7 +220,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ë¢ĞÂ»º³åÇø
+    /// åˆ·æ–°ç¼“å†²åŒº
     /// </summary>
     public void Flush()
     {
@@ -238,7 +240,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´ÈëÔ­Ê¼×Ö·û´®£¬²»½øĞĞ×ªÒå
+    /// å†™å…¥åŸå§‹å­—ç¬¦ä¸²ï¼Œä¸è¿›è¡Œè½¬ä¹‰
     /// </summary>
     private void WriteString(string? str)
     {
@@ -252,7 +254,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// Ğ´Èë×Ö·û´®£¬½øĞĞJSON×ªÒå
+    /// å†™å…¥å­—ç¬¦ä¸²ï¼Œè¿›è¡ŒJSONè½¬ä¹‰
     /// </summary>
     private void WriteStringEscaped(string value)
     {
@@ -316,7 +318,7 @@ public sealed class JsonWriter : IDisposable
             var currentState = _stateStack[_stackDepth - 1];
             if (currentState == JsonWriteState.Array || currentState == JsonWriteState.Object)
             {
-                // µÚÒ»¸öÔªËØ²»ĞèÒª¶ººÅ
+                // ç¬¬ä¸€ä¸ªå…ƒç´ ä¸éœ€è¦é€—å·
                 _stateStack[_stackDepth - 1] = JsonWriteState.Value;
             }
             else if (currentState == JsonWriteState.Value)
@@ -324,10 +326,10 @@ public sealed class JsonWriter : IDisposable
                 WriteChar(',');
                 if (_indented) WriteNewLine();
             }
-            // Property ×´Ì¬²»ĞèÒª¶ººÅ£¬Ö»ĞèÒªÉèÖÃÎª Value
+            // Property çŠ¶æ€ä¸éœ€è¦é€—å·ï¼Œåªéœ€è¦è®¾ç½®ä¸º Value
             else if (currentState == JsonWriteState.Property)
             {
-                // ÊôĞÔÃûºóÃæ¸úÖµ£¬²»ĞèÒª¶ººÅ
+                // å±æ€§ååé¢è·Ÿå€¼ï¼Œä¸éœ€è¦é€—å·
             }
         }
     }
@@ -363,7 +365,7 @@ public sealed class JsonWriter : IDisposable
             throw new InvalidOperationException("Invalid JSON structure: unexpected end marker");
 
         var currentState = _stateStack[--_stackDepth];
-        // ÔÊĞí´Ó Value »ò Property ×´Ì¬ÍË³ö Object/Array£¬ÒòÎªÕâĞ©¶¼ÊÇÓĞĞ§µÄ×´Ì¬
+        // å…è®¸ä» Value æˆ– Property çŠ¶æ€é€€å‡º Object/Arrayï¼Œå› ä¸ºè¿™äº›éƒ½æ˜¯æœ‰æ•ˆçš„çŠ¶æ€
         if (currentState != expectedState && currentState != JsonWriteState.Value &&
             !(expectedState == JsonWriteState.Object && currentState == JsonWriteState.Property))
             throw new InvalidOperationException($"Invalid JSON structure: expected {expectedState}, got {currentState}");
@@ -394,7 +396,7 @@ public sealed class JsonWriter : IDisposable
     }
 
     /// <summary>
-    /// ÊÍ·Å×ÊÔ´
+    /// é‡Šæ”¾èµ„æº
     /// </summary>
     public void Dispose()
     {

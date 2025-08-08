@@ -7,7 +7,7 @@ using System.Text;
 namespace LuYao.Text.Json;
 
 /// <summary>
-/// ¸ßĞÔÄÜ JSON ¶ÁÈ¡Æ÷£¬Ê¹ÓÃ¹Ì¶¨´óĞ¡»º³åÇøÓÅ»¯ĞÔÄÜ
+/// é«˜æ€§èƒ½ JSON è¯»å–å™¨ï¼Œä½¿ç”¨å›ºå®šå¤§å°ç¼“å†²åŒºä¼˜åŒ–æ€§èƒ½
 /// </summary>
 public sealed class JsonReader : IDisposable
 {
@@ -35,29 +35,29 @@ public sealed class JsonReader : IDisposable
     }
 
     /// <summary>
-    /// µ±Ç°±ê¼ÇÀàĞÍ
+    /// å½“å‰æ ‡è®°ç±»å‹
     /// </summary>
     public JsonTokenType TokenType { get; private set; } = JsonTokenType.None;
 
     /// <summary>
-    /// µ±Ç°±ê¼ÇÖµ
+    /// å½“å‰æ ‡è®°å€¼
     /// </summary>
     public object? Value { get; private set; }
 
     /// <summary>
-    /// µ±Ç°ĞĞºÅ
+    /// å½“å‰è¡Œå·
     /// </summary>
     public int Line => _line;
 
     /// <summary>
-    /// µ±Ç°ÁĞºÅ
+    /// å½“å‰åˆ—å·
     /// </summary>
     public int Column => _column;
 
     /// <summary>
-    /// ¶ÁÈ¡ÏÂÒ»¸ö±ê¼Ç
+    /// è¯»å–ä¸‹ä¸€ä¸ªæ ‡è®°
     /// </summary>
-    /// <returns>Èç¹û³É¹¦¶ÁÈ¡µ½±ê¼ÇÔò·µ»Ø true£¬·ñÔò·µ»Ø false</returns>
+    /// <returns>å¦‚æœæˆåŠŸè¯»å–åˆ°æ ‡è®°åˆ™è¿”å› trueï¼Œå¦åˆ™è¿”å› false</returns>
     public bool Read()
     {
         if (_disposed) throw new ObjectDisposedException(nameof(JsonReader));
@@ -112,7 +112,7 @@ public sealed class JsonReader : IDisposable
             case ',':
             case ':':
                 ConsumeChar();
-                return Read(); // Ìø¹ı·Ö¸ô·û£¬¶ÁÈ¡ÏÂÒ»¸ö±ê¼Ç
+                return Read(); // è·³è¿‡åˆ†éš”ç¬¦ï¼Œè¯»å–ä¸‹ä¸€ä¸ªæ ‡è®°
 
             default:
                 if (IsDigit(c) || c == '-' || c == '+')
@@ -171,7 +171,7 @@ public sealed class JsonReader : IDisposable
 
     private bool ReadString()
     {
-        ConsumeChar(); // Ïû·Ñ¿ªÊ¼µÄÒıºÅ
+        ConsumeChar(); // æ¶ˆè´¹å¼€å§‹çš„å¼•å·
 
         var sb = new StringBuilder();
 
@@ -181,9 +181,9 @@ public sealed class JsonReader : IDisposable
 
             if (c == '"')
             {
-                ConsumeChar(); // Ïû·Ñ½áÊøµÄÒıºÅ
+                ConsumeChar(); // æ¶ˆè´¹ç»“æŸçš„å¼•å·
 
-                // ÅĞ¶ÏÊÇ·ñÎªÊôĞÔÃû£¨¼ò»¯ÅĞ¶Ï£º²é¿´ÏÂÒ»¸ö·Ç¿Õ°××Ö·ûÊÇ·ñÎªÃ°ºÅ£©
+                // åˆ¤æ–­æ˜¯å¦ä¸ºå±æ€§åï¼ˆç®€åŒ–åˆ¤æ–­ï¼šæŸ¥çœ‹ä¸‹ä¸€ä¸ªéç©ºç™½å­—ç¬¦æ˜¯å¦ä¸ºå†’å·ï¼‰
                 int savedPos = _bufferPosition;
                 int savedLine = _line;
                 int savedColumn = _column;
@@ -191,7 +191,7 @@ public sealed class JsonReader : IDisposable
                 SkipWhitespace();
                 bool isPropertyName = EnsureBuffer() && _buffer[_bufferPosition] == ':';
 
-                // »Ö¸´Î»ÖÃºÍĞĞÁĞºÅ
+                // æ¢å¤ä½ç½®å’Œè¡Œåˆ—å·
                 _bufferPosition = savedPos;
                 _line = savedLine;
                 _column = savedColumn;
@@ -220,7 +220,7 @@ public sealed class JsonReader : IDisposable
                     case 'r': sb.Append('\r'); break;
                     case 't': sb.Append('\t'); break;
                     case 'u':
-                        // Unicode ×ªÒåĞòÁĞ \uXXXX
+                        // Unicode è½¬ä¹‰åºåˆ— \uXXXX
                         string hexDigits = ReadHexDigits(4);
                         if (int.TryParse(hexDigits, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int unicode))
                         {
@@ -273,14 +273,14 @@ public sealed class JsonReader : IDisposable
         bool hasDecimalPoint = false;
         bool hasExponent = false;
 
-        // ´¦Àí¸ººÅ
+        // å¤„ç†è´Ÿå·
         if (EnsureBuffer() && (_buffer[_bufferPosition] == '-' || _buffer[_bufferPosition] == '+'))
         {
             sb.Append(_buffer[_bufferPosition]);
             ConsumeChar();
         }
 
-        // ¶ÁÈ¡Êı×Ö²¿·Ö
+        // è¯»å–æ•°å­—éƒ¨åˆ†
         bool hasDigits = false;
         while (EnsureBuffer())
         {
@@ -304,7 +304,7 @@ public sealed class JsonReader : IDisposable
                 sb.Append(c);
                 ConsumeChar();
 
-                // Ö¸Êı²¿·Ö¿ÉÄÜÓĞ·ûºÅ
+                // æŒ‡æ•°éƒ¨åˆ†å¯èƒ½æœ‰ç¬¦å·
                 if (EnsureBuffer() && (_buffer[_bufferPosition] == '+' || _buffer[_bufferPosition] == '-'))
                 {
                     sb.Append(_buffer[_bufferPosition]);
@@ -323,7 +323,7 @@ public sealed class JsonReader : IDisposable
         string numberStr = sb.ToString();
         TokenType = JsonTokenType.Number;
 
-        // ³¢ÊÔ½âÎöÎª²»Í¬µÄÊı×ÖÀàĞÍ
+        // å°è¯•è§£æä¸ºä¸åŒçš„æ•°å­—ç±»å‹
         if (!hasDecimalPoint && !hasExponent)
         {
             if (long.TryParse(numberStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out long longValue))
@@ -410,7 +410,7 @@ public sealed class JsonReader : IDisposable
 }
 
 /// <summary>
-/// JSON ½âÎöÒì³£
+/// JSON è§£æå¼‚å¸¸
 /// </summary>
 public class JsonException : Exception
 {
