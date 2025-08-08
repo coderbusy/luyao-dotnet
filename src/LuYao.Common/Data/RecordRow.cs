@@ -52,7 +52,7 @@ public struct RecordRow : IRecordCursor
     public Boolean GetBoolean(string name)
     {
         var col = this.Record.Columns.Find(name);
-        return col != null ? col.ToBoolean() : default;
+        return col != null ? col.ToBoolean(this.Row) : default;
     }
 
     /// <summary>

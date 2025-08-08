@@ -94,9 +94,19 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <summary>
     /// 删除一个列
     /// </summary>
+    /// <param name="column">要删除的列</param>
+    public bool Remove(RecordColumn column)
+    {
+        if (column == null) throw new ArgumentNullException(nameof(column), "要删除的列不能为空");
+        if (column.Record != this.Record) return false;
+        return this._list.Remove(column);
+    }
+
+    /// <summary>
+    /// 删除一个列
+    /// </summary>
     /// <param name="name">要删除的列名</param>
-    /// <returns>如果成功删除则返回被删除的 <see cref="RecordColumn"/> 实例，否则返回 null</returns>
-    public RecordColumn? Remove(string name)
+    public bool Remove(string name)
     {
         RecordColumn? col = null;
         int idx = this.IndexOf(name);
@@ -105,7 +115,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
             col = this[idx];
             this._list.RemoveAt(idx);
         }
-        return col;
+        return col != null;
     }
 
     /// <summary>
