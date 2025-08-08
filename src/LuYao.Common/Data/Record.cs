@@ -801,7 +801,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
         var record = new Record();
         RecordHeader? header = null;
         int rows = 0, cols = 0;
-        while (adapter.Read())
+        while (adapter.ReadSection())
         {
             switch (adapter.Section)
             {

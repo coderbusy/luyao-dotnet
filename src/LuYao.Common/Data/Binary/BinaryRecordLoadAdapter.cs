@@ -242,7 +242,7 @@ public class BinaryRecordLoadAdapter : RecordLoadAdapter
     public override ulong ReadUInt64() => this.Reader.ReadUInt64();
 
     /// <inheritdoc/>
-    public override bool Read()
+    public override bool ReadSection()
     {
         var s = this.Reader.BaseStream;
         if (s.Position >= s.Length) return false;

@@ -40,7 +40,7 @@ public abstract class RecordLoadAdapter
     /// 读取下一个记录项。
     /// </summary>
     /// <returns>如果成功读取到记录项则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
-    public abstract bool Read();
+    public abstract bool ReadSection();
 
     /// <summary>
     /// 获取当前读取位置所在的记录区段。

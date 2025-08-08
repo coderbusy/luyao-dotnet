@@ -48,7 +48,7 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
     }
 
     /// <inheritdoc/>
-    public override bool Read()
+    public override bool ReadSection()
     {
         while (Reader.Read())
         {
@@ -121,12 +121,8 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
                 switch (n)
                 {
                     case "name": ret.Name = v; break;
-                    case "code":
-                        {
-                            ret.Code = Enum<RecordDataCode>.Parse(v);
-                            ret.Type = Helpers.ToType(ret.Code) ?? typeof(Object);
-                        }
-                        break;
+                    case "code": ret.Code = Enum<RecordDataCode>.Parse(v); break;
+                    case "type": ret.ParseTypeName(v); break;
                 }
             }
         }

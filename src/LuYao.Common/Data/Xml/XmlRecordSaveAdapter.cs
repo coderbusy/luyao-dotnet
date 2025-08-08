@@ -39,12 +39,10 @@ public class XmlRecordSaveAdapter : RecordSaveAdapter
     /// </remarks>
     public override void WriteColumn(RecordColumnInfo column)
     {
+        string type = column.GetTypeName();
         Writer.WriteStartElement("column");
         Writer.WriteAttributeString("name", column.Name);
         Writer.WriteAttributeString("code", Valid.ToString(column.Code));
-        string type = column.Code.ToString();
-        var t = Helpers.ToType(column.Code);
-        if (t != column.Type) type = column.Type.AssemblyQualifiedName!;
         Writer.WriteAttributeString("type", type);
         Writer.WriteEndElement();
     }
