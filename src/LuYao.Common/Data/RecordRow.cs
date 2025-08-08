@@ -17,8 +17,8 @@ public struct RecordRow : IRecordCursor
     /// <exception cref="ArgumentNullException">当记录参数为 null 时抛出。</exception>
     internal RecordRow(Record record, int row)
     {
-        if (row < 0 || row >= record.Count) throw new ArgumentOutOfRangeException(nameof(row));
         this.Record = record ?? throw new ArgumentNullException(nameof(record));
+        if (row < 0 || row >= record.Count) throw new ArgumentOutOfRangeException(nameof(row));
         this.Row = row;
     }
 
