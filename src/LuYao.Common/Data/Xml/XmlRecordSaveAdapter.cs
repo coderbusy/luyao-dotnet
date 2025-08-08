@@ -21,6 +21,7 @@ public class XmlRecordSaveAdapter : RecordSaveAdapter
     /// <value>用于执行XML写入操作的 <see cref="XmlWriter"/> 对象。</value>
     public XmlWriter Writer { get; }
 
+    /// <inheritdoc/>
     public override IReadOnlyList<RecordSection> Layout { get; } = [RecordSection.Head, RecordSection.Columns, RecordSection.Rows];
 
     /// <summary>
@@ -148,23 +149,25 @@ public class XmlRecordSaveAdapter : RecordSaveAdapter
     /// </remarks>
     public override void WriteUInt64(string name, int index, ulong value) => Writer.WriteAttributeString(name, Valid.ToString(value));
 
+    /// <inheritdoc/>
     public override void WriteStart()
     {
         this.Writer.WriteStartElement("record");
     }
 
+    /// <inheritdoc/>
     public override void WriteEnd()
     {
         this.Writer.WriteEndElement();
     }
 
+    /// <inheritdoc/>
     public override void WriteStartSection(RecordSection section)
     {
-        this.Writer.WriteStartElement(Valid.ToString(section));
     }
 
+    /// <inheritdoc/>
     public override void WriteEndSection()
     {
-        this.Writer.WriteEndElement();
     }
 }

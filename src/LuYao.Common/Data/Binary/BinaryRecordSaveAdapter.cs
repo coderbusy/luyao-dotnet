@@ -20,6 +20,7 @@ public class BinaryRecordSaveAdapter : RecordSaveAdapter
     /// <value>用于执行二进制写入操作的 <see cref="BinaryWriter"/> 对象。</value>
     public BinaryWriter Writer { get; }
 
+    /// <inheritdoc/>
     public override IReadOnlyList<RecordSection> Layout { get; } = [RecordSection.Head, RecordSection.Columns, RecordSection.Rows];
 
     /// <summary>
@@ -138,19 +139,23 @@ public class BinaryRecordSaveAdapter : RecordSaveAdapter
     /// </remarks>
     public override void WriteUInt64(string name, int index, ulong value) => Writer.Write(value);
 
+    /// <inheritdoc/>
     public override void WriteStart()
     {
     }
 
+    /// <inheritdoc/>
     public override void WriteEnd()
     {
     }
 
+    /// <inheritdoc/>
     public override void WriteStartSection(RecordSection section)
     {
         this.Writer.Write((int)section);
     }
 
+    /// <inheritdoc/>
     public override void WriteEndSection()
     {
     }
