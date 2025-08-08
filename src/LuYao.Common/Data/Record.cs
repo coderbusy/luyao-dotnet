@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace LuYao.Data;
 /// <summary>
 /// 列存储数据集合
 /// </summary>
+[DebuggerTypeProxy(typeof(RecordDebuggerTypeProxy))]
 public partial class Record : IEnumerable<RecordRow>, IRecordCursor
 {
     /// <summary>
