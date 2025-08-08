@@ -92,6 +92,21 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     }
 
     /// <summary>
+    /// 根据列名查找指定泛型类型的列。
+    /// </summary>
+    /// <typeparam name="T">要查找的列的数据类型</typeparam>
+    /// <param name="name">要查找的列名</param>
+    /// <returns>如果找到且类型匹配则返回 <see cref="RecordColumn{T}"/> 实例，否则返回 null</returns>
+    /// <exception cref="InvalidCastException">当找到的列类型与 <typeparamref name="T"/> 不匹配时抛出</exception>
+    public RecordColumn<T>? Find<T>(string name)
+    {
+        var col = this.Find(name);
+        if (col == null) return null;
+        if (col.Type == typeof(T)) return (RecordColumn<T>)col;
+        throw new InvalidCastException($"列 '{name}' 的类型为 {col.Type.Name}，无法转换为 {typeof(T).Name}");
+    }
+
+    /// <summary>
     /// 删除一个列
     /// </summary>
     /// <param name="column">要删除的列</param>
@@ -376,5 +391,6 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <param name="name">列名</param>
     /// <returns>添加的 <see cref="RecordColumn{T}"/> 实例</returns>
     public RecordColumn<T> Add<T>(string name) => (RecordColumn<T>)this.Add(name, typeof(T));
+
     #endregion
 }
