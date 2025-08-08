@@ -164,10 +164,12 @@ public class XmlRecordSaveAdapter : RecordSaveAdapter
     /// <inheritdoc/>
     public override void WriteStartSection(RecordSection section)
     {
+        this.Writer.WriteStartElement(section.ToString().ToLowerInvariant());
     }
 
     /// <inheritdoc/>
     public override void WriteEndSection()
     {
+        this.Writer.WriteEndElement();
     }
 }

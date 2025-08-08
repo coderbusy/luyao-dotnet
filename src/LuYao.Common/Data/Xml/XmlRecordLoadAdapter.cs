@@ -58,17 +58,14 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
             {
                 switch (Reader.LocalName.ToLowerInvariant())
                 {
-                    case "header":
+                    case "head":
                         _section = RecordSection.Head;
-                        LoadCurrentAttributes();
                         return true;
-                    case "column":
+                    case "columns":
                         _section = RecordSection.Columns;
-                        LoadCurrentAttributes();
                         return true;
-                    case "row":
+                    case "rows":
                         _section = RecordSection.Rows;
-                        LoadCurrentAttributes();
                         return true;
                 }
             }
@@ -81,9 +78,27 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
     {
         var header = new RecordHeader();
 
-        if (_currentAttributes.TryGetValue("name", out var name)) header.Name = name;
-        if (_currentAttributes.TryGetValue("columns", out var columns)) header.Columns = Valid.ToInt32(columns);
-        if (_currentAttributes.TryGetValue("count", out var count)) header.Count = Valid.ToInt32(count);
+        while (this.Reader.Read())
+        {
+            if (this.Reader.NodeType == XmlNodeType.Element)
+            {
+                break;
+            }
+        }
+        if (this.Reader.LocalName == "header" && this.Reader.HasAttributes)
+        {
+            while (this.Reader.MoveToNextAttribute())
+            {
+                string n = this.Reader.Name;
+                string v = this.Reader.Value;
+                switch (n)
+                {
+                    case "name": header.Name = v; break;
+                    case "columns": header.Columns = Valid.ToInt32(v); break;
+                    case "count": header.Count = Valid.ToInt32(v); break;
+                }
+            }
+        }
 
         return header;
     }
@@ -91,47 +106,43 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
     /// <inheritdoc/>
     public override RecordColumnInfo ReadColumn()
     {
-        var column = new RecordColumnInfo();
-
-        if (_currentAttributes.TryGetValue("name", out var name)) column.Name = name;
-
-        if (_currentAttributes.TryGetValue("code", out var codeStr))
+        var ret = new RecordColumnInfo { Type = typeof(Object) };
+        while (this.Reader.Read())
         {
-            if (Enum.TryParse<RecordDataCode>(codeStr, out var code)) column.Code = code;
-        }
-
-        if (_currentAttributes.TryGetValue("type", out var typeStr))
-        {
-            if (Enum.TryParse<RecordDataCode>(typeStr, out var typeCode))
+            if (this.Reader.NodeType == XmlNodeType.Element)
             {
-                column.Type = Helpers.ToType(typeCode) ?? typeof(object);
+                break;
             }
-            else
+        }
+        if (this.Reader.LocalName == "column" && this.Reader.HasAttributes)
+        {
+            while (this.Reader.MoveToNextAttribute())
             {
-                // 尝试解析为完整的类型名
-                try
+                string n = this.Reader.Name;
+                string v = this.Reader.Value;
+                switch (n)
                 {
-                    column.Type = Type.GetType(typeStr) ?? typeof(object);
-                }
-                catch
-                {
-                    column.Type = typeof(object);
+                    case "name": ret.Name = v; break;
+                    case "code":
+                        {
+                            ret.Code = Enum<RecordDataCode>.Parse(v);
+                            ret.Type = Helpers.ToType(ret.Code) ?? typeof(Object);
+                        }
+                        break;
                 }
             }
         }
-        else
-        {
-            column.Type = Helpers.ToType(column.Code) ?? typeof(object);
-        }
-
-        return column;
+        return ret;
     }
 
     /// <inheritdoc/>
     public override bool ReadRow()
     {
-        if (Reader.LocalName == "row" && Reader.NodeType == XmlNodeType.Element)
+        while (this.Reader.Read())
         {
+            if (this.Reader.NodeType != XmlNodeType.Element) continue;
+            if (this.Reader.LocalName != "row") continue;
+            if (this.Reader.HasAttributes == false) continue;
             LoadCurrentAttributes();
             PrepareFieldEnumeration();
             return true;
