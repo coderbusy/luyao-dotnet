@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using LuYao.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace LuYao.Data.Tests;
+namespace LuYao.Data;
 
-/// <summary>
-/// RecordLoader 的单元测试类
-/// </summary>
 [TestClass]
 public class RecordLoaderTests
 {
@@ -58,14 +58,14 @@ public class RecordLoaderTests
         var row = record.AddRow();
 
         // 设置数据
-        row.Set(123, idColumn);
-        row.Set("测试名称", nameColumn);
-        row.Set(new DateTime(2023, 7, 28, 10, 30, 0), createTimeColumn);
-        row.Set(true, isActiveColumn);
-        row.Set(95.5, scoreColumn);
-        row.Set("自定义值", customColumn);
-        row.Set(456, nullableIntColumn);
-        row.Set(new DateTime(2023, 8, 1), nullableDateTimeColumn);
+        idColumn.Set(123);
+        nameColumn.Set("测试名称");
+        createTimeColumn.Set(new DateTime(2023, 7, 28, 10, 30, 0));
+        isActiveColumn.Set(true);
+        scoreColumn.Set(95.5);
+        customColumn.Set("自定义值");
+        nullableIntColumn.Set(456);
+        nullableDateTimeColumn.Set(new DateTime(2023, 8, 1));
 
         return (record, row);
     }
@@ -104,7 +104,7 @@ public class RecordLoaderTests
         var record = new Record("TestTable", 1);
         var idColumn = record.Columns.AddInt32("Id");
         var row = record.AddRow();
-        row.Set(100, idColumn);
+        idColumn.Set(100);
 
         var entity = new TestEntity
         {
@@ -153,16 +153,16 @@ public class RecordLoaderTests
         };
 
         // Act
-        RecordLoader<TestEntity>.WriteData(entity, row);
+        RecordLoader<TestEntity>.WriteToRow(entity, row);
 
         // Assert
-        Assert.AreEqual(789, row.ToInt32(idColumn));
-        Assert.AreEqual("写入测试", row.ToString(nameColumn));
-        Assert.AreEqual(new DateTime(2023, 9, 15, 14, 20, 30), row.ToDateTime(createTimeColumn));
-        Assert.AreEqual(false, row.ToBoolean(isActiveColumn));
-        Assert.AreEqual(88.8, row.ToDouble(scoreColumn), 0.001);
-        Assert.AreEqual("写入自定义", row.ToString(customColumn));
-        Assert.AreEqual(999, row.ToInt32(nullableIntColumn));
+        Assert.AreEqual(789, row.GetInt32(idColumn));
+        Assert.AreEqual("写入测试", row.GetString(nameColumn));
+        Assert.AreEqual(new DateTime(2023, 9, 15, 14, 20, 30), row.GetDateTime(createTimeColumn));
+        Assert.AreEqual(false, row.GetBoolean(isActiveColumn));
+        Assert.AreEqual(88.8, row.GetDouble(scoreColumn), 0.001);
+        Assert.AreEqual("写入自定义", row.GetString(customColumn));
+        Assert.AreEqual(999, row.GetInt32(nullableIntColumn));
     }
 
     /// <summary>
@@ -184,10 +184,10 @@ public class RecordLoaderTests
         };
 
         // Act & Assert - 不应该抛出异常
-        RecordLoader<TestEntity>.WriteData(entity, row);
+        RecordLoader<TestEntity>.WriteToRow(entity, row);
 
         // 验证存在的列被正确写入
-        Assert.AreEqual(555, row.ToInt32(idColumn));
+        Assert.AreEqual(555, row.GetInt32(idColumn));
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public class RecordLoaderTests
         var record = new Record("TestTable", 1);
         var customColumn = record.Columns.AddString("custom_column"); // 使用特性指定的名称
         var row = record.AddRow();
-        row.Set("特性测试值", customColumn);
+        customColumn.Set("特性测试值");
 
         var entity = new TestEntity();
 
@@ -267,7 +267,7 @@ public class RecordLoaderTests
         var row = record.AddRow();
 
         // Act - 写入 Record
-        RecordLoader<TestEntity>.WriteData(originalEntity, row);
+        RecordLoader<TestEntity>.WriteToRow(originalEntity, row);
 
         // Act - 从 Record 读取到新实体
         var newEntity = new TestEntity();
@@ -295,8 +295,8 @@ public class RecordLoaderTests
         var textColumn = record.Columns.AddString("Text");
         var row = record.AddRow();
 
-        row.Set(42, valueColumn);
-        row.Set("简单测试", textColumn);
+        valueColumn.Set(42);
+        textColumn.Set("简单测试");
 
         var entity = new SimpleEntity();
 
@@ -318,7 +318,7 @@ public class RecordLoaderTests
         var record = new Record("TestTable", 1);
         var idColumn = record.Columns.AddInt32("Value"); // 修正列名
         var row = record.AddRow();
-        row.Set(1, idColumn);
+        idColumn.Set(1);
 
         var entity1 = new SimpleEntity();
         var entity2 = new SimpleEntity();
@@ -474,40 +474,10 @@ public class RecordLoaderTests
 
         // Act & Assert
         // 第二次调用应该抛出异常，因为列已经存在
-        Assert.ThrowsException<InvalidOperationException>(() =>
+        Assert.ThrowsException<DuplicateNameException>(() =>
         {
             RecordLoader<TestEntity>.WriteHeader(record);
         });
-    }
-
-    /// <summary>
-    /// 测试 WriteHeader 方法 - 列名排序
-    /// </summary>
-    [TestMethod]
-    public void WriteHeader_ShouldCreateColumnsInAlphabeticalOrder()
-    {
-        // Arrange
-        var record = new Record("TestTable", 1);
-
-        // Act
-        RecordLoader<TestEntity>.WriteHeader(record);
-
-        // Assert
-        // 由于使用 SortedDictionary，列应该按字母顺序创建
-        var columnNames = record.Columns.Select(c => c.Name).ToList();
-        var expectedOrder = new List<string>
-        {
-            "CreateTime",
-            "custom_column", // RecordColumnNameAttribute 指定的名称
-            "Id",
-            "IsActive",
-            "Name",
-            "NullableDateTime",
-            "NullableInt",
-            "Score"
-        };
-
-        CollectionAssert.AreEqual(expectedOrder, columnNames);
     }
 
     /// <summary>
@@ -609,16 +579,16 @@ public class RecordLoaderTests
         // Act
         RecordLoader<TestEntity>.WriteHeader(record);
         var row = record.AddRow();
-        RecordLoader<TestEntity>.WriteData(entity, row);
+        RecordLoader<TestEntity>.WriteToRow(entity, row);
 
         // Assert
         // 验证所有列都能正确写入数据
-        Assert.AreEqual(entity.Id, row.ToInt32(record.Columns.Find("Id")!));
-        Assert.AreEqual(entity.Name, row.ToString(record.Columns.Find("Name")!));
-        Assert.AreEqual(entity.CreateTime, row.ToDateTime(record.Columns.Find("CreateTime")!));
-        Assert.AreEqual(entity.IsActive, row.ToBoolean(record.Columns.Find("IsActive")!));
-        Assert.AreEqual(entity.Score, row.ToDouble(record.Columns.Find("Score")!), 0.001);
-        Assert.AreEqual(entity.CustomField, row.ToString(record.Columns.Find("custom_column")!));
-        Assert.AreEqual(entity.NullableInt, row.ToInt32(record.Columns.Find("NullableInt")!));
+        Assert.AreEqual(entity.Id, row.GetInt32("Id"));
+        Assert.AreEqual(entity.Name, row.GetString(("Name")!));
+        Assert.AreEqual(entity.CreateTime, row.GetDateTime(("CreateTime")!));
+        Assert.AreEqual(entity.IsActive, row.GetBoolean(("IsActive")!));
+        Assert.AreEqual(entity.Score, row.GetDouble(("Score")!), 0.001);
+        Assert.AreEqual(entity.CustomField, row.GetString(("custom_column")!));
+        Assert.AreEqual(entity.NullableInt, row.GetInt32(("NullableInt")!));
     }
 }

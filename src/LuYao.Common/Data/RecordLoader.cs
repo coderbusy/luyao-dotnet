@@ -1,80 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace LuYao.Data;
 
-/// <summary>
-/// Record 与实体类型之间的静态加载器，使用表达式树实现高性能转换
-/// </summary>
-/// <typeparam name="T">实体类型</typeparam>
-public static class RecordLoader<T> where T : class, new()
+static class RecordLoader<T> where T : class
 {
-    private sealed class PropertyMapping
-    {
-        public PropertyInfo Property { get; set; } = null!;
-        public string ColumnName { get; set; } = null!;
-        public Type PropertyType { get; set; } = null!;
+    private static readonly IReadOnlyList<Field> _fields = ReadFields();
 
-        public Action<RecordRow, RecordColumn, T>? PopulateObject { get; set; }
-        public Action<T, RecordRow, RecordColumn>? WriteToRow { get; set; }
-    }
-
-    private static readonly SortedDictionary<string, PropertyMapping> _mappings;
-    static RecordLoader()
+    private static IReadOnlyList<Field> ReadFields()
     {
-        var mappings = CreateMappings();
-        _mappings = new SortedDictionary<string, PropertyMapping>();
-        foreach (var mapping in mappings)
+        var ret = new List<Field>();
+        var type = typeof(T);
+        var props = type.GetProperties();
+        foreach (var prop in props)
         {
-            _mappings.Add(mapping.ColumnName, mapping);
+            if (!prop.CanWrite || !prop.CanRead) continue;
+            var field = new Field(prop);
+            field.PopulateObject = MakePopulateObject(prop);
+            field.WriteToRow = MakeWriteToRow(prop);
+            ret.Add(field);
         }
+        return ret;
     }
 
-    private static PropertyMapping[] CreateMappings()
+    private static Action<T, RecordRow, RecordColumn> MakePopulateObject(PropertyInfo property)
     {
-        var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanRead && p.CanWrite)
-            .ToArray();
-
-        var mappings = new List<PropertyMapping>();
-
-        foreach (var property in properties)
-        {
-            var mapping = new PropertyMapping
-            {
-                Property = property,
-                PropertyType = property.PropertyType,
-                ColumnName = GetColumnName(property)
-            };
-
-            // 创建读取委托（从 RecordRow 到实体）
-            mapping.PopulateObject = CreatePopulateObjectDelegate(property);
-
-            // 创建写入委托（从实体到 RecordRow）
-            mapping.WriteToRow = CreateWriteRowDelegate(property);
-
-            mappings.Add(mapping);
-        }
-
-        return mappings.ToArray();
-    }
-
-    private static string GetColumnName(PropertyInfo property)
-    {
-        var attr = property.GetCustomAttribute<RecordColumnNameAttribute>();
-        return attr?.Name ?? property.Name;
-    }
-
-    private static Action<RecordRow, RecordColumn, T> CreatePopulateObjectDelegate(PropertyInfo property)
-    {
-        // 参数: (RecordRow row, RecordColumn column, T target)
+        var targetParam = Expression.Parameter(typeof(T), "target");
         var rowParam = Expression.Parameter(typeof(RecordRow), "row");
         var columnParam = Expression.Parameter(typeof(RecordColumn), "column");
-        var targetParam = Expression.Parameter(typeof(T), "target");
 
         var propertyType = property.PropertyType;
         var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
@@ -82,42 +38,26 @@ public static class RecordLoader<T> where T : class, new()
         Expression valueExpression;
 
         // 根据属性类型选择合适的 RecordRow 方法
-        if (underlyingType == typeof(bool))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToBoolean), null, columnParam);
-        else if (underlyingType == typeof(byte))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToByte), null, columnParam);
-        else if (underlyingType == typeof(char))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToChar), null, columnParam);
-        else if (underlyingType == typeof(DateTime))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToDateTime), null, columnParam);
-        else if (underlyingType == typeof(decimal))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToDecimal), null, columnParam);
-        else if (underlyingType == typeof(double))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToDouble), null, columnParam);
-        else if (underlyingType == typeof(short))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToInt16), null, columnParam);
-        else if (underlyingType == typeof(int))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToInt32), null, columnParam);
-        else if (underlyingType == typeof(long))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToInt64), null, columnParam);
-        else if (underlyingType == typeof(sbyte))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToSByte), null, columnParam);
-        else if (underlyingType == typeof(float))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToSingle), null, columnParam);
-        else if (underlyingType == typeof(string))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToString), null, columnParam);
-        else if (underlyingType == typeof(ushort))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToUInt16), null, columnParam);
-        else if (underlyingType == typeof(uint))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToUInt32), null, columnParam);
-        else if (underlyingType == typeof(ulong))
-            valueExpression = Expression.Call(rowParam, nameof(RecordRow.ToUInt64), null, columnParam);
-        else
+        var typeCode = Type.GetTypeCode(underlyingType);
+        valueExpression = typeCode switch
         {
-            // 使用泛型方法 To<T>
-            var toMethod = typeof(RecordRow).GetMethod(nameof(RecordRow.To))!.MakeGenericMethod(underlyingType);
-            valueExpression = Expression.Call(rowParam, toMethod, columnParam);
-        }
+            TypeCode.Boolean => Expression.Call(rowParam, nameof(RecordRow.GetBoolean), null, columnParam),
+            TypeCode.Byte => Expression.Call(rowParam, nameof(RecordRow.GetByte), null, columnParam),
+            TypeCode.Char => Expression.Call(rowParam, nameof(RecordRow.GetChar), null, columnParam),
+            TypeCode.DateTime => Expression.Call(rowParam, nameof(RecordRow.GetDateTime), null, columnParam),
+            TypeCode.Decimal => Expression.Call(rowParam, nameof(RecordRow.GetDecimal), null, columnParam),
+            TypeCode.Double => Expression.Call(rowParam, nameof(RecordRow.GetDouble), null, columnParam),
+            TypeCode.Int16 => Expression.Call(rowParam, nameof(RecordRow.GetInt16), null, columnParam),
+            TypeCode.Int32 => Expression.Call(rowParam, nameof(RecordRow.GetInt32), null, columnParam),
+            TypeCode.Int64 => Expression.Call(rowParam, nameof(RecordRow.GetInt64), null, columnParam),
+            TypeCode.SByte => Expression.Call(rowParam, nameof(RecordRow.GetSByte), null, columnParam),
+            TypeCode.Single => Expression.Call(rowParam, nameof(RecordRow.GetSingle), null, columnParam),
+            TypeCode.String => Expression.Call(rowParam, nameof(RecordRow.GetString), null, columnParam),
+            TypeCode.UInt16 => Expression.Call(rowParam, nameof(RecordRow.GetUInt16), null, columnParam),
+            TypeCode.UInt32 => Expression.Call(rowParam, nameof(RecordRow.GetUInt32), null, columnParam),
+            TypeCode.UInt64 => Expression.Call(rowParam, nameof(RecordRow.GetUInt64), null, columnParam),
+            _ => MakeObject(rowParam, columnParam, underlyingType)
+        };
 
         // 处理可空类型
         if (propertyType != underlyingType)
@@ -131,18 +71,29 @@ public static class RecordLoader<T> where T : class, new()
         var assignExpression = Expression.Assign(propertyAccess, valueExpression);
 
         // 编译表达式
-        var lambda = Expression.Lambda<Action<RecordRow, RecordColumn, T>>(
-            assignExpression, rowParam, columnParam, targetParam);
+        var lambda = Expression.Lambda<Action<T, RecordRow, RecordColumn>>(
+            assignExpression,
+            targetParam, rowParam, columnParam
+        );
 
         return lambda.Compile();
     }
 
-    private static Action<T, RecordRow, RecordColumn> CreateWriteRowDelegate(PropertyInfo property)
+    private static MethodCallExpression MakeObject(ParameterExpression rowParam, ParameterExpression columnParam, Type underlyingType)
     {
-        // 参数: (T instance, RecordRow row, RecordColumn column)
+        var method = typeof(RecordRow)
+            .GetMethod(nameof(RecordRow.Get), [typeof(RecordColumn)])!
+            .MakeGenericMethod(underlyingType);
+        return Expression.Call(rowParam, method, columnParam);
+    }
+
+    private static Action<T, RecordRow, RecordColumn> MakeWriteToRow(PropertyInfo property)
+    {
         var instanceParam = Expression.Parameter(typeof(T), "instance");
         var rowParam = Expression.Parameter(typeof(RecordRow), "row");
         var columnParam = Expression.Parameter(typeof(RecordColumn), "column");
+
+        var rowExpression = Expression.Property(rowParam, nameof(RecordRow.Row));
 
         var propertyType = property.PropertyType;
         var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
@@ -159,44 +110,27 @@ public static class RecordLoader<T> where T : class, new()
         }
 
         Expression setExpression;
-
         // 根据属性类型选择合适的 RecordRow.Set 方法
-        if (underlyingType == typeof(bool))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(byte))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(char))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(DateTime))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(decimal))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(double))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(short))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(int))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(long))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(sbyte))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(float))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(string))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(ushort))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(uint))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else if (underlyingType == typeof(ulong))
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.Set), null, valueExpression, columnParam);
-        else
+        var typeCode = Type.GetTypeCode(underlyingType);
+        setExpression = typeCode switch
         {
-            // 使用 SetValue 方法处理其他类型
-            var boxedValue = Expression.Convert(valueExpression, typeof(object));
-            setExpression = Expression.Call(rowParam, nameof(RecordRow.SetValue), null, boxedValue, columnParam);
-        }
+            TypeCode.Boolean => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.Byte => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.Char => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.DateTime => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.Decimal => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.Double => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.Int16 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.Int32 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.Int64 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.SByte => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.Single => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.String => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.UInt16 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.UInt32 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            TypeCode.UInt64 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
+            _ => Expression.Call(columnParam, nameof(RecordColumn.SetValue), null, Expression.Convert(valueExpression, typeof(object)), rowExpression)
+        };
 
         // 处理可空类型的 null 检查
         if (propertyType != underlyingType)
@@ -212,52 +146,54 @@ public static class RecordLoader<T> where T : class, new()
         return lambda.Compile();
     }
 
-    /// <summary>
-    /// 将 <see cref="RecordRow"/> 的数据填充到指定的实体对象 <typeparamref name="T"/> 中。
-    /// </summary>
-    /// <param name="row">包含数据的 <see cref="RecordRow"/> 实例。</param>
-    /// <param name="target">要填充数据的目标实体对象。</param>
-    public static void Populate(RecordRow row, T target)
+    public class Field
     {
-        Record record = row.Record;
-        foreach (var column in record.Columns)
+        public Field(PropertyInfo property)
         {
-            if (_mappings.TryGetValue(column.Name, out var mapping) && mapping.PopulateObject != null)
-            {
-                mapping.PopulateObject(row, column, target);
-            }
+            this.Property = property ?? throw new ArgumentNullException(nameof(property));
+            var attr = property.GetCustomAttribute<RecordColumnNameAttribute>();
+            if (attr != null) this.Column = attr.Name;
+            if (this.Column == null || string.IsNullOrEmpty(this.Column)) this.Column = property.Name;
         }
-    }
 
-    /// <summary>
-    /// 将实体类型 <typeparamref name="T"/> 的属性名称写入到 <see cref="Record"/> 的列头中。
-    /// </summary>
-    /// <param name="re">要写入列头的 <see cref="Record"/> 实例。</param>
+        public PropertyInfo Property { get; }
+        public string Column { get; }
+        public Action<T, RecordRow, RecordColumn>? PopulateObject { get; set; }
+        public Action<T, RecordRow, RecordColumn>? WriteToRow { get; set; }
+    }
     public static void WriteHeader(Record re)
     {
-        foreach (var pair in _mappings)
+        foreach (var field in _fields)
         {
-            var mapping = pair.Value;
-            if (mapping.WriteToRow != null)
+            if (field.WriteToRow != null)
             {
-                re.Columns.Add(mapping.ColumnName, mapping.PropertyType);
+                re.Columns.Add(field.Column, field.Property.PropertyType);
             }
         }
     }
 
-    /// <summary>
-    /// 将指定实体对象 <typeparamref name="T"/> 的数据写入到 <see cref="RecordRow"/> 实例中。
-    /// </summary>
-    /// <param name="instance">要读取数据的实体对象。</param>
-    /// <param name="row">要写入数据的 <see cref="RecordRow"/> 实例。</param>
-    public static void WriteData(T instance, RecordRow row)
+    public static void WriteToRow(T instance, RecordRow row)
     {
-        Record record = row.Record;
-        foreach (var column in record.Columns)
+        Record re = row.Record;
+        foreach (RecordColumn col in re.Columns)
         {
-            if (_mappings.TryGetValue(column.Name, out var mapping) && mapping.WriteToRow != null)
+            var field = _fields.FirstOrDefault(f => f.Column == col.Name);
+            if (field != null && field.WriteToRow != null)
             {
-                mapping.WriteToRow(instance, row, column);
+                field.WriteToRow.Invoke(instance, row, col);
+            }
+        }
+    }
+
+    public static void Populate(RecordRow row, T target)
+    {
+        Record re = row.Record;
+        foreach (RecordColumn col in re.Columns)
+        {
+            var field = _fields.FirstOrDefault(f => f.Column == col.Name);
+            if (field != null && field.PopulateObject != null)
+            {
+                field.PopulateObject.Invoke(target, row, col);
             }
         }
     }

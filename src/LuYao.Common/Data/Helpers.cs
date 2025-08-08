@@ -1,94 +1,67 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 
 namespace LuYao.Data;
 
-internal static class Helpers
+static class Helpers
 {
-    private static class FactoryCache<T>
+    private static readonly ConcurrentDictionary<Type, Func<Record, string, RecordDataCode, Type, RecordColumn>> _cache
+        = new();
+
+    private static Func<Record, string, RecordDataCode, Type, RecordColumn> GetConstructor(Type type)
     {
-        public static readonly Func<int, ColumnData> Factory = CreateFactory();
-
-        private static Func<int, ColumnData> CreateFactory()
+        return _cache.GetOrAdd(type, t =>
         {
-            var genericType = typeof(GenericColumnData<>).MakeGenericType(typeof(T));
-            var constructor = genericType.GetConstructor(new[] { typeof(int) });
+            var genericType = typeof(RecordColumn<>).MakeGenericType(t);
+            var ctor = genericType.GetConstructor(new[] {
+                typeof(Record),
+                typeof(string),
+                typeof(RecordDataCode),
+                typeof(Type)
+            });
 
-            if (constructor == null) throw new InvalidOperationException($"Constructor not found for {genericType}");
+            if (ctor == null) throw new InvalidOperationException($"Constructor not found for {genericType}");
+            // Parameters: (object record, string name, RecordDataType dataType, Type type)
+            var pRecord = Expression.Parameter(typeof(Record), "record");
+            var pName = Expression.Parameter(typeof(string), "name");
+            var pDataType = Expression.Parameter(typeof(RecordDataCode), "dataType");
+            var pType = Expression.Parameter(typeof(Type), "type");
 
-            var capacityParam = Expression.Parameter(typeof(int), "capacity");
-            var newExpression = Expression.New(constructor, capacityParam);
-            var lambda = Expression.Lambda<Func<int, ColumnData>>(newExpression, capacityParam);
+            // new RecordColumn<T>(record, name, dataType, type)
+            var newExpr = Expression.New(ctor, pRecord, pName, pDataType, pType);
 
+            var lambda = Expression.Lambda<Func<Record, string, RecordDataCode, Type, RecordColumn>>(newExpr, pRecord, pName, pDataType, pType);
             return lambda.Compile();
-        }
+        });
     }
 
-    public static Type ToType(RecordDataType type)
+    public static RecordColumn MakeRecordColumn(Record re, string name, Type type)
+    {
+        var ctor = GetConstructor(type);
+        return ctor.Invoke(re, name, RecordDataCode.Object, type);
+    }
+
+    public static Type? ToType(RecordDataCode type)
     {
         return type switch
         {
-            RecordDataType.Boolean => typeof(bool),
-            RecordDataType.Byte => typeof(byte),
-            RecordDataType.Char => typeof(char),
-            RecordDataType.DateTime => typeof(DateTime),
-            RecordDataType.Decimal => typeof(decimal),
-            RecordDataType.Double => typeof(double),
-            RecordDataType.Int16 => typeof(short),
-            RecordDataType.Int32 => typeof(int),
-            RecordDataType.Int64 => typeof(long),
-            RecordDataType.SByte => typeof(sbyte),
-            RecordDataType.Single => typeof(float),
-            RecordDataType.String => typeof(string),
-            RecordDataType.UInt16 => typeof(ushort),
-            RecordDataType.UInt32 => typeof(uint),
-            RecordDataType.UInt64 => typeof(ulong),
-            _ => throw new NotSupportedException()
+            RecordDataCode.Boolean => typeof(bool),
+            RecordDataCode.Byte => typeof(byte),
+            RecordDataCode.Char => typeof(char),
+            RecordDataCode.DateTime => typeof(DateTime),
+            RecordDataCode.Decimal => typeof(decimal),
+            RecordDataCode.Double => typeof(double),
+            RecordDataCode.Int16 => typeof(short),
+            RecordDataCode.Int32 => typeof(int),
+            RecordDataCode.Int64 => typeof(long),
+            RecordDataCode.SByte => typeof(sbyte),
+            RecordDataCode.Single => typeof(float),
+            RecordDataCode.String => typeof(string),
+            RecordDataCode.UInt16 => typeof(ushort),
+            RecordDataCode.UInt32 => typeof(uint),
+            RecordDataCode.UInt64 => typeof(ulong),
+            _ => null
         };
-    }
-
-    public static ColumnData MakeData(RecordDataType dt, int capacity, Type type)
-    {
-        return dt switch
-        {
-            RecordDataType.Boolean => new BooleanColumnData(capacity),
-            RecordDataType.Byte => new ByteColumnData(capacity),
-            RecordDataType.Char => new CharColumnData(capacity),
-            RecordDataType.DateTime => new DateTimeColumnData(capacity),
-            RecordDataType.Decimal => new DecimalColumnData(capacity),
-            RecordDataType.Double => new DoubleColumnData(capacity),
-            RecordDataType.Int16 => new Int16ColumnData(capacity),
-            RecordDataType.Int32 => new Int32ColumnData(capacity),
-            RecordDataType.Int64 => new Int64ColumnData(capacity),
-            RecordDataType.SByte => new SByteColumnData(capacity),
-            RecordDataType.Single => new SingleColumnData(capacity),
-            RecordDataType.String => new StringColumnData(capacity),
-            RecordDataType.UInt16 => new UInt16ColumnData(capacity),
-            RecordDataType.UInt32 => new UInt32ColumnData(capacity),
-            RecordDataType.UInt64 => new UInt64ColumnData(capacity),
-            RecordDataType.Object => MakeData(capacity, type),
-            _ => throw new NotSupportedException()
-        };
-    }
-
-    private static ColumnData MakeData(int capacity, Type type)
-    {
-        var factoryMethod = typeof(FactoryCache<>).MakeGenericType(type).GetField("Factory");
-        var factory = (Func<int, ColumnData>)factoryMethod!.GetValue(null)!;
-        return factory(capacity);
-    }
-
-    public static RecordDataType ReadDataType(BinaryReader reader)
-    {
-        byte codeValue = reader.ReadByte();
-        if (!Enum.IsDefined(typeof(RecordDataType), codeValue)) throw new InvalidDataException($"Invalid RecordDataType value: {codeValue}");
-        return (RecordDataType)codeValue;
-    }
-
-    public static void WriteDataType(BinaryWriter writer, RecordDataType type)
-    {
-        writer.Write((byte)type);
     }
 }
