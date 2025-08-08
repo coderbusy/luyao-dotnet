@@ -88,7 +88,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
         this.Count--;
         return true;
     }
-
+    private bool _isReading = false;
     /// <summary>
     /// 读取一行，成功返回 true，失败返回 false。
     /// 当游标位置已经到达最后一行时，重置游标到第一行并返回 false。
@@ -96,13 +96,23 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// <returns>如果成功读取到下一行则返回 true，否则返回 false。</returns>
     public bool Read()
     {
-        if (this.Cursor < this.Count)
+        if (this._isReading)
         {
-            this.Cursor++;
+            if (this.Cursor < this.Count - 1)
+            {
+                this.Cursor++;
+                return true;
+            }
+            this._isReading = false;
+            return false;
+        }
+        else
+        {
+            if (this.Count == 0) return false;
+            this.Cursor = 0;
+            _isReading = true;
             return true;
         }
-        this.Cursor = 0;
-        return false;
     }
 
     /// <summary>

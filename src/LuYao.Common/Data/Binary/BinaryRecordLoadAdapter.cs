@@ -44,6 +44,8 @@ public class BinaryRecordLoadAdapter : RecordLoadAdapter
     /// </summary>
     private int _columnIndex = 0;
 
+    private bool _isReading = false;
+
     /// <summary>
     /// 获取键类型，对于二进制适配器始终返回 <see cref="RecordLoadKeyKind.Index"/>。
     /// </summary>
@@ -100,7 +102,7 @@ public class BinaryRecordLoadAdapter : RecordLoadAdapter
     {
         if (_remainRow <= 0) return false;
         _remainRow--;
-        _columnIndex = 0;
+        _isReading = false;
         return true;
     }
 
@@ -113,9 +115,22 @@ public class BinaryRecordLoadAdapter : RecordLoadAdapter
     /// </remarks>
     public override bool ReadField()
     {
-        if (_columnIndex >= _totalColumn) return false;
-        _columnIndex++;
-        return true;
+        if (_isReading)
+        {
+            if (_columnIndex < _totalColumn - 1)
+            {
+                _columnIndex++;
+                return true;
+            }
+
+            return false;
+        }
+        else
+        {
+            _isReading = true;
+            _columnIndex = 0;
+            return true;
+        }
     }
 
     /// <summary>
