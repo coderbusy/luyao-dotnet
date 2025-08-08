@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace LuYao.Data;
 /// <summary>
 /// 列存储数据集合
 /// </summary>
+[DebuggerTypeProxy(typeof(RecordDebuggerTypeProxy))]
 public partial class Record : IEnumerable<RecordRow>, IRecordCursor
 {
     /// <summary>
@@ -76,7 +78,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// <summary>
     /// 删除当前游标位置的行。
     /// </summary>
-    public void Delete() => this.Delete(this.Cursor);
+    public bool Delete() => this.Delete(this.Cursor);
 
     /// <summary>
     /// 删除指定索引的行。
@@ -712,40 +714,68 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public void Save(RecordSaveAdapter adapter)
     {
         if (adapter == null) throw new ArgumentNullException(nameof(adapter));
-        var header = new RecordHeader(this);
-        adapter.WriteHeader(header);
-        if (this.Columns.Count <= 0) return;
-        foreach (var column in this.Columns) adapter.WriteColumn(new RecordColumnInfo(column));
-        // 将表头信息写入适配器
-        this.MoveFirst();
-        while (this.Read())
+        adapter.WriteStart();
+        foreach (var section in adapter.Layout)
         {
-            adapter.WriteStarRow();
-            for (int i = 0; i < Columns.Count; i++)
+            switch (section)
             {
-                RecordColumn col = this.Columns[i];
-                switch (col.Code)
-                {
-                    case RecordDataCode.Boolean: adapter.WriteBoolean(col.Name, i, col.GetBoolean()); break;
-                    case RecordDataCode.Byte: adapter.WriteByte(col.Name, i, col.GetByte()); break;
-                    case RecordDataCode.Char: adapter.WriteChar(col.Name, i, col.GetChar()); break;
-                    case RecordDataCode.DateTime: adapter.WriteDateTime(col.Name, i, col.GetDateTime()); break;
-                    case RecordDataCode.Decimal: adapter.WriteDecimal(col.Name, i, col.GetDecimal()); break;
-                    case RecordDataCode.Double: adapter.WriteDouble(col.Name, i, col.GetDouble()); break;
-                    case RecordDataCode.Int16: adapter.WriteInt16(col.Name, i, col.GetInt16()); break;
-                    case RecordDataCode.Int32: adapter.WriteInt32(col.Name, i, col.GetInt32()); break;
-                    case RecordDataCode.Int64: adapter.WriteInt64(col.Name, i, col.GetInt64()); break;
-                    case RecordDataCode.SByte: adapter.WriteSByte(col.Name, i, col.GetSByte()); break;
-                    case RecordDataCode.Single: adapter.WriteSingle(col.Name, i, col.GetSingle()); break;
-                    case RecordDataCode.String: adapter.WriteString(col.Name, i, col.GetString()); break;
-                    case RecordDataCode.UInt16: adapter.WriteUInt16(col.Name, i, col.GetUInt16()); break;
-                    case RecordDataCode.UInt32: adapter.WriteUInt32(col.Name, i, col.GetUInt32()); break;
-                    case RecordDataCode.UInt64: adapter.WriteUInt64(col.Name, i, col.GetUInt64()); break;
-                    default: adapter.WriteObject(col.Name, i, col.GetValue(this.Cursor)); break;
-                }
+                case RecordSection.Head:
+                    {
+                        adapter.WriteStartSection(section);
+                        var header = new RecordHeader(this);
+                        adapter.WriteHeader(header);
+                        adapter.WriteEndSection();
+                    }
+                    break;
+                case RecordSection.Columns:
+                    if (this.Columns.Count > 0)
+                    {
+                        adapter.WriteStartSection(section);
+                        foreach (var column in this.Columns) adapter.WriteColumn(new RecordColumnInfo(column));
+                        adapter.WriteEndSection();
+                    }
+                    break;
+                case RecordSection.Rows:
+
+                    if (this.Count > 0)
+                    {
+                        this.MoveFirst();
+                        adapter.WriteStartSection(section);
+                        while (this.Read())
+                        {
+                            adapter.WriteStarRow();
+                            for (int i = 0; i < Columns.Count; i++)
+                            {
+                                RecordColumn col = this.Columns[i];
+                                switch (col.Code)
+                                {
+                                    case RecordDataCode.Boolean: adapter.WriteBoolean(col.Name, i, col.GetBoolean()); break;
+                                    case RecordDataCode.Byte: adapter.WriteByte(col.Name, i, col.GetByte()); break;
+                                    case RecordDataCode.Char: adapter.WriteChar(col.Name, i, col.GetChar()); break;
+                                    case RecordDataCode.DateTime: adapter.WriteDateTime(col.Name, i, col.GetDateTime()); break;
+                                    case RecordDataCode.Decimal: adapter.WriteDecimal(col.Name, i, col.GetDecimal()); break;
+                                    case RecordDataCode.Double: adapter.WriteDouble(col.Name, i, col.GetDouble()); break;
+                                    case RecordDataCode.Int16: adapter.WriteInt16(col.Name, i, col.GetInt16()); break;
+                                    case RecordDataCode.Int32: adapter.WriteInt32(col.Name, i, col.GetInt32()); break;
+                                    case RecordDataCode.Int64: adapter.WriteInt64(col.Name, i, col.GetInt64()); break;
+                                    case RecordDataCode.SByte: adapter.WriteSByte(col.Name, i, col.GetSByte()); break;
+                                    case RecordDataCode.Single: adapter.WriteSingle(col.Name, i, col.GetSingle()); break;
+                                    case RecordDataCode.String: adapter.WriteString(col.Name, i, col.GetString()); break;
+                                    case RecordDataCode.UInt16: adapter.WriteUInt16(col.Name, i, col.GetUInt16()); break;
+                                    case RecordDataCode.UInt32: adapter.WriteUInt32(col.Name, i, col.GetUInt32()); break;
+                                    case RecordDataCode.UInt64: adapter.WriteUInt64(col.Name, i, col.GetUInt64()); break;
+                                    default: adapter.WriteObject(col.Name, i, col.GetValue(this.Cursor)); break;
+                                }
+                            }
+                            adapter.WriteEndRow();
+                        }
+                        adapter.WriteEndSection();
+                    }
+                    break;
+                default: throw new NotSupportedException("未知的记录适配器布局类型：" + section);
             }
-            adapter.WriteEndRow();
         }
+        adapter.WriteEnd();
     }
 
     /// <summary>
@@ -767,52 +797,67 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public static Record Load(RecordLoadAdapter adapter)
     {
         if (adapter == null) throw new ArgumentNullException(nameof(adapter));
-        var header = adapter.ReadHeader();
-        var record = new Record(header.Name, header.Count);
-        if (header.Columns <= 0) return record;
-        for (int i = 0; i < header.Columns; i++)
+        var record = new Record();
+        RecordHeader? header = null;
+        int rows = 0, cols = 0;
+        while (adapter.ReadSection())
         {
-            var col = adapter.ReadColumn();
-            record.Columns.Add(col.Name, col.Type);
-        }
-        if (header.Count > 0)
-        {
-            while (adapter.ReadRow())
+            switch (adapter.Section)
             {
-                record.AddRow();
-                while (adapter.ReadField())
-                {
-                    RecordColumn? col = null;
-                    switch (adapter.KeyKind)
+                case RecordSection.Head:
+                    header = adapter.ReadHeader();
+                    rows = header.Count;
+                    cols = header.Columns;
+                    if (!string.IsNullOrWhiteSpace(header.Name)) record.Name = header.Name;
+                    break;
+                case RecordSection.Rows:
+
+                    while (adapter.ReadRow())
                     {
-                        case RecordLoadKeyKind.Name:
-                            col = record.Columns.Find(adapter.Name);
-                            break;
-                        case RecordLoadKeyKind.Index:
-                            col = record.Columns[adapter.Index];
-                            break;
+                        record.AddRow();
+                        while (adapter.ReadField())
+                        {
+                            RecordColumn? col = null;
+                            switch (adapter.KeyKind)
+                            {
+                                case RecordLoadKeyKind.Name:
+                                    col = record.Columns.Find(adapter.Name);
+                                    break;
+                                case RecordLoadKeyKind.Index:
+                                    col = record.Columns[adapter.Index];
+                                    break;
+                            }
+                            if (col == null) continue; // 如果列不存在，跳过
+                            switch (col.Code)
+                            {
+                                case RecordDataCode.Boolean: col.Set(adapter.ReadBoolean()); break;
+                                case RecordDataCode.Byte: col.Set(adapter.ReadByte()); break;
+                                case RecordDataCode.Char: col.Set(adapter.ReadChar()); break;
+                                case RecordDataCode.DateTime: col.Set(adapter.ReadDateTime()); break;
+                                case RecordDataCode.Decimal: col.Set(adapter.ReadDecimal()); break;
+                                case RecordDataCode.Double: col.Set(adapter.ReadDouble()); break;
+                                case RecordDataCode.Int16: col.Set(adapter.ReadInt16()); break;
+                                case RecordDataCode.Int32: col.Set(adapter.ReadInt32()); break;
+                                case RecordDataCode.Int64: col.Set(adapter.ReadInt64()); break;
+                                case RecordDataCode.SByte: col.Set(adapter.ReadSByte()); break;
+                                case RecordDataCode.Single: col.Set(adapter.ReadSingle()); break;
+                                case RecordDataCode.String: col.Set(adapter.ReadString()); break;
+                                case RecordDataCode.UInt16: col.Set(adapter.ReadUInt16()); break;
+                                case RecordDataCode.UInt32: col.Set(adapter.ReadUInt32()); break;
+                                case RecordDataCode.UInt64: col.Set(adapter.ReadUInt64()); break;
+                                default: col.SetValue(adapter.ReadObject(col.Type), record.Cursor); break;
+                            }
+                        }
                     }
-                    if (col == null) continue; // 如果列不存在，跳过
-                    switch (col.Code)
+                    break;
+                case RecordSection.Columns:
+                    for (int i = 0; i < cols; i++)
                     {
-                        case RecordDataCode.Boolean: col.Set(adapter.ReadBoolean()); break;
-                        case RecordDataCode.Byte: col.Set(adapter.ReadByte()); break;
-                        case RecordDataCode.Char: col.Set(adapter.ReadChar()); break;
-                        case RecordDataCode.DateTime: col.Set(adapter.ReadDateTime()); break;
-                        case RecordDataCode.Decimal: col.Set(adapter.ReadDecimal()); break;
-                        case RecordDataCode.Double: col.Set(adapter.ReadDouble()); break;
-                        case RecordDataCode.Int16: col.Set(adapter.ReadInt16()); break;
-                        case RecordDataCode.Int32: col.Set(adapter.ReadInt32()); break;
-                        case RecordDataCode.Int64: col.Set(adapter.ReadInt64()); break;
-                        case RecordDataCode.SByte: col.Set(adapter.ReadSByte()); break;
-                        case RecordDataCode.Single: col.Set(adapter.ReadSingle()); break;
-                        case RecordDataCode.String: col.Set(adapter.ReadString()); break;
-                        case RecordDataCode.UInt16: col.Set(adapter.ReadUInt16()); break;
-                        case RecordDataCode.UInt32: col.Set(adapter.ReadUInt32()); break;
-                        case RecordDataCode.UInt64: col.Set(adapter.ReadUInt64()); break;
-                        default: col.SetValue(adapter.ReadObject(col.Type), record.Cursor); break;
+                        var col = adapter.ReadColumn();
+                        record.Columns.Add(col.Name, col.Type);
                     }
-                }
+                    break;
+                default: throw new NotSupportedException("未知的记录适配器布局类型：" + adapter.Section);
             }
         }
         return record;

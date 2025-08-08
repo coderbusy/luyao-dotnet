@@ -28,7 +28,7 @@ public class BinaryRecordLoadAdapter : RecordLoadAdapter
     {
         this.Reader = reader ?? throw new ArgumentNullException(nameof(reader));
     }
-
+    private RecordSection _section = RecordSection.Head;
     /// <summary>
     /// 剩余未读取的行数。
     /// </summary>
@@ -63,6 +63,9 @@ public class BinaryRecordLoadAdapter : RecordLoadAdapter
     /// </summary>
     /// <value>空字符串，因为此适配器基于索引而非名称。</value>
     public override string Name => string.Empty;
+
+    /// <inheritdoc/>
+    public override RecordSection Section => _section;
 
     /// <summary>
     /// 从二进制流中读取记录头信息。
@@ -237,4 +240,13 @@ public class BinaryRecordLoadAdapter : RecordLoadAdapter
     /// </summary>
     /// <returns>读取的 64 位无符号整数值。</returns>
     public override ulong ReadUInt64() => this.Reader.ReadUInt64();
+
+    /// <inheritdoc/>
+    public override bool ReadSection()
+    {
+        var s = this.Reader.BaseStream;
+        if (s.Position >= s.Length) return false;
+        this._section = (RecordSection)this.Reader.ReadInt32();
+        return true;
+    }
 }

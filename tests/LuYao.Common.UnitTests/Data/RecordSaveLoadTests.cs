@@ -172,7 +172,7 @@ public class RecordSaveLoadTests
         memoryStream.Position = 0;
 
         // Act
-        using var reader = new BinaryReader(memoryStream);
+        using var reader = new BinaryReader(memoryStream, Encoding.UTF8);
         var loadAdapter = new BinaryRecordLoadAdapter(reader);
         var loadedRecord = Record.Load(loadAdapter);
 
