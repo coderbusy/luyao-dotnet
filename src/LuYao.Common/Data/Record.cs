@@ -161,7 +161,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// <typeparam name="T">要获取的值的类型。</typeparam>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回转换后的值，否则返回默认值。</returns>
-    public T? Get<T>(RecordColumn col) => col.Record == this ? col.To<T>() : default;
+    public T? Get<T>(RecordColumn col) => col.Record == this ? col.Get<T>() : default;
 
     /// <summary>
     /// 根据列名获取当前游标位置的泛型类型值。
@@ -172,7 +172,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public T? Get<T>(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.To<T>() : default;
+        return col != null ? col.Get<T>() : default;
     }
 
     /// <summary>
@@ -183,7 +183,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Boolean GetBoolean(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToBoolean() : default;
+        return col != null ? col.GetBoolean() : default;
     }
 
     /// <summary>
@@ -191,7 +191,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回布尔值，否则通过列名获取。</returns>
-    public Boolean GetBoolean(RecordColumn col) => col.Record == this ? col.ToBoolean() : GetBoolean(col.Name);
+    public Boolean GetBoolean(RecordColumn col) => col.Record == this ? col.GetBoolean() : GetBoolean(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的字节值。
@@ -201,7 +201,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Byte GetByte(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToByte() : default;
+        return col != null ? col.GetByte() : default;
     }
 
     /// <summary>
@@ -209,7 +209,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回字节值，否则通过列名获取。</returns>
-    public Byte GetByte(RecordColumn col) => col.Record == this ? col.ToByte() : GetByte(col.Name);
+    public Byte GetByte(RecordColumn col) => col.Record == this ? col.GetByte() : GetByte(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的字符值。
@@ -219,7 +219,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Char GetChar(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToChar() : default;
+        return col != null ? col.GetChar() : default;
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回字符值，否则通过列名获取。</returns>
-    public Char GetChar(RecordColumn col) => col.Record == this ? col.ToChar() : GetChar(col.Name);
+    public Char GetChar(RecordColumn col) => col.Record == this ? col.GetChar() : GetChar(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的日期时间值。
@@ -237,7 +237,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public DateTime GetDateTime(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToDateTime() : default;
+        return col != null ? col.GetDateTime() : default;
     }
 
     /// <summary>
@@ -245,7 +245,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回日期时间值，否则通过列名获取。</returns>
-    public DateTime GetDateTime(RecordColumn col) => col.Record == this ? col.ToDateTime() : GetDateTime(col.Name);
+    public DateTime GetDateTime(RecordColumn col) => col.Record == this ? col.GetDateTime() : GetDateTime(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的十进制数值。
@@ -255,7 +255,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Decimal GetDecimal(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToDecimal() : default;
+        return col != null ? col.GetDecimal() : default;
     }
 
     /// <summary>
@@ -263,7 +263,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回十进制数值，否则通过列名获取。</returns>
-    public Decimal GetDecimal(RecordColumn col) => col.Record == this ? col.ToDecimal() : GetDecimal(col.Name);
+    public Decimal GetDecimal(RecordColumn col) => col.Record == this ? col.GetDecimal() : GetDecimal(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的双精度浮点数值。
@@ -273,7 +273,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Double GetDouble(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToDouble() : default;
+        return col != null ? col.GetDouble() : default;
     }
 
     /// <summary>
@@ -281,7 +281,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回双精度浮点数值，否则通过列名获取。</returns>
-    public Double GetDouble(RecordColumn col) => col.Record == this ? col.ToDouble() : GetDouble(col.Name);
+    public Double GetDouble(RecordColumn col) => col.Record == this ? col.GetDouble() : GetDouble(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的16位有符号整数值。
@@ -291,7 +291,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Int16 GetInt16(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToInt16() : default;
+        return col != null ? col.GetInt16() : default;
     }
 
     /// <summary>
@@ -299,7 +299,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回16位有符号整数值，否则通过列名获取。</returns>
-    public Int16 GetInt16(RecordColumn col) => col.Record == this ? col.ToInt16() : GetInt16(col.Name);
+    public Int16 GetInt16(RecordColumn col) => col.Record == this ? col.GetInt16() : GetInt16(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的32位有符号整数值。
@@ -309,7 +309,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Int32 GetInt32(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToInt32() : default;
+        return col != null ? col.GetInt32() : default;
     }
 
     /// <summary>
@@ -317,7 +317,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回32位有符号整数值，否则通过列名获取。</returns>
-    public Int32 GetInt32(RecordColumn col) => col.Record == this ? col.ToInt32() : GetInt32(col.Name);
+    public Int32 GetInt32(RecordColumn col) => col.Record == this ? col.GetInt32() : GetInt32(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的64位有符号整数值。
@@ -327,7 +327,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Int64 GetInt64(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToInt64() : default;
+        return col != null ? col.GetInt64() : default;
     }
 
     /// <summary>
@@ -335,7 +335,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回64位有符号整数值，否则通过列名获取。</returns>
-    public Int64 GetInt64(RecordColumn col) => col.Record == this ? col.ToInt64() : GetInt64(col.Name);
+    public Int64 GetInt64(RecordColumn col) => col.Record == this ? col.GetInt64() : GetInt64(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的8位有符号整数值。
@@ -345,7 +345,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public SByte GetSByte(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToSByte() : default;
+        return col != null ? col.GetSByte() : default;
     }
 
     /// <summary>
@@ -353,7 +353,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回8位有符号整数值，否则通过列名获取。</returns>
-    public SByte GetSByte(RecordColumn col) => col.Record == this ? col.ToSByte() : GetSByte(col.Name);
+    public SByte GetSByte(RecordColumn col) => col.Record == this ? col.GetSByte() : GetSByte(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的单精度浮点数值。
@@ -363,7 +363,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public Single GetSingle(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToSingle() : default;
+        return col != null ? col.GetSingle() : default;
     }
 
     /// <summary>
@@ -371,7 +371,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回单精度浮点数值，否则通过列名获取。</returns>
-    public Single GetSingle(RecordColumn col) => col.Record == this ? col.ToSingle() : GetSingle(col.Name);
+    public Single GetSingle(RecordColumn col) => col.Record == this ? col.GetSingle() : GetSingle(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的字符串值。
@@ -381,7 +381,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public String? GetString(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToString() : default;
+        return col != null ? col.GetString() : default;
     }
 
     /// <summary>
@@ -389,7 +389,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回字符串值，否则通过列名获取。</returns>
-    public String? GetString(RecordColumn col) => col.Record == this ? col.ToString() : GetString(col.Name);
+    public String? GetString(RecordColumn col) => col.Record == this ? col.GetString() : GetString(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的16位无符号整数值。
@@ -399,7 +399,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public UInt16 GetUInt16(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToUInt16() : default;
+        return col != null ? col.GetUInt16() : default;
     }
 
     /// <summary>
@@ -407,7 +407,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回16位无符号整数值，否则通过列名获取。</returns>
-    public UInt16 GetUInt16(RecordColumn col) => col.Record == this ? col.ToUInt16() : GetUInt16(col.Name);
+    public UInt16 GetUInt16(RecordColumn col) => col.Record == this ? col.GetUInt16() : GetUInt16(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的32位无符号整数值。
@@ -417,7 +417,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public UInt32 GetUInt32(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToUInt32() : default;
+        return col != null ? col.GetUInt32() : default;
     }
 
     /// <summary>
@@ -425,7 +425,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回32位无符号整数值，否则通过列名获取。</returns>
-    public UInt32 GetUInt32(RecordColumn col) => col.Record == this ? col.ToUInt32() : GetUInt32(col.Name);
+    public UInt32 GetUInt32(RecordColumn col) => col.Record == this ? col.GetUInt32() : GetUInt32(col.Name);
 
     /// <summary>
     /// 根据列名获取当前游标位置的64位无符号整数值。
@@ -435,7 +435,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     public UInt64 GetUInt64(string name)
     {
         var col = this.Columns.Find(name);
-        return col != null ? col.ToUInt64() : default;
+        return col != null ? col.GetUInt64() : default;
     }
 
     /// <summary>
@@ -443,7 +443,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// </summary>
     /// <param name="col">要获取值的列。</param>
     /// <returns>如果列属于此记录则返回64位无符号整数值，否则通过列名获取。</returns>
-    public UInt64 GetUInt64(RecordColumn col) => col.Record == this ? col.ToUInt64() : GetUInt64(col.Name);
+    public UInt64 GetUInt64(RecordColumn col) => col.Record == this ? col.GetUInt64() : GetUInt64(col.Name);
     #endregion
 
     #region IDataReader
@@ -510,7 +510,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
 
                 for (int i = 0; i < Count; i++)
                 {
-                    string s = col.ToString(i);
+                    string s = col.GetString(i);
                     int len = bLength(s);
                     if (len > MAX_LENGTH)
                     {

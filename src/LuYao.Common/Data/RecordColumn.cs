@@ -81,6 +81,19 @@ public abstract class RecordColumn
     public abstract int Capacity { get; }
     internal abstract void Extend(int length);
 
+    ///  <inheritdoc/>
+    public override string ToString()
+    {
+        if (this.Code != RecordDataCode.Object)
+        {
+            return $"{this.Name},{this.Code}";
+        }
+        else
+        {
+            return $"{this.Name},{this.Type.FullName}";
+        }
+    }
+
     internal void OnSet(int row)
     {
         if (row == 0 && this.Record.Count == 0)
@@ -293,7 +306,7 @@ public abstract class RecordColumn
 
     #endregion
 
-    #region To
+    #region Get
 
     /// <summary>
     /// 获取指定行的值并转换为指定的泛型类型。
@@ -303,7 +316,7 @@ public abstract class RecordColumn
     /// <returns>转换后的值，如果原值为 null 则返回类型 T 的默认值。</returns>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
     /// <exception cref="InvalidCastException">当值无法转换为目标类型时抛出。</exception>
-    public virtual T? To<T>(int row)
+    public virtual T? Get<T>(int row)
     {
         OnGet(row);
         object? value = this.GetValue(row);
@@ -318,201 +331,201 @@ public abstract class RecordColumn
     /// <typeparam name="T">要转换到的目标类型。</typeparam>
     /// <returns>转换后的值，如果原值为 null 则返回类型 T 的默认值。</returns>
     /// <exception cref="InvalidCastException">当值无法转换为目标类型时抛出。</exception>
-    public T? To<T>() => this.To<T>(this.Record.Cursor);
+    public T? Get<T>() => this.Get<T>(this.Record.Cursor);
 
     /// <summary>
     /// 获取指定行的值并转换为布尔值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的布尔值。</returns>
-    public virtual Boolean ToBoolean(int row) => Valid.ToBoolean(this.GetValue(row));
+    public virtual Boolean GetBoolean(int row) => Valid.ToBoolean(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为字节值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的字节值。</returns>
-    public virtual Byte ToByte(int row) => Valid.ToByte(this.GetValue(row));
+    public virtual Byte GetByte(int row) => Valid.ToByte(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为字符值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的字符值。</returns>
-    public virtual Char ToChar(int row) => Valid.ToChar(this.GetValue(row));
+    public virtual Char GetChar(int row) => Valid.ToChar(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为日期时间值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的日期时间值。</returns>
-    public virtual DateTime ToDateTime(int row) => Valid.ToDateTime(this.GetValue(row));
+    public virtual DateTime GetDateTime(int row) => Valid.ToDateTime(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为十进制数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的十进制数值。</returns>
-    public virtual Decimal ToDecimal(int row) => Valid.ToDecimal(this.GetValue(row));
+    public virtual Decimal GetDecimal(int row) => Valid.ToDecimal(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为双精度浮点数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的双精度浮点数值。</returns>
-    public virtual Double ToDouble(int row) => Valid.ToDouble(this.GetValue(row));
+    public virtual Double GetDouble(int row) => Valid.ToDouble(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为16位有符号整数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的16位有符号整数值。</returns>
-    public virtual Int16 ToInt16(int row) => Valid.ToInt16(this.GetValue(row));
+    public virtual Int16 GetInt16(int row) => Valid.ToInt16(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为32位有符号整数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的32位有符号整数值。</returns>
-    public virtual Int32 ToInt32(int row) => Valid.ToInt32(this.GetValue(row));
+    public virtual Int32 GetInt32(int row) => Valid.ToInt32(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为64位有符号整数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的64位有符号整数值。</returns>
-    public virtual Int64 ToInt64(int row) => Valid.ToInt64(this.GetValue(row));
+    public virtual Int64 GetInt64(int row) => Valid.ToInt64(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为8位有符号整数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的8位有符号整数值。</returns>
-    public virtual SByte ToSByte(int row) => Valid.ToSByte(this.GetValue(row));
+    public virtual SByte GetSByte(int row) => Valid.ToSByte(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为单精度浮点数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的单精度浮点数值。</returns>
-    public virtual Single ToSingle(int row) => Valid.ToSingle(this.GetValue(row));
+    public virtual Single GetSingle(int row) => Valid.ToSingle(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为字符串。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的字符串值。</returns>
-    public virtual String ToString(int row) => Valid.ToString(this.GetValue(row));
+    public virtual String GetString(int row) => Valid.ToString(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为16位无符号整数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的16位无符号整数值。</returns>
-    public virtual UInt16 ToUInt16(int row) => Valid.ToUInt16(this.GetValue(row));
+    public virtual UInt16 GetUInt16(int row) => Valid.ToUInt16(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为32位无符号整数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的32位无符号整数值。</returns>
-    public virtual UInt32 ToUInt32(int row) => Valid.ToUInt32(this.GetValue(row));
+    public virtual UInt32 GetUInt32(int row) => Valid.ToUInt32(this.GetValue(row));
 
     /// <summary>
     /// 获取指定行的值并转换为64位无符号整数值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>转换后的64位无符号整数值。</returns>
-    public virtual UInt64 ToUInt64(int row) => Valid.ToUInt64(this.GetValue(row));
+    public virtual UInt64 GetUInt64(int row) => Valid.ToUInt64(this.GetValue(row));
 
     /// <summary>
     /// 获取当前游标位置的值并转换为布尔值。
     /// </summary>
     /// <returns>转换后的布尔值。</returns>
-    public Boolean ToBoolean() => this.ToBoolean(this.Record.Cursor);
+    public Boolean GetBoolean() => this.GetBoolean(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为字节值。
     /// </summary>
     /// <returns>转换后的字节值。</returns>
-    public Byte ToByte() => this.ToByte(this.Record.Cursor);
+    public Byte GetByte() => this.GetByte(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为字符值。
     /// </summary>
     /// <returns>转换后的字符值。</returns>
-    public Char ToChar() => this.ToChar(this.Record.Cursor);
+    public Char GetChar() => this.GetChar(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为日期时间值。
     /// </summary>
     /// <returns>转换后的日期时间值。</returns>
-    public DateTime ToDateTime() => this.ToDateTime(this.Record.Cursor);
+    public DateTime GetDateTime() => this.GetDateTime(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为十进制数值。
     /// </summary>
     /// <returns>转换后的十进制数值。</returns>
-    public Decimal ToDecimal() => this.ToDecimal(this.Record.Cursor);
+    public Decimal GetDecimal() => this.GetDecimal(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为双精度浮点数值。
     /// </summary>
     /// <returns>转换后的双精度浮点数值。</returns>
-    public Double ToDouble() => this.ToDouble(this.Record.Cursor);
+    public Double GetDouble() => this.GetDouble(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为16位有符号整数值。
     /// </summary>
     /// <returns>转换后的16位有符号整数值。</returns>
-    public Int16 ToInt16() => this.ToInt16(this.Record.Cursor);
+    public Int16 GetInt16() => this.GetInt16(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为32位有符号整数值。
     /// </summary>
     /// <returns>转换后的32位有符号整数值。</returns>
-    public Int32 ToInt32() => this.ToInt32(this.Record.Cursor);
+    public Int32 GetInt32() => this.GetInt32(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为64位有符号整数值。
     /// </summary>
     /// <returns>转换后的64位有符号整数值。</returns>
-    public Int64 ToInt64() => this.ToInt64(this.Record.Cursor);
+    public Int64 GetInt64() => this.GetInt64(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为8位有符号整数值。
     /// </summary>
     /// <returns>转换后的8位有符号整数值。</returns>
-    public SByte ToSByte() => this.ToSByte(this.Record.Cursor);
+    public SByte GetSByte() => this.GetSByte(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为单精度浮点数值。
     /// </summary>
     /// <returns>转换后的单精度浮点数值。</returns>
-    public Single ToSingle() => this.ToSingle(this.Record.Cursor);
+    public Single GetSingle() => this.GetSingle(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为字符串。
     /// </summary>
     /// <returns>转换后的字符串值。</returns>
-    public override String ToString() => this.ToString(this.Record.Cursor);
+    public String GetString() => this.GetString(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为16位无符号整数值。
     /// </summary>
     /// <returns>转换后的16位无符号整数值。</returns>
-    public UInt16 ToUInt16() => this.ToUInt16(this.Record.Cursor);
+    public UInt16 GetUInt16() => this.GetUInt16(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为32位无符号整数值。
     /// </summary>
     /// <returns>转换后的32位无符号整数值。</returns>
-    public UInt32 ToUInt32() => this.ToUInt32(this.Record.Cursor);
+    public UInt32 GetUInt32() => this.GetUInt32(this.Record.Cursor);
 
     /// <summary>
     /// 获取当前游标位置的值并转换为64位无符号整数值。
     /// </summary>
     /// <returns>转换后的64位无符号整数值。</returns>
-    public UInt64 ToUInt64() => this.ToUInt64(this.Record.Cursor);
+    public UInt64 GetUInt64() => this.GetUInt64(this.Record.Cursor);
     #endregion
 }

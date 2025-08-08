@@ -124,105 +124,105 @@ public sealed class Int16RecordColumn : RecordColumn<Int16>
     #region To
 
     /// <inheritdoc/>
-    public override Boolean ToBoolean(Int32 row)
+    public override Boolean GetBoolean(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToBoolean(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override Byte ToByte(Int32 row)
+    public override Byte GetByte(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToByte(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override Char ToChar(Int32 row)
+    public override Char GetChar(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToChar(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override DateTime ToDateTime(Int32 row)
+    public override DateTime GetDateTime(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToDateTime(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override Decimal ToDecimal(Int32 row)
+    public override Decimal GetDecimal(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToDecimal(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override Double ToDouble(Int32 row)
+    public override Double GetDouble(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToDouble(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override Int16 ToInt16(Int32 row)
+    public override Int16 GetInt16(Int32 row)
     {
         this.OnGet(row);
         return this._data[row];
     }
 
     /// <inheritdoc/>
-    public override Int32 ToInt32(Int32 row)
+    public override Int32 GetInt32(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToInt32(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override Int64 ToInt64(Int32 row)
+    public override Int64 GetInt64(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToInt64(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override SByte ToSByte(Int32 row)
+    public override SByte GetSByte(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToSByte(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override Single ToSingle(Int32 row)
+    public override Single GetSingle(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToSingle(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override String ToString(Int32 row)
+    public override String GetString(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToString(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override UInt16 ToUInt16(Int32 row)
+    public override UInt16 GetUInt16(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToUInt16(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override UInt32 ToUInt32(Int32 row)
+    public override UInt32 GetUInt32(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToUInt32(this._data[row]);
     }
 
     /// <inheritdoc/>
-    public override UInt64 ToUInt64(Int32 row)
+    public override UInt64 GetUInt64(Int32 row)
     {
         this.OnGet(row);
         return Valid.ToUInt64(this._data[row]);
