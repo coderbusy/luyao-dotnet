@@ -655,13 +655,23 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// 此方法会创建目标类型的新实例，并将记录第一行的数据填充到对象的相应属性中。
     /// 如果记录中没有数据，返回的对象将包含属性的默认值。
     /// </remarks>
-    public T To<T>() where T : class, new()
+    public T To<T>() where T : class, new() => this.To<T>(this.Cursor);
+
+    /// <summary>
+    /// 将记录的第一行数据转换为指定类型的对象。
+    /// </summary>
+    /// <typeparam name="T">要转换到的目标类型，必须为引用类型且具有无参构造函数。</typeparam>
+    /// <returns>根据记录数据创建的对象实例。如果记录为空，返回具有默认值的对象实例。</returns>
+    /// <remarks>
+    /// 此方法会创建目标类型的新实例，并将记录第一行的数据填充到对象的相应属性中。
+    /// 如果记录中没有数据，返回的对象将包含属性的默认值。
+    /// </remarks>
+    public T To<T>(int row) where T : class, new()
     {
         var item = new T();
-        if (this.Count > 0) RecordLoader<T>.Populate(new RecordRow(this, 0), item);
+        if (this.Count > 0) RecordLoader<T>.Populate(new RecordRow(this, row), item);
         return item;
     }
-
     /// <summary>
     /// 将记录中的所有行数据转换为指定类型的对象列表。
     /// </summary>
