@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace LuYao.Data;
 
-static class RecordLoader<T> where T : class, new()
+static class RecordLoader<T> where T : class
 {
     private static readonly IReadOnlyList<Field> _fields = ReadFields();
 

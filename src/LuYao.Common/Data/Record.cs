@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 
 namespace LuYao.Data;
 
@@ -59,7 +61,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// <summary>
     /// 游标位置
     /// </summary>
-    public int Cursor { get; private set; } = 0;
+    public int Cursor { get; set; } = 0;
 
     /// <summary>
     /// 获取数据是否为空
@@ -576,6 +578,109 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
             else len++;
         }
         return len;
+    }
+    #endregion
+
+    #region Loader
+    /// <summary>
+    /// 向记录中添加一个对象并创建相应的列结构。
+    /// </summary>
+    /// <typeparam name="T">要添加的对象类型，必须为引用类型。</typeparam>
+    /// <param name="item">要添加的对象实例。</param>
+    /// <returns>新添加的行数据。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="item"/> 为 null 时抛出。</exception>
+    /// <remarks>
+    /// 此方法会根据对象的属性自动创建列结构，并添加一行数据。
+    /// 注意：该方法只创建列结构但不会将数据写入行中，需要手动设置数据。
+    /// </remarks>
+    public RecordRow Add<T>(T item) where T : class
+    {
+        if (item == null) throw new ArgumentNullException(nameof(item));
+        var row = this.AddRow();
+        RecordLoader<T>.WriteHeader(this);
+        return row;
+    }
+
+    /// <summary>
+    /// 从单个对象创建一个新的 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <typeparam name="T">要转换的对象类型，必须为引用类型。</typeparam>
+    /// <param name="item">用于创建记录的对象实例。</param>
+    /// <returns>包含该对象数据的新 <see cref="Record"/> 实例。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="item"/> 为 null 时抛出。</exception>
+    /// <remarks>
+    /// 此方法会根据对象的属性自动创建列结构，并将对象的属性值填充到记录中。
+    /// </remarks>
+    public static Record From<T>(T item) where T : class
+    {
+        if (item == null) throw new ArgumentNullException(nameof(item));
+        var record = new Record();
+        RecordLoader<T>.WriteHeader(record);
+        var row = record.AddRow();
+        RecordLoader<T>.WriteToRow(item, row);
+        return record;
+    }
+
+    /// <summary>
+    /// 从对象集合创建一个新的 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <typeparam name="T">集合中对象的类型，必须为引用类型。</typeparam>
+    /// <param name="items">用于创建记录的对象集合。</param>
+    /// <returns>包含集合中所有对象数据的新 <see cref="Record"/> 实例。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="items"/> 为 null 时抛出。</exception>
+    /// <remarks>
+    /// 此方法会根据对象的属性自动创建列结构，并将集合中每个非空对象的属性值填充到记录的相应行中。
+    /// 集合中的 null 值会被跳过。
+    /// </remarks>
+    public static Record FromList<T>(IEnumerable<T> items) where T : class
+    {
+        if (items == null) throw new ArgumentNullException(nameof(items));
+        var record = new Record();
+        RecordLoader<T>.WriteHeader(record);
+        foreach (var item in items)
+        {
+            if (item == null) continue;
+            var row = record.AddRow();
+            RecordLoader<T>.WriteToRow(item, row);
+        }
+        return record;
+    }
+
+    /// <summary>
+    /// 将记录的第一行数据转换为指定类型的对象。
+    /// </summary>
+    /// <typeparam name="T">要转换到的目标类型，必须为引用类型且具有无参构造函数。</typeparam>
+    /// <returns>根据记录数据创建的对象实例。如果记录为空，返回具有默认值的对象实例。</returns>
+    /// <remarks>
+    /// 此方法会创建目标类型的新实例，并将记录第一行的数据填充到对象的相应属性中。
+    /// 如果记录中没有数据，返回的对象将包含属性的默认值。
+    /// </remarks>
+    public T To<T>() where T : class, new()
+    {
+        var item = new T();
+        if (this.Count > 0) RecordLoader<T>.Populate(new RecordRow(this, 0), item);
+        return item;
+    }
+
+    /// <summary>
+    /// 将记录中的所有行数据转换为指定类型的对象列表。
+    /// </summary>
+    /// <typeparam name="T">要转换到的目标类型，必须为引用类型且具有无参构造函数。</typeparam>
+    /// <returns>包含记录中所有行数据转换后的对象列表。</returns>
+    /// <remarks>
+    /// 此方法会遍历记录中的每一行，为每行创建一个目标类型的新实例，
+    /// 并将行数据填充到对象的相应属性中。返回的列表容量与记录的行数相同。
+    /// </remarks>
+    public IList<T> ToList<T>() where T : class, new()
+    {
+        var ret = new List<T>(this.Count);
+        foreach (var row in this)
+        {
+            var item = new T();
+            RecordLoader<T>.Populate(row, item);
+            ret.Add(item);
+        }
+        return ret;
     }
     #endregion
 }

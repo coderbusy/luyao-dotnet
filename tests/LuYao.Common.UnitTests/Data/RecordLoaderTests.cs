@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -473,7 +474,7 @@ public class RecordLoaderTests
 
         // Act & Assert
         // 第二次调用应该抛出异常，因为列已经存在
-        Assert.ThrowsException<ArgumentException>(() =>
+        Assert.ThrowsException<DuplicateNameException>(() =>
         {
             RecordLoader<TestEntity>.WriteHeader(record);
         });

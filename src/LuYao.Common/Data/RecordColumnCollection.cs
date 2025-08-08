@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace LuYao.Data;
@@ -153,7 +154,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     private void OnAdd(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
-        if (this.Contains(name)) throw new ArgumentException($"列名 '{name}' 已经存在", nameof(name));
+        if (this.Contains(name)) throw new DuplicateNameException($"列名 '{name}' 已经存在");
     }
 
     /// <summary>

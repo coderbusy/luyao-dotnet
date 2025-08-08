@@ -1081,7 +1081,7 @@ public class RecordTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(DuplicateNameException))]
     public void Columns_AddDuplicateName_ThrowsException()
     {
         // Arrange
@@ -1093,7 +1093,7 @@ public class RecordTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(DuplicateNameException))]
     public void Columns_AddDuplicateNameDifferentType_ThrowsException()
     {
         // Arrange
