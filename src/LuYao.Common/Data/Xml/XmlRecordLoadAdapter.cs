@@ -17,8 +17,6 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
 {
     private RecordSection _section = RecordSection.Head;
     private string _name = string.Empty;
-    private readonly Dictionary<string, string> _currentAttributes = new();
-    private readonly Queue<string> _attributeNames = new();
 
     /// <summary>
     /// 获取用于读取XML数据的 <see cref="XmlReader"/> 实例。
@@ -143,8 +141,6 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
             if (this.Reader.NodeType != XmlNodeType.Element) continue;
             if (this.Reader.LocalName != "row") continue;
             if (this.Reader.HasAttributes == false) continue;
-            LoadCurrentAttributes();
-            PrepareFieldEnumeration();
             return true;
         }
         return false;
@@ -153,16 +149,27 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
     /// <inheritdoc/>
     public override bool ReadField()
     {
-        if (_attributeNames.Count > 0)
+        if (this.Reader.MoveToNextAttribute())
         {
-            _name = _attributeNames.Dequeue();
+            _name = this.Reader.Name;
             return true;
         }
+        return false;
+    }
+    private bool TryGetCurrentValue(out string value)
+    {
+        if (this.Reader.NodeType == XmlNodeType.Attribute)
+        {
+            value = this.Reader.Value;
+            return true;
+        }
+        value = string.Empty;
         return false;
     }
 
     /// <inheritdoc/>
     public override bool ReadBoolean() => TryGetCurrentValue(out var value) ? Valid.ToBoolean(value) : default;
+
 
     /// <inheritdoc/>
     public override byte ReadByte() => TryGetCurrentValue(out var value) ? Valid.ToByte(value) : default;
@@ -214,38 +221,5 @@ public class XmlRecordLoadAdapter : RecordLoadAdapter
     public override object? ReadObject(object type)
     {
         throw new NotImplementedException("复杂类型的XML读写暂不支持");
-    }
-
-    private void LoadCurrentAttributes()
-    {
-        _currentAttributes.Clear();
-
-        if (Reader.HasAttributes)
-        {
-            while (Reader.MoveToNextAttribute())
-            {
-                _currentAttributes[Reader.Name] = Reader.Value;
-            }
-        }
-    }
-
-    private void PrepareFieldEnumeration()
-    {
-        _attributeNames.Clear();
-
-        foreach (var attributeName in _currentAttributes.Keys)
-        {
-            _attributeNames.Enqueue(attributeName);
-        }
-    }
-
-    /// <summary>
-    /// 尝试获取当前字段的值。
-    /// </summary>
-    /// <param name="value">当前字段的值，如果字段不存在则为 null。</param>
-    /// <returns>如果成功获取到字段值则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
-    private bool TryGetCurrentValue(out string? value)
-    {
-        return _currentAttributes.TryGetValue(Name, out value);
     }
 }
