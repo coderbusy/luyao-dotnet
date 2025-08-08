@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using System.Runtime.Remoting.Messaging;
 
 namespace LuYao.Data;
 
@@ -40,5 +41,28 @@ static class Helpers
     {
         var ctor = GetConstructor(type);
         return ctor.Invoke(re, name, RecordDataCode.Object, type);
+    }
+
+    public static Type? ToType(RecordDataCode type)
+    {
+        return type switch
+        {
+            RecordDataCode.Boolean => typeof(bool),
+            RecordDataCode.Byte => typeof(byte),
+            RecordDataCode.Char => typeof(char),
+            RecordDataCode.DateTime => typeof(DateTime),
+            RecordDataCode.Decimal => typeof(decimal),
+            RecordDataCode.Double => typeof(double),
+            RecordDataCode.Int16 => typeof(short),
+            RecordDataCode.Int32 => typeof(int),
+            RecordDataCode.Int64 => typeof(long),
+            RecordDataCode.SByte => typeof(sbyte),
+            RecordDataCode.Single => typeof(float),
+            RecordDataCode.String => typeof(string),
+            RecordDataCode.UInt16 => typeof(ushort),
+            RecordDataCode.UInt32 => typeof(uint),
+            RecordDataCode.UInt64 => typeof(ulong),
+            _ => null
+        };
     }
 }

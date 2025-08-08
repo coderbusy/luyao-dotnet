@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LuYao.Data.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -58,15 +59,7 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// 数据条数
     /// </summary>
     public int Count { get; private set; } = 0;
-    /// <summary>
-    /// 游标位置
-    /// </summary>
-    public int Cursor { get; set; } = 0;
 
-    /// <summary>
-    /// 获取数据是否为空
-    /// </summary>
-    public bool IsEmpty { get { return Count > 0 ? false : true; } }
 
     /// <summary>
     /// 添加一行数据。
@@ -692,5 +685,177 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
         }
         return ret;
     }
+    #endregion
+
+    #region Adapter
+
+    public void Save(RecordSaveAdapter adapter)
+    {
+        if (adapter == null) throw new ArgumentNullException(nameof(adapter));
+        var header = new RecordHeader(this);
+        adapter.WriteHeader(header);
+        if (this.Columns.Count <= 0) return;
+        foreach (var column in this.Columns) adapter.WriteColumn(new RecordColumnInfo(column));
+        // 将表头信息写入适配器
+        this.MoveFirst();
+        while (this.Read())
+        {
+            adapter.WriteStarRow();
+            for (int i = 0; i < Columns.Count; i++)
+            {
+                RecordColumn col = this.Columns[i];
+                switch (col.Code)
+                {
+                    case RecordDataCode.Boolean: adapter.WriteBoolean(col.Name, i, col.GetBoolean()); break;
+                    case RecordDataCode.Byte: adapter.WriteByte(col.Name, i, col.GetByte()); break;
+                    case RecordDataCode.Char: adapter.WriteChar(col.Name, i, col.GetChar()); break;
+                    case RecordDataCode.DateTime: adapter.WriteDateTime(col.Name, i, col.GetDateTime()); break;
+                    case RecordDataCode.Decimal: adapter.WriteDecimal(col.Name, i, col.GetDecimal()); break;
+                    case RecordDataCode.Double: adapter.WriteDouble(col.Name, i, col.GetDouble()); break;
+                    case RecordDataCode.Int16: adapter.WriteInt16(col.Name, i, col.GetInt16()); break;
+                    case RecordDataCode.Int32: adapter.WriteInt32(col.Name, i, col.GetInt32()); break;
+                    case RecordDataCode.Int64: adapter.WriteInt64(col.Name, i, col.GetInt64()); break;
+                    case RecordDataCode.SByte: adapter.WriteSByte(col.Name, i, col.GetSByte()); break;
+                    case RecordDataCode.Single: adapter.WriteSingle(col.Name, i, col.GetSingle()); break;
+                    case RecordDataCode.String: adapter.WriteString(col.Name, i, col.GetString()); break;
+                    case RecordDataCode.UInt16: adapter.WriteUInt16(col.Name, i, col.GetUInt16()); break;
+                    case RecordDataCode.UInt32: adapter.WriteUInt32(col.Name, i, col.GetUInt32()); break;
+                    case RecordDataCode.UInt64: adapter.WriteUInt64(col.Name, i, col.GetUInt64()); break;
+                    default: adapter.WriteObject(col.Name, i, col.GetValue(this.Cursor)); break;
+                }
+            }
+            adapter.WriteEndRow();
+        }
+    }
+    public static Record Load(RecordLoadAdapter adapter)
+    {
+        if (adapter == null) throw new ArgumentNullException(nameof(adapter));
+        var header = adapter.ReadHeader();
+        var record = new Record(header.Name, header.Count);
+        if (header.Columns <= 0) return record;
+        for (int i = 0; i < header.Columns; i++)
+        {
+            var col = adapter.ReadColumn();
+            record.Columns.Add(col.Name, col.Type);
+        }
+        if (header.Count > 0)
+        {
+            while (adapter.ReadRow())
+            {
+                record.AddRow();
+                while (adapter.ReadField())
+                {
+                    RecordColumn? col = null;
+                    switch (adapter.KeyKind)
+                    {
+                        case RecordLoadKeyKind.Name:
+                            col = record.Columns.Find(adapter.Name);
+                            break;
+                        case RecordLoadKeyKind.Index:
+                            col = record.Columns[adapter.Index];
+                            break;
+                    }
+                    if (col == null) continue; // 如果列不存在，跳过
+                    switch (col.Code)
+                    {
+                        case RecordDataCode.Boolean: col.Set(adapter.ReadBoolean()); break;
+                        case RecordDataCode.Byte: col.Set(adapter.ReadByte()); break;
+                        case RecordDataCode.Char: col.Set(adapter.ReadChar()); break;
+                        case RecordDataCode.DateTime: col.Set(adapter.ReadDateTime()); break;
+                        case RecordDataCode.Decimal: col.Set(adapter.ReadDecimal()); break;
+                        case RecordDataCode.Double: col.Set(adapter.ReadDouble()); break;
+                        case RecordDataCode.Int16: col.Set(adapter.ReadInt16()); break;
+                        case RecordDataCode.Int32: col.Set(adapter.ReadInt32()); break;
+                        case RecordDataCode.Int64: col.Set(adapter.ReadInt64()); break;
+                        case RecordDataCode.SByte: col.Set(adapter.ReadSByte()); break;
+                        case RecordDataCode.Single: col.Set(adapter.ReadSingle()); break;
+                        case RecordDataCode.String: col.Set(adapter.ReadString()); break;
+                        case RecordDataCode.UInt16: col.Set(adapter.ReadUInt16()); break;
+                        case RecordDataCode.UInt32: col.Set(adapter.ReadUInt32()); break;
+                        case RecordDataCode.UInt64: col.Set(adapter.ReadUInt64()); break;
+                        default: col.SetValue(adapter.ReadObject(col.Type), record.Cursor); break;
+                    }
+                }
+            }
+        }
+        return record;
+    }
+    #endregion
+
+    #region Cursor
+    /// <summary>
+    /// 获取或设置当前游标位置，用于指示当前操作的行索引。
+    /// </summary>
+    /// <value>
+    /// 游标位置的整数值，范围从 0 到 <see cref="Count"/> - 1。
+    /// 当设置超出有效范围的值时，可能会导致数据访问异常。
+    /// </value>
+    /// <remarks>
+    /// 游标用于跟踪当前正在操作的数据行，许多数据读取和写入操作都基于当前游标位置执行。
+    /// </remarks>
+    public int Cursor { get; set; } = 0;
+
+    /// <summary>
+    /// 将游标移动到第一行（索引为 0）。
+    /// </summary>
+    /// <remarks>
+    /// 此方法将游标重置到数据集的开始位置。如果数据集为空，游标仍会被设置为 0。
+    /// </remarks>
+    public void MoveFirst() { this.Cursor = 0; }
+
+    /// <summary>
+    /// 将游标移动到最后一行。
+    /// </summary>
+    /// <remarks>
+    /// 此方法将游标设置为 <see cref="Count"/> - 1。如果数据集为空（<see cref="Count"/> 为 0），
+    /// 游标将被设置为 -1，这可能会在后续操作中导致异常。
+    /// </remarks>
+    public void MoveLast() { this.Cursor = this.Count - 1; }
+
+    /// <summary>
+    /// 获取一个值，该值指示数据集是否为空（不包含任何行）。
+    /// </summary>
+    /// <value>
+    /// 如果 <see cref="Count"/> 为 0，则为 <see langword="true"/>；否则为 <see langword="false"/>。
+    /// </value>
+    /// <remarks>
+    /// 此属性提供了一种简便的方法来检查数据集是否包含数据行。
+    /// </remarks>
+    public bool IsEmpty { get { return Count > 0 ? false : true; } }
+
+    /// <summary>
+    /// 获取一个值，该值指示当前游标是否位于第一行。
+    /// </summary>
+    /// <value>
+    /// 如果 <see cref="Cursor"/> 为 0，则为 <see langword="true"/>；否则为 <see langword="false"/>。
+    /// </value>
+    /// <remarks>
+    /// 此属性用于确定游标是否处于数据集的开始位置。
+    /// </remarks>
+    public bool IsFirst => this.Cursor == 0;
+
+    /// <summary>
+    /// 获取一个值，该值指示当前游标是否位于最后一行。
+    /// </summary>
+    /// <value>
+    /// 如果 <see cref="Cursor"/> 等于 <see cref="Count"/> - 1，则为 <see langword="true"/>；否则为 <see langword="false"/>。
+    /// </value>
+    /// <remarks>
+    /// 此属性用于确定游标是否处于数据集的末尾位置。当数据集为空时，此属性返回 <see langword="false"/>。
+    /// </remarks>
+    public bool IsLast => this.Cursor == this.Count - 1;
+
+    /// <summary>
+    /// 获取一个值，该值指示当前游标是否已超出记录范围或记录为空。
+    /// </summary>
+    /// <value>
+    /// 如果 <see cref="Cursor"/> 大于或等于 <see cref="Count"/>，或者 <see cref="Count"/> 为 0，
+    /// 则为 <see langword="true"/>；否则为 <see langword="false"/>。
+    /// </value>
+    /// <remarks>
+    /// 此属性用于检查游标是否处于无效位置，通常在遍历数据或执行读取操作前进行检查。
+    /// 当此属性返回 <see langword="true"/> 时，基于游标的数据操作可能会失败。
+    /// </remarks>
+    public bool IsEndOfRecord => this.Cursor >= this.Count || this.Count == 0;
     #endregion
 }
