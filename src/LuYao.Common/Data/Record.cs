@@ -689,6 +689,16 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
 
     #region Adapter
 
+    /// <summary>
+    /// 使用指定的适配器保存记录数据。
+    /// </summary>
+    /// <param name="adapter">用于保存数据的适配器，不能为 null。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="adapter"/> 为 null 时抛出。</exception>
+    /// <remarks>
+    /// 此方法会将记录的表头信息、列定义和所有行数据通过适配器写入目标存储。
+    /// 保存过程包括：写入记录头、写入列信息、遍历所有行并根据列的数据类型写入相应的值。
+    /// 保存过程中会重置游标到第一行，并在保存完成后游标位置可能发生变化。
+    /// </remarks>
     public void Save(RecordSaveAdapter adapter)
     {
         if (adapter == null) throw new ArgumentNullException(nameof(adapter));
@@ -727,6 +737,23 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
             adapter.WriteEndRow();
         }
     }
+
+    /// <summary>
+    /// 使用指定的适配器加载记录数据并创建新的 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <param name="adapter">用于加载数据的适配器，不能为 null。</param>
+    /// <returns>从适配器加载数据后创建的新 <see cref="Record"/> 实例。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="adapter"/> 为 null 时抛出。</exception>
+    /// <remarks>
+    /// 此方法会从适配器读取记录的完整结构和数据，包括：
+    /// <list type="number">
+    /// <item><description>读取记录头信息（名称、行数、列数）</description></item>
+    /// <item><description>读取所有列的定义信息（名称和类型）</description></item>
+    /// <item><description>读取所有行数据，根据列的数据类型进行相应的类型转换</description></item>
+    /// </list>
+    /// 加载过程中会根据适配器的键类型（名称或索引）来匹配相应的列，
+    /// 如果列不存在则跳过该字段的数据。
+    /// </remarks>
     public static Record Load(RecordLoadAdapter adapter)
     {
         if (adapter == null) throw new ArgumentNullException(nameof(adapter));
