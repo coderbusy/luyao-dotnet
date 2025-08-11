@@ -92,6 +92,20 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
         return idx > -1 ? this[idx] : null;
     }
 
+
+    /// <summary>
+    /// 根据列名获取 <see cref="RecordColumn"/> 实例，如果列不存在则抛出 <see cref="KeyNotFoundException"/>。
+    /// </summary>
+    /// <param name="name">要查找的列名</param>
+    /// <returns>对应的 <see cref="RecordColumn"/> 实例</returns>
+    /// <exception cref="KeyNotFoundException">当列名不存在时抛出</exception>
+    public RecordColumn Get(string name)
+    {
+        var col = Find(name);
+        if (col == null) throw new KeyNotFoundException($"列 '{name}' 不存在");
+        return col;
+    }
+
     /// <summary>
     /// 根据列名查找指定泛型类型的列。
     /// </summary>

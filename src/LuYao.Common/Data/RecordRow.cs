@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LuYao.Text.Json;
+using System;
 
 namespace LuYao.Data;
 
@@ -6,7 +7,7 @@ namespace LuYao.Data;
 /// 代表一行数据，提供对列存储数据集合中特定行数据的访问。
 /// 实现了 <see cref="IRecordCursor"/> 接口，支持类型安全的数据读取操作。
 /// </summary>
-public struct RecordRow : IRecordCursor
+public struct RecordRow : IRecordCursor, IDataModel
 {
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
@@ -33,6 +34,7 @@ public struct RecordRow : IRecordCursor
     /// </summary>
     /// <value>从零开始的行索引。</value>
     public int Row { get; }
+
 
     /// <summary>
     /// 定义从 <see cref="RecordRow"/> 到 <see cref="int"/> 的隐式转换。
@@ -335,4 +337,42 @@ public struct RecordRow : IRecordCursor
     }
 
     #endregion
+
+    #region IDataModel
+
+    ///<inheritdoc/>
+    public object? this[string key]
+    {
+        get => this.Record.Columns.Get(key).GetValue(this);
+        set => this.Record.Columns.Get(key).SetValue(value, this);
+    }
+
+    /// <summary>
+    /// 将当前行的数据以 JSON 对象形式写入指定的 <see cref="JsonWriter"/>。
+    /// </summary>
+    /// <param name="writer">用于写入 JSON 数据的 <see cref="JsonWriter"/> 实例。</param>
+    public void Write(JsonWriter writer)
+    {
+        Record re = this.Record;
+        int row = this.Row;
+        writer.WriteStartObject();
+        foreach (RecordColumn col in re.Columns)
+        {
+            writer.WritePropertyName(col.Name);
+            switch (col.Code)
+            {
+                case RecordDataCode.String: writer.WriteValue(col.GetString(row)); break;
+                case RecordDataCode.Boolean: writer.WriteValue(col.GetBoolean(row)); break;
+                case RecordDataCode.Int32: writer.WriteValue(col.GetInt32(row)); break;
+                case RecordDataCode.Int64: writer.WriteValue(col.GetInt64(row)); break;
+                case RecordDataCode.Single: writer.WriteValue(col.GetSingle(row)); break;
+                case RecordDataCode.Double: writer.WriteValue(col.GetDouble(row)); break;
+                case RecordDataCode.DateTime: writer.WriteValue(col.GetDateTime(row).ToString("O")); break;
+                default: writer.WriteValue(col.GetString(row)); break;
+            }
+        }
+        writer.WriteEndObject();
+    }
+    #endregion
+
 }

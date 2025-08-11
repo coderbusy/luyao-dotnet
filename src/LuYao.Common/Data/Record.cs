@@ -1,4 +1,6 @@
-﻿using LuYao.Data.Models;
+﻿using LuYao.Data.Formatters;
+using LuYao.Data.Models;
+using LuYao.Text.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -699,171 +701,6 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     }
     #endregion
 
-    #region Adapter
-
-    /// <summary>
-    /// 使用指定的适配器保存记录数据。
-    /// </summary>
-    /// <param name="adapter">用于保存数据的适配器，不能为 null。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="adapter"/> 为 null 时抛出。</exception>
-    /// <remarks>
-    /// 此方法会将记录的表头信息、列定义和所有行数据通过适配器写入目标存储。
-    /// 保存过程包括：写入记录头、写入列信息、遍历所有行并根据列的数据类型写入相应的值。
-    /// 保存过程中会重置游标到第一行，并在保存完成后游标位置可能发生变化。
-    /// </remarks>
-    public void Save(RecordSaveAdapter adapter)
-    {
-        if (adapter == null) throw new ArgumentNullException(nameof(adapter));
-        adapter.WriteStart();
-        foreach (var section in adapter.Layout)
-        {
-            switch (section)
-            {
-                case RecordSection.Head:
-                    {
-                        adapter.WriteStartSection(section);
-                        var header = new RecordHeader(this);
-                        adapter.WriteHeader(header);
-                        adapter.WriteEndSection();
-                    }
-                    break;
-                case RecordSection.Columns:
-                    if (this.Columns.Count > 0)
-                    {
-                        adapter.WriteStartSection(section);
-                        foreach (var column in this.Columns) adapter.WriteColumn(new RecordColumnInfo(column));
-                        adapter.WriteEndSection();
-                    }
-                    break;
-                case RecordSection.Rows:
-
-                    if (this.Count > 0)
-                    {
-                        this.MoveFirst();
-                        adapter.WriteStartSection(section);
-                        while (this.Read())
-                        {
-                            adapter.WriteStarRow();
-                            for (int i = 0; i < Columns.Count; i++)
-                            {
-                                RecordColumn col = this.Columns[i];
-                                switch (col.Code)
-                                {
-                                    case RecordDataCode.Boolean: adapter.WriteBoolean(col.Name, i, col.GetBoolean()); break;
-                                    case RecordDataCode.Byte: adapter.WriteByte(col.Name, i, col.GetByte()); break;
-                                    case RecordDataCode.Char: adapter.WriteChar(col.Name, i, col.GetChar()); break;
-                                    case RecordDataCode.DateTime: adapter.WriteDateTime(col.Name, i, col.GetDateTime()); break;
-                                    case RecordDataCode.Decimal: adapter.WriteDecimal(col.Name, i, col.GetDecimal()); break;
-                                    case RecordDataCode.Double: adapter.WriteDouble(col.Name, i, col.GetDouble()); break;
-                                    case RecordDataCode.Int16: adapter.WriteInt16(col.Name, i, col.GetInt16()); break;
-                                    case RecordDataCode.Int32: adapter.WriteInt32(col.Name, i, col.GetInt32()); break;
-                                    case RecordDataCode.Int64: adapter.WriteInt64(col.Name, i, col.GetInt64()); break;
-                                    case RecordDataCode.SByte: adapter.WriteSByte(col.Name, i, col.GetSByte()); break;
-                                    case RecordDataCode.Single: adapter.WriteSingle(col.Name, i, col.GetSingle()); break;
-                                    case RecordDataCode.String: adapter.WriteString(col.Name, i, col.GetString()); break;
-                                    case RecordDataCode.UInt16: adapter.WriteUInt16(col.Name, i, col.GetUInt16()); break;
-                                    case RecordDataCode.UInt32: adapter.WriteUInt32(col.Name, i, col.GetUInt32()); break;
-                                    case RecordDataCode.UInt64: adapter.WriteUInt64(col.Name, i, col.GetUInt64()); break;
-                                    default: adapter.WriteObject(col.Name, i, col.GetValue(this.Cursor)); break;
-                                }
-                            }
-                            adapter.WriteEndRow();
-                        }
-                        adapter.WriteEndSection();
-                    }
-                    break;
-                default: throw new NotSupportedException("未知的记录适配器布局类型：" + section);
-            }
-        }
-        adapter.WriteEnd();
-    }
-
-    /// <summary>
-    /// 使用指定的适配器加载记录数据并创建新的 <see cref="Record"/> 实例。
-    /// </summary>
-    /// <param name="adapter">用于加载数据的适配器，不能为 null。</param>
-    /// <returns>从适配器加载数据后创建的新 <see cref="Record"/> 实例。</returns>
-    /// <exception cref="ArgumentNullException">当 <paramref name="adapter"/> 为 null 时抛出。</exception>
-    /// <remarks>
-    /// 此方法会从适配器读取记录的完整结构和数据，包括：
-    /// <list type="number">
-    /// <item><description>读取记录头信息（名称、行数、列数）</description></item>
-    /// <item><description>读取所有列的定义信息（名称和类型）</description></item>
-    /// <item><description>读取所有行数据，根据列的数据类型进行相应的类型转换</description></item>
-    /// </list>
-    /// 加载过程中会根据适配器的键类型（名称或索引）来匹配相应的列，
-    /// 如果列不存在则跳过该字段的数据。
-    /// </remarks>
-    public static Record Load(RecordLoadAdapter adapter)
-    {
-        if (adapter == null) throw new ArgumentNullException(nameof(adapter));
-        var record = new Record();
-        RecordHeader? header = null;
-        int rows = 0, cols = 0;
-        while (adapter.ReadSection())
-        {
-            switch (adapter.Section)
-            {
-                case RecordSection.Head:
-                    header = adapter.ReadHeader();
-                    rows = header.Count;
-                    cols = header.Columns;
-                    if (!string.IsNullOrWhiteSpace(header.Name)) record.Name = header.Name;
-                    break;
-                case RecordSection.Rows:
-
-                    while (adapter.ReadRow())
-                    {
-                        record.AddRow();
-                        while (adapter.ReadField())
-                        {
-                            RecordColumn? col = null;
-                            switch (adapter.KeyKind)
-                            {
-                                case RecordLoadKeyKind.Name:
-                                    col = record.Columns.Find(adapter.Name);
-                                    break;
-                                case RecordLoadKeyKind.Index:
-                                    col = record.Columns[adapter.Index];
-                                    break;
-                            }
-                            if (col == null) continue; // 如果列不存在，跳过
-                            switch (col.Code)
-                            {
-                                case RecordDataCode.Boolean: col.Set(adapter.ReadBoolean()); break;
-                                case RecordDataCode.Byte: col.Set(adapter.ReadByte()); break;
-                                case RecordDataCode.Char: col.Set(adapter.ReadChar()); break;
-                                case RecordDataCode.DateTime: col.Set(adapter.ReadDateTime()); break;
-                                case RecordDataCode.Decimal: col.Set(adapter.ReadDecimal()); break;
-                                case RecordDataCode.Double: col.Set(adapter.ReadDouble()); break;
-                                case RecordDataCode.Int16: col.Set(adapter.ReadInt16()); break;
-                                case RecordDataCode.Int32: col.Set(adapter.ReadInt32()); break;
-                                case RecordDataCode.Int64: col.Set(adapter.ReadInt64()); break;
-                                case RecordDataCode.SByte: col.Set(adapter.ReadSByte()); break;
-                                case RecordDataCode.Single: col.Set(adapter.ReadSingle()); break;
-                                case RecordDataCode.String: col.Set(adapter.ReadString()); break;
-                                case RecordDataCode.UInt16: col.Set(adapter.ReadUInt16()); break;
-                                case RecordDataCode.UInt32: col.Set(adapter.ReadUInt32()); break;
-                                case RecordDataCode.UInt64: col.Set(adapter.ReadUInt64()); break;
-                                default: col.SetValue(adapter.ReadObject(col.Type), record.Cursor); break;
-                            }
-                        }
-                    }
-                    break;
-                case RecordSection.Columns:
-                    for (int i = 0; i < cols; i++)
-                    {
-                        var col = adapter.ReadColumn();
-                        record.Columns.Add(col.Name, col.Type);
-                    }
-                    break;
-                default: throw new NotSupportedException("未知的记录适配器布局类型：" + adapter.Section);
-            }
-        }
-        return record;
-    }
-    #endregion
-
     #region Cursor
     /// <summary>
     /// 获取或设置当前游标位置，用于指示当前操作的行索引。
@@ -939,5 +776,139 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// 当此属性返回 <see langword="true"/> 时，基于游标的数据操作可能会失败。
     /// </remarks>
     public bool IsEndOfRecord => this.Cursor >= this.Count || this.Count == 0;
+    #endregion
+
+    /// <summary>
+    /// 获取指定索引处的 <see cref="RecordRow"/> 实例。
+    /// </summary>
+    /// <param name="row">要获取的行的索引。</param>
+    /// <returns>指定索引处的 <see cref="RecordRow"/>。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当索引超出范围时抛出。</exception>
+    public RecordRow this[int row]
+    {
+        get
+        {
+            if (row < 0 || row >= this.Count) throw new ArgumentOutOfRangeException(nameof(row), "索引超出范围");
+            return new RecordRow(this, row);
+        }
+    }
+
+    #region Read \ Write
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例以二进制格式写入指定的 <see cref="BinaryWriter"/>。
+    /// </summary>
+    /// <param name="writer">用于写入二进制数据的 <see cref="BinaryWriter"/> 实例。</param>
+    /// <remarks>
+    /// 此方法会使用 <see cref="BinaryRecordFormatter"/> 将记录内容序列化为二进制数据并写入到流中。
+    /// </remarks>
+    public void Write(BinaryWriter writer)
+    {
+        var formatter = new BinaryRecordFormatter();
+        formatter.Write(this, writer);
+    }
+
+    /// <summary>
+    /// 从指定的 <see cref="BinaryReader"/> 读取二进制格式的数据并返回一个新的 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <param name="reader">用于读取二进制数据的 <see cref="BinaryReader"/> 实例。</param>
+    /// <returns>读取到的 <see cref="Record"/> 实例。</returns>
+    public static Record Read(BinaryReader reader)
+    {
+        var formatter = new BinaryRecordFormatter();
+        return formatter.Read(reader);
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例的数据写入指定的 <see cref="DataTable"/>。
+    /// </summary>
+    /// <param name="dt">用于接收数据的 <see cref="DataTable"/> 实例。</param>
+    /// <remarks>
+    /// 此方法会将当前记录的所有列结构和行数据写入到指定的 <see cref="DataTable"/> 中。
+    /// 如果 <paramref name="dt"/> 为 null，则会抛出 <see cref="ArgumentNullException"/>。
+    /// </remarks>
+    public void Write(DataTable dt)
+    {
+        if (dt == null) throw new ArgumentNullException(nameof(dt));
+        foreach (RecordColumn col in this.Columns)
+        {
+            dt.Columns.Add(col.Name, col.Type);
+        }
+        this.MoveFirst();
+        while (this.Read())
+        {
+            DataRow row = dt.Rows.Add();
+            for (int i = 0; i < this.Columns.Count; i++)
+            {
+                row[i] = this.Columns[i].GetValue(this.Cursor);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 从指定的 <see cref="DataTable"/> 读取数据并返回一个新的 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <param name="dt">用于读取数据的 <see cref="DataTable"/> 实例。</param>
+    /// <returns>读取到的 <see cref="Record"/> 实例。</returns>
+    public static Record Read(DataTable dt)
+    {
+        var ret = new Record(dt.TableName, dt.Rows.Count);
+        foreach (DataColumn col in dt.Columns)
+        {
+            ret.Columns.Add(col.ColumnName, col.DataType);
+        }
+        foreach (DataRow row in dt.Rows)
+        {
+            RecordRow recordRow = ret.AddRow();
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                var col = ret.Columns[i];
+                if (row.IsNull(i)) continue;
+                col.SetValue(row[i], recordRow);
+            }
+        }
+        return ret;
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例转换为 <see cref="DataTable"/>。
+    /// </summary>
+    /// <returns>包含当前记录所有数据的 <see cref="DataTable"/> 实例。</returns>
+    /// <remarks>
+    /// 此方法会创建一个新的 <see cref="DataTable"/>，表名与当前记录名称一致，并将所有列结构和行数据写入到该表中。
+    /// </remarks>
+    public DataTable ToDataTable()
+    {
+        var dt = new DataTable(this.Name);
+        this.Write(dt);
+        return dt;
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例以 JSON 数组格式写入指定的 <see cref="JsonWriter"/>。
+    /// </summary>
+    /// <param name="w">用于写入 JSON 数据的 <see cref="JsonWriter"/> 实例。</param>
+    /// <remarks>
+    /// 此方法会遍历所有行，并将每行数据以 JSON 对象的形式写入到 JSON 数组中。
+    /// </remarks>
+    public void Write(JsonWriter w)
+    {
+        w.WriteStartArray();
+        foreach (var row in this) row.Write(w);
+        w.WriteEndArray();
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例以 JSON 数组格式序列化为字符串。
+    /// </summary>
+    /// <returns>表示当前记录所有行数据的 JSON 字符串。</returns>
+    public string ToJson()
+    {
+        using (var sw = new StringWriter())
+        using (var w = new JsonWriter(sw))
+        {
+            this.Write(w);
+            return sw.ToString();
+        }
+    }
     #endregion
 }

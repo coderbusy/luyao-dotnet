@@ -1,7 +1,7 @@
 ﻿using LuYao.Data.Models;
 using System.IO;
 
-namespace LuYao.Data.Binary;
+namespace LuYao.Data.Formatters;
 
 internal class BinaryRecordColumnInfo : RecordColumnInfo
 {
@@ -12,16 +12,21 @@ internal class BinaryRecordColumnInfo : RecordColumnInfo
 
     public BinaryRecordColumnInfo(RecordColumnInfo col)
     {
-        this.Name = col.Name;
-        this.Code = col.Code;
-        this.Type = col.Type;
+        Name = col.Name;
+        Code = col.Code;
+        Type = col.Type;
+    }
+
+    public BinaryRecordColumnInfo(RecordColumn col) : this(new RecordColumnInfo(col))
+    {
+
     }
 
 
     public void Write(BinaryWriter writer)
     {
-        int code = (int)this.Code;
-        string type = this.GetTypeName();
+        int code = (int)Code;
+        string type = GetTypeName();
 
         writer.Write(Name);
         writer.Write(code);
@@ -30,9 +35,9 @@ internal class BinaryRecordColumnInfo : RecordColumnInfo
 
     public void Read(BinaryReader reader)
     {
-        this.Name = reader.ReadString();
-        this.Code = (RecordDataCode)reader.ReadInt32();
+        Name = reader.ReadString();
+        Code = (RecordDataCode)reader.ReadInt32();
         string typeName = reader.ReadString();
-        this.ParseTypeName(typeName);
+        ParseTypeName(typeName);
     }
 }

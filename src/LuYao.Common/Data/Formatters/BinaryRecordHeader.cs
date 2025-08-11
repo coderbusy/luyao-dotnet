@@ -24,6 +24,11 @@ internal class BinaryRecordHeader : RecordHeader
         Count = header.Count;
     }
 
+    public BinaryRecordHeader(Record record) : this(new RecordHeader(record))
+    {
+
+    }
+
     public void Write(BinaryWriter writer)
     {
         if (writer == null) throw new ArgumentNullException(nameof(writer));
