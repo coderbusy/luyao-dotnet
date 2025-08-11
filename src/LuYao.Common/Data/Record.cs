@@ -1,5 +1,6 @@
 ﻿using LuYao.Data.Formatters;
 using LuYao.Data.Models;
+using LuYao.Text.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -844,6 +845,31 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     }
 
     /// <summary>
+    /// 从指定的 <see cref="DataTable"/> 读取数据并返回一个新的 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <param name="dt">用于读取数据的 <see cref="DataTable"/> 实例。</param>
+    /// <returns>读取到的 <see cref="Record"/> 实例。</returns>
+    public static Record Read(DataTable dt)
+    {
+        var ret = new Record(dt.TableName, dt.Rows.Count);
+        foreach (DataColumn col in dt.Columns)
+        {
+            ret.Columns.Add(col.ColumnName, col.DataType);
+        }
+        foreach (DataRow row in dt.Rows)
+        {
+            RecordRow recordRow = ret.AddRow();
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                var col = ret.Columns[i];
+                if (row.IsNull(i)) continue;
+                col.SetValue(row[i], recordRow);
+            }
+        }
+        return ret;
+    }
+
+    /// <summary>
     /// 将当前 <see cref="Record"/> 实例转换为 <see cref="DataTable"/>。
     /// </summary>
     /// <returns>包含当前记录所有数据的 <see cref="DataTable"/> 实例。</returns>
@@ -855,6 +881,34 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
         var dt = new DataTable(this.Name);
         this.Write(dt);
         return dt;
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例以 JSON 数组格式写入指定的 <see cref="JsonWriter"/>。
+    /// </summary>
+    /// <param name="w">用于写入 JSON 数据的 <see cref="JsonWriter"/> 实例。</param>
+    /// <remarks>
+    /// 此方法会遍历所有行，并将每行数据以 JSON 对象的形式写入到 JSON 数组中。
+    /// </remarks>
+    public void Write(JsonWriter w)
+    {
+        w.WriteStartArray();
+        foreach (var row in this) row.Write(w);
+        w.WriteEndArray();
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例以 JSON 数组格式序列化为字符串。
+    /// </summary>
+    /// <returns>表示当前记录所有行数据的 JSON 字符串。</returns>
+    public string ToJson()
+    {
+        using (var sw = new StringWriter())
+        using (var w = new JsonWriter(sw))
+        {
+            this.Write(w);
+            return sw.ToString();
+        }
     }
     #endregion
 }
