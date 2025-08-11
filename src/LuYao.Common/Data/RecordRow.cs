@@ -6,7 +6,7 @@ namespace LuYao.Data;
 /// 代表一行数据，提供对列存储数据集合中特定行数据的访问。
 /// 实现了 <see cref="IRecordCursor"/> 接口，支持类型安全的数据读取操作。
 /// </summary>
-public struct RecordRow : IRecordCursor
+public struct RecordRow : IRecordCursor, IDataModel
 {
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
@@ -33,6 +33,7 @@ public struct RecordRow : IRecordCursor
     /// </summary>
     /// <value>从零开始的行索引。</value>
     public int Row { get; }
+
 
     /// <summary>
     /// 定义从 <see cref="RecordRow"/> 到 <see cref="int"/> 的隐式转换。
@@ -335,4 +336,16 @@ public struct RecordRow : IRecordCursor
     }
 
     #endregion
+
+    #region IDataModel
+
+    ///<inheritdoc/>
+    public object? this[string key]
+    {
+        get => this.Record.Columns.Get(key).GetValue(this);
+        set => this.Record.Columns.Get(key).SetValue(value, this);
+    }
+
+    #endregion
+
 }

@@ -1,4 +1,5 @@
-﻿using LuYao.Data.Models;
+﻿using LuYao.Data.Formatters;
+using LuYao.Data.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -699,10 +700,6 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     }
     #endregion
 
-    #region Adapter
-
-    #endregion
-
     #region Cursor
     /// <summary>
     /// 获取或设置当前游标位置，用于指示当前操作的行索引。
@@ -778,5 +775,86 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
     /// 当此属性返回 <see langword="true"/> 时，基于游标的数据操作可能会失败。
     /// </remarks>
     public bool IsEndOfRecord => this.Cursor >= this.Count || this.Count == 0;
+    #endregion
+
+    /// <summary>
+    /// 获取指定索引处的 <see cref="RecordRow"/> 实例。
+    /// </summary>
+    /// <param name="row">要获取的行的索引。</param>
+    /// <returns>指定索引处的 <see cref="RecordRow"/>。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当索引超出范围时抛出。</exception>
+    public RecordRow this[int row]
+    {
+        get
+        {
+            if (row < 0 || row >= this.Count) throw new ArgumentOutOfRangeException(nameof(row), "索引超出范围");
+            return new RecordRow(this, row);
+        }
+    }
+
+    #region Read \ Write
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例以二进制格式写入指定的 <see cref="BinaryWriter"/>。
+    /// </summary>
+    /// <param name="writer">用于写入二进制数据的 <see cref="BinaryWriter"/> 实例。</param>
+    /// <remarks>
+    /// 此方法会使用 <see cref="BinaryRecordFormatter"/> 将记录内容序列化为二进制数据并写入到流中。
+    /// </remarks>
+    public void Write(BinaryWriter writer)
+    {
+        var formatter = new BinaryRecordFormatter();
+        formatter.Write(this, writer);
+    }
+
+    /// <summary>
+    /// 从指定的 <see cref="BinaryReader"/> 读取二进制格式的数据并返回一个新的 <see cref="Record"/> 实例。
+    /// </summary>
+    /// <param name="reader">用于读取二进制数据的 <see cref="BinaryReader"/> 实例。</param>
+    /// <returns>读取到的 <see cref="Record"/> 实例。</returns>
+    public static Record Read(BinaryReader reader)
+    {
+        var formatter = new BinaryRecordFormatter();
+        return formatter.Read(reader);
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例的数据写入指定的 <see cref="DataTable"/>。
+    /// </summary>
+    /// <param name="dt">用于接收数据的 <see cref="DataTable"/> 实例。</param>
+    /// <remarks>
+    /// 此方法会将当前记录的所有列结构和行数据写入到指定的 <see cref="DataTable"/> 中。
+    /// 如果 <paramref name="dt"/> 为 null，则会抛出 <see cref="ArgumentNullException"/>。
+    /// </remarks>
+    public void Write(DataTable dt)
+    {
+        if (dt == null) throw new ArgumentNullException(nameof(dt));
+        foreach (RecordColumn col in this.Columns)
+        {
+            dt.Columns.Add(col.Name, col.Type);
+        }
+        this.MoveFirst();
+        while (this.Read())
+        {
+            DataRow row = dt.Rows.Add();
+            for (int i = 0; i < this.Columns.Count; i++)
+            {
+                row[i] = this.Columns[i].GetValue(this.Cursor);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 实例转换为 <see cref="DataTable"/>。
+    /// </summary>
+    /// <returns>包含当前记录所有数据的 <see cref="DataTable"/> 实例。</returns>
+    /// <remarks>
+    /// 此方法会创建一个新的 <see cref="DataTable"/>，表名与当前记录名称一致，并将所有列结构和行数据写入到该表中。
+    /// </remarks>
+    public DataTable ToDataTable()
+    {
+        var dt = new DataTable(this.Name);
+        this.Write(dt);
+        return dt;
+    }
     #endregion
 }
