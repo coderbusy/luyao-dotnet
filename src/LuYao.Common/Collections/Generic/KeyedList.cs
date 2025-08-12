@@ -10,21 +10,25 @@ namespace LuYao.Collections.Generic;
 /// </summary>
 /// <typeparam name="TKey">用于标识集合中元素的键的类型。</typeparam>
 /// <typeparam name="TValue">集合中元素的类型。</typeparam>
-public class KeyedList<TKey, TValue> : IList<TValue>
+public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, TValue>.Entry>
 {
     /// <summary>
     /// 获取用于从集合元素中提取键值的函数。
     /// </summary>
     public Func<TValue, TKey> KeySelector { get; }
 
+    /// <summary>
+    /// 获取用于比较键的比较器。
+    /// </summary>
+    public IComparer<TKey> KeyComparer { get; }
+
     private List<TValue> _list = new List<TValue>();
     private Entry[]? _cache;
-    private readonly EntryComparer _entryComparer;
 
     /// <summary>
     /// 表示键和对应索引的内部结构。
     /// </summary>
-    private struct Entry
+    internal struct Entry
     {
         /// <summary>
         /// 获取或设置元素的键。
@@ -38,35 +42,40 @@ public class KeyedList<TKey, TValue> : IList<TValue>
     }
 
     /// <summary>
-    /// 专用于比较 Entry 结构的比较器类。
-    /// </summary>
-    private sealed class EntryComparer : IComparer<Entry>
-    {
-        /// <summary>
-        /// 比较两个 Entry 对象的键。
-        /// </summary>
-        /// <param name="x">要比较的第一个 Entry。</param>
-        /// <param name="y">要比较的第二个 Entry。</param>
-        /// <returns>
-        /// 如果 x.Key 小于 y.Key，则小于零；
-        /// 如果 x.Key 等于 y.Key，则为零；
-        /// 如果 x.Key 大于 y.Key，则大于零。
-        /// </returns>
-        public int Compare(Entry x, Entry y)
-        {
-            return Comparer<TKey>.Default.Compare(x.Key, y.Key);
-        }
-    }
-
-    /// <summary>
     /// 使用指定的键选择器函数初始化 <see cref="KeyedList{TKey, TValue}"/> 类的新实例。
     /// </summary>
     /// <param name="keySelector">用于从元素中提取键的函数。</param>
     /// <exception cref="ArgumentNullException">keySelector 参数为 null。</exception>
     public KeyedList(Func<TValue, TKey> keySelector)
+        : this(keySelector, Comparer<TKey>.Default)
+    {
+    }
+
+    /// <summary>
+    /// 使用指定的键选择器函数和键比较器初始化 <see cref="KeyedList{TKey, TValue}"/> 类的新实例。
+    /// </summary>
+    /// <param name="keySelector">用于从元素中提取键的函数。</param>
+    /// <param name="comparer">用于比较键的比较器。</param>
+    /// <exception cref="ArgumentNullException">keySelector 或 comparer 参数为 null。</exception>
+    public KeyedList(Func<TValue, TKey> keySelector, IComparer<TKey> comparer)
     {
         KeySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
-        _entryComparer = new EntryComparer();
+        KeyComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+    }
+
+    /// <summary>
+    /// 比较两个 Entry 对象的键。
+    /// </summary>
+    /// <param name="x">要比较的第一个 Entry。</param>
+    /// <param name="y">要比较的第二个 Entry。</param>
+    /// <returns>
+    /// 如果 x.Key 小于 y.Key，则小于零；
+    /// 如果 x.Key 等于 y.Key，则为零；
+    /// 如果 x.Key 大于 y.Key，则大于零。
+    /// </returns>
+    int IComparer<KeyedList<TKey, TValue>.Entry>.Compare(Entry x, Entry y)
+    {
+        return KeyComparer.Compare(x.Key, y.Key);
     }
 
     /// <summary>
@@ -143,14 +152,14 @@ public class KeyedList<TKey, TValue> : IList<TValue>
                 };
             }
 
-            Array.Sort(_cache, _entryComparer);
+            Array.Sort(_cache, this);
         }
 
-        var idx = Array.BinarySearch(_cache, new Entry { Key = key }, _entryComparer);
+        var idx = Array.BinarySearch(_cache, new Entry { Key = key }, this);
         if (idx < 0) return idx;
 
         // 查找第一个匹配的元素
-        while (idx > 0 && Comparer<TKey>.Default.Compare(_cache[idx - 1].Key, key) == 0)
+        while (idx > 0 && KeyComparer.Compare(_cache[idx - 1].Key, key) == 0)
         {
             idx--;
         }
