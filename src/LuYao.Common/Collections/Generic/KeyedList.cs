@@ -19,6 +19,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>
 
     private List<TValue> _list = new List<TValue>();
     private Entry[]? _cache;
+    private readonly EntryComparer _entryComparer;
 
     /// <summary>
     /// 表示键和对应索引的内部结构。
@@ -37,6 +38,27 @@ public class KeyedList<TKey, TValue> : IList<TValue>
     }
 
     /// <summary>
+    /// 专用于比较 Entry 结构的比较器类。
+    /// </summary>
+    private sealed class EntryComparer : IComparer<Entry>
+    {
+        /// <summary>
+        /// 比较两个 Entry 对象的键。
+        /// </summary>
+        /// <param name="x">要比较的第一个 Entry。</param>
+        /// <param name="y">要比较的第二个 Entry。</param>
+        /// <returns>
+        /// 如果 x.Key 小于 y.Key，则小于零；
+        /// 如果 x.Key 等于 y.Key，则为零；
+        /// 如果 x.Key 大于 y.Key，则大于零。
+        /// </returns>
+        public int Compare(Entry x, Entry y)
+        {
+            return Comparer<TKey>.Default.Compare(x.Key, y.Key);
+        }
+    }
+
+    /// <summary>
     /// 使用指定的键选择器函数初始化 <see cref="KeyedList{TKey, TValue}"/> 类的新实例。
     /// </summary>
     /// <param name="keySelector">用于从元素中提取键的函数。</param>
@@ -44,6 +66,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>
     public KeyedList(Func<TValue, TKey> keySelector)
     {
         KeySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
+        _entryComparer = new EntryComparer();
     }
 
     /// <summary>
@@ -107,29 +130,32 @@ public class KeyedList<TKey, TValue> : IList<TValue>
     {
         if (_cache == null)
         {
-            _cache = this._list
-                .Select((value, index) => new Entry
+            int count = _list.Count;
+            if (count == 0) return -1;
+
+            _cache = new Entry[count];
+            for (int i = 0; i < count; i++)
+            {
+                _cache[i] = new Entry
                 {
-                    Key = KeySelector(value),
-                    Index = index
-                })
-                .OrderBy(entry => entry.Key)
-                .ToArray();
+                    Key = KeySelector(_list[i]),
+                    Index = i
+                };
+            }
+
+            Array.Sort(_cache, _entryComparer);
         }
-        var idx = Array.BinarySearch
-            (
-                _cache,
-                new Entry { Key = key },
-                Comparer<Entry>.Create((x, y) => Comparer<TKey>.Default.Compare(x.Key, y.Key))
-            );
+
+        var idx = Array.BinarySearch(_cache, new Entry { Key = key }, _entryComparer);
         if (idx < 0) return idx;
-        Entry e = _cache[idx];
+
+        // 查找第一个匹配的元素
         while (idx > 0 && Comparer<TKey>.Default.Compare(_cache[idx - 1].Key, key) == 0)
         {
             idx--;
-            e = _cache[idx];
         }
-        return e.Index;
+
+        return _cache[idx].Index;
     }
 
     /// <summary>
