@@ -207,7 +207,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     {
         get
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
+            if (string.IsNullOrWhiteSpace(name)) return null;
             return this.Find(name);
         }
     }

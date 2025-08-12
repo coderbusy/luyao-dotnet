@@ -51,7 +51,7 @@ public struct RecordRow : IRecordCursor, IDataModel
     /// </summary>
     /// <typeparam name="T">要获取的值的类型。</typeparam>
     /// <param name="col">要读取的列对象。</param>
-    /// <returns>如果列属于当前记录则直接返回转换后的泛型类型值，否则返回该类型的默认值。</returns>
+    /// <returns>如果列属于当前记录则直接返回转换后的泛型类型值，否则返回同名值。</returns>
     public T? Get<T>(RecordColumn col) => col.Record == this.Record ? col.Get<T>(this.Row) : this.Get<T>(col.Name);
 
     /// <summary>
