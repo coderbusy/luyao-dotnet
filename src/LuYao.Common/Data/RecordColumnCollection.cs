@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LuYao.Collections.Generic;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -11,7 +12,7 @@ namespace LuYao.Data;
 /// </summary>
 public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 {
-    private readonly List<RecordColumn> _list = new List<RecordColumn>();
+    private readonly KeyedList<string, RecordColumn> _list = new KeyedList<string, RecordColumn>(c => c.Name);
     /// <summary>
     /// 关联的记录
     /// </summary>
@@ -65,11 +66,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <returns>如果找到列则返回索引，否则返回 -1</returns>
     public int IndexOf(string name)
     {
-        for (int i = 0; i < this.Count; i++)
-        {
-            if (this[i].Name == name) return i;
-        }
-        return -1;
+        return _list.IndexOfKey(name);
     }
 
 
@@ -78,7 +75,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// </summary>
     /// <param name="name">要检查的列名</param>
     /// <returns>如果列名存在则返回 true，否则返回 false</returns>
-    public bool Contains(string name) { return this.IndexOf(name) > -1; }
+    public bool Contains(string name) { return _list.ContainsKey(name); }
 
     /// <summary>
     /// 根据列名查找列

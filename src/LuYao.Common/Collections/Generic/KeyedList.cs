@@ -156,7 +156,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
         }
 
         var idx = Array.BinarySearch(_cache, new Entry { Key = key }, this);
-        if (idx < 0) return idx;
+        if (idx < 0) return -1;
 
         // 查找第一个匹配的元素
         while (idx > 0 && KeyComparer.Compare(_cache[idx - 1].Key, key) == 0)
