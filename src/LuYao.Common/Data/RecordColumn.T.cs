@@ -16,11 +16,11 @@ public class RecordColumn<T> : RecordColumn
     /// <summary>
     /// 创建一个泛型列
     /// </summary>
-    public RecordColumn(Record record, string name, RecordDataCode code, Type type)
-        : base(record, name, code, type)
+    public RecordColumn(Record record, string name, Type type)
+        : base(record, name, type)
     {
         var capacity = record.Capacity;
-        if (capacity < 0) capacity = 5;
+        if (capacity <= 0) capacity = 5;
         _data = new T[capacity];
     }
 
@@ -40,7 +40,6 @@ public class RecordColumn<T> : RecordColumn
         var count = this.Record.Count;
         for (int i = row; i < count - 1; i++)
         {
-            //this._data.SetValue(this._data.GetValue(i + 1), i);
             this._data[i] = this._data[i + 1];
         }
     }
@@ -80,21 +79,24 @@ public class RecordColumn<T> : RecordColumn
 
     #region Get / Set
 
+    ///<inheritdoc/>
     public T Get(int row)
     {
         OnGet(row);
         return _data[row];
     }
 
+    ///<inheritdoc/>
     public T Get() => Get(Record.Cursor);
 
+    ///<inheritdoc/>
     public virtual void Set(T value, int row)
     {
         OnSet(row);
         _data[row] = value;
     }
 
+    ///<inheritdoc/>
     public void Set(T value) => Set(value, Record.Cursor);
-
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿using LuYao.Data.Columns;
+﻿using LuYao.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace LuYao.Data;
 /// </summary>
 public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 {
-    private readonly List<RecordColumn> _list = new List<RecordColumn>();
+    private readonly KeyedList<string, RecordColumn> _list = new KeyedList<string, RecordColumn>(c => c.Name);
     /// <summary>
     /// 关联的记录
     /// </summary>
@@ -66,11 +66,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <returns>如果找到列则返回索引，否则返回 -1</returns>
     public int IndexOf(string name)
     {
-        for (int i = 0; i < this.Count; i++)
-        {
-            if (this[i].Name == name) return i;
-        }
-        return -1;
+        return _list.IndexOfKey(name);
     }
 
 
@@ -79,7 +75,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// </summary>
     /// <param name="name">要检查的列名</param>
     /// <returns>如果列名存在则返回 true，否则返回 false</returns>
-    public bool Contains(string name) { return this.IndexOf(name) > -1; }
+    public bool Contains(string name) { return _list.ContainsKey(name); }
 
     /// <summary>
     /// 根据列名查找列
@@ -171,202 +167,6 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
         if (this.Contains(name)) throw new DuplicateNameException($"列名 '{name}' 已经存在");
     }
 
-    /// <summary>
-    /// 添加一个 Boolean 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>BooleanRecordColumn 实例</returns>
-    public BooleanRecordColumn AddBoolean(string name)
-    {
-        this.OnAdd(name);
-        var col = new BooleanRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 Byte 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>ByteRecordColumn 实例</returns>
-    public ByteRecordColumn AddByte(string name)
-    {
-        this.OnAdd(name);
-        var col = new ByteRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 Char 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>CharRecordColumn 实例</returns>
-    public CharRecordColumn AddChar(string name)
-    {
-        this.OnAdd(name);
-        var col = new CharRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 DateTime 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>DateTimeRecordColumn 实例</returns>
-    public DateTimeRecordColumn AddDateTime(string name)
-    {
-        this.OnAdd(name);
-        var col = new DateTimeRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 Decimal 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>DecimalRecordColumn 实例</returns>
-    public DecimalRecordColumn AddDecimal(string name)
-    {
-        this.OnAdd(name);
-        var col = new DecimalRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 Double 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>DoubleRecordColumn 实例</returns>
-    public DoubleRecordColumn AddDouble(string name)
-    {
-        this.OnAdd(name);
-        var col = new DoubleRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 Int16 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>Int16RecordColumn 实例</returns>
-    public Int16RecordColumn AddInt16(string name)
-    {
-        this.OnAdd(name);
-        var col = new Int16RecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 Int32 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>Int32RecordColumn 实例</returns>
-    public Int32RecordColumn AddInt32(string name)
-    {
-        this.OnAdd(name);
-        var col = new Int32RecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 Int64 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>Int64RecordColumn 实例</returns>
-    public Int64RecordColumn AddInt64(string name)
-    {
-        this.OnAdd(name);
-        var col = new Int64RecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 SByte 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>SByteRecordColumn 实例</returns>
-    public SByteRecordColumn AddSByte(string name)
-    {
-        this.OnAdd(name);
-        var col = new SByteRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 Single 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>SingleRecordColumn 实例</returns>
-    public SingleRecordColumn AddSingle(string name)
-    {
-        this.OnAdd(name);
-        var col = new SingleRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 String 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>StringRecordColumn 实例</returns>
-    public StringRecordColumn AddString(string name)
-    {
-        this.OnAdd(name);
-        var col = new StringRecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 UInt16 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>UInt16RecordColumn 实例</returns>
-    public UInt16RecordColumn AddUInt16(string name)
-    {
-        this.OnAdd(name);
-        var col = new UInt16RecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 UInt32 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>UInt32RecordColumn 实例</returns>
-    public UInt32RecordColumn AddUInt32(string name)
-    {
-        this.OnAdd(name);
-        var col = new UInt32RecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-    /// <summary>
-    /// 添加一个 UInt64 类型的列
-    /// </summary>
-    /// <param name="name">列名</param>
-    /// <returns>UInt64RecordColumn 实例</returns>
-    public UInt64RecordColumn AddUInt64(string name)
-    {
-        this.OnAdd(name);
-        var col = new UInt64RecordColumn(this.Record, name);
-        this._list.Add(col);
-        return col;
-    }
-
-
     ///<summary>
     /// 根据列名和类型添加一个列。
     /// </summary>
@@ -375,24 +175,6 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <returns>添加的 <see cref="RecordColumn"/> 实例</returns>
     public RecordColumn Add(string name, Type type)
     {
-        switch (Type.GetTypeCode(type))
-        {
-            case TypeCode.Boolean: return this.AddBoolean(name);
-            case TypeCode.Byte: return this.AddByte(name);
-            case TypeCode.Char: return this.AddChar(name);
-            case TypeCode.DateTime: return this.AddDateTime(name);
-            case TypeCode.Decimal: return this.AddDecimal(name);
-            case TypeCode.Double: return this.AddDouble(name);
-            case TypeCode.Int16: return this.AddInt16(name);
-            case TypeCode.Int32: return this.AddInt32(name);
-            case TypeCode.Int64: return this.AddInt64(name);
-            case TypeCode.SByte: return this.AddSByte(name);
-            case TypeCode.Single: return this.AddSingle(name);
-            case TypeCode.String: return this.AddString(name);
-            case TypeCode.UInt16: return this.AddUInt16(name);
-            case TypeCode.UInt32: return this.AddUInt32(name);
-            case TypeCode.UInt64: return this.AddUInt64(name);
-        }
         this.OnAdd(name);
         RecordColumn col = Helpers.MakeRecordColumn(this.Record, name, type);
         this._list.Add(col);
@@ -405,7 +187,28 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <typeparam name="T">列的数据类型</typeparam>
     /// <param name="name">列名</param>
     /// <returns>添加的 <see cref="RecordColumn{T}"/> 实例</returns>
-    public RecordColumn<T> Add<T>(string name) => (RecordColumn<T>)this.Add(name, typeof(T));
+    public RecordColumn<T> Add<T>(string name)
+    {
+        this.OnAdd(name);
+        var col = new RecordColumn<T>(this.Record, name, typeof(T));
+        this._list.Add(col);
+        return col;
+    }
 
     #endregion
+
+
+    /// <summary>
+    /// 根据列名获取 <see cref="RecordColumn"/> 实例，如果列不存在则返回 null。
+    /// </summary>
+    /// <param name="name">要查找的列名</param>
+    /// <returns>对应的 <see cref="RecordColumn"/> 实例，如果不存在则为 null</returns>
+    public RecordColumn? this[string name]
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+            return this.Find(name);
+        }
+    }
 }

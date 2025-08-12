@@ -45,14 +45,14 @@ public class RecordLoaderTests
         var record = new Record("TestTable", 1);
 
         // 添加列
-        var idColumn = record.Columns.AddInt32("Id");
-        var nameColumn = record.Columns.AddString("Name");
-        var createTimeColumn = record.Columns.AddDateTime("CreateTime");
-        var isActiveColumn = record.Columns.AddBoolean("IsActive");
-        var scoreColumn = record.Columns.AddDouble("Score");
-        var customColumn = record.Columns.AddString("custom_column");
-        var nullableIntColumn = record.Columns.AddInt32("NullableInt");
-        var nullableDateTimeColumn = record.Columns.AddDateTime("NullableDateTime");
+        var idColumn = record.Columns.Add<Int32>("Id");
+        var nameColumn = record.Columns.Add<String>("Name");
+        var createTimeColumn = record.Columns.Add<DateTime>("CreateTime");
+        var isActiveColumn = record.Columns.Add<Boolean>("IsActive");
+        var scoreColumn = record.Columns.Add<Double>("Score");
+        var customColumn = record.Columns.Add<String>("custom_column");
+        var nullableIntColumn = record.Columns.Add<Int32>("NullableInt");
+        var nullableDateTimeColumn = record.Columns.Add<DateTime>("NullableDateTime");
 
         // 添加一行数据
         var row = record.AddRow();
@@ -102,7 +102,7 @@ public class RecordLoaderTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var idColumn = record.Columns.AddInt32("Id");
+        var idColumn = record.Columns.Add<Int32>("Id");
         var row = record.AddRow();
         idColumn.Set(100);
 
@@ -131,13 +131,13 @@ public class RecordLoaderTests
         var record = new Record("TestTable", 1);
 
         // 添加列
-        var idColumn = record.Columns.AddInt32("Id");
-        var nameColumn = record.Columns.AddString("Name");
-        var createTimeColumn = record.Columns.AddDateTime("CreateTime");
-        var isActiveColumn = record.Columns.AddBoolean("IsActive");
-        var scoreColumn = record.Columns.AddDouble("Score");
-        var customColumn = record.Columns.AddString("custom_column");
-        var nullableIntColumn = record.Columns.AddInt32("NullableInt");
+        var idColumn = record.Columns.Add<Int32>("Id");
+        var nameColumn = record.Columns.Add<String>("Name");
+        var createTimeColumn = record.Columns.Add<DateTime>("CreateTime");
+        var isActiveColumn = record.Columns.Add<Boolean>("IsActive");
+        var scoreColumn = record.Columns.Add<Double>("Score");
+        var customColumn = record.Columns.Add<String>("custom_column");
+        var nullableIntColumn = record.Columns.Add<Int32>("NullableInt");
 
         var row = record.AddRow();
 
@@ -156,13 +156,13 @@ public class RecordLoaderTests
         RecordLoader<TestEntity>.WriteToRow(entity, row);
 
         // Assert
-        Assert.AreEqual(789, row.GetInt32(idColumn));
-        Assert.AreEqual("写入测试", row.GetString(nameColumn));
-        Assert.AreEqual(new DateTime(2023, 9, 15, 14, 20, 30), row.GetDateTime(createTimeColumn));
-        Assert.AreEqual(false, row.GetBoolean(isActiveColumn));
-        Assert.AreEqual(88.8, row.GetDouble(scoreColumn), 0.001);
-        Assert.AreEqual("写入自定义", row.GetString(customColumn));
-        Assert.AreEqual(999, row.GetInt32(nullableIntColumn));
+        Assert.AreEqual(789, row.Get<Int32>(idColumn));
+        Assert.AreEqual("写入测试", row.Get<String>(nameColumn));
+        Assert.AreEqual(new DateTime(2023, 9, 15, 14, 20, 30), row.Get<DateTime>(createTimeColumn));
+        Assert.AreEqual(false, row.Get<Boolean>(isActiveColumn));
+        Assert.AreEqual(88.8, row.Get<Double>(scoreColumn), 0.001);
+        Assert.AreEqual("写入自定义", row.Get<String>(customColumn));
+        Assert.AreEqual(999, row.Get<Int32>(nullableIntColumn));
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ public class RecordLoaderTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var idColumn = record.Columns.AddInt32("Id");
+        var idColumn = record.Columns.Add<Int32>("Id");
         var row = record.AddRow();
 
         var entity = new TestEntity
@@ -187,7 +187,7 @@ public class RecordLoaderTests
         RecordLoader<TestEntity>.WriteToRow(entity, row);
 
         // 验证存在的列被正确写入
-        Assert.AreEqual(555, row.GetInt32(idColumn));
+        Assert.AreEqual(555, row.Get<Int32>(idColumn));
     }
 
     /// <summary>
@@ -198,7 +198,7 @@ public class RecordLoaderTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var customColumn = record.Columns.AddString("custom_column"); // 使用特性指定的名称
+        var customColumn = record.Columns.Add<String>("custom_column"); // 使用特性指定的名称
         var row = record.AddRow();
         customColumn.Set("特性测试值");
 
@@ -219,8 +219,8 @@ public class RecordLoaderTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var nullableIntColumn = record.Columns.AddInt32("NullableInt");
-        var nullableDateTimeColumn = record.Columns.AddDateTime("NullableDateTime");
+        var nullableIntColumn = record.Columns.Add<Int32>("NullableInt");
+        var nullableDateTimeColumn = record.Columns.Add<DateTime>("NullableDateTime");
         var row = record.AddRow();
 
         // 设置为 null 值（通过不设置任何值来模拟 null）
@@ -291,8 +291,8 @@ public class RecordLoaderTests
     {
         // Arrange
         var record = new Record("SimpleTable", 1);
-        var valueColumn = record.Columns.AddInt32("Value");
-        var textColumn = record.Columns.AddString("Text");
+        var valueColumn = record.Columns.Add<Int32>("Value");
+        var textColumn = record.Columns.Add<String>("Text");
         var row = record.AddRow();
 
         valueColumn.Set(42);
@@ -316,7 +316,7 @@ public class RecordLoaderTests
     {
         // Arrange & Act
         var record = new Record("TestTable", 1);
-        var idColumn = record.Columns.AddInt32("Value"); // 修正列名
+        var idColumn = record.Columns.Add<Int32>("Value"); // 修正列名
         var row = record.AddRow();
         idColumn.Set(1);
 
@@ -583,12 +583,12 @@ public class RecordLoaderTests
 
         // Assert
         // 验证所有列都能正确写入数据
-        Assert.AreEqual(entity.Id, row.GetInt32("Id"));
-        Assert.AreEqual(entity.Name, row.GetString(("Name")!));
-        Assert.AreEqual(entity.CreateTime, row.GetDateTime(("CreateTime")!));
-        Assert.AreEqual(entity.IsActive, row.GetBoolean(("IsActive")!));
-        Assert.AreEqual(entity.Score, row.GetDouble(("Score")!), 0.001);
-        Assert.AreEqual(entity.CustomField, row.GetString(("custom_column")!));
-        Assert.AreEqual(entity.NullableInt, row.GetInt32(("NullableInt")!));
+        Assert.AreEqual(entity.Id, row.Get<Int32>("Id"));
+        Assert.AreEqual(entity.Name, row.Get<String>(("Name")!));
+        Assert.AreEqual(entity.CreateTime, row.Get<DateTime>(("CreateTime")!));
+        Assert.AreEqual(entity.IsActive, row.Get<Boolean>(("IsActive")!));
+        Assert.AreEqual(entity.Score, row.Get<Double>(("Score")!), 0.001);
+        Assert.AreEqual(entity.CustomField, row.Get<String>(("custom_column")!));
+        Assert.AreEqual(entity.NullableInt, row.Get<Int32>(("NullableInt")!));
     }
 }

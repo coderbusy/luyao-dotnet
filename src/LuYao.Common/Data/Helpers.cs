@@ -6,62 +6,50 @@ namespace LuYao.Data;
 
 static class Helpers
 {
-    private static readonly ConcurrentDictionary<Type, Func<Record, string, RecordDataCode, Type, RecordColumn>> _cache
-        = new();
+    private static readonly ConcurrentDictionary<Type, Func<Record, string, Type, RecordColumn>> _cache = new();
 
-    private static Func<Record, string, RecordDataCode, Type, RecordColumn> GetConstructor(Type type)
+    private static Func<Record, string, Type, RecordColumn> GetConstructor(Type type)
     {
-        return _cache.GetOrAdd(type, t =>
+        return _cache.GetOrAdd(type, static t =>
         {
+            // 创建泛型类型
             var genericType = typeof(RecordColumn<>).MakeGenericType(t);
+
+            // 获取构造函数
             var ctor = genericType.GetConstructor(new[] {
                 typeof(Record),
                 typeof(string),
-                typeof(RecordDataCode),
                 typeof(Type)
-            });
+            }) ?? throw new InvalidOperationException($"Constructor not found for {genericType}");
 
-            if (ctor == null) throw new InvalidOperationException($"Constructor not found for {genericType}");
-            // Parameters: (object record, string name, RecordDataType dataType, Type type)
+            // 定义参数表达式
             var pRecord = Expression.Parameter(typeof(Record), "record");
             var pName = Expression.Parameter(typeof(string), "name");
-            var pDataType = Expression.Parameter(typeof(RecordDataCode), "dataType");
             var pType = Expression.Parameter(typeof(Type), "type");
 
-            // new RecordColumn<T>(record, name, dataType, type)
-            var newExpr = Expression.New(ctor, pRecord, pName, pDataType, pType);
+            // 创建构造函数调用表达式
+            var newExpr = Expression.New(ctor, pRecord, pName, pType);
 
-            var lambda = Expression.Lambda<Func<Record, string, RecordDataCode, Type, RecordColumn>>(newExpr, pRecord, pName, pDataType, pType);
-            return lambda.Compile();
+            // 编译表达式树为委托
+            return Expression.Lambda<Func<Record, string, Type, RecordColumn>>(
+                newExpr, pRecord, pName, pType).Compile();
         });
     }
 
-    public static RecordColumn MakeRecordColumn(Record re, string name, Type type)
+    public static RecordColumn MakeRecordColumn<T>(Record record, string name)
     {
-        var ctor = GetConstructor(type);
-        return ctor.Invoke(re, name, RecordDataCode.Object, type);
+        // 使用泛型方法优化，避免运行时查找类型
+        var ctor = GetConstructor(typeof(T));
+        return ctor.Invoke(record, name, typeof(T));
     }
 
-    public static Type? ToType(RecordDataCode type)
+    public static RecordColumn MakeRecordColumn(Record record, string name, Type type)
     {
-        return type switch
-        {
-            RecordDataCode.Boolean => typeof(bool),
-            RecordDataCode.Byte => typeof(byte),
-            RecordDataCode.Char => typeof(char),
-            RecordDataCode.DateTime => typeof(DateTime),
-            RecordDataCode.Decimal => typeof(decimal),
-            RecordDataCode.Double => typeof(double),
-            RecordDataCode.Int16 => typeof(short),
-            RecordDataCode.Int32 => typeof(int),
-            RecordDataCode.Int64 => typeof(long),
-            RecordDataCode.SByte => typeof(sbyte),
-            RecordDataCode.Single => typeof(float),
-            RecordDataCode.String => typeof(string),
-            RecordDataCode.UInt16 => typeof(ushort),
-            RecordDataCode.UInt32 => typeof(uint),
-            RecordDataCode.UInt64 => typeof(ulong),
-            _ => null
-        };
+        if (record == null) throw new ArgumentNullException(nameof(record));
+        if (name == null) throw new ArgumentNullException(nameof(name));
+        if (type == null) throw new ArgumentNullException(nameof(type));
+
+        var ctor = GetConstructor(type);
+        return ctor.Invoke(record, name, type);
     }
 }

@@ -17,31 +17,31 @@ public class GenericMethodTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var intColumn = record.Columns.AddInt32("IntColumn");
-        var stringColumn = record.Columns.AddString("StringColumn");
-        var boolColumn = record.Columns.AddBoolean("BoolColumn");
-        var dateTimeColumn = record.Columns.AddDateTime("DateTimeColumn");
-        var doubleColumn = record.Columns.AddDouble("DoubleColumn");
+        var intColumn = record.Columns.Add<Int32>("IntColumn");
+        var stringColumn = record.Columns.Add<String>("StringColumn");
+        var boolColumn = record.Columns.Add<Boolean>("BoolColumn");
+        var dateTimeColumn = record.Columns.Add<DateTime>("DateTimeColumn");
+        var doubleColumn = record.Columns.Add<Double>("DoubleColumn");
 
         var row = record.AddRow();
         var rowIndex = 0;
 
         // Act & Assert - 测试所有基础类型
         intColumn.Set(42, rowIndex);
-        Assert.AreEqual(42, intColumn.GetInt32(rowIndex));
+        Assert.AreEqual(42, intColumn.Get<Int32>(rowIndex));
 
         stringColumn.Set("Hello World", rowIndex);
-        Assert.AreEqual("Hello World", stringColumn.GetString(rowIndex));
+        Assert.AreEqual("Hello World", stringColumn.Get<String>(rowIndex));
 
         boolColumn.Set(true, rowIndex);
-        Assert.AreEqual(true, boolColumn.GetBoolean(rowIndex));
+        Assert.AreEqual(true, boolColumn.Get<Boolean>(rowIndex));
 
         var testDate = new DateTime(2023, 7, 28, 10, 30, 0);
         dateTimeColumn.Set(testDate, rowIndex);
-        Assert.AreEqual(testDate, dateTimeColumn.GetDateTime(rowIndex));
+        Assert.AreEqual(testDate, dateTimeColumn.Get<DateTime>(rowIndex));
 
         doubleColumn.Set(3.14159, rowIndex);
-        Assert.AreEqual(3.14159, doubleColumn.GetDouble(rowIndex), 0.00001);
+        Assert.AreEqual(3.14159, doubleColumn.Get<Double>(rowIndex), 0.00001);
     }
 
     /// <summary>
@@ -52,9 +52,9 @@ public class GenericMethodTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var intColumn = record.Columns.AddInt32("IntColumn");
-        var stringColumn = record.Columns.AddString("StringColumn");
-        var boolColumn = record.Columns.AddBoolean("BoolColumn");
+        var intColumn = record.Columns.Add<Int32>("IntColumn");
+        var stringColumn = record.Columns.Add<String>("StringColumn");
+        var boolColumn = record.Columns.Add<Boolean>("BoolColumn");
         var row = record.AddRow();
 
         // Act
@@ -63,31 +63,11 @@ public class GenericMethodTests
         boolColumn.Set(false);
 
         // Assert
-        Assert.AreEqual(123, row.GetInt32(intColumn));
-        Assert.AreEqual("Test String", row.GetString(stringColumn));
-        Assert.AreEqual(false, row.GetBoolean(boolColumn));
+        Assert.AreEqual(123, row.Get<Int32>(intColumn));
+        Assert.AreEqual("Test String", row.Get<String>(stringColumn));
+        Assert.AreEqual(false, row.Get<Boolean>(boolColumn));
     }
 
-    /// <summary>
-    /// 测试类型转换功能
-    /// </summary>
-    [TestMethod]
-    public void GenericSet_TypeConversion_ShouldWork()
-    {
-        // Arrange
-        var record = new Record("TestTable", 1);
-        var intColumn = record.Columns.AddInt32("IntColumn");
-        var stringColumn = record.Columns.AddString("StringColumn");
-        var row = record.AddRow();
-
-        // Act - 测试隐式类型转换
-        intColumn.Set("456", 0); // string -> int
-        stringColumn.Set(789, 0);   // int -> string
-
-        // Assert
-        Assert.AreEqual(456, intColumn.GetInt32(0));
-        Assert.AreEqual("789", stringColumn.GetString(0));
-    }
 
     /// <summary>
     /// 测试 To 泛型方法
@@ -97,8 +77,8 @@ public class GenericMethodTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var intColumn = record.Columns.AddInt32("IntColumn");
-        var stringColumn = record.Columns.AddString("StringColumn");
+        var intColumn = record.Columns.Add<Int32>("IntColumn");
+        var stringColumn = record.Columns.Add<String>("StringColumn");
         var row = record.AddRow();
 
         // 设置一些测试数据
@@ -132,17 +112,17 @@ public class GenericMethodTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var intColumn = record.Columns.AddInt32("IntColumn");
+        var intColumn = record.Columns.Add<Int32>("IntColumn");
         var row = record.AddRow();
 
         // Act & Assert - 测试可空类型
         int? nullableValue = 42;
         intColumn.SetValue(nullableValue, 0);
-        Assert.AreEqual(42, intColumn.GetInt32(0));
+        Assert.AreEqual(42, intColumn.Get<Int32>(0));
 
         // 测试 null 值处理
         intColumn.SetValue(null, 0);
-        int defaultValue = intColumn.GetInt32(0);
+        int defaultValue = intColumn.Get<Int32>(0);
         Assert.AreEqual(0, defaultValue); // 默认值
     }
 
@@ -154,16 +134,16 @@ public class GenericMethodTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var stringColumn = record.Columns.AddString("StringColumn");
+        var stringColumn = record.Columns.Add<String>("StringColumn");
         var row = record.AddRow();
 
         // Act & Assert - 测试空字符串
         stringColumn.Set("", 0);
-        Assert.AreEqual("", stringColumn.GetString(0));
+        Assert.AreEqual("", stringColumn.Get<String>(0));
 
         // 测试 null 字符串
         stringColumn.Set(null, 0);
-        string result = stringColumn.GetString(0);
+        string result = stringColumn.Get<String>(0);
         Assert.IsNull(result); // 应该返回 null
     }
 
@@ -175,7 +155,7 @@ public class GenericMethodTests
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var intColumn = record.Columns.AddInt32("IntColumn");
+        var intColumn = record.Columns.Add<Int32>("IntColumn");
         record.AddRow(); // 只有一行，有效索引是 0
 
         // Act & Assert
@@ -194,7 +174,7 @@ public class GenericMethodTests
     {
         // Arrange
         var record = new Record("PerfTest", 1000);
-        var intColumn = record.Columns.AddInt32("IntColumn");
+        var intColumn = record.Columns.Add<Int32>("IntColumn");
 
         // 添加 1000 行
         for (int i = 0; i < 1000; i++)
@@ -229,7 +209,7 @@ public class GenericMethodTests
         // 验证结果正确性
         for (int i = 0; i < 1000; i++)
         {
-            Assert.AreEqual(i, intColumn.GetInt32(i));
+            Assert.AreEqual(i, intColumn.Get<Int32>(i));
         }
 
         // 输出性能对比（调试信息）
@@ -250,10 +230,10 @@ public class GenericMethodTests
     {
         // Arrange
         var record = new Record("ConversionTest", 1);
-        var intColumn = record.Columns.AddInt32("IntColumn");
-        var doubleColumn = record.Columns.AddDouble("DoubleColumn");
-        var stringColumn = record.Columns.AddString("StringColumn");
-        var boolColumn = record.Columns.AddBoolean("BoolColumn");
+        var intColumn = record.Columns.Add<Int32>("IntColumn");
+        var doubleColumn = record.Columns.Add<Double>("DoubleColumn");
+        var stringColumn = record.Columns.Add<String>("StringColumn");
+        var boolColumn = record.Columns.Add<Boolean>("BoolColumn");
 
         var row = record.AddRow();
 
