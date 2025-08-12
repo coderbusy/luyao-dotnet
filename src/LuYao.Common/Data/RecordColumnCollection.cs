@@ -199,4 +199,19 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     }
 
     #endregion
+
+
+    /// <summary>
+    /// 根据列名获取 <see cref="RecordColumn"/> 实例，如果列不存在则返回 null。
+    /// </summary>
+    /// <param name="name">要查找的列名</param>
+    /// <returns>对应的 <see cref="RecordColumn"/> 实例，如果不存在则为 null</returns>
+    public RecordColumn? this[string name]
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
+            return this.Find(name);
+        }
+    }
 }

@@ -20,7 +20,7 @@ public class RecordColumn<T> : RecordColumn
         : base(record, name, type)
     {
         var capacity = record.Capacity;
-        if (capacity < 0) capacity = 5;
+        if (capacity <= 0) capacity = 5;
         _data = new T[capacity];
     }
 
