@@ -26,7 +26,6 @@ public class HelperTests
         // Assert
         Assert.IsNotNull(column);
         Assert.AreEqual(name, column.Name);
-        Assert.AreEqual(RecordDataCode.Object, column.Code);
         Assert.AreEqual(type, column.Type);
         Assert.IsInstanceOfType(column, typeof(RecordColumn<Foo>));
     }

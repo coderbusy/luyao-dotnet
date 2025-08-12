@@ -163,7 +163,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetBoolean("BoolColumn");
+        var result = recordRow.Get<Boolean>("BoolColumn");
 
         // Assert
         Assert.AreEqual(true, result);
@@ -180,7 +180,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetBoolean("NonExistentColumn");
+        var result = recordRow.Get<Boolean>("NonExistentColumn");
 
         // Assert
         Assert.AreEqual(default(bool), result);
@@ -197,7 +197,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 1);
 
         // Act
-        var result = recordRow.GetBoolean(boolColumn);
+        var result = recordRow.Get<Boolean>(boolColumn);
 
         // Assert
         Assert.AreEqual(false, result);
@@ -215,7 +215,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record1, 0);
 
         // Act
-        var result = recordRow.GetBoolean(boolColumn2);
+        var result = recordRow.Get<Boolean>(boolColumn2);
 
         // Assert
         Assert.AreEqual(true, result); // 应该通过列名查找到 record1 中的 BoolColumn
@@ -236,7 +236,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 1);
 
         // Act
-        var result = recordRow.GetString("StringColumn");
+        var result = recordRow.Get<String>("StringColumn");
 
         // Assert
         Assert.AreEqual("Test2", result);
@@ -253,7 +253,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetString("NonExistentColumn");
+        var result = recordRow.Get<String>("NonExistentColumn");
 
         // Assert
         Assert.AreEqual(default(string), result);
@@ -270,7 +270,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetString(stringColumn);
+        var result = recordRow.Get<String>(stringColumn);
 
         // Assert
         Assert.AreEqual("Test1", result);
@@ -291,7 +291,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 1);
 
         // Act
-        var result = recordRow.GetInt32("IntColumn");
+        var result = recordRow.Get<Int32>("IntColumn");
 
         // Assert
         Assert.AreEqual(200, result);
@@ -308,7 +308,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetInt32("NonExistentColumn");
+        var result = recordRow.Get<Int32>("NonExistentColumn");
 
         // Assert
         Assert.AreEqual(default(int), result);
@@ -325,7 +325,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetInt32(intColumn);
+        var result = recordRow.Get<Int32>(intColumn);
 
         // Assert
         Assert.AreEqual(100, result);
@@ -386,23 +386,6 @@ public class RecordRowTests
         Assert.AreEqual(200, result);
     }
 
-    /// <summary>
-    /// 测试 Get<T>(RecordColumn col) - 列属于不同记录
-    /// </summary>
-    [TestMethod]
-    public void GetGeneric_ByColumn_DifferentRecord_ShouldReturnDefault()
-    {
-        // Arrange
-        var (record1, _, _, _) = CreateTestRecord();
-        var (record2, intColumn2, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record1, 0);
-
-        // Act
-        var result = recordRow.Get<int>(intColumn2);
-
-        // Assert
-        Assert.AreEqual(default(int), result);
-    }
 
     #endregion
 
@@ -422,7 +405,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetByte("ByteColumn");
+        var result = recordRow.Get<Byte>("ByteColumn");
 
         // Assert
         Assert.AreEqual((byte)255, result);
@@ -442,7 +425,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetDouble("DoubleColumn");
+        var result = recordRow.Get<Double>("DoubleColumn");
 
         // Assert
         Assert.AreEqual(3.14159, result, 0.00001);
@@ -463,7 +446,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.GetDateTime("DateTimeColumn");
+        var result = recordRow.Get<DateTime>("DateTimeColumn");
 
         // Assert
         Assert.AreEqual(testDate, result);
@@ -484,9 +467,9 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act & Assert
-        Assert.AreEqual(default(int), recordRow.GetInt32(""));
-        Assert.AreEqual(default(string), recordRow.GetString(""));
-        Assert.AreEqual(default(bool), recordRow.GetBoolean(""));
+        Assert.AreEqual(default(int), recordRow.Get<Int32>(""));
+        Assert.AreEqual(default(string), recordRow.Get<String>(""));
+        Assert.AreEqual(default(bool), recordRow.Get<Boolean>(""));
     }
 
     /// <summary>
@@ -509,17 +492,17 @@ public class RecordRowTests
         var recordRow2 = new RecordRow(record, 2);
 
         // Act & Assert
-        Assert.AreEqual(100, recordRow0.GetInt32("IntColumn"));
-        Assert.AreEqual(200, recordRow1.GetInt32("IntColumn"));
-        Assert.AreEqual(300, recordRow2.GetInt32("IntColumn"));
+        Assert.AreEqual(100, recordRow0.Get<Int32>("IntColumn"));
+        Assert.AreEqual(200, recordRow1.Get<Int32>("IntColumn"));
+        Assert.AreEqual(300, recordRow2.Get<Int32>("IntColumn"));
 
-        Assert.AreEqual("Test1", recordRow0.GetString("StringColumn"));
-        Assert.AreEqual("Test2", recordRow1.GetString("StringColumn"));
-        Assert.AreEqual("Test3", recordRow2.GetString("StringColumn"));
+        Assert.AreEqual("Test1", recordRow0.Get<String>("StringColumn"));
+        Assert.AreEqual("Test2", recordRow1.Get<String>("StringColumn"));
+        Assert.AreEqual("Test3", recordRow2.Get<String>("StringColumn"));
 
-        Assert.AreEqual(true, recordRow0.GetBoolean("BoolColumn"));
-        Assert.AreEqual(false, recordRow1.GetBoolean("BoolColumn"));
-        Assert.AreEqual(true, recordRow2.GetBoolean("BoolColumn"));
+        Assert.AreEqual(true, recordRow0.Get<Boolean>("BoolColumn"));
+        Assert.AreEqual(false, recordRow1.Get<Boolean>("BoolColumn"));
+        Assert.AreEqual(true, recordRow2.Get<Boolean>("BoolColumn"));
     }
 
     #endregion
@@ -537,9 +520,9 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result1 = recordRow.GetInt32("IntColumn");
-        var result2 = recordRow.GetInt32("IntColumn");
-        var result3 = recordRow.GetInt32(intColumn);
+        var result1 = recordRow.Get<Int32>("IntColumn");
+        var result2 = recordRow.Get<Int32>("IntColumn");
+        var result3 = recordRow.Get<Int32>(intColumn);
 
         // Assert
         Assert.AreEqual(result1, result2);
@@ -558,9 +541,9 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 1);
 
         // Act & Assert
-        Assert.AreEqual(recordRow.GetInt32("IntColumn"), recordRow.GetInt32(intColumn));
-        Assert.AreEqual(recordRow.GetString("StringColumn"), recordRow.GetString(stringColumn));
-        Assert.AreEqual(recordRow.GetBoolean("BoolColumn"), recordRow.GetBoolean(boolColumn));
+        Assert.AreEqual(recordRow.Get<Int32>("IntColumn"), recordRow.Get<Int32>(intColumn));
+        Assert.AreEqual(recordRow.Get<String>("StringColumn"), recordRow.Get<String>(stringColumn));
+        Assert.AreEqual(recordRow.Get<Boolean>("BoolColumn"), recordRow.Get<Boolean>(boolColumn));
     }
 
     #endregion

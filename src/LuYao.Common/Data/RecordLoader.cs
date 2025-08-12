@@ -41,21 +41,6 @@ static class RecordLoader<T> where T : class
         var typeCode = Type.GetTypeCode(underlyingType);
         valueExpression = typeCode switch
         {
-            TypeCode.Boolean => Expression.Call(rowParam, nameof(RecordRow.GetBoolean), null, columnParam),
-            TypeCode.Byte => Expression.Call(rowParam, nameof(RecordRow.GetByte), null, columnParam),
-            TypeCode.Char => Expression.Call(rowParam, nameof(RecordRow.GetChar), null, columnParam),
-            TypeCode.DateTime => Expression.Call(rowParam, nameof(RecordRow.GetDateTime), null, columnParam),
-            TypeCode.Decimal => Expression.Call(rowParam, nameof(RecordRow.GetDecimal), null, columnParam),
-            TypeCode.Double => Expression.Call(rowParam, nameof(RecordRow.GetDouble), null, columnParam),
-            TypeCode.Int16 => Expression.Call(rowParam, nameof(RecordRow.GetInt16), null, columnParam),
-            TypeCode.Int32 => Expression.Call(rowParam, nameof(RecordRow.GetInt32), null, columnParam),
-            TypeCode.Int64 => Expression.Call(rowParam, nameof(RecordRow.GetInt64), null, columnParam),
-            TypeCode.SByte => Expression.Call(rowParam, nameof(RecordRow.GetSByte), null, columnParam),
-            TypeCode.Single => Expression.Call(rowParam, nameof(RecordRow.GetSingle), null, columnParam),
-            TypeCode.String => Expression.Call(rowParam, nameof(RecordRow.GetString), null, columnParam),
-            TypeCode.UInt16 => Expression.Call(rowParam, nameof(RecordRow.GetUInt16), null, columnParam),
-            TypeCode.UInt32 => Expression.Call(rowParam, nameof(RecordRow.GetUInt32), null, columnParam),
-            TypeCode.UInt64 => Expression.Call(rowParam, nameof(RecordRow.GetUInt64), null, columnParam),
             _ => MakeObject(rowParam, columnParam, underlyingType)
         };
 
@@ -114,21 +99,6 @@ static class RecordLoader<T> where T : class
         var typeCode = Type.GetTypeCode(underlyingType);
         setExpression = typeCode switch
         {
-            TypeCode.Boolean => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.Byte => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.Char => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.DateTime => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.Decimal => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.Double => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.Int16 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.Int32 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.Int64 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.SByte => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.Single => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.String => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.UInt16 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.UInt32 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
-            TypeCode.UInt64 => Expression.Call(columnParam, nameof(RecordColumn.Set), null, valueExpression, rowExpression),
             _ => Expression.Call(columnParam, nameof(RecordColumn.SetValue), null, Expression.Convert(valueExpression, typeof(object)), rowExpression)
         };
 

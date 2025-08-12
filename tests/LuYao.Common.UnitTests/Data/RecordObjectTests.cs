@@ -143,11 +143,11 @@ public class RecordObjectTests
 
         // 验证数据是否正确填充
         record.Cursor = 0;
-        Assert.AreEqual(1, record.GetInt32(nameof(TestModel.Id)));
-        Assert.AreEqual("Test", record.GetString(nameof(TestModel.Name)));
-        Assert.AreEqual(true, record.GetBoolean(nameof(TestModel.IsActive)));
-        Assert.AreEqual(new DateTime(2023, 1, 1), record.GetDateTime(nameof(TestModel.CreatedDate)));
-        Assert.AreEqual(100.50m, record.GetDecimal(nameof(TestModel.Price)));
+        Assert.AreEqual(1, record.Get<int>(nameof(TestModel.Id)));
+        Assert.AreEqual("Test", record.Get<string>(nameof(TestModel.Name)));
+        Assert.AreEqual(true, record.Get<Boolean>(nameof(TestModel.IsActive)));
+        Assert.AreEqual(new DateTime(2023, 1, 1), record.Get<DateTime>(nameof(TestModel.CreatedDate)));
+        Assert.AreEqual(100.50m, record.Get<Decimal>(nameof(TestModel.Price)));
     }
 
     /// <summary>
@@ -197,21 +197,21 @@ public class RecordObjectTests
 
         // 验证各种数据类型
         record.Cursor = 0;
-        Assert.AreEqual(42, record.GetInt32(nameof(ComplexModel.IntValue)));
-        Assert.AreEqual(1234567890L, record.GetInt64(nameof(ComplexModel.LongValue)));
-        Assert.AreEqual(3.14159, record.GetDouble(nameof(ComplexModel.DoubleValue)), 0.00001);
-        Assert.AreEqual(2.71f, record.GetSingle(nameof(ComplexModel.FloatValue)), 0.001f);
-        Assert.AreEqual((byte)255, record.GetByte(nameof(ComplexModel.ByteValue)));
-        Assert.AreEqual('A', record.GetChar(nameof(ComplexModel.CharValue)));
-        Assert.AreEqual(true, record.GetBoolean(nameof(ComplexModel.BoolValue)));
-        Assert.AreEqual("Complex Test", record.GetString(nameof(ComplexModel.StringValue)));
-        Assert.AreEqual(new DateTime(2023, 12, 25), record.GetDateTime(nameof(ComplexModel.DateTimeValue)));
-        Assert.AreEqual(999.99m, record.GetDecimal(nameof(ComplexModel.DecimalValue)));
-        Assert.AreEqual((short)32767, record.GetInt16(nameof(ComplexModel.ShortValue)));
-        Assert.AreEqual((sbyte)-128, record.GetSByte(nameof(ComplexModel.SByteValue)));
-        Assert.AreEqual((ushort)65535, record.GetUInt16(nameof(ComplexModel.UShortValue)));
-        Assert.AreEqual(4294967295u, record.GetUInt32(nameof(ComplexModel.UIntValue)));
-        Assert.AreEqual(18446744073709551615ul, record.GetUInt64(nameof(ComplexModel.ULongValue)));
+        Assert.AreEqual(42, record.Get<Int32>(nameof(ComplexModel.IntValue)));
+        Assert.AreEqual(1234567890L, record.Get<long>(nameof(ComplexModel.LongValue)));
+        Assert.AreEqual(3.14159, record.Get<double>(nameof(ComplexModel.DoubleValue)), 0.00001);
+        Assert.AreEqual(2.71f, record.Get<float>(nameof(ComplexModel.FloatValue)), 0.001f);
+        Assert.AreEqual((byte)255, record.Get<byte>(nameof(ComplexModel.ByteValue)));
+        Assert.AreEqual('A', record.Get<char>(nameof(ComplexModel.CharValue)));
+        Assert.AreEqual(true, record.Get<bool>(nameof(ComplexModel.BoolValue)));
+        Assert.AreEqual("Complex Test", record.Get<string>(nameof(ComplexModel.StringValue)));
+        Assert.AreEqual(new DateTime(2023, 12, 25), record.Get<DateTime>(nameof(ComplexModel.DateTimeValue)));
+        Assert.AreEqual(999.99m, record.Get<decimal>(nameof(ComplexModel.DecimalValue)));
+        Assert.AreEqual((short)32767, record.Get<short>(nameof(ComplexModel.ShortValue)));
+        Assert.AreEqual((sbyte)-128, record.Get<sbyte>(nameof(ComplexModel.SByteValue)));
+        Assert.AreEqual((ushort)65535, record.Get<ushort>(nameof(ComplexModel.UShortValue)));
+        Assert.AreEqual(4294967295u, record.Get<uint>(nameof(ComplexModel.UIntValue)));
+        Assert.AreEqual(18446744073709551615ul, record.Get<ulong>(nameof(ComplexModel.ULongValue)));
     }
 
     #endregion
