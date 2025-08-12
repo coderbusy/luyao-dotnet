@@ -24,7 +24,20 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
 
     private List<TValue> _list = new List<TValue>();
     private Entry[]? _cache;
-
+    private Entry[] BuildCache()
+    {
+        int count = _list.Count;
+        if (count == 0) return Arrays.Empty<Entry>();
+        return this._list
+            .Select((item, index) => new Entry
+            {
+                Key = KeySelector(item),
+                Index = index
+            })
+            .OrderBy(e => e.Key, KeyComparer)
+            .ThenBy(e => e.Index)
+            .ToArray();
+    }
     /// <summary>
     /// 表示键和对应索引的内部结构。
     /// </summary>
@@ -63,20 +76,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
         KeyComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
     }
 
-    /// <summary>
-    /// 比较两个 Entry 对象的键。
-    /// </summary>
-    /// <param name="x">要比较的第一个 Entry。</param>
-    /// <param name="y">要比较的第二个 Entry。</param>
-    /// <returns>
-    /// 如果 x.Key 小于 y.Key，则小于零；
-    /// 如果 x.Key 等于 y.Key，则为零；
-    /// 如果 x.Key 大于 y.Key，则大于零。
-    /// </returns>
-    int IComparer<KeyedList<TKey, TValue>.Entry>.Compare(Entry x, Entry y)
-    {
-        return KeyComparer.Compare(x.Key, y.Key);
-    }
+    int IComparer<KeyedList<TKey, TValue>.Entry>.Compare(Entry x, Entry y) => KeyComparer.Compare(x.Key, y.Key);
 
     /// <summary>
     /// 获取或设置指定索引处的元素。
@@ -137,23 +137,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
     /// <returns>如果在整个集合中找到具有指定键的元素，则为该元素的从零开始的索引；否则为负数。</returns>
     public int IndexOfKey(TKey key)
     {
-        if (_cache == null)
-        {
-            int count = _list.Count;
-            if (count == 0) return -1;
-
-            _cache = new Entry[count];
-            for (int i = 0; i < count; i++)
-            {
-                _cache[i] = new Entry
-                {
-                    Key = KeySelector(_list[i]),
-                    Index = i
-                };
-            }
-
-            Array.Sort(_cache, this);
-        }
+        this._cache ??= BuildCache();
 
         var idx = Array.BinarySearch(_cache, new Entry { Key = key }, this);
         if (idx < 0) return -1;
@@ -237,4 +221,34 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
     /// </summary>
     /// <returns>可用于循环访问集合的 <see cref="IEnumerator"/>。</returns>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// 返回集合中所有具有指定键的元素序列。
+    /// </summary>
+    /// <param name="key">要查找的元素键。</param>
+    /// <returns>一个 <see cref="IEnumerable{TValue}"/>，包含所有具有指定键的元素。</returns>
+    public IEnumerable<TValue> Read(TKey key)
+    {
+        this._cache ??= BuildCache();
+        var idx = Array.BinarySearch(_cache, new Entry { Key = key }, this);
+        if (idx < 0)
+        {
+            yield break; // 如果没有找到，返回空集合
+        }
+        else
+        {
+            // 查找第一个匹配的元素
+            var first = idx;
+            var last = idx;
+
+            while (first > 0 && KeyComparer.Compare(_cache[first - 1].Key, key) == 0) first--;
+
+            while (last < _cache.Length - 1 && KeyComparer.Compare(_cache[last + 1].Key, key) == 0) last++;
+
+            for (int i = first; i <= last; i++)
+            {
+                yield return _list[_cache[i].Index];
+            }
+        }
+    }
 }

@@ -216,7 +216,7 @@ public class KeyedListTests
         var firstItem = new TestItem { Id = 1, Name = "First Item" };
         var secondItem = new TestItem { Id = 1, Name = "Second Item" };
         var thirdItem = new TestItem { Id = 1, Name = "Third Item" };
-        
+
         // 按顺序添加三个具有相同键的元素
         keyedList.Add(firstItem);
         keyedList.Add(secondItem);
@@ -236,14 +236,14 @@ public class KeyedListTests
     {
         // Arrange
         var keyedList = new KeyedList<int, TestItem>(item => item.Id);
-        
+
         // 创建多个元素，按非递增顺序添加，以测试是否能正确处理非按键排序的情况
         var firstItem = new TestItem { Id = 5, Name = "First Item" };
         var secondItem = new TestItem { Id = 3, Name = "Second Item" };
         var thirdItem = new TestItem { Id = 5, Name = "Third Item" }; // 与第一个元素有相同的键
         var fourthItem = new TestItem { Id = 2, Name = "Fourth Item" };
         var fifthItem = new TestItem { Id = 5, Name = "Fifth Item" }; // 与第一个和第三个元素有相同的键
-        
+
         keyedList.Add(firstItem);   // 索引 0, 键 5
         keyedList.Add(secondItem);  // 索引 1, 键 3
         keyedList.Add(thirdItem);   // 索引 2, 键 5
@@ -267,17 +267,17 @@ public class KeyedListTests
         var firstItem = new TestItem { Id = 1, Name = "First Item" };
         var secondItem = new TestItem { Id = 1, Name = "Second Item" };
         var thirdItem = new TestItem { Id = 1, Name = "Third Item" };
-        
+
         keyedList.Add(firstItem);
         keyedList.Add(secondItem);
         keyedList.Add(thirdItem);
-        
+
         // 移除第一个元素
         keyedList.Remove(firstItem);
-        
+
         // Act
         int index = keyedList.IndexOfKey(1);
-        
+
         // Assert
         // 验证返回的是剩余的第一个元素的索引
         Assert.AreEqual(keyedList.IndexOf(secondItem), index);
@@ -292,19 +292,19 @@ public class KeyedListTests
         var firstItem = new TestItem { Id = 1, Name = "First Item" };
         var secondItem = new TestItem { Id = 2, Name = "Second Item" };
         var thirdItem = new TestItem { Id = 1, Name = "Third Item" };
-        
+
         keyedList.Add(firstItem);
         keyedList.Add(secondItem);
-        
+
         // 触发一次 IndexOfKey 以构建缓存
         keyedList.IndexOfKey(1);
-        
+
         // 添加另一个具有相同键的元素，这会使缓存无效
         keyedList.Add(thirdItem);
-        
+
         // Act
         int index = keyedList.IndexOfKey(1);
-        
+
         // Assert
         // 验证返回的是第一个添加的元素的索引
         Assert.AreEqual(keyedList.IndexOf(firstItem), index);
@@ -610,6 +610,193 @@ public class KeyedListTests
 
         // Assert
         Assert.AreEqual(5, key);
+    }
+
+    #endregion
+
+    #region Read 方法测试
+
+    [TestMethod]
+    public void Read_ExistingKey_ReturnsAllMatchingItems()
+    {
+        // Arrange
+        var keyedList = new KeyedList<int, TestItem>(item => item.Id);
+        var item1 = new TestItem { Id = 1, Name = "Item 1A" };
+        var item2 = new TestItem { Id = 2, Name = "Item 2" };
+        var item3 = new TestItem { Id = 1, Name = "Item 1B" };
+        var item4 = new TestItem { Id = 3, Name = "Item 3" };
+        var item5 = new TestItem { Id = 1, Name = "Item 1C" };
+
+        keyedList.Add(item1);
+        keyedList.Add(item2);
+        keyedList.Add(item3);
+        keyedList.Add(item4);
+        keyedList.Add(item5);
+
+        // Act
+        var result = keyedList.Read(1).ToList();
+
+        // Assert
+        Assert.AreEqual(3, result.Count);
+        CollectionAssert.Contains(result, item1);
+        CollectionAssert.Contains(result, item3);
+        CollectionAssert.Contains(result, item5);
+    }
+
+    [TestMethod]
+    public void Read_NonExistingKey_ReturnsEmptyCollection()
+    {
+        // Arrange
+        var nonExistingKey = 999;
+
+        // Act
+        var result = _keyedList.Read(nonExistingKey).ToList();
+
+        // Assert
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void Read_EmptyList_ReturnsEmptyCollection()
+    {
+        // Arrange
+        var keyedList = new KeyedList<int, TestItem>(item => item.Id);
+
+        // Act
+        var result = keyedList.Read(1).ToList();
+
+        // Assert
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public void Read_PreservesOriginalOrder()
+    {
+        // Arrange
+        var keyedList = new KeyedList<int, TestItem>(item => item.Id);
+        var item1 = new TestItem { Id = 1, Name = "First" };
+        var item2 = new TestItem { Id = 2, Name = "Second" };
+        var item3 = new TestItem { Id = 1, Name = "Third" };
+        var item4 = new TestItem { Id = 1, Name = "Fourth" };
+
+        keyedList.Add(item1);
+        keyedList.Add(item2);
+        keyedList.Add(item3);
+        keyedList.Add(item4);
+
+        // Act
+        var result = keyedList.Read(1).ToList();
+
+        // Assert
+        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(item1, result[0]);
+        Assert.AreEqual(item3, result[1]);
+        Assert.AreEqual(item4, result[2]);
+    }
+
+    [TestMethod]
+    public void Read_AfterCacheInvalidation_ReturnsCorrectItems()
+    {
+        // Arrange
+        var keyedList = new KeyedList<int, TestItem>(item => item.Id);
+        var item1 = new TestItem { Id = 1, Name = "Item 1" };
+        var item2 = new TestItem { Id = 2, Name = "Item 2" };
+
+        keyedList.Add(item1);
+        keyedList.Add(item2);
+
+        // 触发一次 Read 以构建缓存
+        keyedList.Read(1).ToList();
+
+        // 添加另一个具有相同键的元素，这会使缓存无效
+        var item3 = new TestItem { Id = 1, Name = "Item 3" };
+        keyedList.Add(item3);
+
+        // Act
+        var result = keyedList.Read(1).ToList();
+
+        // Assert
+        Assert.AreEqual(2, result.Count);
+        CollectionAssert.Contains(result, item1);
+        CollectionAssert.Contains(result, item3);
+    }
+
+    [TestMethod]
+    public void Read_AfterModification_ReturnsUpdatedItems()
+    {
+        // Arrange
+        var keyedList = new KeyedList<int, TestItem>(item => item.Id);
+        var item1 = new TestItem { Id = 1, Name = "Item 1" };
+        var item2 = new TestItem { Id = 1, Name = "Item 2" };
+        var item3 = new TestItem { Id = 2, Name = "Item 3" };
+
+        keyedList.Add(item1);
+        keyedList.Add(item2);
+        keyedList.Add(item3);
+
+        // 初始检查
+        Assert.AreEqual(2, keyedList.Read(1).Count());
+
+        // 移除一个元素
+        keyedList.Remove(item1);
+
+        // Act
+        var result = keyedList.Read(1).ToList();
+
+        // Assert
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(item2, result[0]);
+    }
+
+    [TestMethod]
+    public void Read_WithCustomComparer_ReturnsMatchingItems()
+    {
+        // Arrange
+        var stringComparer = StringComparer.OrdinalIgnoreCase;
+        var keyedList = new KeyedList<string, TestItem>(item => item.Name, stringComparer);
+
+        var item1 = new TestItem { Id = 1, Name = "Test" };
+        var item2 = new TestItem { Id = 2, Name = "Different" };
+        var item3 = new TestItem { Id = 3, Name = "test" }; // 仅大小写不同
+
+        keyedList.Add(item1);
+        keyedList.Add(item2);
+        keyedList.Add(item3);
+
+        // Act
+        var result = keyedList.Read("TEST").ToList(); // 搜索大写形式
+
+        // Assert
+        Assert.AreEqual(2, result.Count);
+        CollectionAssert.Contains(result, item1);
+        CollectionAssert.Contains(result, item3);
+    }
+
+    [TestMethod]
+    public void Read_ItemsAddedRandomly_ReturnsSortedByAdditionOrder()
+    {
+        // Arrange
+        var keyedList = new KeyedList<int, TestItem>(item => item.Id);
+
+        // 按随机顺序添加元素
+        var item3 = new TestItem { Id = 5, Name = "Item 3" };
+        var item1 = new TestItem { Id = 5, Name = "Item 1" };
+        var item4 = new TestItem { Id = 2, Name = "Item 4" };
+        var item2 = new TestItem { Id = 5, Name = "Item 2" };
+
+        keyedList.Add(item1);  // 索引 0
+        keyedList.Add(item4);  // 索引 1
+        keyedList.Add(item2);  // 索引 2
+        keyedList.Add(item3);  // 索引 3
+
+        // Act
+        var result = keyedList.Read(5).ToList();
+
+        // Assert
+        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(item1, result[0]); // 第一个添加的 ID=5 的元素
+        Assert.AreEqual(item2, result[1]); // 第二个添加的 ID=5 的元素
+        Assert.AreEqual(item3, result[2]); // 第三个添加的 ID=5 的元素
     }
 
     #endregion
