@@ -22,7 +22,8 @@ public class HashAgent
     public HashAgent(Func<HashAlgorithm> hashAlgorithmFactory)
     {
         _hashAlgorithmFactory = hashAlgorithmFactory;
-    }
+    }
+
 
     /// <summary>
     /// 计算字符串的哈希值，使用 UTF-8 编码。
