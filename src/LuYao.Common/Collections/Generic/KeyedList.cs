@@ -90,7 +90,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
         set
         {
             _list[index] = value;
-            _cache = null;
+            InvalidateCache();
         }
     }
 
@@ -111,7 +111,19 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
     public void Add(TValue item)
     {
         _list.Add(item);
-        _cache = null;
+        InvalidateCache();
+    }
+
+    /// <summary>
+    /// 将指定的项集合添加到集合的末尾。
+    /// </summary>
+    /// <param name="items">要添加到集合的项的枚举集合。</param>
+    /// <exception cref="ArgumentNullException">items 参数为 null。</exception>
+    public void AddRange(IEnumerable<TValue> items)
+    {
+        if (items == null) throw new ArgumentNullException(nameof(items));
+        _list.AddRange(items);
+        InvalidateCache();
     }
 
     /// <summary>
@@ -120,7 +132,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
     public void Clear()
     {
         _list.Clear();
-        _cache = null;
+        InvalidateCache();
     }
 
     /// <summary>
@@ -190,7 +202,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
     public void Insert(int index, TValue item)
     {
         _list.Insert(index, item);
-        _cache = null;
+        InvalidateCache();
     }
 
     /// <summary>
@@ -201,7 +213,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
     public bool Remove(TValue item)
     {
         bool result = _list.Remove(item);
-        if (result) _cache = null;
+        if (result) InvalidateCache();
         return result;
     }
 
@@ -213,7 +225,7 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
     public void RemoveAt(int index)
     {
         _list.RemoveAt(index);
-        _cache = null;
+        InvalidateCache();
     }
 
     /// <summary>
@@ -251,4 +263,9 @@ public class KeyedList<TKey, TValue> : IList<TValue>, IComparer<KeyedList<TKey, 
             }
         }
     }
+
+    /// <summary>
+    /// 使内部缓存失效，强制下次访问时重新构建缓存。
+    /// </summary>
+    public void InvalidateCache() => _cache = null;
 }
