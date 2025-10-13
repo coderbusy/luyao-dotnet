@@ -101,8 +101,8 @@ using (var tempFile = AutoCleanTempFile.Create())
     // File will be automatically deleted when disposed
 }
 
-// Create temp file with specific extension
-using var tempCsv = AutoCleanTempFile.Create(".csv");
+// Or use constructor with custom path
+using var customTemp = new AutoCleanTempFile(Path.Combine(Path.GetTempPath(), "myfile.csv"));
 ```
 
 ##### 5. Thread Synchronization
@@ -116,9 +116,8 @@ lock (lockObj)
     // Critical section
 }
 
-// Async lock
-using var asyncLock = new AsyncLock();
-using (await asyncLock.LockAsync())
+// Async lock with key
+using (await AsyncLock.LockAsync("my-async-resource"))
 {
     // Async critical section
 }
@@ -221,10 +220,10 @@ var tokens = analyzer.Analyze("Hello World!");
 using LuYao.IO;
 
 // File size formatting
-var sizeStr = FileSizeHelper.FormatSize(1024 * 1024); // "1 MB"
+var sizeStr = FileSizeHelper.GetDisplayName(1024 * 1024); // "1.00 MB"
 
 // Path utilities
-var normalized = PathHelper.NormalizePath(@"C:\Users\..\Documents");
+var safeName = PathHelper.SafeFileName("my<file>name?.txt"); // "myfilename.txt"
 ```
 
 #### LuYao.Text.Json
@@ -396,8 +395,8 @@ using (var tempFile = AutoCleanTempFile.Create())
     // 文件将在 dispose 时自动删除
 }
 
-// 创建指定扩展名的临时文件
-using var tempCsv = AutoCleanTempFile.Create(".csv");
+// 或使用构造函数指定自定义路径
+using var customTemp = new AutoCleanTempFile(Path.Combine(Path.GetTempPath(), "myfile.csv"));
 ```
 
 ##### 5. 线程同步
@@ -411,9 +410,8 @@ lock (lockObj)
     // 临界区
 }
 
-// 异步锁
-using var asyncLock = new AsyncLock();
-using (await asyncLock.LockAsync())
+// 基于键的异步锁
+using (await AsyncLock.LockAsync("my-async-resource"))
 {
     // 异步临界区
 }
@@ -516,10 +514,10 @@ var tokens = analyzer.Analyze("Hello World!");
 using LuYao.IO;
 
 // 文件大小格式化
-var sizeStr = FileSizeHelper.FormatSize(1024 * 1024); // "1 MB"
+var sizeStr = FileSizeHelper.GetDisplayName(1024 * 1024); // "1.00 MB"
 
 // 路径工具
-var normalized = PathHelper.NormalizePath(@"C:\Users\..\Documents");
+var safeName = PathHelper.SafeFileName("my<file>name?.txt"); // "myfilename.txt"
 ```
 
 #### LuYao.Text.Json
