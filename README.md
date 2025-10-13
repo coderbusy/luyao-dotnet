@@ -1,74 +1,598 @@
-# LuYao .NET Í¨ÓÃ¹¤¾ß¿â
+# LuYao .NET é€šç”¨å·¥å…·åº“
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/LuYao.Common.svg)](https://www.nuget.org/packages/LuYao.Common)
+[![Build](https://img.shields.io/github/actions/workflow/status/coderbusy/luyao-dotnet/build.yml?branch=main)](https://github.com/coderbusy/luyao-dotnet/actions)
 
-## ¼ò½é
+[ä¸­æ–‡](#chinese) | [English](#english)
 
-`luyao-dotnet` ÊÇÒ»¸ö¸ßÖÊÁ¿¡¢Ò×ÓÃµÄ .NET ¹¤¾ß¿â£¬Ìá¹©·á¸»µÄÍ¨ÓÃ¹¤¾ßÀàºÍÀ©Õ¹·½·¨£¬º­¸Ç»º´æ¡¢¹şÏ£¡¢Êı×é¡¢Ïß³ÌËø¡¢ÁÙÊ±ÎÄ¼ş¡¢×Ö·û´®Ñ¹ËõµÈ³£ÓÃ¿ª·¢³¡¾°£¬ÖúÁ¦ .NET ¿ª·¢ÕßÌáÉı¿ª·¢Ğ§ÂÊÓë´úÂëÖÊÁ¿¡£
+---
 
-## Ö÷Òª¹¦ÄÜ
+<a name="chinese"></a>
+## ä¸­æ–‡
 
-- **»º´æ¶ÔÏó**£º`CachedObject<T>` Ö§³Ö»º´æÖµ¼°¶àÖÖ¹ıÆÚ²ßÂÔ¡£
-- **Êı×é¹¤¾ß**£º`Arrays` Àà±ã½İ»ñÈ¡Ö¸¶¨ÀàĞÍµÄ¿ÕÊı×é¡£
-- **¹şÏ£Ëã·¨**£º`HashAgent`/`HashAgents` Ö§³Ö CRC32¡¢CRC64¡¢MD5¡¢SHA1 µÈ³£ÓÃ¹şÏ£Ëã·¨¡£
-- **ÁÙÊ±ÎÄ¼ş¹ÜÀí**£º`AutoCleanTempFile` ¶ÔÏó×Ô¶¯ÇåÀíÁÙÊ±ÎÄ¼ş£¬±ÜÃâ×ÊÔ´Ğ¹Â¶¡£
-- **Ïß³ÌËø»úÖÆ**£º`KeyedLocker<T>` ÊµÏÖ»ùÓÚ Key µÄ¸ß²¢·¢Ëø¡£
-- **×Ö·û´®Ñ¹Ëõ/½âÑ¹**£º`LzString`¡¢`GZipString` Ö§³Ö¶àÖÖ×Ö·û´®Ñ¹ËõÓë½âÑ¹ËõËã·¨¡£
+### ç®€ä»‹
 
-## °²×°
+LuYao æ˜¯ä¸€ä¸ªé¢å‘ä¼ä¸šçº§åº”ç”¨çš„ .NET å®ç”¨å·¥å…·åº“é›†åˆï¼Œæä¾›ä¸°å¯Œçš„é€šç”¨å·¥å…·ã€æ‰©å±•æ–¹æ³•å’Œå®ç”¨ç¨‹åºï¼Œå¸®åŠ© .NET å¼€å‘äººå‘˜æ›´é«˜æ•ˆåœ°ç¼–å†™ä¸šåŠ¡ä»£ç ã€‚
 
-ÍÆ¼öÍ¨¹ı NuGet °²×°£º
+è¯¥é¡¹ç›®åŒ…å«ä¸‰ä¸ªä¸»è¦åŒ…ï¼š
+- **LuYao.Common**ï¼šæ ¸å¿ƒå·¥å…·åº“ï¼ŒåŒ…å«ç¼“å­˜ã€å“ˆå¸Œã€I/O åŠ©æ‰‹ã€çº¿ç¨‹å·¥å…·ç­‰
+- **LuYao.Text.Json**ï¼šåŸºäº Newtonsoft.Json çš„ JSON å¤„ç†å·¥å…·
+- **LuYao.Text.Json.Jint**ï¼šä½¿ç”¨ Jint å¼•æ“çš„ JavaScript é©±åŠ¨çš„ JSON è½¬æ¢
+
+### æ”¯æŒçš„æ¡†æ¶
+
+- .NET Framework 4.5+
+- .NET Framework 4.6.1+
+- .NET Standard 2.0
+- .NET Standard 2.1
+- .NET 6.0
+- .NET 8.0
+
+### å®‰è£…
+
+é€šè¿‡ NuGet åŒ…ç®¡ç†å™¨å®‰è£…ï¼š
 
 ```bash
+# æ ¸å¿ƒå·¥å…·åº“
 dotnet add package LuYao.Common
-```
-»ò·ÃÎÊ [NuGet ¹ÙÍø](https://www.nuget.org/packages/LuYao.Common) »ñÈ¡×îĞÂĞÅÏ¢¡£
 
-Ò²¿ÉÍ¨¹ıÔ´Âë¼¯³Éµ½ÄãµÄ .NET ÏîÄ¿ÖĞ£º
+# JSON å·¥å…·
+dotnet add package LuYao.Text.Json
+
+# åŸºäº Jint çš„ JSON è½¬æ¢
+dotnet add package LuYao.Text.Json.Jint
+```
+
+æˆ–å…‹éš†æºä»£ç ï¼š
 
 ```bash
 git clone https://github.com/coderbusy/luyao-dotnet.git
 ```
 
-## Ê¾Àı
+### ä¸»è¦åŠŸèƒ½
 
+#### LuYao.Common
+
+##### 1. ç¼“å­˜æœºåˆ¶
 ```csharp
-// »º´æ¶ÔÏóµÄÊ¹ÓÃ
-var cache = new CachedObject<string>("Hello", TimeSpan.FromMinutes(5));
-Console.WriteLine(cache.Value);
+using LuYao;
 
-// »ñÈ¡¿ÕÊı×é
+// åˆ›å»ºå¸¦è‡ªåŠ¨è¿‡æœŸçš„ç¼“å­˜å¯¹è±¡
+var cache = new CachedObject<string>("Hello World", TimeSpan.FromMinutes(5));
+Console.WriteLine(cache.Value); // "Hello World"
+Console.WriteLine(cache.IsExpired); // false
+```
+
+##### 2. æ•°ç»„å·¥å…·
+```csharp
+using LuYao;
+
+// è·å–ç©ºæ•°ç»„å®ä¾‹ï¼ˆå†…å­˜ä¼˜åŒ–ï¼‰
 var emptyInts = Arrays.Empty<int>();
+var emptyStrings = Arrays.Empty<string>();
+```
 
-// ¼ÆËãÎÄ¼şµÄ MD5
+##### 3. å“ˆå¸Œç®—æ³•
+```csharp
+using LuYao.IO.Hashing;
+
+// è®¡ç®—æ–‡ä»¶å“ˆå¸Œ
 var md5 = HashAgents.MD5.HashFile("test.txt");
+var sha1 = HashAgents.SHA1.HashFile("test.txt");
 
-// ´´½¨×Ô¶¯ÇåÀíµÄÁÙÊ±ÎÄ¼ş
-using var tempFile = new AutoCleanTempFile();
-File.WriteAllText(tempFile.FileName, "ÁÙÊ±Êı¾İ");
+// è®¡ç®—å­—ç¬¦ä¸²å“ˆå¸Œ
+var crc32 = HashAgents.CRC32.HashString("hello");
+var crc64 = HashAgents.CRC64.HashString("world");
 
-// Ïß³ÌËø»úÖÆ
-var lockObj = KeyedLocker<string>.GetLock("my-key");
+// æµå“ˆå¸Œ
+using var stream = File.OpenRead("data.bin");
+var murmur128 = HashAgents.Murmur128.HashStream(stream);
+```
+
+##### 4. ä¸´æ—¶æ–‡ä»¶ç®¡ç†
+```csharp
+using LuYao.IO;
+
+// è‡ªåŠ¨æ¸…ç†çš„ä¸´æ—¶æ–‡ä»¶
+using (var tempFile = AutoCleanTempFile.Create())
+{
+    File.WriteAllText(tempFile.FileName, "ä¸´æ—¶å†…å®¹");
+    // æ–‡ä»¶å°†åœ¨ dispose æ—¶è‡ªåŠ¨åˆ é™¤
+}
+
+// åˆ›å»ºæŒ‡å®šæ‰©å±•åçš„ä¸´æ—¶æ–‡ä»¶
+using var tempCsv = AutoCleanTempFile.Create(".csv");
+```
+
+##### 5. çº¿ç¨‹åŒæ­¥
+```csharp
+using LuYao.Threading;
+
+// åŸºäºé”®çš„é”ï¼Œç”¨äºç»†ç²’åº¦åŒæ­¥
+var lockObj = KeyedLocker<string>.GetLock("my-resource");
 lock (lockObj)
 {
-    // ÁÙ½çÇø´úÂë
+    // ä¸´ç•ŒåŒº
+}
+
+// å¼‚æ­¥é”
+using var asyncLock = new AsyncLock();
+using (await asyncLock.LockAsync())
+{
+    // å¼‚æ­¥ä¸´ç•ŒåŒº
 }
 ```
 
-## ÊÚÈ¨Ğ­Òé
+##### 6. å­—ç¬¦ä¸²å‹ç¼©
+```csharp
+using LuYao.Encoders;
+using LuYao;
 
-±¾ÏîÄ¿»ùÓÚ [MIT License](LICENSE) ¿ªÔ´£¬»¶Ó­×ÔÓÉÊ¹ÓÃÓë¹±Ï×¡£
+// LZ-string å‹ç¼©
+var compressed = LzString.CompressToBase64("Hello World");
+var decompressed = LzString.DecompressFromBase64(compressed);
+
+// GZip å‹ç¼©
+var gzipCompressed = GZipString.Compress("å¤§é‡æ–‡æœ¬æ•°æ®");
+var gzipDecompressed = GZipString.Decompress(gzipCompressed);
+```
+
+##### 7. Hosts æ–‡ä»¶ç®¡ç†
+```csharp
+using LuYao.IO.Hosts;
+
+// è¯»å–å’Œè§£æ hosts æ–‡ä»¶
+var hostsFile = HostFile.Read(@"C:\Windows\System32\drivers\etc\hosts");
+
+// ä»å­—ç¬¦ä¸²è§£æ
+var hosts = HostFile.Parse("127.0.0.1 localhost\n192.168.1.1 router");
+
+// ä¿®æ”¹å¹¶è®¿é—®æ¡ç›®
+foreach (var line in hosts.Lines)
+{
+    if (line is RecordLine record)
+    {
+        Console.WriteLine($"{record.IPAddress} -> {record.Domain}");
+    }
+}
+```
+
+##### 8. ä¼ªé€ ç”¨æˆ·ä»£ç†
+```csharp
+using LuYao.Net.Http.FakeUserAgent;
+
+// è·å–éšæœºç”¨æˆ·ä»£ç†
+var selector = UserAgentSelector.All;
+var userAgent = selector.Random();
+Console.WriteLine(userAgent?.UserAgent);
+
+// æŒ‰æ¡ä»¶è¿‡æ»¤
+var chromeSelector = UserAgentSelector.Filter(x => x.Browser == "Chrome");
+var chromeUA = chromeSelector.Random();
+```
+
+##### 9. é™æµï¼ˆä»¤ç‰Œæ¡¶ï¼‰
+```csharp
+using LuYao.Limiters.TokenBucket;
+
+// åˆ›å»ºä»¤ç‰Œæ¡¶é™æµå™¨
+var bucket = TokenBuckets.Builder()
+    .WithCapacity(100)
+    .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(1))
+    .Build();
+
+// å°è¯•æ¶ˆè´¹ä»¤ç‰Œ
+if (bucket.TryConsume(1))
+{
+    // å¤„ç†è¯·æ±‚
+}
+else
+{
+    // è¶…è¿‡é€Ÿç‡é™åˆ¶
+}
+```
+
+##### 10. å¯†ç å¼ºåº¦æ£€æµ‹
+```csharp
+using LuYao.Security;
+
+var advisor = new PasswordAdvisor();
+var score = advisor.CheckStrength("MyP@ssw0rd123");
+Console.WriteLine(score); // Strong, Medium, Weak ç­‰
+```
+
+##### 11. æ–‡æœ¬åˆ†è¯ä¸åˆ†æ
+```csharp
+using LuYao.Text.Tokenizer;
+
+// æ„å»ºè‡ªå®šä¹‰åˆ†æå™¨
+var analyzer = new AnalyzerBuilder()
+    .WithCharacterFilter(new ToDbcCaseCharacterFilter())
+    .WithTokenizer(new StandardTokenizer())
+    .WithTokenFilter(new ToLowerCaseTokenFilter())
+    .Build();
+
+var tokens = analyzer.Analyze("Hello World!");
+```
+
+##### 12. æ–‡ä»¶å’Œè·¯å¾„å·¥å…·
+```csharp
+using LuYao.IO;
+
+// æ–‡ä»¶å¤§å°æ ¼å¼åŒ–
+var sizeStr = FileSizeHelper.FormatSize(1024 * 1024); // "1 MB"
+
+// è·¯å¾„å·¥å…·
+var normalized = PathHelper.NormalizePath(@"C:\Users\..\Documents");
+```
+
+#### LuYao.Text.Json
+
+##### JSON æå–ä¸å¤„ç†
+```csharp
+using LuYao.Text.Json;
+
+// ä»æ··åˆå†…å®¹ä¸­æå– JSON
+var text = "å‰é¢çš„æ–‡æœ¬ {\"name\":\"å¼ ä¸‰\",\"age\":30} åé¢çš„æ–‡æœ¬";
+var json = JsonHelper.ExtractJson(text, Formatting.Indented);
+Console.WriteLine(json); // {"name":"å¼ ä¸‰","age":30}
+```
+
+#### LuYao.Text.Json.Jint
+
+##### JavaScript é©±åŠ¨çš„ JSON è½¬æ¢
+```csharp
+using LuYao.Text.Json;
+
+// å®šä¹‰å¸¦åµŒå…¥å¼ JS çš„è½¬æ¢æ¨¡å‹
+public class MyModel : TranslatableJsonModel
+{
+    // å®ç°è½¬æ¢é€»è¾‘
+}
+
+// ä½¿ç”¨æ¨¡å‹è¿›è¡Œ JSON è½¬æ¢
+var model = new MyModel();
+// ä½¿ç”¨ JavaScript è½¬æ¢ JSON
+```
+
+### ä»æºç æ„å»º
+
+```bash
+# å…‹éš†ä»“åº“
+git clone https://github.com/coderbusy/luyao-dotnet.git
+cd luyao-dotnet
+
+# æ„å»ºè§£å†³æ–¹æ¡ˆ
+dotnet build --configuration Release
+
+# è¿è¡Œæµ‹è¯•
+dotnet test --configuration Release
+```
+
+### è¿è¡Œæµ‹è¯•
+
+```bash
+# è¿è¡Œæ‰€æœ‰æµ‹è¯•
+dotnet test
+
+# è¿è¡Œç‰¹å®šæµ‹è¯•é¡¹ç›®
+dotnet test tests/LuYao.Common.UnitTests/LuYao.Common.UnitTests.csproj
+```
+
+### è´¡çŒ®
+
+æ¬¢è¿è´¡çŒ®ï¼æ‚¨å¯ä»¥ï¼š
+- é€šè¿‡ [Issues](https://github.com/coderbusy/luyao-dotnet/issues) æŠ¥å‘Šé”™è¯¯æˆ–è¯·æ±‚åŠŸèƒ½
+- æäº¤æ”¹è¿›çš„æ‹‰å–è¯·æ±‚
+- æ”¹è¿›æ–‡æ¡£
+- åˆ†äº«æ‚¨çš„ä½¿ç”¨æ¡ˆä¾‹
+
+### è®¸å¯è¯
+
+æœ¬é¡¹ç›®åŸºäº [MIT License](LICENSE) å¼€æºã€‚
+
+### é“¾æ¥
+
+- **GitHub**: [coderbusy/luyao-dotnet](https://github.com/coderbusy/luyao-dotnet)
+- **NuGet åŒ…**:
+  - [LuYao.Common](https://www.nuget.org/packages/LuYao.Common)
+  - [LuYao.Text.Json](https://www.nuget.org/packages/LuYao.Text.Json)
+  - [LuYao.Text.Json.Jint](https://www.nuget.org/packages/LuYao.Text.Json.Jint)
+- **ç½‘ç«™**: [https://www.coderbusy.com/](https://www.coderbusy.com/)
+
 
 ---
 
-## ¹±Ï×
+<a name="english"></a>
+## English
 
-»¶Ó­Ìá½» Issue ºÍ PR¡£
+### Introduction
 
----
+LuYao is a comprehensive collection of .NET utility libraries designed for enterprise-level applications. It provides a rich set of common tools, extensions, and utilities to help .NET developers write business code more efficiently.
 
-## ÁªÏµ
+The project consists of three main packages:
+- **LuYao.Common**: Core utilities library with caching, hashing, I/O helpers, threading utilities, and more
+- **LuYao.Text.Json**: JSON processing utilities built on Newtonsoft.Json
+- **LuYao.Text.Json.Jint**: JavaScript-powered JSON transformation using Jint engine
 
-GitHub: [coderbusy/luyao-dotnet](https://github.com/coderbusy/luyao-dotnet)  
-NuGet: [LuYao.Common](https://www.nuget.org/packages/LuYao.Common)
+### Supported Frameworks
+
+- .NET Framework 4.5+
+- .NET Framework 4.6.1+
+- .NET Standard 2.0
+- .NET Standard 2.1
+- .NET 6.0
+- .NET 8.0
+
+### Installation
+
+Install via NuGet Package Manager:
+
+```bash
+# Core utilities
+dotnet add package LuYao.Common
+
+# JSON utilities
+dotnet add package LuYao.Text.Json
+
+# Jint-based JSON transformation
+dotnet add package LuYao.Text.Json.Jint
+```
+
+Or clone the source code:
+
+```bash
+git clone https://github.com/coderbusy/luyao-dotnet.git
+```
+
+### Key Features
+
+#### LuYao.Common
+
+##### 1. Caching
+```csharp
+using LuYao;
+
+// Create a cached object with automatic expiration
+var cache = new CachedObject<string>("Hello World", TimeSpan.FromMinutes(5));
+Console.WriteLine(cache.Value); // "Hello World"
+Console.WriteLine(cache.IsExpired); // false
+```
+
+##### 2. Array Utilities
+```csharp
+using LuYao;
+
+// Get empty array instances (optimized for memory)
+var emptyInts = Arrays.Empty<int>();
+var emptyStrings = Arrays.Empty<string>();
+```
+
+##### 3. Hashing Algorithms
+```csharp
+using LuYao.IO.Hashing;
+
+// Compute file hash
+var md5 = HashAgents.MD5.HashFile("test.txt");
+var sha1 = HashAgents.SHA1.HashFile("test.txt");
+
+// Compute string hash
+var crc32 = HashAgents.CRC32.HashString("hello");
+var crc64 = HashAgents.CRC64.HashString("world");
+
+// Stream hashing
+using var stream = File.OpenRead("data.bin");
+var murmur128 = HashAgents.Murmur128.HashStream(stream);
+```
+
+##### 4. Temporary File Management
+```csharp
+using LuYao.IO;
+
+// Auto-cleaning temporary file
+using (var tempFile = AutoCleanTempFile.Create())
+{
+    File.WriteAllText(tempFile.FileName, "Temporary content");
+    // File will be automatically deleted when disposed
+}
+
+// Create temp file with specific extension
+using var tempCsv = AutoCleanTempFile.Create(".csv");
+```
+
+##### 5. Thread Synchronization
+```csharp
+using LuYao.Threading;
+
+// Keyed lock for fine-grained synchronization
+var lockObj = KeyedLocker<string>.GetLock("my-resource");
+lock (lockObj)
+{
+    // Critical section
+}
+
+// Async lock
+using var asyncLock = new AsyncLock();
+using (await asyncLock.LockAsync())
+{
+    // Async critical section
+}
+```
+
+##### 6. String Compression
+```csharp
+using LuYao.Encoders;
+using LuYao;
+
+// LZ-string compression
+var compressed = LzString.CompressToBase64("Hello World");
+var decompressed = LzString.DecompressFromBase64(compressed);
+
+// GZip compression
+var gzipCompressed = GZipString.Compress("Large text data");
+var gzipDecompressed = GZipString.Decompress(gzipCompressed);
+```
+
+##### 7. Hosts File Management
+```csharp
+using LuYao.IO.Hosts;
+
+// Read and parse hosts file
+var hostsFile = HostFile.Read(@"C:\Windows\System32\drivers\etc\hosts");
+
+// Parse from string
+var hosts = HostFile.Parse("127.0.0.1 localhost\n192.168.1.1 router");
+
+// Modify and access entries
+foreach (var line in hosts.Lines)
+{
+    if (line is RecordLine record)
+    {
+        Console.WriteLine($"{record.IPAddress} -> {record.Domain}");
+    }
+}
+```
+
+##### 8. Fake User Agent
+```csharp
+using LuYao.Net.Http.FakeUserAgent;
+
+// Get random user agent
+var selector = UserAgentSelector.All;
+var userAgent = selector.Random();
+Console.WriteLine(userAgent?.UserAgent);
+
+// Filter by criteria
+var chromeSelector = UserAgentSelector.Filter(x => x.Browser == "Chrome");
+var chromeUA = chromeSelector.Random();
+```
+
+##### 9. Rate Limiting (Token Bucket)
+```csharp
+using LuYao.Limiters.TokenBucket;
+
+// Create token bucket limiter
+var bucket = TokenBuckets.Builder()
+    .WithCapacity(100)
+    .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(1))
+    .Build();
+
+// Try to consume tokens
+if (bucket.TryConsume(1))
+{
+    // Process request
+}
+else
+{
+    // Rate limit exceeded
+}
+```
+
+##### 10. Password Strength Advisor
+```csharp
+using LuYao.Security;
+
+var advisor = new PasswordAdvisor();
+var score = advisor.CheckStrength("MyP@ssw0rd123");
+Console.WriteLine(score); // Strong, Medium, Weak, etc.
+```
+
+##### 11. Text Tokenization and Analysis
+```csharp
+using LuYao.Text.Tokenizer;
+
+// Build custom analyzer
+var analyzer = new AnalyzerBuilder()
+    .WithCharacterFilter(new ToDbcCaseCharacterFilter())
+    .WithTokenizer(new StandardTokenizer())
+    .WithTokenFilter(new ToLowerCaseTokenFilter())
+    .Build();
+
+var tokens = analyzer.Analyze("Hello World!");
+```
+
+##### 12. File and Path Helpers
+```csharp
+using LuYao.IO;
+
+// File size formatting
+var sizeStr = FileSizeHelper.FormatSize(1024 * 1024); // "1 MB"
+
+// Path utilities
+var normalized = PathHelper.NormalizePath(@"C:\Users\..\Documents");
+```
+
+#### LuYao.Text.Json
+
+##### JSON Extraction and Processing
+```csharp
+using LuYao.Text.Json;
+
+// Extract JSON from mixed content
+var text = "Some text before {\"name\":\"John\",\"age\":30} some text after";
+var json = JsonHelper.ExtractJson(text, Formatting.Indented);
+Console.WriteLine(json); // {"name":"John","age":30}
+```
+
+#### LuYao.Text.Json.Jint
+
+##### JavaScript-Powered JSON Transformation
+```csharp
+using LuYao.Text.Json;
+
+// Define transformation model with embedded JS
+public class MyModel : TranslatableJsonModel
+{
+    // Implement transformation logic
+}
+
+// Use the model for JSON transformation
+var model = new MyModel();
+// Transform JSON using JavaScript
+```
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/coderbusy/luyao-dotnet.git
+cd luyao-dotnet
+
+# Build the solution
+dotnet build --configuration Release
+
+# Run tests
+dotnet test --configuration Release
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run specific test project
+dotnet test tests/LuYao.Common.UnitTests/LuYao.Common.UnitTests.csproj
+```
+
+### Contributing
+
+We welcome contributions! Please feel free to:
+- Report bugs or request features via [Issues](https://github.com/coderbusy/luyao-dotnet/issues)
+- Submit pull requests with improvements
+- Improve documentation
+- Share your use cases
+
+### License
+
+This project is licensed under the [MIT License](LICENSE).
+
+### Links
+
+- **GitHub**: [coderbusy/luyao-dotnet](https://github.com/coderbusy/luyao-dotnet)
+- **NuGet Packages**:
+  - [LuYao.Common](https://www.nuget.org/packages/LuYao.Common)
+  - [LuYao.Text.Json](https://www.nuget.org/packages/LuYao.Text.Json)
+  - [LuYao.Text.Json.Jint](https://www.nuget.org/packages/LuYao.Text.Json.Jint)
+- **Website**: [https://www.coderbusy.com/](https://www.coderbusy.com/)
