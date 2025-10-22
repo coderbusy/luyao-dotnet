@@ -12,15 +12,15 @@ public class StringHelperTests
     public void Truncate_ThrowsArgumentNullException_WhenTextIsNull()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => StringHelper.Truncate(null, 10));
+        Assert.ThrowsException<ArgumentNullException>(() => StringHelper.Truncate(null, 10, out _));
     }
 
     [TestMethod]
     public void Truncate_ThrowsArgumentOutOfRangeException_WhenMaxLengthIsLessThanOne()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => StringHelper.Truncate("test", 0));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => StringHelper.Truncate("test", -1));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => StringHelper.Truncate("test", 0, out _));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => StringHelper.Truncate("test", -1, out _));
     }
 
     [TestMethod]
@@ -30,12 +30,11 @@ public class StringHelperTests
         var text = "Hello World";
 
         // Act
-        var result = StringHelper.Truncate(text, 20);
+        var truncated = StringHelper.Truncate(text, 20, out string remaining);
 
         // Assert
-        Assert.AreEqual(text, result.Truncated);
-        Assert.AreEqual(string.Empty, result.Remaining);
-        Assert.IsFalse(result.WasTruncated);
+        Assert.AreEqual(text, truncated);
+        Assert.AreEqual(string.Empty, remaining);
     }
 
     [TestMethod]
@@ -45,12 +44,11 @@ public class StringHelperTests
         var text = "Hello";
 
         // Act
-        var result = StringHelper.Truncate(text, 5);
+        var truncated = StringHelper.Truncate(text, 5, out string remaining);
 
         // Assert
-        Assert.AreEqual(text, result.Truncated);
-        Assert.AreEqual(string.Empty, result.Remaining);
-        Assert.IsFalse(result.WasTruncated);
+        Assert.AreEqual(text, truncated);
+        Assert.AreEqual(string.Empty, remaining);
     }
 
     [TestMethod]
@@ -60,12 +58,11 @@ public class StringHelperTests
         var text = "Hello World Test";
 
         // Act
-        var result = StringHelper.Truncate(text, 12);
+        var truncated = StringHelper.Truncate(text, 12, out string remaining);
 
         // Assert
-        Assert.AreEqual("Hello World", result.Truncated);
-        Assert.AreEqual(" Test", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Hello World", truncated);
+        Assert.AreEqual(" Test", remaining);
     }
 
     [TestMethod]
@@ -75,12 +72,11 @@ public class StringHelperTests
         var text = "Hello   World   Test";
 
         // Act
-        var result = StringHelper.Truncate(text, 12);
+        var truncated = StringHelper.Truncate(text, 12, out string remaining);
 
         // Assert
-        Assert.AreEqual("Hello", result.Truncated);
-        Assert.AreEqual("   World   Test", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Hello", truncated);
+        Assert.AreEqual("   World   Test", remaining);
     }
 
     [TestMethod]
@@ -90,12 +86,11 @@ public class StringHelperTests
         var text = "你好世界，这是一个测试";
 
         // Act
-        var result = StringHelper.Truncate(text, 5);
+        var truncated = StringHelper.Truncate(text, 5, out string remaining);
 
         // Assert
-        Assert.AreEqual("你好世界，", result.Truncated);
-        Assert.AreEqual("这是一个测试", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("你好世界，", truncated);
+        Assert.AreEqual("这是一个测试", remaining);
     }
 
     [TestMethod]
@@ -105,12 +100,11 @@ public class StringHelperTests
         var text = "こんにちは世界です";
 
         // Act
-        var result = StringHelper.Truncate(text, 5);
+        var truncated = StringHelper.Truncate(text, 5, out string remaining);
 
         // Assert
-        Assert.AreEqual("こんにちは", result.Truncated);
-        Assert.AreEqual("世界です", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("こんにちは", truncated);
+        Assert.AreEqual("世界です", remaining);
     }
 
     [TestMethod]
@@ -120,12 +114,11 @@ public class StringHelperTests
         var text = "안녕하세요세계입니다";
 
         // Act
-        var result = StringHelper.Truncate(text, 5);
+        var truncated = StringHelper.Truncate(text, 5, out string remaining);
 
         // Assert
-        Assert.AreEqual("안녕하세요", result.Truncated);
-        Assert.AreEqual("세계입니다", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("안녕하세요", truncated);
+        Assert.AreEqual("세계입니다", remaining);
     }
 
     [TestMethod]
@@ -135,12 +128,11 @@ public class StringHelperTests
         var text = "Hello 世界 Test 测试";
 
         // Act
-        var result = StringHelper.Truncate(text, 10);
+        var truncated = StringHelper.Truncate(text, 10, out string remaining);
 
         // Assert
-        Assert.AreEqual("Hello 世界", result.Truncated);
-        Assert.AreEqual(" Test 测试", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Hello 世界", truncated);
+        Assert.AreEqual(" Test 测试", remaining);
     }
 
     [TestMethod]
@@ -150,12 +142,11 @@ public class StringHelperTests
         var text = "Product123 产品456 Item789";
 
         // Act
-        var result = StringHelper.Truncate(text, 15);
+        var truncated = StringHelper.Truncate(text, 15, out string remaining);
 
         // Assert
-        Assert.AreEqual("Product123 产品", result.Truncated);
-        Assert.AreEqual("456 Item789", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Product123 产品", truncated);
+        Assert.AreEqual("456 Item789", remaining);
     }
 
     [TestMethod]
@@ -165,12 +156,11 @@ public class StringHelperTests
         var text = "";
 
         // Act
-        var result = StringHelper.Truncate(text, 10);
+        var truncated = StringHelper.Truncate(text, 10, out string remaining);
 
         // Assert
-        Assert.AreEqual(string.Empty, result.Truncated);
-        Assert.AreEqual(string.Empty, result.Remaining);
-        Assert.IsFalse(result.WasTruncated);
+        Assert.AreEqual(string.Empty, truncated);
+        Assert.AreEqual(string.Empty, remaining);
     }
 
     [TestMethod]
@@ -180,12 +170,11 @@ public class StringHelperTests
         var text = "Hello";
 
         // Act
-        var result = StringHelper.Truncate(text, 3);
+        var truncated = StringHelper.Truncate(text, 3, out string remaining);
 
         // Assert
-        Assert.AreEqual("Hel", result.Truncated);
-        Assert.AreEqual("lo", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Hel", truncated);
+        Assert.AreEqual("lo", remaining);
     }
 
     [TestMethod]
@@ -195,12 +184,11 @@ public class StringHelperTests
         var text = "Hello, World! Test.";
 
         // Act
-        var result = StringHelper.Truncate(text, 14);
+        var truncated = StringHelper.Truncate(text, 14, out string remaining);
 
         // Assert
-        Assert.AreEqual("Hello, World!", result.Truncated);
-        Assert.AreEqual(" Test.", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Hello, World!", truncated);
+        Assert.AreEqual(" Test.", remaining);
     }
 
     [TestMethod]
@@ -210,72 +198,11 @@ public class StringHelperTests
         var text = "你好，世界！测试。";
 
         // Act
-        var result = StringHelper.Truncate(text, 3);
+        var truncated = StringHelper.Truncate(text, 3, out string remaining);
 
         // Assert
-        Assert.AreEqual("你好，", result.Truncated);
-        Assert.AreEqual("世界！测试。", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
-    }
-
-    [TestMethod]
-    public void Truncate_WithSuffix_AppendsSuffixToTruncatedText()
-    {
-        // Arrange
-        var text = "Hello World Test";
-
-        // Act
-        var result = StringHelper.Truncate(text, 9, "...");
-
-        // Assert
-        Assert.AreEqual("Hello...", result.Truncated);
-        Assert.AreEqual(" World Test", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
-    }
-
-    [TestMethod]
-    public void Truncate_WithSuffix_AccountsForSuffixLength()
-    {
-        // Arrange
-        var text = "你好世界测试";
-
-        // Act
-        var result = StringHelper.Truncate(text, 5, "...");
-
-        // Assert
-        Assert.AreEqual("你好...", result.Truncated);
-        Assert.AreEqual("世界测试", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
-    }
-
-    [TestMethod]
-    public void Truncate_WithSuffix_HandlesNullSuffix()
-    {
-        // Arrange
-        var text = "Hello World";
-
-        // Act
-        var result = StringHelper.Truncate(text, 8, null);
-
-        // Assert
-        Assert.AreEqual("Hello", result.Truncated);
-        Assert.AreEqual(" World", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
-    }
-
-    [TestMethod]
-    public void Truncate_HandlesVeryLongText()
-    {
-        // Arrange
-        var text = new string('A', 10000) + " " + new string('B', 10000);
-
-        // Act
-        var result = StringHelper.Truncate(text, 5000);
-
-        // Assert
-        Assert.IsTrue(result.Truncated.Length <= 5000);
-        Assert.IsTrue(result.WasTruncated);
-        Assert.IsTrue(result.Remaining.Length > 0);
+        Assert.AreEqual("你好，", truncated);
+        Assert.AreEqual("世界！测试。", remaining);
     }
 
     [TestMethod]
@@ -285,12 +212,25 @@ public class StringHelperTests
         var text = "hello world test";
 
         // Act
-        var result = StringHelper.Truncate(text, 13);
+        var truncated = StringHelper.Truncate(text, 13, out string remaining);
 
         // Assert
-        Assert.AreEqual("hello world", result.Truncated);
-        Assert.AreEqual(" test", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("hello world", truncated);
+        Assert.AreEqual(" test", remaining);
+    }
+
+    [TestMethod]
+    public void Truncate_HandlesVeryLongText()
+    {
+        // Arrange
+        var text = new string('A', 10000) + " " + new string('B', 10000);
+
+        // Act
+        var truncated = StringHelper.Truncate(text, 5000, out string remaining);
+
+        // Assert
+        Assert.IsTrue(truncated.Length <= 5000);
+        Assert.IsTrue(remaining.Length > 0);
     }
 
     [TestMethod]
@@ -300,12 +240,11 @@ public class StringHelperTests
         var text = "Test123 Hello456";
 
         // Act
-        var result = StringHelper.Truncate(text, 10);
+        var truncated = StringHelper.Truncate(text, 10, out string remaining);
 
         // Assert
-        Assert.AreEqual("Test123", result.Truncated);
-        Assert.AreEqual(" Hello456", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Test123", truncated);
+        Assert.AreEqual(" Hello456", remaining);
     }
 
     [TestMethod]
@@ -315,12 +254,11 @@ public class StringHelperTests
         var text = "Hello@World#Test$End";
 
         // Act
-        var result = StringHelper.Truncate(text, 12);
+        var truncated = StringHelper.Truncate(text, 12, out string remaining);
 
         // Assert
-        Assert.AreEqual("Hello@World#", result.Truncated);
-        Assert.AreEqual("Test$End", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Hello@World#", truncated);
+        Assert.AreEqual("Test$End", remaining);
     }
 
     [TestMethod]
@@ -330,12 +268,11 @@ public class StringHelperTests
         var text = "ＨｅｌｌｏＷｏｒｌｄ";
 
         // Act
-        var result = StringHelper.Truncate(text, 5);
+        var truncated = StringHelper.Truncate(text, 5, out string remaining);
 
         // Assert
-        Assert.AreEqual("Ｈｅｌｌｏ", result.Truncated);
-        Assert.AreEqual("Ｗｏｒｌｄ", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
+        Assert.AreEqual("Ｈｅｌｌｏ", truncated);
+        Assert.AreEqual("Ｗｏｒｌｄ", remaining);
     }
 
     [TestMethod]
@@ -345,27 +282,11 @@ public class StringHelperTests
         var text = "Hello World";
 
         // Act
-        var result = StringHelper.Truncate(text, 1);
+        var truncated = StringHelper.Truncate(text, 1, out string remaining);
 
         // Assert
-        Assert.AreEqual("H", result.Truncated);
-        Assert.AreEqual("ello World", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
-    }
-
-    [TestMethod]
-    public void Truncate_WithLargeSuffix_StillTruncates()
-    {
-        // Arrange
-        var text = "Hello World";
-
-        // Act
-        var result = StringHelper.Truncate(text, 8, ".....");
-
-        // Assert
-        Assert.AreEqual("Hel.....", result.Truncated);
-        Assert.IsTrue(result.WasTruncated);
-        Assert.IsTrue(result.Remaining.Length > 0);
+        Assert.AreEqual("H", truncated);
+        Assert.AreEqual("ello World", remaining);
     }
 
     [TestMethod]
@@ -375,40 +296,11 @@ public class StringHelperTests
         var text = "Product名称：iPhone14 Pro 价格：$999";
 
         // Act
-        var result = StringHelper.Truncate(text, 20);
+        var truncated = StringHelper.Truncate(text, 20, out string remaining);
 
         // Assert
-        Assert.IsTrue(result.Truncated.Length <= 20);
-        Assert.IsTrue(result.WasTruncated);
-        Assert.IsTrue(result.Remaining.Length > 0);
-    }
-
-    #endregion
-
-    #region TruncateResult 结构测试
-
-    [TestMethod]
-    public void TruncateResult_Constructor_SetsProperties()
-    {
-        // Arrange & Act
-        var result = new StringHelper.TruncateResult("truncated", "remaining", true);
-
-        // Assert
-        Assert.AreEqual("truncated", result.Truncated);
-        Assert.AreEqual("remaining", result.Remaining);
-        Assert.IsTrue(result.WasTruncated);
-    }
-
-    [TestMethod]
-    public void TruncateResult_Constructor_HandlesEmptyStrings()
-    {
-        // Arrange & Act
-        var result = new StringHelper.TruncateResult("", "", false);
-
-        // Assert
-        Assert.AreEqual(string.Empty, result.Truncated);
-        Assert.AreEqual(string.Empty, result.Remaining);
-        Assert.IsFalse(result.WasTruncated);
+        Assert.IsTrue(truncated.Length <= 20);
+        Assert.IsTrue(remaining.Length > 0);
     }
 
     #endregion

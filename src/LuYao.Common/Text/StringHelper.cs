@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Text;
 
 namespace LuYao.Text;
 
@@ -10,87 +9,48 @@ namespace LuYao.Text;
 public static class StringHelper
 {
     /// <summary>
-    /// 表示字符串截断的结果。
-    /// </summary>
-    public readonly struct TruncateResult
-    {
-        /// <summary>
-        /// 初始化 <see cref="TruncateResult"/> 结构的新实例。
-        /// </summary>
-        /// <param name="truncated">截断后的字符串</param>
-        /// <param name="remaining">被截断的剩余字符串</param>
-        /// <param name="wasTruncated">指示字符串是否被截断</param>
-        public TruncateResult(string truncated, string remaining, bool wasTruncated)
-        {
-            Truncated = truncated;
-            Remaining = remaining;
-            WasTruncated = wasTruncated;
-        }
-
-        /// <summary>
-        /// 获取截断后的字符串。
-        /// </summary>
-        public string Truncated { get; }
-
-        /// <summary>
-        /// 获取被截断的剩余字符串。
-        /// </summary>
-        public string Remaining { get; }
-
-        /// <summary>
-        /// 获取一个值，该值指示字符串是否被截断。
-        /// </summary>
-        public bool WasTruncated { get; }
-    }
-
-    /// <summary>
     /// 截断字符串到指定的最大长度，保留完整的单词或亚洲字符片段。
     /// </summary>
-    /// <param name="text">要截断的字符串</param>
-    /// <param name="maxLength">最大长度</param>
-    /// <param name="suffix">截断后添加的后缀，默认为空字符串</param>
-    /// <returns>截断结果，包含截断后的字符串和剩余字符串</returns>
-    /// <exception cref="ArgumentNullException">当 text 为 null 时</exception>
-    /// <exception cref="ArgumentOutOfRangeException">当 maxLength 小于 1 时</exception>
+    /// <param name="str">要截断的字符串</param>
+    /// <param name="maxlen">最大长度</param>
+    /// <param name="remain">被截断的剩余字符串</param>
+    /// <returns>截断后的字符串</returns>
+    /// <exception cref="ArgumentNullException">当 str 为 null 时</exception>
+    /// <exception cref="ArgumentOutOfRangeException">当 maxlen 小于 1 时</exception>
     /// <example>
     /// <code>
-    /// var result = StringHelper.Truncate("Hello World", 8);
-    /// Console.WriteLine(result.Truncated);  // "Hello"
-    /// Console.WriteLine(result.Remaining);  // " World"
+    /// var truncated = StringHelper.Truncate("Hello World", 8, out string remain);
+    /// Console.WriteLine(truncated);  // "Hello"
+    /// Console.WriteLine(remain);     // " World"
     /// 
-    /// var result2 = StringHelper.Truncate("你好世界，这是一个测试", 6);
-    /// Console.WriteLine(result2.Truncated);  // "你好世界"
-    /// Console.WriteLine(result2.Remaining);  // "，这是一个测试"
+    /// var truncated2 = StringHelper.Truncate("你好世界，这是一个测试", 6, out string remain2);
+    /// Console.WriteLine(truncated2);  // "你好世界"
+    /// Console.WriteLine(remain2);     // "，这是一个测试"
     /// </code>
     /// </example>
-    public static TruncateResult Truncate(string text, int maxLength, string suffix = "")
+    public static string Truncate(string str, int maxlen, out string remain)
     {
-        if (text == null)
-            throw new ArgumentNullException(nameof(text));
+        if (str == null)
+            throw new ArgumentNullException(nameof(str));
 
-        if (maxLength < 1)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), "最大长度必须大于或等于 1");
-
-        if (suffix == null)
-            suffix = string.Empty;
+        if (maxlen < 1)
+            throw new ArgumentOutOfRangeException(nameof(maxlen), "最大长度必须大于或等于 1");
 
         // 如果文本长度小于等于最大长度，不需要截断
-        if (text.Length <= maxLength)
-            return new TruncateResult(text, string.Empty, false);
-
-        // 计算实际可用长度（减去后缀长度）
-        int effectiveMaxLength = maxLength - suffix.Length;
-        if (effectiveMaxLength < 1)
-            effectiveMaxLength = 1;
+        if (str.Length <= maxlen)
+        {
+            remain = string.Empty;
+            return str;
+        }
 
         // 找到合适的截断位置
-        int truncatePos = FindTruncatePosition(text, effectiveMaxLength);
+        int truncatePos = FindTruncatePosition(str, maxlen);
 
         // 截断字符串
-        string truncated = text.Substring(0, truncatePos) + suffix;
-        string remaining = text.Substring(truncatePos);
+        string truncated = str.Substring(0, truncatePos);
+        remain = str.Substring(truncatePos);
 
-        return new TruncateResult(truncated, remaining, true);
+        return truncated;
     }
 
     /// <summary>
