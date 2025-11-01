@@ -1,0 +1,787 @@
+单位,中文名称,单位类型,补充说明,换算公式
+0_to_100_kmh,0-100公里/小时加速时间,性能指标,需要时间数据，无法直接转换,仅表示性能指标
+0_to_60_mph,0-60英里/小时加速时间,性能指标,需要时间数据，无法直接转换,仅表示性能指标
+accelerated_reader,加速阅读器等级,教育等级,需要专业评估系统，无法简单转换,无固定公式
+actuation,操作次数,计数单位,简单转换,基准单位
+adult_mx,墨西哥成人尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+adult_uk,英国成人尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+adult_us,美国成人尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+afghan_afghani,阿富汗尼,货币,需要实时汇率，无法简单转换,无固定公式
+albanian_lek,阿尔巴尼亚列克,货币,需要实时汇率，无法简单转换,无固定公式
+algerian_dinar,阿尔及利亚第纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+amp_hours,安时,电池容量,简单转换,1 Ah = 1000 mAh
+amperes_per_watts,安培/瓦特,电学效率,简单转换,基准单位
+amps,安培,电流,简单转换,基准单位
+ampule,安瓿,药品包装,计数单位，无法转换,基准单位
+ampules,安瓿(复数),药品包装,计数单位，无法转换,基准单位
+angolan_kwanza,安哥拉宽扎,货币,需要实时汇率，无法简单转换,无固定公式
+angstrom,埃,长度,简单转换,1 Å = 10⁻¹⁰ m = 0.1 nm
+ansi_lumens,安流明,光通量,简单转换,基准单位
+applicator,涂抹器,医疗器械,计数单位，无法转换,基准单位
+arc_minute,角分,角度,简单转换,1′ = 1/60° = π/10800 rad
+arc_sec,角秒,角度,简单转换,1″ = 1/3600° = π/648000 rad
+argentine_peso,阿根廷比索,货币,需要实时汇率，无法简单转换,无固定公式
+armenian_dram,亚美尼亚德拉姆,货币,需要实时汇率，无法简单转换,无固定公式
+aruban_florin,阿鲁巴弗罗林,货币,需要实时汇率，无法简单转换,无固定公式
+assistant,助理,人员计数,计数单位，无法转换,基准单位
+athens_reading_level,雅典阅读水平,教育等级,需要专业评估，无法简单转换,无固定公式
+atmosphere,标准大气压,压力,简单转换,1 atm = 101325 Pa
+attofarad,阿法,电容,简单转换,1 aF = 10⁻¹⁸ F
+australian_dollars,澳元,货币,需要实时汇率，无法简单转换,无固定公式
+austrian_schillings,奥地利先令,货币,已淘汰，需要历史汇率,无固定公式
+azerbaijani_manat,阿塞拜疆马纳特,货币,需要实时汇率，无法简单转换,无固定公式
+baby_boys_us,美国男婴尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+baby_girls_us,美国女婴尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+bag,袋,包装单位,计数单位，无法转换,基准单位
+bahamian_dollar,巴哈马元,货币,需要实时汇率，无法简单转换,无固定公式
+bahraini_dinar,巴林第纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+bangladeshi_taka,孟加拉塔卡,货币,需要实时汇率，无法简单转换,无固定公式
+bante,班特(未知单位),未知单位,具体含义不明，无法转换,无固定公式
+bar,巴,压力,简单转换,1 bar = 100000 Pa
+barbados_dollar,巴巴多斯元,货币,需要实时汇率，无法简单转换,无固定公式
+barcol,巴氏硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+bars,巴(复数),压力,简单转换,1 bar = 100000 Pa
+belarusian_ruble,白俄罗斯卢布,货币,需要实时汇率，无法简单转换,无固定公式
+belgian_francs,比利时法郎,货币,已淘汰，需要历史汇率,无固定公式
+belize_dollar,伯利兹元,货币,需要实时汇率，无法简单转换,无固定公式
+bermudian_dollar,百慕大元,货币,需要实时汇率，无法简单转换,无固定公式
+bhutanese_ngultrum,不丹努尔特鲁姆,货币,需要实时汇率，无法简单转换,无固定公式
+big_boys_us,美国大童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+big_child_us,美国大童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+big_girls_us,美国大女童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+bioequivalent_allergy_unit,生物等效过敏单位,生物活性,需要具体标准，无法简单转换,无固定公式
+bits,比特,数据存储,简单转换,1 bit = 0.125 byte
+bits_per_second,比特/秒,数据传输率,简单转换,基准单位
+blister,泡罩包装,药品包装,计数单位，无法转换,基准单位
+boliviano,玻利维亚诺,货币,需要实时汇率，无法简单转换,无固定公式
+botswana_pula,博茨瓦纳普拉,货币,需要实时汇率，无法简单转换,无固定公式
+bottle,瓶,包装单位,计数单位，无法转换,基准单位
+box,盒,包装单位,计数单位，无法转换,基准单位
+boys_us,美国男童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+brazilian_real,巴西雷亚尔,货币,需要实时汇率，无法简单转换,无固定公式
+brinell,布氏硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+brinnell,布氏硬度(拼写变体),材料硬度,需要专业测试数据，无法简单转换,无固定公式
+brunei_dollar,文莱元,货币,需要实时汇率，无法简单转换,无固定公式
+btu_per_hour_per_foot_per_fahrenheit,BTU/小时·英尺·华氏度,热导率,简单转换,1 BTU/(h·ft·°F) = 1.73073 W/(m·K)
+btus,英热单位,能量,简单转换,1 BTU = 1055.05585262 J
+bulgarian_lev,保加利亚列弗,货币,需要实时汇率，无法简单转换,无固定公式
+burundian_franc,布隆迪法郎,货币,需要实时汇率，无法简单转换,无固定公式
+bytes,字节,数据存储,简单转换,基准单位
+bytes_per_second,字节/秒,数据传输率,简单转换,1 B/s = 8 bps
+calls,呼叫次数,计数单位,简单转换,基准单位
+calories,卡路里,能量,简单转换,1 cal = 4.184 J
+cambodian_riel,柬埔寨瑞尔,货币,需要实时汇率，无法简单转换,无固定公式
+can,罐,包装单位,计数单位，无法转换,基准单位
+canadian_dollars,加元,货币,需要实时汇率，无法简单转换,无固定公式
+candela,坎德拉,发光强度,简单转换,基准单位
+candela_per_square_meter,坎德拉/平方米,亮度,简单转换,1 cd/m² = 1 nit
+candle_power,烛光,发光强度,简单转换,1 CP = 1 cd
+cannister,罐,包装单位,计数单位，无法转换,基准单位
+cape_verde_escudo,佛得角埃斯库多,货币,需要实时汇率，无法简单转换,无固定公式
+caplet,胶囊片,药品剂型,计数单位，无法转换,基准单位
+capsule,胶囊,药品剂型,计数单位，无法转换,基准单位
+capsules,胶囊(复数),药品剂型,计数单位，无法转换,基准单位
+carats,克拉,质量,简单转换,1 ct = 0.2 g
+carton,纸箱,包装单位,计数单位，无法转换,基准单位
+cartridge,墨盒,打印耗材,计数单位，无法转换,基准单位
+case,箱,包装单位,计数单位，无法转换,基准单位
+cayman_islands_dollar,开曼群岛元,货币,需要实时汇率，无法简单转换,无固定公式
+cells,细胞,生物单位,计数单位，无法转换,基准单位
+center_beam_candle_power,中心光束烛光,发光强度,简单转换,基准单位
+centifarad,厘法,电容,简单转换,1 cF = 0.01 F
+centiliters,厘升,体积,简单转换,1 cL = 0.01 L
+centiliters_per_second,厘升/秒,流量,简单转换,1 cL/s = 0.01 L/s
+centimeter_kilograms,厘米·千克,扭矩,简单转换,1 cm·kg = 0.0980665 N·m
+centimeters,厘米,长度,简单转换,1 cm = 0.01 m
+centimeters_mercury,厘米汞柱,压力,简单转换,1 cmHg = 1333.22 Pa
+centimeters_per_second,厘米/秒,速度,简单转换,1 cm/s = 0.01 m/s
+centimeters_per_second_squared,厘米/秒²,加速度,简单转换,1 cm/s² = 0.01 m/s²
+centimeters_squared,平方厘米,面积,简单转换,1 cm² = 0.0001 m²
+centimeters_water,厘米水柱,压力,简单转换,1 cmH₂O = 98.0638 Pa
+centipoise,厘泊,粘度,简单转换,1 cP = 0.01 P = 0.001 Pa·s
+centistokes,厘斯托克斯,运动粘度,简单转换,1 cSt = 0.01 St = 10⁻⁶ m²/s
+central_african_cfa_franc,中非CFA法郎,货币,需要实时汇率，无法简单转换,无固定公式
+cfp_franc,太平洋法郎,货币,需要实时汇率，无法简单转换,无固定公式
+chapters,章节,计数单位,简单转换,基准单位
+characters_per_inch,字符/英寸,打印密度,简单转换,基准单位
+child_au,澳大利亚儿童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+child_mx,墨西哥儿童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+child_uk,英国儿童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+chilean_peso,智利比索,货币,需要实时汇率，无法简单转换,无固定公式
+chinese_yuan,人民币,货币,需要实时汇率，无法简单转换,无固定公式
+co,一氧化碳浓度,气体浓度,需要专业测量，无法简单转换,无固定公式
+colombian_peso,哥伦比亚比索,货币,需要实时汇率，无法简单转换,无固定公式
+comoro_franc,科摩罗法郎,货币,需要实时汇率，无法简单转换,无固定公式
+congolese_franc,刚果法郎,货币,需要实时汇率，无法简单转换,无固定公式
+consulting,咨询,服务单位,计数单位，无法转换,基准单位
+convertible_mark,可兑换马克,货币,需要实时汇率，无法简单转换,无固定公式
+costa_rican_colon,哥斯达黎加科朗,货币,需要实时汇率，无法简单转换,无固定公式
+count,计数,计数单位,简单转换,基准单位
+croatian_kuna,克罗地亚库纳,货币,需要实时汇率，无法简单转换,无固定公式
+cttw,克拉总重量,珠宝重量,简单转换,基准单位
+cuban_convertible_peso,古巴可兑换比索,货币,需要实时汇率，无法简单转换,无固定公式
+cuban_peso,古巴比索,货币,需要实时汇率，无法简单转换,无固定公式
+cubic_centimeters,立方厘米,体积,简单转换,1 cm³ = 0.001 L
+cubic_centimeters_per_minute,立方厘米/分钟,流量,简单转换,1 cm³/min = 0.001 L/min
+cubic_centimeters_per_second,立方厘米/秒,流量,简单转换,1 cm³/s = 0.001 L/s
+cubic_feet,立方英尺,体积,简单转换,1 ft³ = 28.3168 L
+cubic_feet_per_hour,立方英尺/小时,流量,简单转换,1 ft³/h = 0.00786579 L/s
+cubic_feet_per_minute,立方英尺/分钟,流量,简单转换,1 CFM = 0.471947 L/s
+cubic_feet_per_minute_per_watt,立方英尺/分钟·瓦特,冷却效率,简单转换,基准单位
+cubic_feet_per_second,立方英尺/秒,流量,简单转换,1 ft³/s = 28.3168 L/s
+cubic_inches,立方英寸,体积,简单转换,1 in³ = 16.3871 mL
+cubic_inches_per_minute,立方英寸/分钟,流量,简单转换,1 in³/min = 0.273117 mL/s
+cubic_meters,立方米,体积,简单转换,1 m³ = 1000 L
+cubic_meters_per_hour,立方米/小时,流量,简单转换,1 m³/h = 0.277778 L/s
+cubic_meters_per_minute,立方米/分钟,流量,简单转换,1 m³/min = 16.6667 L/s
+cubic_meters_per_second,立方米/秒,流量,简单转换,1 m³/s = 1000 L/s
+cubic_yards,立方码,体积,简单转换,1 yd³ = 0.764555 m³
+cups,杯,体积,简单转换,1 US cup = 236.588 mL
+cycles,周期,计数单位,简单转换,基准单位
+cycles_per_gallon,周期/加仑,洗涤效率,需要具体测试，无法简单转换,无固定公式
+cycles_per_liter,周期/升,洗涤效率,需要具体测试，无法简单转换,无固定公式
+czech_koruna,捷克克朗,货币,需要实时汇率，无法简单转换,无固定公式
+daltons,道尔顿,分子质量,简单转换,基准单位
+danish_krone,丹麦克朗,货币,需要实时汇率，无法简单转换,无固定公式
+days,天,时间,简单转换,1 day = 86400 s
+decafarad,十法,电容,简单转换,1 daF = 10 F
+decibel_volt_per_micro_bar,分贝伏特/微巴,声学灵敏度,需要专业标准，无法简单转换,无固定公式
+decibel_volt_per_pascal,分贝伏特/帕斯卡,声学灵敏度,需要专业标准，无法简单转换,无固定公式
+decibels,分贝,相对单位,对数单位，需要参考值,无固定公式
+decifarad,分法,电容,简单转换,1 dF = 0.1 F
+deciliters,分升,体积,简单转换,1 dL = 0.1 L
+decimeters,分米,长度,简单转换,1 dm = 0.1 m
+degrees,度,角度,简单转换,1° = π/180 rad ≈ 0.0174533 rad
+degrees_balling,巴林度,糖度,需要专业测量，无法简单转换,无固定公式
+degrees_baume,波美度,密度,需要专业测量，无法简单转换,无固定公式
+degrees_brix,白利度,糖度,需要专业测量，无法简单转换,无固定公式
+degrees_celsius,摄氏度,温度,简单转换但有特殊公式,°F = °C × 9/5 + 32, K = °C + 273.15
+degrees_fahrenheit,华氏度,温度,简单转换但有特殊公式,°C = (°F - 32) × 5/9
+degrees_ochsle,奥克斯勒度,葡萄汁密度,需要专业测量，无法简单转换,无固定公式
+degrees_per_second,度/秒,角速度,简单转换,1 °/s = π/180 rad/s
+degrees_per_second_squared,度/秒²,角加速度,简单转换,1 °/s² = π/180 rad/s²
+deputy,副职,人员计数,计数单位，无法转换,基准单位
+device,设备,计数单位,简单转换,基准单位
+din,德国工业标准,标准规范,需要具体标准，无法转换,无固定公式
+diopters,屈光度,光学度数,简单转换,1 D = 1 m⁻¹
+disk,磁盘,存储介质,计数单位，无法转换,基准单位
+djiboutian_franc,吉布提法郎,货币,需要实时汇率，无法简单转换,无固定公式
+dominican_peso,多米尼加比索,货币,需要实时汇率，无法简单转换,无固定公式
+dots,点,打印单位,计数单位，无法转换,基准单位
+dots_per_centimetre,点/厘米,分辨率,简单转换,1 dpcm = 2.54 dpi
+dots_per_inch,点/英寸,分辨率,简单转换,基准单位
+drams,打兰,质量,简单转换,1 dr = 1.77185 g
+drp_score,DRP阅读分数,教育评估,需要专业评估，无法简单转换,无固定公式
+dwt,英钱,金衡质量,简单转换,1 dwt = 1.55517 g
+dyne_centimeters,达因·厘米,扭矩,简单转换,1 dyn·cm = 10⁻⁷ N·m
+east_caribbean_dollar,东加勒比元,货币,需要实时汇率，无法简单转换,无固定公式
+egyptian_pound,埃及镑,货币,需要实时汇率，无法简单转换,无固定公式
+emails,电子邮件,计数单位,简单转换,基准单位
+eritrean_nakfa,厄立特里亚纳克法,货币,需要实时汇率，无法简单转换,无固定公式
+ethiopian_birr,埃塞俄比亚比尔,货币,需要实时汇率，无法简单转换,无固定公式
+euro,欧元,货币,需要实时汇率，无法简单转换,无固定公式
+exabyte,艾字节,数据存储,简单转换,1 EB = 1024 PB = 1,152,921,504,606,846,976 bytes
+exafarad,艾法,电容,简单转换,1 EF = 10¹⁸ F
+exposure_value,曝光值,摄影,需要专业计算，无法简单转换,无固定公式
+f_stop,光圈值,摄影,简单转换但对数关系,每档光圈面积减半
+falkland_islands_pound,福克兰群岛镑,货币,需要实时汇率，无法简单转换,无固定公式
+farad,法拉,电容,简单转换,基准单位
+feet,英尺,长度,简单转换,1 ft = 0.3048 m
+feet_per_minute,英尺/分钟,速度,简单转换,1 ft/min = 0.00508 m/s
+feet_per_second,英尺/秒,速度,简单转换,1 ft/s = 0.3048 m/s
+feet_per_second_squared,英尺/秒²,加速度,简单转换,1 ft/s² = 0.3048 m/s²
+femtofarad,飞法,电容,简单转换,1 fF = 10⁻¹⁵ F
+femtoseconds,飞秒,时间,简单转换,1 fs = 10⁻¹⁵ s
+fiji_dollar,斐济元,货币,需要实时汇率，无法简单转换,无固定公式
+film,胶片,摄影材料,计数单位，无法转换,基准单位
+finnish_markka,芬兰马克,货币,已淘汰，需要历史汇率,无固定公式
+fluid_ounces,液盎司,体积,简单转换,1 US fl oz = 29.5735 mL
+food_bars,食品条,食品包装,计数单位，无法转换,基准单位
+foot_ounces,英尺·盎司,扭矩,简单转换,1 ft·oz = 0.00706155 N·m
+foot_pounds,英尺·磅,扭矩,简单转换,1 ft·lb = 1.35582 N·m
+fr_school_grade,法国学校年级,教育等级,需要年龄对应表，无法简单转换,无固定公式
+frames_per_second,帧/秒,帧率,简单转换,基准单位
+french_francs,法国法郎,货币,已淘汰，需要历史汇率,无固定公式
+gallons,加仑,体积,简单转换,1 US gallon = 3.78541 L
+gallons_per_day,加仑/天,流量,简单转换,1 GPD = 0.0438126 L/h
+gallons_per_flush,加仑/次冲洗,用水量,简单转换,基准单位
+gallons_per_hour,加仑/小时,流量,简单转换,1 GPH = 0.0010515 L/s
+gallons_per_minute,加仑/分钟,流量,简单转换,1 GPM = 0.0630902 L/s
+gambian_dalasi,冈比亚达拉西,货币,需要实时汇率，无法简单转换,无固定公式
+gauge,规,厚度单位,需要具体标准，无法简单转换,无固定公式
+gb,吉字节,数据存储,简单转换,1 GB = 1024 MB = 1,073,741,824 bytes
+georgian_lari,格鲁吉亚拉里,货币,需要实时汇率，无法简单转换,无固定公式
+german_mark,德国马克,货币,已淘汰，需要历史汇率,无固定公式
+ghanaian_cedi,加纳塞地,货币,需要实时汇率，无法简单转换,无固定公式
+ghz,吉赫兹,频率,简单转换,1 GHz = 1000 MHz = 10⁹ Hz
+gibraltar_pound,直布罗陀镑,货币,需要实时汇率，无法简单转换,无固定公式
+giga_samples_per_second,吉采样点/秒,采样率,简单转换,1 GS/s = 10⁹ samples/s
+gigabits_per_second,吉比特/秒,数据传输率,简单转换,1 Gbps = 1000 Mbps
+gigabyte,吉字节,数据存储,简单转换,1 GB = 1024 MB
+gigabytes_per_hour,吉字节/小时,数据传输率,简单转换,1 GB/h = 0.000277778 GB/s
+gigabytes_per_second,吉字节/秒,数据传输率,简单转换,基准单位
+gigafarad,吉法,电容,简单转换,1 GF = 10⁹ F
+gigahertz,吉赫兹,频率,简单转换,1 GHz = 10⁹ Hz
+gigaohms,吉欧,电阻,简单转换,1 GΩ = 10⁹ Ω
+gigapascals,吉帕,压力,简单转换,1 GPa = 10⁹ Pa
+girls_us,美国女童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+gram_meters,克·米,扭矩,简单转换,1 g·m = 0.00980665 N·m
+grams,克,质量,简单转换,1 g = 0.001 kg
+grams_per_100_kilometers,克/百公里,排放,简单转换,基准单位
+grams_per_cubic_centimeter,克/立方厘米,密度,简单转换,1 g/cm³ = 1000 kg/m³
+grams_per_kilometer,克/公里,排放,简单转换,1 g/km = 0.01 g/100km
+grams_per_liter,克/升,浓度,简单转换,1 g/L = 0.001 kg/L
+grams_per_mile,克/英里,排放,简单转换,1 g/mi = 0.621371 g/km
+grams_per_milliliter,克/毫升,密度,简单转换,1 g/mL = 1000 kg/m³
+grams_per_minute,克/分钟,质量流量,简单转换,1 g/min = 0.0000166667 kg/s
+grams_per_square_meter,克/平方米,面密度,简单转换,基准单位
+gravity,重力加速度,加速度,简单转换,1 g = 9.80665 m/s²
+greek_drachma,希腊德拉克马,货币,已淘汰，需要历史汇率,无固定公式
+gsm,克/平方米,面密度,简单转换,同 grams_per_square_meter
+guatemalan_quetzal,危地马拉格查尔,货币,需要实时汇率，无法简单转换,无固定公式
+guinean_franc,几内亚法郎,货币,需要实时汇率，无法简单转换,无固定公式
+gum,口香糖,食品,计数单位，无法转换,基准单位
+guyanese_dollar,圭亚那元,货币,需要实时汇率，无法简单转换,无固定公式
+haitian_gourde,海地古德,货币,需要实时汇率，无法简单转换,无固定公式
+hectofarad,百法,电容,简单转换,1 hF = 100 F
+hectopascal,百帕,压力,简单转换,1 hPa = 100 Pa
+henry,亨利,电感,简单转换,基准单位
+hertz,赫兹,频率,简单转换,基准单位
+honduran_lempira,洪都拉斯伦皮拉,货币,需要实时汇率，无法简单转换,无固定公式
+hong_kong_dollar,港元,货币,需要实时汇率，无法简单转换,无固定公式
+horsepower,马力,功率,简单转换,1 hp = 745.7 W
+hour,小时,时间,简单转换,1 h = 3600 s
+hours,小时,时间,简单转换,1 h = 3600 s
+hours_per_gallon,小时/加仑,能耗效率,需要具体测试，无法简单转换,无固定公式
+hours_per_liter,小时/升,能耗效率,需要具体测试，无法简单转换,无固定公式
+hsl,HSL颜色空间,颜色模型,需要专业计算，无法简单转换,无固定公式
+hsv,HSV颜色空间,颜色模型,需要专业计算，无法简单转换,无固定公式
+hundredths_inches,百分之一英寸,长度,简单转换,0.01 in = 0.254 mm
+hundredths_pounds,百分之一磅,质量,简单转换,0.01 lb = 4.53592 g
+hungarian_forint,匈牙利福林,货币,需要实时汇率，无法简单转换,无固定公式
+icelandic_krona,冰岛克朗,货币,需要实时汇率，无法简单转换,无固定公式
+images_per_minute,图像/分钟,扫描速度,简单转换,基准单位
+imperial_gallons,英制加仑,体积,简单转换,1 imperial gallon = 4.54609 L
+implant,植入物,医疗器械,计数单位，无法转换,基准单位
+inch_ounces,英寸·盎司,扭矩,简单转换,1 in·oz = 0.00706155 N·m
+inch_pounds,英寸·磅,扭矩,简单转换,1 in·lb = 0.112985 N·m
+inches,英寸,长度,简单转换,1 in = 0.0254 m
+inches_mercury,英寸汞柱,压力,简单转换,1 inHg = 3386.39 Pa
+inches_per_inches_degrees_fahrenheit,英寸/英寸·华氏度,热膨胀系数,简单转换,基准单位
+inches_per_second,英寸/秒,速度,简单转换,1 in/s = 0.0254 m/s
+inches_per_second_squared,英寸/秒²,加速度,简单转换,1 in/s² = 0.0254 m/s²
+inches_squared,平方英寸,面积,简单转换,1 in² = 0.00064516 m²
+inches_water,英寸水柱,压力,简单转换,1 inH₂O = 249.089 Pa
+indian_rupee,印度卢比,货币,需要实时汇率，无法简单转换,无固定公式
+indonesian_rupiah,印尼盾,货币,需要实时汇率，无法简单转换,无固定公式
+infant_uk,英国婴儿尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+infant_us,美国婴儿尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+inhaler,吸入器,医疗器械,计数单位，无法转换,基准单位
+input_output_operations_per_second,输入输出操作/秒,计算机性能,简单转换,基准单位
+insert,插入物,医疗器械,计数单位，无法转换,基准单位
+international_units,国际单位,生物活性,需要具体物质标准，无法简单转换,无固定公式
+iranian_rial,伊朗里亚尔,货币,需要实时汇率，无法简单转换,无固定公式
+iraqi_dinar,伊拉克第纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+irla_score,IRLA阅读分数,教育评估,需要专业评估，无法简单转换,无固定公式
+iso,ISO感光度,摄影,简单转换但对数关系,每档ISO感光度加倍
+israeli_new_shekel,以色列新谢克尔,货币,需要实时汇率，无法简单转换,无固定公式
+italian_lira,意大利里拉,货币,已淘汰，需要历史汇率,无固定公式
+jamaican_dollar,牙买加元,货币,需要实时汇率，无法简单转换,无固定公式
+japanese_yen,日元,货币,需要实时汇率，无法简单转换,无固定公式
+jordanian_dinar,约旦第纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+joules,焦耳,能量,简单转换,基准单位
+juniors_us,美国青少年尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+kazakhstani_tenge,哈萨克斯坦坚戈,货币,需要实时汇率，无法简单转换,无固定公式
+kb,千字节,数据存储,简单转换,1 KB = 1024 bytes
+kbaud,千波特,数据传输率,简单转换,1 kbaud = 1000 baud
+kelvin,开尔文,温度,简单转换但有特殊公式,K = °C + 273.15
+kenyan_shilling,肯尼亚先令,货币,需要实时汇率，无法简单转换,无固定公式
+khz,千赫兹,频率,简单转换,1 kHz = 1000 Hz
+kilo_samples_per_second,千采样点/秒,采样率,简单转换,1 kS/s = 1000 samples/s
+kiloamps,千安,电流,简单转换,1 kA = 1000 A
+kilobits_per_second,千比特/秒,数据传输率,简单转换,1 kbps = 1000 bps
+kilobyte,千字节,数据存储,简单转换,1 KB = 1024 bytes
+kilobytes_per_second,千字节/秒,数据传输率,简单转换,1 KB/s = 8 kbps
+kilocalories,千卡,能量,简单转换,1 kcal = 4184 J
+kilodaltons,千道尔顿,分子质量,简单转换,1 kDa = 1000 Da
+kilofarad,千法,电容,简单转换,1 kF = 1000 F
+kilogram_centimeters,千克·厘米,扭矩,简单转换,1 kg·cm = 0.0980665 N·m
+kilogram_force_meter,千克力·米,扭矩,简单转换,1 kgf·m = 9.80665 N·m
+kilogram_meters,千克·米,扭矩,简单转换,1 kg·m = 9.80665 N·m
+kilograms,千克,质量,简单转换,基准单位
+kilograms_per_100_kilometers,千克/百公里,排放,简单转换,1 kg/100km = 1000 g/100km
+kilograms_per_cubic_meter,千克/立方米,密度,简单转换,基准单位
+kilograms_per_liter,千克/升,密度,简单转换,1 kg/L = 1000 kg/m³
+kilograms_per_millimeter,千克/毫米,线密度,简单转换,1 kg/mm = 1000 kg/m
+kilograms_per_square_centimeter,千克/平方厘米,压力,简单转换,1 kg/cm² = 98066.5 Pa
+kilohenry,千亨,电感,简单转换,1 kH = 1000 H
+kilohertz,千赫兹,频率,简单转换,1 kHz = 1000 Hz
+kilojoules,千焦,能量,简单转换,1 kJ = 1000 J
+kilometer,千米,长度,简单转换,1 km = 1000 m
+kilometers,千米,长度,简单转换,1 km = 1000 m
+kilometers_per_hour,公里/小时,速度,简单转换,1 km/h = 0.277778 m/s
+kilonewton_meters,千牛·米,扭矩,简单转换,1 kN·m = 1000 N·m
+kilonewtons,千牛,力,简单转换,1 kN = 1000 N
+kiloohms,千欧,电阻,简单转换,1 kΩ = 1000 Ω
+kilopascal,千帕,压力,简单转换,1 kPa = 1000 Pa
+kilopixel,千像素,数字图像,简单转换,1 kpx = 1000 pixels
+kilovolts,千伏,电压,简单转换,1 kV = 1000 V
+kilowatt_hour_per_kilometre,千瓦时/公里,能耗,简单转换,基准单位
+kilowatt_hour_per_mile,千瓦时/英里,能耗,简单转换,1 kWh/mi = 0.621371 kWh/km
+kilowatt_hours,千瓦时,能量,简单转换,1 kWh = 3600000 J
+kilowatt_hours_per_100_cycles,千瓦时/100次循环,能耗效率,简单转换,基准单位
+kilowatt_hours_per_1000_hours,千瓦时/1000小时,能耗效率,简单转换,基准单位
+kilowatt_hours_per_year,千瓦时/年,能耗,简单转换,基准单位
+kilowatts,千瓦,功率,简单转换,1 kW = 1000 W
+kips_per_square_inch,千磅力/平方英寸,压力,简单转换,1 ksi = 6894757 Pa
+kit,工具包,产品包装,计数单位，无法转换,基准单位
+knoop,努氏硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+kuwaiti_dinar,科威特第纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+kyrgyzstani_som,吉尔吉斯斯坦索姆,货币,需要实时汇率，无法简单转换,无固定公式
+lancet,采血针,医疗器械,计数单位，无法转换,基准单位
+lao_kip,老挝基普,货币,需要实时汇率，无法简单转换,无固定公式
+latvian_lats,拉脱维亚拉特,货币,已淘汰，需要历史汇率,无固定公式
+layers,层,计数单位,简单转换,基准单位
+lbs,磅,质量,简单转换,1 lb = 0.45359237 kg
+lebanese_pound,黎巴嫩镑,货币,需要实时汇率，无法简单转换,无固定公式
+lesotho_loti,莱索托洛蒂,货币,需要实时汇率，无法简单转换,无固定公式
+levels,等级,计数单位,简单转换,基准单位
+lexile,蓝思等级,教育评估,需要专业评估，无法简单转换,无固定公式
+lexile_code,蓝思代码,教育评估,需要专业评估，无法简单转换,无固定公式
+lexile_number,蓝思数值,教育评估,需要专业评估，无法简单转换,无固定公式
+liberian_dollar,利比里亚元,货币,需要实时汇率，无法简单转换,无固定公式
+libyan_dinar,利比亚第纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+lines,行,计数单位,简单转换,基准单位
+lines_per_inch,行/英寸,打印密度,简单转换,基准单位
+links_per_foot,链/英尺,机械连接,简单转换,基准单位
+links_per_inch,链/英寸,机械连接,简单转换,基准单位
+liters,升,体积,简单转换,基准单位
+liters_per_100_kilometers,升/百公里,油耗,简单转换,基准单位
+liters_per_day,升/天,流量,简单转换,1 L/d = 0.0416667 L/h
+liters_per_flush,升/次冲洗,用水量,简单转换,基准单位
+liters_per_hour,升/小时,流量,简单转换,1 L/h = 0.000277778 L/s
+liters_per_minute,升/分钟,流量,简单转换,1 L/min = 0.0166667 L/s
+liters_per_second,升/秒,流量,简单转换,基准单位
+liters_per_year,升/年,流量,简单转换,基准单位
+lithuanian_litas,立陶宛立特,货币,已淘汰，需要历史汇率,无固定公式
+little_boys_us,美国小男童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+little_child_us,美国小童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+little_girls_us,美国小女童尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+load,负载,计数单位,简单转换,基准单位
+lozenge,锭剂,药品剂型,计数单位，无法转换,基准单位
+lumen,流明,光通量,简单转换,基准单位
+lumens,流明,光通量,简单转换,基准单位
+lux,勒克斯,照度,简单转换,1 lx = 1 lm/m²
+luxembourg_franc,卢森堡法郎,货币,已淘汰，需要历史汇率,无固定公式
+macanese_pataca,澳门币,货币,需要实时汇率，无法简单转换,无固定公式
+macedonian_denar,马其顿代纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+malagasy_ariary,马达加斯加阿里亚里,货币,需要实时汇率，无法简单转换,无固定公式
+malawian_kwacha,马拉维克瓦查,货币,需要实时汇率，无法简单转换,无固定公式
+malaysian_ringgit,马来西亚令吉,货币,需要实时汇率，无法简单转换,无固定公式
+maldivian_rufiyaa,马尔代夫拉菲亚,货币,需要实时汇率，无法简单转换,无固定公式
+mauritanian_ouguiya,毛里塔尼亚乌吉亚,货币,需要实时汇率，无法简单转换,无固定公式
+mauritian_rupee,毛里求斯卢比,货币,需要实时汇率，无法简单转换,无固定公式
+mb,兆字节,数据存储,简单转换,1 MB = 1024 KB
+mean_spherical_candle_power,平均球面烛光,发光强度,简单转换,基准单位
+mega_samples_per_second,兆采样点/秒,采样率,简单转换,1 MS/s = 10⁶ samples/s
+megabits,兆比特,数据存储,简单转换,1 Mb = 0.125 MB
+megabits_per_second,兆比特/秒,数据传输率,简单转换,1 Mbps = 1000 kbps
+megabyte,兆字节,数据存储,简单转换,1 MB = 1024 KB
+megabytes_per_hour,兆字节/小时,数据传输率,简单转换,1 MB/h = 0.000277778 MB/s
+megabytes_per_second,兆字节/秒,数据传输率,简单转换,1 MB/s = 8 Mbps
+megafarad,兆法,电容,简单转换,1 MF = 10⁶ F
+megahertz,兆赫兹,频率,简单转换,1 MHz = 1000 kHz
+megaohms,兆欧,电阻,简单转换,1 MΩ = 1000 kΩ
+megapascals,兆帕,压力,简单转换,1 MPa = 1000 kPa
+megapixels,百万像素,数字图像,简单转换,1 MP = 1000000 pixels
+mens_au,澳大利亚男装尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+mens_uk,英国男装尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+mens_us,美国男装尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+mesh_count_per_square_inch,网格数/平方英寸,筛网密度,简单转换,基准单位
+messages,消息,计数单位,简单转换,基准单位
+meter,米,长度,简单转换,基准单位
+meters,米,长度,简单转换,基准单位
+meters_per_meters_kelvin,米/米·开尔文,热膨胀系数,简单转换,基准单位
+meters_per_second,米/秒,速度,简单转换,基准单位
+meters_per_second_squared,米/秒²,加速度,简单转换,基准单位
+metric_tons_per_hectare,公吨/公顷,产量,简单转换,1 t/ha = 1000 kg/ha
+mexican_peso,墨西哥比索,货币,需要实时汇率，无法简单转换,无固定公式
+mhz,兆赫兹,频率,简单转换,1 MHz = 1000 kHz
+microamps,微安,电流,简单转换,1 μA = 0.000001 A
+microcandela,微坎德拉,发光强度,简单转换,1 μcd = 0.000001 cd
+microfarad,微法,电容,简单转换,1 μF = 0.000001 F
+micrograms,微克,质量,简单转换,1 μg = 0.000001 g
+microhenry,微亨,电感,简单转换,1 μH = 0.000001 H
+microhertz,微赫,频率,简单转换,1 μHz = 0.000001 Hz
+microliters,微升,体积,简单转换,1 μL = 0.000001 L
+microliters_per_minute,微升/分钟,流量,简单转换,1 μL/min = 0.0000000166667 L/s
+microliters_per_second,微升/秒,流量,简单转换,1 μL/s = 0.000001 L/s
+micrometer,微米,长度,简单转换,1 μm = 0.000001 m
+micrometers,微米,长度,简单转换,1 μm = 0.000001 m
+micromoles,微摩尔,物质量,简单转换,1 μmol = 0.000001 mol
+micron,微米,长度,简单转换,1 micron = 1 μm = 0.000001 m
+micronewton_meters,微牛·米,扭矩,简单转换,1 μN·m = 0.000001 N·m
+microohms,微欧,电阻,简单转换,1 μΩ = 0.000001 Ω
+microradian,微弧度,角度,简单转换,1 μrad = 0.000001 rad
+microseconds,微秒,时间,简单转换,1 μs = 0.000001 s
+microvolts,微伏,电压,简单转换,1 μV = 0.000001 V
+microwatts,微瓦,功率,简单转换,1 μW = 0.000001 W
+mile,英里,长度,简单转换,1 mile = 1609.344 m
+miles,英里,长度,简单转换,1 mile = 1609.344 m
+miles_per_gallon,英里/加仑,油耗,简单转换,1 MPG ≈ 235.215 L/100km
+miles_per_gallon_gasoline_equivalent,英里/加仑汽油当量,能耗,简单转换,1 MPGe = 33.705 kWh/100mi
+miles_per_hour,英里/小时,速度,简单转换,1 mph = 0.44704 m/s
+milli_international_units,毫国际单位,生物活性,需要具体物质标准，无法简单转换,无固定公式
+milliamp_hours,毫安时,电池容量,简单转换,1 mAh = 0.001 Ah
+milliampere_hour,毫安时,电池容量,简单转换,1 mAh = 0.001 Ah
+milliampere_hour_mah,毫安时,电池容量,简单转换,1 mAh = 0.001 Ah
+milliampere_second,毫安秒,辐射剂量,简单转换,1 mAs = 0.001 As
+milliampere_second_mas,毫安秒,辐射剂量,简单转换,1 mAs = 0.001 As
+milliamps,毫安,电流,简单转换,1 mA = 0.001 A
+millibars,毫巴,压力,简单转换,1 mbar = 0.001 bar = 100 Pa
+millicandela,毫坎德拉,发光强度,简单转换,1 mcd = 0.001 cd
+millicuries,毫居里,放射性活度,简单转换,1 mCi = 0.001 Ci = 3.7×10⁷ Bq
+milliequivalents,毫当量,化学单位,需要具体物质，无法简单转换,无固定公式
+millifarad,毫法,电容,简单转换,1 mF = 0.001 F
+milligrams,毫克,质量,简单转换,1 mg = 0.001 g
+milligrams_per_gram,毫克/克,浓度,简单转换,1 mg/g = 0.001 g/g
+milligrams_per_milliliter,毫克/毫升,浓度,简单转换,1 mg/mL = 1 g/L
+millihenry,毫亨,电感,简单转换,1 mH = 0.001 H
+millihertz,毫赫,频率,简单转换,1 mHz = 0.001 Hz
+milliliters,毫升,体积,简单转换,1 mL = 0.001 L
+milliliters_per_minute,毫升/分钟,流量,简单转换,1 mL/min = 0.0000166667 L/s
+milliliters_per_second,毫升/秒,流量,简单转换,1 mL/s = 0.001 L/s
+millimeters,毫米,长度,简单转换,1 mm = 0.001 m
+millimeters_mercury,毫米汞柱,压力,简单转换,1 mmHg = 133.322 Pa
+millimeters_per_second,毫米/秒,速度,简单转换,1 mm/s = 0.001 m/s
+millimeters_water,毫米水柱,压力,简单转换,1 mmH₂O = 9.80665 Pa
+millimeters_water_per_square_centimeter,毫米水柱/平方厘米,压力梯度,简单转换,基准单位
+millimoles,毫摩尔,物质量,简单转换,1 mmol = 0.001 mol
+millinewton_meters,毫牛·米,扭矩,简单转换,1 mN·m = 0.001 N·m
+milliohms,毫欧,电阻,简单转换,1 mΩ = 0.001 Ω
+milliradian,毫弧度,角度,简单转换,1 mrad = 0.001 rad
+milliseconds,毫秒,时间,简单转换,1 ms = 0.001 s
+millivolts,毫伏,电压,简单转换,1 mV = 0.001 V
+millivolts_per_gravity,毫伏/重力,加速度灵敏度,简单转换,基准单位
+millivolts_per_pascals,毫伏/帕斯卡,压力灵敏度,简单转换,基准单位
+millivolts_per_pounds_per_square_inch,毫伏/磅力/平方英寸,压力灵敏度,简单转换,基准单位
+milliwatts,毫瓦,功率,简单转换,1 mW = 0.001 W
+milliwatts_per_centimeters_squared,毫瓦/平方厘米,功率密度,简单转换,基准单位
+mils,密耳,长度,简单转换,1 mil = 0.001 in = 0.0254 mm
+minute,分钟,时间,简单转换,1 min = 60 s
+minutes,分钟,时间,简单转换,1 min = 60 s
+minutes_per_liter,分钟/升,能耗效率,需要具体测试，无法简单转换,无固定公式
+mohs,莫氏硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+moldovan_leu,摩尔多瓦列伊,货币,需要实时汇率，无法简单转换,无固定公式
+mongolian_togrog,蒙古图格里克,货币,需要实时汇率，无法简单转换,无固定公式
+months,月,时间,简单转换但月份长度不同,平均1月 = 30.436875天
+moroccan_dirham,摩洛哥迪拉姆,货币,需要实时汇率，无法简单转换,无固定公式
+mozambican_metical,莫桑比克梅蒂卡尔,货币,需要实时汇率，无法简单转换,无固定公式
+mpg,英里/加仑,油耗,简单转换,1 MPG ≈ 235.215 L/100km
+mpge,英里/加仑汽油当量,能耗,简单转换,1 MPGe = 33.705 kWh/100mi
+mt_s,米/秒,速度,简单转换,同 meters_per_second
+multiplier_x,倍率,比例系数,简单转换,基准单位
+myanma_kyat,缅甸元,货币,需要实时汇率，无法简单转换,无固定公式
+namibian_dollar,纳米比亚元,货币,需要实时汇率，无法简单转换,无固定公式
+nanoamps,纳安,电流,简单转换,1 nA = 0.000000001 A
+nanofarad,纳法,电容,简单转换,1 nF = 0.000000001 F
+nanohenry,纳亨,电感,简单转换,1 nH = 0.000000001 H
+nanoliters,纳升,体积,简单转换,1 nL = 0.000000001 L
+nanoliters_per_minute,纳升/分钟,流量,简单转换,1 nL/min = 0.0000000000166667 L/s
+nanoliters_per_second,纳升/秒,流量,简单转换,1 nL/s = 0.000000001 L/s
+nanometer,纳米,长度,简单转换,1 nm = 0.000000001 m
+nanoohms,纳欧,电阻,简单转换,1 nΩ = 0.000000001 Ω
+nanoseconds,纳秒,时间,简单转换,1 ns = 0.000000001 s
+nanovolts,纳伏,电压,简单转换,1 nV = 0.000000001 V
+nanowatts,纳瓦,功率,简单转换,1 nW = 0.000000001 W
+nepalese_rupee,尼泊尔卢比,货币,需要实时汇率，无法简单转换,无固定公式
+netherlands_antillean_guilder,荷属安的列斯盾,货币,需要实时汇率，无法简单转换,无固定公式
+new_taiwan_dollar,新台币,货币,需要实时汇率，无法简单转换,无固定公式
+new_zealand_dollar,新西兰元,货币,需要实时汇率，无法简单转换,无固定公式
+newton_centimeters,牛·厘米,扭矩,简单转换,1 N·cm = 0.01 N·m
+newton_meters,牛·米,扭矩,简单转换,基准单位
+newton_millimeters,牛·毫米,扭矩,简单转换,1 N·mm = 0.001 N·m
+newtons,牛顿,力,简单转换,基准单位
+newtons_per_square_millimeter,牛/平方毫米,压力,简单转换,1 N/mm² = 1 MPa
+nicaraguan_cordoba,尼加拉瓜科多巴,货币,需要实时汇率，无法简单转换,无固定公式
+nigerian_naira,尼日利亚奈拉,货币,需要实时汇率，无法简单转换,无固定公式
+nit,尼特,亮度,简单转换,1 nt = 1 cd/m²
+nits,尼特,亮度,简单转换,1 nt = 1 cd/m²
+north_korean_won,朝鲜元,货币,需要实时汇率，无法简单转换,无固定公式
+norwegian_krone,挪威克朗,货币,需要实时汇率，无法简单转换,无固定公式
+ohm,欧姆,电阻,简单转换,基准单位
+ohms_per_centimeter,欧姆/厘米,电阻率,简单转换,1 Ω/cm = 100 Ω/m
+ohms_per_inch,欧姆/英寸,电阻率,简单转换,1 Ω/in = 39.3701 Ω/m
+ohms_per_meter,欧姆/米,电阻率,简单转换,基准单位
+omani_rial,阿曼里亚尔,货币,需要实时汇率，无法简单转换,无固定公式
+openings_per_square_cm,开口数/平方厘米,筛网密度,简单转换,基准单位
+openings_per_square_inch,开口数/平方英寸,筛网密度,简单转换,基准单位
+operations,操作,计数单位,简单转换,基准单位
+ounce,盎司,质量,简单转换,1 oz = 28.3495 g
+ounces,盎司,质量,简单转换,1 oz = 28.3495 g
+ounces_per_cubic_inch,盎司/立方英寸,密度,简单转换,1 oz/in³ = 1729.99 kg/m³
+ounces_per_square_inch,盎司/平方英寸,面密度,简单转换,基准单位
+packet,包,包装单位,计数单位，无法转换,基准单位
+pad,垫,产品包装,计数单位，无法转换,基准单位
+pages,页,计数单位,简单转换,基准单位
+pages_per_minute,页/分钟,打印速度,简单转换,基准单位
+pages_per_month,页/月,打印量,简单转换,基准单位
+pages_per_second,页/秒,打印速度,简单转换,基准单位
+pages_per_sheet,页/张,打印密度,简单转换,基准单位
+pair,对,计数单位,简单转换,1 pair = 2 units
+pakistani_rupee,巴基斯坦卢比,货币,需要实时汇率，无法简单转换,无固定公式
+panamanian_balboa,巴拿马巴波亚,货币,需要实时汇率，无法简单转换,无固定公式
+papua_new_guinean_kina,巴布亚新几内亚基那,货币,需要实时汇率，无法简单转换,无固定公式
+paraguayan_guarani,巴拉圭瓜拉尼,货币,需要实时汇率，无法简单转换,无固定公式
+parts_per_billion,十亿分之一,浓度,简单转换,1 ppb = 0.001 ppm
+parts_per_hundred,百分之一,比例,简单转换,1 pph = 1% = 0.01
+parts_per_million,百万分之一,浓度,简单转换,基准单位
+parts_per_quadrillion,千万亿分之一,浓度,简单转换,1 ppq = 0.000000001 ppm
+parts_per_thousand,千分之一,比例,简单转换,1 ppt = 0.1% = 0.001
+parts_per_trillion,万亿分之一,浓度,简单转换,1 ppt = 0.000001 ppm
+pascal,帕斯卡,压力,简单转换,基准单位
+pascal_seconds,帕斯卡·秒,粘度,简单转换,1 Pa·s = 10 P
+patch,贴片,药品剂型,计数单位，无法转换,基准单位
+pen_needle,笔用针头,医疗器械,计数单位，无法转换,基准单位
+percent,百分比,比例,简单转换,1% = 0.01
+percent_by_volume,体积百分比,浓度,简单转换,基准单位
+percent_by_weight,重量百分比,浓度,简单转换,基准单位
+percent_daily_value_fda,FDA每日百分比,营养标准,需要具体营养标准，无法简单转换,无固定公式
+percent_volume_by_volume,体积/体积百分比,浓度,简单转换,基准单位
+percent_weight_by_volume,重量/体积百分比,浓度,简单转换,基准单位
+percent_weight_by_weight,重量/重量百分比,浓度,简单转换,基准单位
+percentage,百分比,比例,简单转换,1% = 0.01
+peruvian_nuevo_sol,秘鲁新索尔,货币,需要实时汇率，无法简单转换,无固定公式
+petabyte,拍字节,数据存储,简单转换,1 PB = 1024 TB
+petafarad,拍法,电容,简单转换,1 PF = 10¹⁵ F
+ph,pH值,酸碱度,简单转换但有特殊公式,pH = -log₁₀[H⁺]
+philippine_peso,菲律宾比索,货币,需要实时汇率，无法简单转换,无固定公式
+photos,照片,计数单位,简单转换,基准单位
+picoamps,皮安,电流,简单转换,1 pA = 0.000000000001 A
+picofarad,皮法,电容,简单转换,1 pF = 0.000000000001 F
+picoliters,皮升,体积,简单转换,1 pL = 0.000000000001 L
+picoliters_per_minute,皮升/分钟,流量,简单转换,1 pL/min = 0.0000000000000166667 L/s
+picoliters_per_second,皮升/秒,流量,简单转换,1 pL/s = 0.000000000001 L/s
+picometer,皮米,长度,简单转换,1 pm = 0.000000000001 m
+picoohms,皮欧,电阻,简单转换,1 pΩ = 0.000000000001 Ω
+picoseconds,皮秒,时间,简单转换,1 ps = 0.000000000001 s
+picowatts,皮瓦,功率,简单转换,1 pW = 0.000000000001 W
+pictures,图片,计数单位,简单转换,基准单位
+piece,个,计数单位,简单转换,基准单位
+pills,药丸,药品剂型,计数单位，无法转换,基准单位
+pints,品脱,体积,简单转换,1 US pint = 473.176 mL
+pints_per_day,品脱/天,流量,简单转换,1 pt/d = 0.00000549537 L/s
+pitch,节距,长度,简单转换,基准单位
+pixels,像素,数字图像,简单转换,基准单位
+pixels_per_inch,像素/英寸,分辨率,简单转换,基准单位
+place_settings,餐位,餐具计数,计数单位，无法转换,基准单位
+pods,豆荚,产品包装,计数单位，无法转换,基准单位
+poise,泊,粘度,简单转换,基准单位
+polish_zloty,波兰兹罗提,货币,需要实时汇率，无法简单转换,无固定公式
+portions,份,食品计量,计数单位，无法转换,基准单位
+portuguese_escudos,葡萄牙埃斯库多,货币,已淘汰，需要历史汇率,无固定公式
+pouch,小袋,包装单位,计数单位，无法转换,基准单位
+pound_per_square_foot,磅力/平方英尺,压力,简单转换,1 psf = 47.8803 Pa
+pounds,磅,质量,简单转换,1 lb = 0.45359237 kg
+pounds_per_cubic_foot,磅/立方英尺,密度,简单转换,1 lb/ft³ = 16.0185 kg/m³
+pounds_per_cubic_inch,磅/立方英寸,密度,简单转换,1 lb/in³ = 27679.9 kg/m³
+pounds_per_cubic_yard,磅/立方码,密度,简单转换,1 lb/yd³ = 0.593276 kg/m³
+pounds_per_gallon,磅/加仑,密度,简单转换,1 lb/gal = 119.826 kg/m³
+pounds_per_inch,磅/英寸,线密度,简单转换,1 lb/in = 17.8580 kg/m
+pounds_per_square_inch,磅力/平方英寸,压力,简单转换,1 psi = 6894.76 Pa
+pounds_per_square_yard,磅/平方码,面密度,简单转换,1 lb/yd² = 0.542492 kg/m²
+pre_filled_pen,预充式笔,医疗器械,计数单位，无法转换,基准单位
+primary,初级,等级分类,需要具体标准，无法转换,无固定公式
+pulses,脉冲,计数单位,简单转换,基准单位
+pump,泵,医疗器械,计数单位，无法转换,基准单位
+qatari_riyal,卡塔尔里亚尔,货币,需要实时汇率，无法简单转换,无固定公式
+quarters,四分之一,分数单位,简单转换,1 quarter = 0.25
+quarts,夸脱,体积,简单转换,1 US quart = 946.353 mL
+r_value,R值,热阻,简单转换,基准单位
+r_value_metric,公制R值,热阻,简单转换,1 R (metric) = 0.1761 R (US)
+radians,弧度,角度,简单转换,基准单位
+radians_per_second,弧度/秒,角速度,简单转换,基准单位
+radians_per_second_squared,弧度/秒²,角加速度,简单转换,基准单位
+revolutions,转,计数单位,简单转换,基准单位
+revolutions_per_hour,转/小时,转速,简单转换,1 RPH = 1/3600 RPS
+revolutions_per_month,转/月,转速,简单转换,基准单位
+revolutions_per_second,转/秒,转速,简单转换,1 RPS = 60 RPM
+revolutions_per_second_squared,转/秒²,角加速度,简单转换,基准单位
+revolutions_per_week,转/周,转速,简单转换,基准单位
+ring,环,珠宝,计数单位，无法转换,基准单位
+rockwell_15n,洛氏15N硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_15t,洛氏15T硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_30n,洛氏30N硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_30t,洛氏30T硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_45n,洛氏45N硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_45t,洛氏45T硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_a,洛氏A硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_b,洛氏B硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_c,洛氏C硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_d,洛氏D硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_e,洛氏E硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_f,洛氏F硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_g,洛氏G硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_h,洛氏H硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_k,洛氏K硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_l,洛氏L硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_m,洛氏M硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_p,洛氏P硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_r,洛氏R硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_s,洛氏S硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+rockwell_v,洛氏V硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+roll,卷,产品包装,计数单位，无法转换,基准单位
+romanian_leu,罗马尼亚列伊,货币,需要实时汇率，无法简单转换,无固定公式
+rotations,旋转,计数单位,简单转换,基准单位
+rows,行,计数单位,简单转换,基准单位
+rpm,转/分钟,转速,简单转换,1 RPM = 1/60 RPS
+russian_rouble,俄罗斯卢布,货币,需要实时汇率，无法简单转换,无固定公式
+russian_ruble,俄罗斯卢布,货币,需要实时汇率，无法简单转换,无固定公式
+rwandan_franc,卢旺达法郎,货币,需要实时汇率，无法简单转换,无固定公式
+sachet,小袋,包装单位,计数单位，无法转换,基准单位
+sae_grade,SAE等级,标准规范,需要具体标准，无法转换,无固定公式
+saint_helena_pound,圣赫勒拿镑,货币,需要实时汇率，无法简单转换,无固定公式
+samoan_tala,萨摩亚塔拉,货币,需要实时汇率，无法简单转换,无固定公式
+samples_per_second,采样点/秒,采样率,简单转换,基准单位
+sao_tome_and_principe_dobra,圣多美和普林西比多布拉,货币,需要实时汇率，无法简单转换,无固定公式
+saudi_riyal,沙特里亚尔,货币,需要实时汇率，无法简单转换,无固定公式
+scoops,勺,计量单位,计数单位，无法转换,基准单位
+seconds,秒,时间,简单转换,基准单位
+serbian_dinar,塞尔维亚第纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+seychelles_rupee,塞舌尔卢比,货币,需要实时汇率，无法简单转换,无固定公式
+sheet,张,计数单位,简单转换,基准单位
+shore_a,邵氏A硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_b,邵氏B硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_c,邵氏C硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_d,邵氏D硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_do,邵氏DO硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_e,邵氏E硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_m,邵氏M硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_o,邵氏O硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_oo,邵氏OO硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_ooo,邵氏OOO硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_ooo_s,邵氏OOO-S硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+shore_r,邵氏R硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+sierra_leonean_leone,塞拉利昂利昂,货币,需要实时汇率，无法简单转换,无固定公式
+singapore_dollar,新加坡元,货币,需要实时汇率，无法简单转换,无固定公式
+softgel,软胶囊,药品剂型,计数单位，无法转换,基准单位
+solomon_islands_dollar,所罗门群岛元,货币,需要实时汇率，无法简单转换,无固定公式
+somali_shilling,索马里先令,货币,需要实时汇率，无法简单转换,无固定公式
+sones,宋,响度,需要心理声学测量，无法简单转换,无固定公式
+south_african_rand,南非兰特,货币,需要实时汇率，无法简单转换,无固定公式
+south_korean_won,韩元,货币,需要实时汇率，无法简单转换,无固定公式
+south_sudanese_pound,南苏丹镑,货币,需要实时汇率，无法简单转换,无固定公式
+spanish_pesetas,西班牙比塞塔,货币,已淘汰，需要历史汇率,无固定公式
+spray,喷雾,药品剂型,计数单位，无法转换,基准单位
+square_centimeters,平方厘米,面积,简单转换,1 cm² = 0.0001 m²
+square_feet,平方英尺,面积,简单转换,1 ft² = 0.092903 m²
+square_inches,平方英寸,面积,简单转换,1 in² = 0.00064516 m²
+square_meters,平方米,面积,简单转换,基准单位
+square_millimeters,平方毫米,面积,简单转换,1 mm² = 0.000001 m²
+square_yards,平方码,面积,简单转换,1 yd² = 0.836127 m²
+sri_lankan_rupee,斯里兰卡卢比,货币,需要实时汇率，无法简单转换,无固定公式
+stick,棒,产品包装,计数单位，无法转换,基准单位
+stokes,斯托克斯,运动粘度,简单转换,基准单位
+stops,档,摄影,简单转换但对数关系,每档光圈面积减半或ISO加倍
+strip,条,产品包装,计数单位，无法转换,基准单位
+sudanese_pound,苏丹镑,货币,需要实时汇率，无法简单转换,无固定公式
+sun_protection_factor,防晒系数,防晒,简单转换,基准单位
+suppository,栓剂,药品剂型,计数单位，无法转换,基准单位
+surinamese_dollar,苏里南元,货币,需要实时汇率，无法简单转换,无固定公式
+swazi_lilangeni,斯威士兰里兰吉尼,货币,需要实时汇率，无法简单转换,无固定公式
+swedish_krona,瑞典克朗,货币,需要实时汇率，无法简单转换,无固定公式
+swiss_francs,瑞士法郎,货币,需要实时汇率，无法简单转换,无固定公式
+syrian_pound,叙利亚镑,货币,需要实时汇率，无法简单转换,无固定公式
+syringe,注射器,医疗器械,计数单位，无法转换,基准单位
+tablespoons,汤匙,体积,简单转换,1 US tbsp = 14.7868 mL
+tablet,片剂,药品剂型,计数单位，无法转换,基准单位
+tajikistani_somoni,塔吉克斯坦索莫尼,货币,需要实时汇率，无法简单转换,无固定公式
+tanzanian_shilling,坦桑尼亚先令,货币,需要实时汇率，无法简单转换,无固定公式
+tb,太字节,数据存储,简单转换,1 TB = 1024 GB
+teaspoons,茶匙,体积,简单转换,1 US tsp = 4.92892 mL
+teen_boys_us,美国青少年男装尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+teen_girls_us,美国青少年女装尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+teen_us,美国青少年尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+teeth,齿,计数单位,简单转换,基准单位
+teeth_per_inch,齿/英寸,密度,简单转换,基准单位
+ten_thousandths_inches,万分之一英寸,长度,简单转换,0.0001 in = 0.00254 mm
+terabyte,太字节,数据存储,简单转换,1 TB = 1024 GB
+terabytes_per_second,太字节/秒,数据传输率,简单转换,1 TB/s = 1024 GB/s
+terafarad,太法,电容,简单转换,1 TF = 10¹² F
+terahertz,太赫兹,频率,简单转换,1 THz = 1000 GHz
+teraohms,太欧,电阻,简单转换,1 TΩ = 1000 GΩ
+tgw,总毛重,质量,简单转换,基准单位
+thai_baht,泰铢,货币,需要实时汇率，无法简单转换,无固定公式
+thirty_seconds_inches,三十二分之一英寸,长度,简单转换,1/32 in = 0.79375 mm
+thousandths_inches,千分之一英寸,长度,简单转换,0.001 in = 0.0254 mm
+threads_per_centimeter,螺纹/厘米,密度,简单转换,基准单位
+threads_per_inch,螺纹/英寸,密度,简单转换,基准单位
+toddler_uk,英国幼儿尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+toddler_us,美国幼儿尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+tog,托格,热阻,简单转换,1 tog = 0.1 m²·K/W
+tongan_paanga,汤加潘加,货币,需要实时汇率，无法简单转换,无固定公式
+tons,吨,质量,简单转换,1 US ton = 907.185 kg
+tons_per_acre,吨/英亩,产量,简单转换,1 ton/acre = 2.24170 t/ha
+torr,托,压力,简单转换,1 Torr = 133.322 Pa
+tray,托盘,包装单位,计数单位，无法转换,基准单位
+trinidad_and_tobago_dollar,特立尼达和多巴哥元,货币,需要实时汇率，无法简单转换,无固定公式
+troche,糖链,药品剂型,计数单位，无法转换,基准单位
+tube,管,包装单位,计数单位，无法转换,基准单位
+tunisian_dinar,突尼斯第纳尔,货币,需要实时汇率，无法简单转换,无固定公式
+turkish_lira,土耳其里拉,货币,需要实时汇率，无法简单转换,无固定公式
+turkmenistani_manat,土库曼斯坦马纳特,货币,需要实时汇率，无法简单转换,无固定公式
+turns,匝,计数单位,简单转换,基准单位
+turns_per_centimeter,匝/厘米,密度,简单转换,基准单位
+turns_per_inch,匝/英寸,密度,简单转换,基准单位
+ugandan_shilling,乌干达先令,货币,需要实时汇率，无法简单转换,无固定公式
+uk_pounds,英镑,货币,需要实时汇率，无法简单转换,无固定公式
+ukrainian_hryvnia,乌克兰格里夫纳,货币,需要实时汇率，无法简单转换,无固定公式
+unidad_de_valor_real,哥伦比亚实际价值单位,货币单位,需要实时汇率，无法简单转换,无固定公式
+unisex_br,巴西通用尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+unisex_eu,欧洲通用尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+unisex_jp,日本通用尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+unit_of_alcohol,酒精单位,酒精含量,需要具体标准，无法简单转换,无固定公式
+united_arab_emirates_dirham,阿联酋迪拉姆,货币,需要实时汇率，无法简单转换,无固定公式
+units,单位,计数单位,简单转换,基准单位
+unknown_modifier,未知修饰符,未知单位,具体含义不明，无法转换,无固定公式
+uruguayan_peso,乌拉圭比索,货币,需要实时汇率，无法简单转换,无固定公式
+us_dollars,美元,货币,需要实时汇率，无法简单转换,无固定公式
+us_school_grade,美国学校年级,教育等级,需要年龄对应表，无法简单转换,无固定公式
+uzbekistan_som,乌兹别克斯坦苏姆,货币,需要实时汇率，无法简单转换,无固定公式
+vanuatu_vatu,瓦努阿图瓦图,货币,需要实时汇率，无法简单转换,无固定公式
+vector_genomes,载体基因组,生物技术,计数单位，无法转换,基准单位
+venezuelan_bolivar,委内瑞拉玻利瓦尔,货币,需要实时汇率，无法简单转换,无固定公式
+vial,小瓶,包装单位,计数单位，无法转换,基准单位
+vickers,维氏硬度,材料硬度,需要专业测试数据，无法简单转换,无固定公式
+vietnamese_dong,越南盾,货币,需要实时汇率，无法简单转换,无固定公式
+volt_amperes,伏安,视在功率,简单转换,基准单位
+volts,伏特,电压,简单转换,基准单位
+volts_of_alternating_current,交流伏特,电压,简单转换,基准单位
+volts_of_direct_current,直流伏特,电压,简单转换,基准单位
+volts_per_gravity,伏特/重力,加速度灵敏度,简单转换,基准单位
+wafer,晶圆,半导体,计数单位，无法转换,基准单位
+watt_hours,瓦时,能量,简单转换,1 Wh = 3600 J
+watts,瓦特,功率,简单转换,基准单位
+watts_per_kilogram,瓦特/千克,功率密度,简单转换,基准单位
+watts_per_meter_per_celsius,瓦特/米·摄氏度,热导率,简单转换,基准单位
+watts_per_meter_per_kelvin,瓦特/米·开尔文,热导率,简单转换,基准单位
+weeks,周,时间,简单转换,1 week = 7 days = 604800 s
+west_african_cfa_franc,西非CFA法郎,货币,需要实时汇率，无法简单转换,无固定公式
+wir_euro,WIR欧元,补充货币,需要特殊汇率，无法简单转换,无固定公式
+wir_franc,WIR法郎,补充货币,需要特殊汇率，无法简单转换,无固定公式
+womens_au,澳大利亚女装尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+womens_uk,英国女装尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+womens_us,美国女装尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+words,词,计数单位,简单转换,基准单位
+x,倍,比例系数,简单转换,基准单位
+yards,码,长度,简单转换,1 yd = 0.9144 m
+years,年,时间,简单转换但年份长度不同,平均1年 = 365.2425天
+yemeni_rial,也门里亚尔,货币,需要实时汇率，无法简单转换,无固定公式
+yoctofarad,幺法,电容,简单转换,1 yF = 10⁻²⁴ F
+yottafarad,尧法,电容,简单转换,1 YF = 10²⁴ F
+youth_uk,英国青少年尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+youth_us,美国青少年尺码,服装尺码,需要尺寸对照表，无法简单转换,无固定公式
+zambian_kwacha,赞比亚克瓦查,货币,需要实时汇率，无法简单转换,无固定公式
+zeptofarad,仄法,电容,简单转换,1 zF = 10⁻²¹ F
+zettafarad,泽法,电容,简单转换,1 ZF = 10²¹ F
+zimbabwe_dollar,津巴布韦元,货币,需要实时汇率，无法简单转换,无固定公式
