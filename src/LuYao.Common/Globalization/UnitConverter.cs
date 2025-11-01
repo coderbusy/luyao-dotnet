@@ -279,22 +279,22 @@ namespace LuYao.Globalization
 
             AddUnit("bytes", category, 1.0m, 0m); // 基准单位：字节
             AddUnit("kilobytes", category, 1024m, 0m);
-            AddUnit("megabytes", category, 1048576m, 0m); // 1024 * 1024
-            AddUnit("gigabytes", category, 1073741824m, 0m); // 1024 * 1024 * 1024
-            AddUnit("terabytes", category, 1099511627776m, 0m); // 1024 * 1024 * 1024 * 1024
+            AddUnit("megabytes", category, 1024m * 1024m, 0m); // 1024^2
+            AddUnit("gigabytes", category, 1024m * 1024m * 1024m, 0m); // 1024^3
+            AddUnit("terabytes", category, 1024m * 1024m * 1024m * 1024m, 0m); // 1024^4
             
             // Additional data storage units from amazon_units.csv
             AddUnit("bits", category, 0.125m, 0m); // 比特
             AddUnit("kilobyte", category, 1024m, 0m); // 单数形式
             AddUnit("kb", category, 1024m, 0m); // 简写
-            AddUnit("megabyte", category, 1048576m, 0m); // 单数形式
-            AddUnit("mb", category, 1048576m, 0m); // 简写
-            AddUnit("gigabyte", category, 1073741824m, 0m); // 单数形式
-            AddUnit("gb", category, 1073741824m, 0m); // 简写
-            AddUnit("terabyte", category, 1099511627776m, 0m); // 单数形式
-            AddUnit("tb", category, 1099511627776m, 0m); // 简写
-            AddUnit("petabyte", category, 1125899906842624m, 0m); // 1024^5
-            AddUnit("petabytes", category, 1125899906842624m, 0m);
+            AddUnit("megabyte", category, 1024m * 1024m, 0m); // 单数形式
+            AddUnit("mb", category, 1024m * 1024m, 0m); // 简写
+            AddUnit("gigabyte", category, 1024m * 1024m * 1024m, 0m); // 单数形式
+            AddUnit("gb", category, 1024m * 1024m * 1024m, 0m); // 简写
+            AddUnit("terabyte", category, 1024m * 1024m * 1024m * 1024m, 0m); // 单数形式
+            AddUnit("tb", category, 1024m * 1024m * 1024m * 1024m, 0m); // 简写
+            AddUnit("petabyte", category, 1024m * 1024m * 1024m * 1024m * 1024m, 0m); // 1024^5
+            AddUnit("petabytes", category, 1024m * 1024m * 1024m * 1024m * 1024m, 0m);
         }
 
         private void InitializeEnergyUnits()
@@ -392,12 +392,19 @@ namespace LuYao.Globalization
 
             AddUnit("radians", category, 1.0m, 0m); // 基准单位：弧度
             AddUnit("radian", category, 1.0m, 0m);
-            AddUnit("degrees", category, 0.0174532925199433m, 0m); // 度 (π/180)
-            AddUnit("degree", category, 0.0174532925199433m, 0m);
-            AddUnit("arc_minute", category, 0.000290888208665722m, 0m); // 角分
-            AddUnit("arc_minutes", category, 0.000290888208665722m, 0m);
-            AddUnit("arc_sec", category, 0.00000484813681109536m, 0m); // 角秒
-            AddUnit("arc_seconds", category, 0.00000484813681109536m, 0m);
+            
+            // π/180 弧度 = 1度
+            decimal degreesToRadians = (decimal)(Math.PI / 180.0);
+            AddUnit("degrees", category, degreesToRadians, 0m); // 度 (π/180)
+            AddUnit("degree", category, degreesToRadians, 0m);
+            
+            // 1角分 = 1/60度
+            AddUnit("arc_minute", category, degreesToRadians / 60m, 0m); // 角分
+            AddUnit("arc_minutes", category, degreesToRadians / 60m, 0m);
+            
+            // 1角秒 = 1/3600度
+            AddUnit("arc_sec", category, degreesToRadians / 3600m, 0m); // 角秒
+            AddUnit("arc_seconds", category, degreesToRadians / 3600m, 0m);
         }
 
         private void InitializeElectricCurrentUnits()
