@@ -527,5 +527,445 @@ bool success = _converter.TryExchange("meters", "grams", 100m, out decimal resul
   }
 
         #endregion
+
+        #region Enhanced Length Units Tests
+
+        [TestMethod]
+        public void TryExchange_NanometersToMeters_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("nanometers", "meters", 1000000000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_AngstromToNanometers_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("angstrom", "nanometers", 10m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MicrometersToMillimeters_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("micrometers", "millimeters", 1000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        #endregion
+
+        #region Enhanced Mass Units Tests
+
+        [TestMethod]
+        public void TryExchange_MicrogramsToGrams_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("micrograms", "grams", 1000000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_TonsToKilograms_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("tons", "kilograms", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(907.185m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_CaratsToGrams_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("carats", "grams", 5m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        #endregion
+
+        #region Pressure Conversion Tests
+
+        [TestMethod]
+        public void TryExchange_BarToPascals_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("bar", "pascals", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(100000m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_PsiToPascals_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("psi", "pascals", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(6894.76m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_AtmosphereToBar_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("atmosphere", "bar", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1.01325m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_TorrToPascals_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("torr", "pascals", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(133.322m, result);
+        }
+
+        #endregion
+
+        #region Time Units Tests
+
+        [TestMethod]
+        public void TryExchange_MillisecondsToSeconds_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("milliseconds", "seconds", 1000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MinutesToSeconds_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("minutes", "seconds", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(60m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_HoursToMinutes_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("hours", "minutes", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(60m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_DaysToHours_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("days", "hours", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(24m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_WeeksToDays_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("weeks", "days", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(7m, result);
+        }
+
+        #endregion
+
+        #region Power Units Tests
+
+        [TestMethod]
+        public void TryExchange_KilowattsToWatts_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("kilowatts", "watts", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1000m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_HorsepowerToWatts_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("horsepower", "watts", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(745.7m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MilliwattsToWatts_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("milliwatts", "watts", 1000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        #endregion
+
+        #region Frequency Units Tests
+
+        [TestMethod]
+        public void TryExchange_KilohertzToHertz_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("kilohertz", "hertz", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1000m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MegahertzToKilohertz_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("megahertz", "kilohertz", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1000m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_GigahertzToMegahertz_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("gigahertz", "megahertz", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1000m, result);
+        }
+
+        #endregion
+
+        #region Angle Units Tests
+
+        [TestMethod]
+        public void TryExchange_DegreesToRadians_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("degrees", "radians", 180m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(3.14159265358979m, result, 0.0000001m);
+        }
+
+        [TestMethod]
+        public void TryExchange_RadiansToDegrees_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("radians", "degrees", 3.14159265358979m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(180m, result, 0.0001m);
+        }
+
+        [TestMethod]
+        public void TryExchange_ArcMinuteToDegrees_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("arc_minute", "degrees", 60m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result, 0.0001m);
+        }
+
+        #endregion
+
+        #region Electric Current Units Tests
+
+        [TestMethod]
+        public void TryExchange_MilliampsToAmperes_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("milliamps", "amperes", 1000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MicroampsToMilliamps_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("microamps", "milliamps", 1000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        #endregion
+
+        #region Voltage Units Tests
+
+        [TestMethod]
+        public void TryExchange_MillivoltsToVolts_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("millivolts", "volts", 1000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_KilovoltsToVolts_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("kilovolts", "volts", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1000m, result);
+        }
+
+        #endregion
+
+        #region Electric Resistance Units Tests
+
+        [TestMethod]
+        public void TryExchange_KilohmsToOhms_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("kilohms", "ohms", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1000m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MegohmsToKilohms_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("megohms", "kilohms", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1000m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MilliohmsToOhms_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("milliohms", "ohms", 1000m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        #endregion
+
+        #region Enhanced Data Storage Tests
+
+        [TestMethod]
+        public void TryExchange_BitsToBytes_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("bits", "bytes", 8m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_KbToBytes_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("kb", "bytes", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1024m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MbToKb_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("mb", "kb", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1024m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_GbToMb_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("gb", "mb", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1024m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_TbToGb_ReturnsCorrectValue()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("tb", "gb", 1m, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(1024m, result);
+        }
+
+        #endregion
     }
 }
