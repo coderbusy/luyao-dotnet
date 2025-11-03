@@ -971,36 +971,15 @@ namespace LuYao.Globalization
         #region Enhanced Multi-Unit TryExchange Tests
 
         [TestMethod]
-        public void TryExchange_MultiUnit_GramsToKilograms_ReturnsLargestInRange()
+        public void TryExchange_MultiUnit_GramsToKilograms_ReturnsFirstInRange()
         {
             // Arrange - this test includes all mass units mentioned in the issue
             string[] units = { "grams", "kilograms", "tons", "milligrams", "hundredths_pounds", "ounces", "pounds" };
 
-            // Act - 1500 grams with range 0 to 99.99 should select ounces (~52.91)
-            // because it's the largest value that fits in range
+            // Act - 1500 grams with range 0 to 99.99 should select kilograms (1.5)
+            // because it's the first unit in the array that fits in range
             // grams: 1500 (out of range)
-            // kilograms: 1.5 (in range)
-            // tons: ~0.00165 (in range but smaller)
-            // milligrams: 1500000 (out of range)
-            // hundredths_pounds: ~330.69 (out of range)
-            // ounces: ~52.91 (in range and largest)
-            // pounds: ~3.31 (in range but smaller than ounces)
-            bool success = _converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
-
-            // Assert
-            Assert.IsTrue(success);
-            Assert.AreEqual("ounces", unit);
-            Assert.IsTrue(result > 52m && result < 53m, $"Expected result around 52.91 but got {result}");
-        }
-
-        [TestMethod]
-        public void TryExchange_MultiUnit_IssueExample_ExactUnits()
-        {
-            // Arrange - exact units from the issue example (grams, kilograms, tons only)
-            string[] units = { "grams", "kilograms", "tons" };
-
-            // Act - 1500 grams with range 0 to 99.99
-            // As per issue: grams (1500) is out of range, kilograms (1.5) is valid, tons (0.00165) is smaller
+            // kilograms: 1.5 (first in range, selected)
             bool success = _converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
 
             // Assert
@@ -1010,15 +989,31 @@ namespace LuYao.Globalization
         }
 
         [TestMethod]
-        public void TryExchange_MultiUnit_SelectsLargestValueInRange()
+        public void TryExchange_MultiUnit_IssueExample_ExactUnits()
+        {
+            // Arrange - exact units from the issue example (grams, kilograms, tons only)
+            string[] units = { "grams", "kilograms", "tons" };
+
+            // Act - 1500 grams with range 0 to 99.99
+            // grams (1500) is out of range, kilograms (1.5) is first valid match
+            bool success = _converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("kilograms", unit);
+            Assert.AreEqual(1.5m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_SelectsFirstValueInRange()
         {
             // Arrange
             string[] units = { "grams", "kilograms", "tons" };
 
             // Act - 1500 grams with range 0 to 99.99
             // grams: 1500 (out of range)
-            // kilograms: 1.5 (in range)
-            // tons: 0.0016534... (in range but smaller)
+            // kilograms: 1.5 (first in range, selected)
+            // tons: 0.0016534... (also in range but not selected)
             bool success = _converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
 
             // Assert
@@ -1058,21 +1053,21 @@ namespace LuYao.Globalization
         }
 
         [TestMethod]
-        public void TryExchange_MultiUnit_AllUnitsValid_SelectsLargest()
+        public void TryExchange_MultiUnit_AllUnitsValid_SelectsFirst()
         {
             // Arrange
             string[] units = { "meters", "centimeters", "millimeters" };
 
             // Act - 0.5 meters with range 0 to 1000
-            // meters: 0.5
-            // centimeters: 50
-            // millimeters: 500
+            // meters: 0.5 (first in range, selected)
+            // centimeters: 50 (also in range)
+            // millimeters: 500 (also in range)
             bool success = _converter.TryExchange("meters", units, 0.5m, 0m, 1000m, out string? unit, out decimal result);
 
             // Assert
             Assert.IsTrue(success);
-            Assert.AreEqual("millimeters", unit);
-            Assert.AreEqual(500m, result);
+            Assert.AreEqual("meters", unit);
+            Assert.AreEqual(0.5m, result);
         }
 
         [TestMethod]
@@ -1234,7 +1229,7 @@ namespace LuYao.Globalization
         }
 
         [TestMethod]
-        public void TryExchange_MultiUnit_LengthUnits_SelectsBest()
+        public void TryExchange_MultiUnit_LengthUnits_SelectsFirst()
         {
             // Arrange
             string[] units = { "meters", "centimeters", "kilometers" };
@@ -1242,7 +1237,7 @@ namespace LuYao.Globalization
             // Act - 5000 meters with range 0 to 10
             // meters: 5000 (out of range)
             // centimeters: 500000 (out of range)
-            // kilometers: 5 (in range)
+            // kilometers: 5 (first in range, selected)
             bool success = _converter.TryExchange("meters", units, 5000m, 0m, 10m, out string? unit, out decimal result);
 
             // Assert
@@ -1252,15 +1247,15 @@ namespace LuYao.Globalization
         }
 
         [TestMethod]
-        public void TryExchange_MultiUnit_VolumeUnits_SelectsBest()
+        public void TryExchange_MultiUnit_VolumeUnits_SelectsFirst()
         {
             // Arrange
             string[] units = { "liters", "milliliters", "gallons" };
 
             // Act - 2 liters with range 0 to 100
-            // liters: 2
+            // liters: 2 (first in range, selected)
             // milliliters: 2000 (out of range)
-            // gallons: ~0.528 (in range but smaller than liters)
+            // gallons: ~0.528 (also in range)
             bool success = _converter.TryExchange("liters", units, 2m, 0m, 100m, out string? unit, out decimal result);
 
             // Assert
@@ -1319,9 +1314,12 @@ namespace LuYao.Globalization
         public void TryExchange_MultiUnit_HundredthsPounds_Works()
         {
             // Arrange
-            string[] units = { "grams", "pounds", "hundredths_pounds" };
+            string[] units = { "grams", "hundredths_pounds", "pounds" };
 
             // Act - test the newly added hundredths_pounds unit
+            // grams: 100 (out of range)
+            // hundredths_pounds: ~22.046 (first in range, selected)
+            // pounds: ~0.22 (also in range)
             bool success = _converter.TryExchange("grams", units, 100m, 0m, 50m, out string? unit, out decimal result);
 
             // Assert

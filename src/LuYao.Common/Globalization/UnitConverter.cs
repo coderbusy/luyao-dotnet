@@ -115,16 +115,15 @@ public class UnitConverter
     }
 
     /// <summary>
-    /// 从可接受的目标单位数组中选择最佳单位进行转换，使转换后的值尽可能大但不超过指定范围。
+    /// 从可接受的目标单位数组中选择合适的单位进行转换，返回第一个满足范围条件的单位。
     /// </summary>
     /// <param name="request">包含转换所需参数的请求对象。</param>
     /// <returns>包含转换结果的响应对象。</returns>
     /// <remarks>
     /// <para>算法规则：</para>
     /// <list type="number">
-    /// <item><description>遍历所有目标单位，将源值转换为每个单位的值。</description></item>
-    /// <item><description>过滤掉转换后的值不在 [min, max] 范围内的单位。</description></item>
-    /// <item><description>从满足条件的单位中，选择转换后值最大的那个单位。</description></item>
+    /// <item><description>按顺序遍历目标单位数组，将源值转换为每个单位的值。</description></item>
+    /// <item><description>返回第一个转换后的值在 [min, max] 范围内的单位。</description></item>
     /// </list>
     /// <para>只有同一类别的单位才能相互转换。例如，长度单位只能转换为其他长度单位，不能转换为质量单位。</para>
     /// </remarks>
@@ -143,8 +142,8 @@ public class UnitConverter
     /// var response = converter.TryExchange(request);
     /// if (response.Success)
     /// {
-    ///     Console.WriteLine($"最佳单位: {response.Unit}, 值: {response.Result}");
-    ///     // 输出: 最佳单位: kilograms, 值: 1.5
+    ///     Console.WriteLine($"选择单位: {response.Unit}, 值: {response.Result}");
+    ///     // 返回第一个满足条件的单位 kilograms (1.5)
     /// }
     /// </code>
     /// </example>
@@ -166,7 +165,7 @@ public class UnitConverter
     }
 
     /// <summary>
-    /// 从可接受的目标单位数组中选择最佳单位进行转换，使转换后的值尽可能大但不超过指定范围。
+    /// 从可接受的目标单位数组中选择合适的单位进行转换，返回第一个满足范围条件的单位。
     /// </summary>
     /// <param name="from">源单位名称（不区分大小写）。</param>
     /// <param name="targetUnits">可接受的目标单位数组（不区分大小写）。</param>
@@ -181,9 +180,8 @@ public class UnitConverter
     /// <remarks>
     /// <para>算法规则：</para>
     /// <list type="number">
-    /// <item><description>遍历所有目标单位，将源值转换为每个单位的值。</description></item>
-    /// <item><description>过滤掉转换后的值不在 [min, max] 范围内的单位。</description></item>
-    /// <item><description>从满足条件的单位中，选择转换后值最大的那个单位。</description></item>
+    /// <item><description>按顺序遍历目标单位数组，将源值转换为每个单位的值。</description></item>
+    /// <item><description>返回第一个转换后的值在 [min, max] 范围内的单位。</description></item>
     /// </list>
     /// <para>只有同一类别的单位才能相互转换。例如，长度单位只能转换为其他长度单位，不能转换为质量单位。</para>
     /// </remarks>
@@ -195,9 +193,8 @@ public class UnitConverter
     /// // 转换 1500 克，要求结果在 0 到 99.99 之间
     /// if (converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string selectedUnit, out decimal result))
     /// {
-    ///     Console.WriteLine($"最佳单位: {selectedUnit}, 值: {result}"); 
-    ///     // 输出: 最佳单位: kilograms, 值: 1.5
-    ///     // 因为 grams 的值 1500 超过 99.99，kilograms 的值 1.5 在范围内且最大
+    ///     Console.WriteLine($"选择单位: {selectedUnit}, 值: {result}"); 
+    ///     // 因为 grams 的值 1500 超过 99.99，会跳过并返回第一个满足条件的 kilograms (1.5)
     /// }
     /// </code>
     /// </example>
@@ -212,10 +209,7 @@ public class UnitConverter
         if (min > max)
             return false;
 
-        // 存储所有有效的转换结果
-        var validConversions = new List<ConversionCandidate>();
-
-        // 尝试转换到每个目标单位
+        // 按顺序尝试转换到每个目标单位，返回第一个满足条件的
         foreach (var targetUnit in targetUnits)
         {
             if (string.IsNullOrEmpty(targetUnit))
@@ -227,20 +221,16 @@ public class UnitConverter
                 // 检查转换后的值是否在范围内
                 if (convertedValue >= min && convertedValue <= max)
                 {
-                    validConversions.Add(new ConversionCandidate { Unit = targetUnit, Value = convertedValue });
+                    // 找到第一个满足条件的单位，立即返回
+                    unit = targetUnit;
+                    result = convertedValue;
+                    return true;
                 }
             }
         }
 
-        // 如果没有找到满足条件的单位
-        if (validConversions.Count == 0)
-            return false;
-
-        // 选择值最大的那个单位
-        var best = validConversions.OrderByDescending(x => x.Value).First();
-        unit = best.Unit;
-        result = best.Value;
-        return true;
+        // 没有找到满足条件的单位
+        return false;
     }
 
     /// <summary>
@@ -650,13 +640,6 @@ public class UnitConverter
             ToBaseUnit = toBase,
             FromBaseUnit = fromBase
         };
-    }
-
-    // 转换候选结果内部类
-    private class ConversionCandidate
-    {
-        public string Unit { get; set; } = string.Empty;
-        public decimal Value { get; set; }
     }
 
     // 单位定义内部类
