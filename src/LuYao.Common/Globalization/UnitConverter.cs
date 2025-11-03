@@ -63,6 +63,187 @@ public class UnitConverter
     }
 
     /// <summary>
+    /// 单位转换请求的参数类，用于封装多单位选择转换所需的所有参数。
+    /// </summary>
+    public class UnitExchangeRequest
+    {
+        /// <summary>
+        /// 获取或设置源单位名称（不区分大小写）。
+        /// </summary>
+        public string From { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 获取或设置可接受的目标单位数组（不区分大小写）。
+        /// </summary>
+        public string[] TargetUnits { get; set; } = new string[0];
+
+        /// <summary>
+        /// 获取或设置要转换的数值。
+        /// </summary>
+        public decimal Value { get; set; }
+
+        /// <summary>
+        /// 获取或设置转换结果的最小值（包含）。
+        /// </summary>
+        public decimal Min { get; set; }
+
+        /// <summary>
+        /// 获取或设置转换结果的最大值（包含）。
+        /// </summary>
+        public decimal Max { get; set; }
+    }
+
+    /// <summary>
+    /// 单位转换结果的响应类，包含转换后的单位和值。
+    /// </summary>
+    public class UnitExchangeResponse
+    {
+        /// <summary>
+        /// 获取或设置转换是否成功。
+        /// </summary>
+        public bool Success { get; set; }
+
+        /// <summary>
+        /// 获取或设置转换后选择的单位。如果转换失败，则为 <c>null</c>。
+        /// </summary>
+        public string? Unit { get; set; }
+
+        /// <summary>
+        /// 获取或设置转换后的结果值。如果转换失败，则为 0。
+        /// </summary>
+        public decimal Result { get; set; }
+    }
+
+    /// <summary>
+    /// 从可接受的目标单位数组中选择最佳单位进行转换，使转换后的值尽可能大但不超过指定范围。
+    /// </summary>
+    /// <param name="request">包含转换所需参数的请求对象。</param>
+    /// <returns>包含转换结果的响应对象。</returns>
+    /// <remarks>
+    /// <para>算法规则：</para>
+    /// <list type="number">
+    /// <item><description>遍历所有目标单位，将源值转换为每个单位的值。</description></item>
+    /// <item><description>过滤掉转换后的值不在 [min, max] 范围内的单位。</description></item>
+    /// <item><description>从满足条件的单位中，选择转换后值最大的那个单位。</description></item>
+    /// </list>
+    /// <para>只有同一类别的单位才能相互转换。例如，长度单位只能转换为其他长度单位，不能转换为质量单位。</para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var converter = new UnitConverter();
+    /// var request = new UnitConverter.UnitExchangeRequest
+    /// {
+    ///     From = "grams",
+    ///     TargetUnits = new[] { "grams", "kilograms", "tons", "milligrams" },
+    ///     Value = 1500m,
+    ///     Min = 0m,
+    ///     Max = 99.99m
+    /// };
+    /// 
+    /// var response = converter.TryExchange(request);
+    /// if (response.Success)
+    /// {
+    ///     Console.WriteLine($"最佳单位: {response.Unit}, 值: {response.Result}");
+    ///     // 输出: 最佳单位: kilograms, 值: 1.5
+    /// }
+    /// </code>
+    /// </example>
+    public UnitExchangeResponse TryExchange(UnitExchangeRequest request)
+    {
+        if (request == null)
+        {
+            return new UnitExchangeResponse { Success = false };
+        }
+
+        bool success = TryExchange(request.From, request.TargetUnits, request.Value, request.Min, request.Max, out string? unit, out decimal result);
+        
+        return new UnitExchangeResponse
+        {
+            Success = success,
+            Unit = unit,
+            Result = result
+        };
+    }
+
+    /// <summary>
+    /// 从可接受的目标单位数组中选择最佳单位进行转换，使转换后的值尽可能大但不超过指定范围。
+    /// </summary>
+    /// <param name="from">源单位名称（不区分大小写）。</param>
+    /// <param name="targetUnits">可接受的目标单位数组（不区分大小写）。</param>
+    /// <param name="value">要转换的数值。</param>
+    /// <param name="min">转换结果的最小值（包含）。</param>
+    /// <param name="max">转换结果的最大值（包含）。</param>
+    /// <param name="unit">转换后选择的单位。如果转换失败，则为 <c>null</c>。</param>
+    /// <param name="result">转换后的结果值。如果转换失败，则为 0。</param>
+    /// <returns>
+    /// 如果找到满足条件的单位并转换成功，返回 <c>true</c>；否则返回 <c>false</c>。
+    /// </returns>
+    /// <remarks>
+    /// <para>算法规则：</para>
+    /// <list type="number">
+    /// <item><description>遍历所有目标单位，将源值转换为每个单位的值。</description></item>
+    /// <item><description>过滤掉转换后的值不在 [min, max] 范围内的单位。</description></item>
+    /// <item><description>从满足条件的单位中，选择转换后值最大的那个单位。</description></item>
+    /// </list>
+    /// <para>只有同一类别的单位才能相互转换。例如，长度单位只能转换为其他长度单位，不能转换为质量单位。</para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var converter = new UnitConverter();
+    /// string[] units = { "grams", "kilograms", "tons", "milligrams" };
+    /// 
+    /// // 转换 1500 克，要求结果在 0 到 99.99 之间
+    /// if (converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string selectedUnit, out decimal result))
+    /// {
+    ///     Console.WriteLine($"最佳单位: {selectedUnit}, 值: {result}"); 
+    ///     // 输出: 最佳单位: kilograms, 值: 1.5
+    ///     // 因为 grams 的值 1500 超过 99.99，kilograms 的值 1.5 在范围内且最大
+    /// }
+    /// </code>
+    /// </example>
+    public bool TryExchange(string from, string[] targetUnits, decimal value, decimal min, decimal max, out string? unit, out decimal result)
+    {
+        unit = null;
+        result = 0;
+
+        if (string.IsNullOrEmpty(from) || targetUnits == null || targetUnits.Length == 0)
+            return false;
+
+        if (min > max)
+            return false;
+
+        // 存储所有有效的转换结果
+        var validConversions = new List<ConversionCandidate>();
+
+        // 尝试转换到每个目标单位
+        foreach (var targetUnit in targetUnits)
+        {
+            if (string.IsNullOrEmpty(targetUnit))
+                continue;
+
+            // 执行转换
+            if (TryExchange(from, targetUnit, value, out decimal convertedValue))
+            {
+                // 检查转换后的值是否在范围内
+                if (convertedValue >= min && convertedValue <= max)
+                {
+                    validConversions.Add(new ConversionCandidate { Unit = targetUnit, Value = convertedValue });
+                }
+            }
+        }
+
+        // 如果没有找到满足条件的单位
+        if (validConversions.Count == 0)
+            return false;
+
+        // 选择值最大的那个单位
+        var best = validConversions.OrderByDescending(x => x.Value).First();
+        unit = best.Unit;
+        result = best.Value;
+        return true;
+    }
+
+    /// <summary>
     /// 将指定数值从原始单位转换为目标单位。
     /// </summary>
     /// <param name="from">源单位名称（不区分大小写）。</param>
@@ -217,6 +398,7 @@ public class UnitConverter
         AddUnit("lbs", category, 0.45359237m, 0m); // 磅（简写）
         AddUnit("ounce", category, 0.028349523125m, 0m); // 盎司（单数）
         AddUnit("carats", category, 0.0002m, 0m); // 克拉
+        AddUnit("hundredths_pounds", category, 0.0045359237m, 0m); // 百分之一磅
     }
 
     private void InitializeTemperatureUnits()
@@ -468,6 +650,13 @@ public class UnitConverter
             ToBaseUnit = toBase,
             FromBaseUnit = fromBase
         };
+    }
+
+    // 转换候选结果内部类
+    private class ConversionCandidate
+    {
+        public string Unit { get; set; } = string.Empty;
+        public decimal Value { get; set; }
     }
 
     // 单位定义内部类

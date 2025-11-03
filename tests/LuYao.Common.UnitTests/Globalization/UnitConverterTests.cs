@@ -967,5 +967,370 @@ namespace LuYao.Globalization
         }
 
         #endregion
+
+        #region Enhanced Multi-Unit TryExchange Tests
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_GramsToKilograms_ReturnsLargestInRange()
+        {
+            // Arrange - this test includes all mass units mentioned in the issue
+            string[] units = { "grams", "kilograms", "tons", "milligrams", "hundredths_pounds", "ounces", "pounds" };
+
+            // Act - 1500 grams with range 0 to 99.99 should select ounces (~52.91)
+            // because it's the largest value that fits in range
+            // grams: 1500 (out of range)
+            // kilograms: 1.5 (in range)
+            // tons: ~0.00165 (in range but smaller)
+            // milligrams: 1500000 (out of range)
+            // hundredths_pounds: ~330.69 (out of range)
+            // ounces: ~52.91 (in range and largest)
+            // pounds: ~3.31 (in range but smaller than ounces)
+            bool success = _converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("ounces", unit);
+            Assert.IsTrue(result > 52m && result < 53m, $"Expected result around 52.91 but got {result}");
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_IssueExample_ExactUnits()
+        {
+            // Arrange - exact units from the issue example (grams, kilograms, tons only)
+            string[] units = { "grams", "kilograms", "tons" };
+
+            // Act - 1500 grams with range 0 to 99.99
+            // As per issue: grams (1500) is out of range, kilograms (1.5) is valid, tons (0.00165) is smaller
+            bool success = _converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("kilograms", unit);
+            Assert.AreEqual(1.5m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_SelectsLargestValueInRange()
+        {
+            // Arrange
+            string[] units = { "grams", "kilograms", "tons" };
+
+            // Act - 1500 grams with range 0 to 99.99
+            // grams: 1500 (out of range)
+            // kilograms: 1.5 (in range)
+            // tons: 0.0016534... (in range but smaller)
+            bool success = _converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("kilograms", unit);
+            Assert.AreEqual(1.5m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_NoValidUnit_ReturnsFalse()
+        {
+            // Arrange
+            string[] units = { "tons", "metric_tons" };
+
+            // Act - 1 gram with range 1000 to 2000 - no unit can satisfy this
+            bool success = _converter.TryExchange("grams", units, 1m, 1000m, 2000m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.IsNull(unit);
+            Assert.AreEqual(0m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_SingleValidUnit_ReturnsIt()
+        {
+            // Arrange
+            string[] units = { "grams", "kilograms", "tons" };
+
+            // Act - 0.5 kilograms with range 0.4 to 0.6 - only kilograms works
+            bool success = _converter.TryExchange("kilograms", units, 0.5m, 0.4m, 0.6m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("kilograms", unit);
+            Assert.AreEqual(0.5m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_AllUnitsValid_SelectsLargest()
+        {
+            // Arrange
+            string[] units = { "meters", "centimeters", "millimeters" };
+
+            // Act - 0.5 meters with range 0 to 1000
+            // meters: 0.5
+            // centimeters: 50
+            // millimeters: 500
+            bool success = _converter.TryExchange("meters", units, 0.5m, 0m, 1000m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("millimeters", unit);
+            Assert.AreEqual(500m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_NullFrom_ReturnsFalse()
+        {
+            // Arrange
+            string[] units = { "grams", "kilograms" };
+
+            // Act
+            bool success = _converter.TryExchange(null, units, 100m, 0m, 100m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.IsNull(unit);
+            Assert.AreEqual(0m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_NullTargetUnits_ReturnsFalse()
+        {
+            // Arrange & Act
+            bool success = _converter.TryExchange("grams", null, 100m, 0m, 100m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.IsNull(unit);
+            Assert.AreEqual(0m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_EmptyTargetUnits_ReturnsFalse()
+        {
+            // Arrange
+            string[] units = new string[0];
+
+            // Act
+            bool success = _converter.TryExchange("grams", units, 100m, 0m, 100m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.IsNull(unit);
+            Assert.AreEqual(0m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_MinGreaterThanMax_ReturnsFalse()
+        {
+            // Arrange
+            string[] units = { "grams", "kilograms" };
+
+            // Act - min > max is invalid
+            bool success = _converter.TryExchange("grams", units, 100m, 100m, 0m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.IsNull(unit);
+            Assert.AreEqual(0m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_IncompatibleUnits_ReturnsFalse()
+        {
+            // Arrange
+            string[] units = { "liters", "gallons" }; // Volume units
+
+            // Act - trying to convert length to volume
+            bool success = _converter.TryExchange("meters", units, 100m, 0m, 100m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.IsNull(unit);
+            Assert.AreEqual(0m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_UnknownTargetUnit_SkipsIt()
+        {
+            // Arrange
+            string[] units = { "unknown_unit", "kilograms", "grams" };
+
+            // Act
+            bool success = _converter.TryExchange("grams", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("kilograms", unit);
+            Assert.AreEqual(1.5m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_WithRequest_Success()
+        {
+            // Arrange
+            var request = new UnitConverter.UnitExchangeRequest
+            {
+                From = "grams",
+                TargetUnits = new[] { "grams", "kilograms", "tons", "milligrams" },
+                Value = 1500m,
+                Min = 0m,
+                Max = 99.99m
+            };
+
+            // Act
+            var response = _converter.TryExchange(request);
+
+            // Assert
+            Assert.IsTrue(response.Success);
+            Assert.AreEqual("kilograms", response.Unit);
+            Assert.AreEqual(1.5m, response.Result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_WithRequest_Failure()
+        {
+            // Arrange
+            var request = new UnitConverter.UnitExchangeRequest
+            {
+                From = "grams",
+                TargetUnits = new[] { "tons", "metric_tons" },
+                Value = 1m,
+                Min = 1000m,
+                Max = 2000m
+            };
+
+            // Act
+            var response = _converter.TryExchange(request);
+
+            // Assert
+            Assert.IsFalse(response.Success);
+            Assert.IsNull(response.Unit);
+            Assert.AreEqual(0m, response.Result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_WithNullRequest_ReturnsFalse()
+        {
+            // Arrange & Act
+            var response = _converter.TryExchange(null);
+
+            // Assert
+            Assert.IsFalse(response.Success);
+            Assert.IsNull(response.Unit);
+            Assert.AreEqual(0m, response.Result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_CaseInsensitive_Success()
+        {
+            // Arrange
+            string[] units = { "GRAMS", "KILOGRAMS", "TONS" };
+
+            // Act
+            bool success = _converter.TryExchange("GRAMS", units, 1500m, 0m, 99.99m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("KILOGRAMS", unit);
+            Assert.AreEqual(1.5m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_LengthUnits_SelectsBest()
+        {
+            // Arrange
+            string[] units = { "meters", "centimeters", "kilometers" };
+
+            // Act - 5000 meters with range 0 to 10
+            // meters: 5000 (out of range)
+            // centimeters: 500000 (out of range)
+            // kilometers: 5 (in range)
+            bool success = _converter.TryExchange("meters", units, 5000m, 0m, 10m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("kilometers", unit);
+            Assert.AreEqual(5m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_VolumeUnits_SelectsBest()
+        {
+            // Arrange
+            string[] units = { "liters", "milliliters", "gallons" };
+
+            // Act - 2 liters with range 0 to 100
+            // liters: 2
+            // milliliters: 2000 (out of range)
+            // gallons: ~0.528 (in range but smaller than liters)
+            bool success = _converter.TryExchange("liters", units, 2m, 0m, 100m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("liters", unit);
+            Assert.AreEqual(2m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_ZeroValue_Success()
+        {
+            // Arrange
+            string[] units = { "grams", "kilograms" };
+
+            // Act
+            bool success = _converter.TryExchange("grams", units, 0m, 0m, 100m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            // Both units will have value 0, so either is acceptable
+            Assert.IsNotNull(unit);
+            Assert.AreEqual(0m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_NegativeValue_Success()
+        {
+            // Arrange
+            string[] units = { "meters", "kilometers" };
+
+            // Act - -1000 meters with range -10 to 10
+            bool success = _converter.TryExchange("meters", units, -1000m, -10m, 10m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("kilometers", unit);
+            Assert.AreEqual(-1m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_DecimalPrecision_Success()
+        {
+            // Arrange
+            string[] units = { "grams", "kilograms" };
+
+            // Act - 1234.56 grams
+            bool success = _converter.TryExchange("grams", units, 1234.56m, 0m, 10m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("kilograms", unit);
+            Assert.AreEqual(1.23456m, result);
+        }
+
+        [TestMethod]
+        public void TryExchange_MultiUnit_HundredthsPounds_Works()
+        {
+            // Arrange
+            string[] units = { "grams", "pounds", "hundredths_pounds" };
+
+            // Act - test the newly added hundredths_pounds unit
+            bool success = _converter.TryExchange("grams", units, 100m, 0m, 50m, out string? unit, out decimal result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual("hundredths_pounds", unit);
+            // 100 grams to hundredths_pounds: 100 * (1/0.0045359237) ≈ 22.046
+            Assert.IsTrue(result > 20m && result < 25m);
+        }
+
+        #endregion
     }
 }
