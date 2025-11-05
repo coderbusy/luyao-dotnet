@@ -297,7 +297,6 @@ public class SizeHelperTests
         Assert.AreEqual(25.5m, arr[0]);
     }
 
-
     /// <summary>
     /// 测试仅包含文字没有数字的字符串，期望返回 false 或空数组
     /// </summary>

@@ -55,10 +55,11 @@ public static class SizeHelper
 {
     // Compiled regex patterns for better performance
     private static readonly Regex ParenthesesPattern = new Regex(@"\(([^)]+)\)", RegexOptions.Compiled);
-    private static readonly Regex PerValueUnitPattern = new Regex(@"\d+\.?\d*\s*(inch|in|mm|cm|dm|m)\s*[x\*]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static readonly Regex NumberWithOptionalUnitPattern = new Regex(@"(\d+\.?\d*)\s*(inch|in|mm|cm|dm|m)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex PerValueUnitPattern = new Regex(@"\d+(?:\.\d+)?\s*(inch|in|mm|cm|dm|m)\s*[x\*]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex NumberWithOptionalUnitPattern = new Regex(@"(\d+(?:\.\d+)?)\s*(inch|in|mm|cm|dm|m)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex UnitPattern = new Regex(@"(inch|in|mm|cm|dm|m)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static readonly Regex NumberPattern = new Regex(@"(\d+\.?\d*)", RegexOptions.Compiled);
+    private static readonly Regex NumberPattern = new Regex(@"(\d+(?:\.\d+)?)", RegexOptions.Compiled);
+    private static readonly Regex SingleValuePattern = new Regex(@"^\s*(\d+(?:\.\d+)?)\s*(inch|in|mm|cm|dm|m)?\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     
     // Unit conversion factors (relative to centimeters)
     private static readonly Dictionary<string, decimal> UnitConversions = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
@@ -116,8 +117,6 @@ public static class SizeHelper
             return false;
         }
 
-        var allResults = new List<decimal>();
-
         // Check if contains separators (x or *)
         if (!ContainsIgnoreCase(size, "x", "*"))
         {
@@ -132,6 +131,8 @@ public static class SizeHelper
             arr = new decimal[0];
             return false;
         }
+
+        var allResults = new List<decimal>();
 
         // Extract all groups (including those in parentheses)
         // Split by parentheses to handle multiple groups
@@ -221,7 +222,8 @@ public static class SizeHelper
         if (string.IsNullOrWhiteSpace(input))
             return null;
 
-        // Try to match number with optional unit pattern
+        // Use the same pattern as multi-value extraction for consistency
+        // This allows extracting size from text like "Size: 50cm"
         var match = NumberWithOptionalUnitPattern.Match(input);
         
         if (match.Success && match.Groups[1].Success && !string.IsNullOrWhiteSpace(match.Groups[1].Value))
