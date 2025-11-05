@@ -20,6 +20,12 @@ namespace LuYao.Globalization;
 /// </remarks>
 /// <example>
 /// <code>
+/// // 单一数值
+/// if (SizeHelper.ExtractSize("50cm", out decimal[] result))
+/// {
+///     // result = [50]
+/// }
+/// 
 /// // 单一单位
 /// if (SizeHelper.ExtractSize("10x10x10cm", out decimal[] result))
 /// {
@@ -49,10 +55,11 @@ public static class SizeHelper
 {
     // Compiled regex patterns for better performance
     private static readonly Regex ParenthesesPattern = new Regex(@"\(([^)]+)\)", RegexOptions.Compiled);
-    private static readonly Regex PerValueUnitPattern = new Regex(@"\d+\.?\d*\s*(inch|in|mm|cm|dm|m)\s*[x\*]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static readonly Regex NumberWithOptionalUnitPattern = new Regex(@"(\d+\.?\d*)\s*(inch|in|mm|cm|dm|m)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex PerValueUnitPattern = new Regex(@"\d+(?:\.\d+)?\s*(inch|in|mm|cm|dm|m)\s*[x\*]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex NumberWithOptionalUnitPattern = new Regex(@"(\d+(?:\.\d+)?)\s*(inch|in|mm|cm|dm|m)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex UnitPattern = new Regex(@"(inch|in|mm|cm|dm|m)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static readonly Regex NumberPattern = new Regex(@"(\d+\.?\d*)", RegexOptions.Compiled);
+    private static readonly Regex NumberPattern = new Regex(@"(\d+(?:\.\d+)?)", RegexOptions.Compiled);
+    private static readonly Regex SingleValuePattern = new Regex(@"^\s*(\d+(?:\.\d+)?)\s*(inch|in|mm|cm|dm|m)?\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     
     // Unit conversion factors (relative to centimeters)
     private static readonly Dictionary<string, decimal> UnitConversions = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
@@ -73,6 +80,7 @@ public static class SizeHelper
     /// <remarks>
     /// <para>提取规则：</para>
     /// <list type="bullet">
+    /// <item><description>支持单一数值输入：50cm，结果为 [50]</description></item>
     /// <item><description>使用 'x' 或 '*' 分隔多个尺寸值</description></item>
     /// <item><description>如果没有明确单位，默认单位为厘米（CM）</description></item>
     /// <item><description>支持小数输入，例如 "10.5cm"</description></item>
@@ -85,6 +93,13 @@ public static class SizeHelper
     /// </remarks>
     /// <example>
     /// <code>
+    /// // 单一数值
+    /// if (SizeHelper.ExtractSize("50cm", out decimal[] result))
+    /// {
+    ///     // result = [50]
+    /// }
+    /// 
+    /// // 多个尺寸
     /// if (SizeHelper.ExtractSize("10x20x30cm", out decimal[] result))
     /// {
     ///     foreach (var size in result)
@@ -105,6 +120,14 @@ public static class SizeHelper
         // Check if contains separators (x or *)
         if (!ContainsIgnoreCase(size, "x", "*"))
         {
+            // Try to extract a single value
+            var singleValue = ExtractSingleValue(size);
+            if (singleValue.HasValue)
+            {
+                arr = new decimal[] { singleValue.Value };
+                return true;
+            }
+            
             arr = new decimal[0];
             return false;
         }
@@ -189,6 +212,32 @@ public static class SizeHelper
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// 从不包含分隔符的字符串中提取单个尺寸值。
+    /// </summary>
+    private static decimal? ExtractSingleValue(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return null;
+
+        // Use the same pattern as multi-value extraction for consistency
+        // This allows extracting size from text like "Size: 50cm"
+        var match = NumberWithOptionalUnitPattern.Match(input);
+        
+        if (match.Success && match.Groups[1].Success && !string.IsNullOrWhiteSpace(match.Groups[1].Value))
+        {
+            if (decimal.TryParse(match.Groups[1].Value, out decimal value))
+            {
+                string unit = match.Groups[2].Success && !string.IsNullOrEmpty(match.Groups[2].Value) 
+                    ? match.Groups[2].Value 
+                    : "CM";
+                return ConvertToCentimeters(value, unit);
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
