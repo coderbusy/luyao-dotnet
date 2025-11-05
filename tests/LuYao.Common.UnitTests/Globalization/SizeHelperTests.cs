@@ -233,16 +233,70 @@ public class SizeHelperTests
     }
 
     /// <summary>
-    /// 测试没有分隔符的字符串，期望返回 false
+    /// 测试单一数值输入（带厘米单位），期望返回单个元素的数组
     /// </summary>
     [TestMethod]
-    public void ExtractSize_NoSeparator_ReturnsFalse()
+    public void ExtractSize_SingleValueWithCm_ReturnsCorrectArray()
     {
-        var result = SizeHelper.ExtractSize("10cm", out decimal[] arr);
+        var result = SizeHelper.ExtractSize("50cm", out decimal[] arr);
         
-        Assert.IsFalse(result);
-        Assert.AreEqual(0, arr.Length);
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, arr.Length);
+        Assert.AreEqual(50m, arr[0]);
     }
+
+    /// <summary>
+    /// 测试单一数值输入（带英寸单位），期望返回转换为厘米的值
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SingleValueWithInch_ReturnsCorrectArray()
+    {
+        var result = SizeHelper.ExtractSize("10in", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, arr.Length);
+        Assert.AreEqual(25.4m, arr[0]); // 10 inch = 25.4 cm
+    }
+
+    /// <summary>
+    /// 测试单一数值输入（带毫米单位），期望返回转换为厘米的值
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SingleValueWithMm_ReturnsCorrectArray()
+    {
+        var result = SizeHelper.ExtractSize("100mm", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, arr.Length);
+        Assert.AreEqual(10m, arr[0]); // 100 mm = 10 cm
+    }
+
+    /// <summary>
+    /// 测试单一数值输入（不带单位），期望默认为厘米
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SingleValueWithoutUnit_DefaultsToCm()
+    {
+        var result = SizeHelper.ExtractSize("30", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, arr.Length);
+        Assert.AreEqual(30m, arr[0]);
+    }
+
+    /// <summary>
+    /// 测试单一小数数值输入，期望返回小数值
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SingleDecimalValue_ReturnsCorrectArray()
+    {
+        var result = SizeHelper.ExtractSize("25.5cm", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, arr.Length);
+        Assert.AreEqual(25.5m, arr[0]);
+    }
+
 
     /// <summary>
     /// 测试仅包含文字没有数字的字符串，期望返回 false 或空数组
