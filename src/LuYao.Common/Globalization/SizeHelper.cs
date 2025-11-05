@@ -47,6 +47,23 @@ namespace LuYao.Globalization;
 /// </example>
 public static class SizeHelper
 {
+    // Compiled regex patterns for better performance
+    private static readonly Regex ParenthesesPattern = new Regex(@"\(([^)]+)\)", RegexOptions.Compiled);
+    private static readonly Regex PerValueUnitPattern = new Regex(@"\d+\.?\d*\s*(inch|in|mm|cm|dm|m)\s*[x\*]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex NumberWithOptionalUnitPattern = new Regex(@"(\d+\.?\d*)\s*(inch|in|mm|cm|dm|m)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex UnitPattern = new Regex(@"(inch|in|mm|cm|dm|m)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex NumberPattern = new Regex(@"(\d+\.?\d*)", RegexOptions.Compiled);
+    
+    // Unit conversion factors (relative to centimeters)
+    private static readonly Dictionary<string, decimal> UnitConversions = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "CM", 1m },
+        { "MM", 0.1m },
+        { "INCH", 2.54m },
+        { "IN", 2.54m },
+        { "DM", 10m },
+        { "M", 100m }
+    };
     /// <summary>
     /// 从字符串中提取尺寸信息，并将其转换为以厘米为单位的数值数组。
     /// </summary>
@@ -125,8 +142,7 @@ public static class SizeHelper
         var groups = new List<string>();
 
         // First, extract groups in parentheses that contain separators
-        var parenthesesPattern = @"\(([^)]+)\)";
-        var matches = Regex.Matches(size, parenthesesPattern);
+        var matches = ParenthesesPattern.Matches(size);
         
         foreach (Match match in matches)
         {
@@ -142,7 +158,7 @@ public static class SizeHelper
         }
 
         // Then, remove parentheses content and add the remaining as a group
-        var withoutParentheses = Regex.Replace(size, parenthesesPattern, string.Empty);
+        var withoutParentheses = ParenthesesPattern.Replace(size, string.Empty);
         if (!string.IsNullOrWhiteSpace(withoutParentheses))
         {
             groups.Insert(0, withoutParentheses);
@@ -182,8 +198,7 @@ public static class SizeHelper
     {
         // Check if units appear multiple times before separators
         // Pattern: number + unit + separator
-        var pattern = @"\d+\.?\d*\s*(inch|in|mm|cm|dm|m)\s*[x\*]";
-        return Regex.IsMatch(group, pattern, RegexOptions.IgnoreCase);
+        return PerValueUnitPattern.IsMatch(group);
     }
 
     /// <summary>
@@ -195,8 +210,7 @@ public static class SizeHelper
 
         // Pattern to match: number + optional unit
         // We need to extract each number with its unit
-        var pattern = @"(\d+\.?\d*)\s*(inch|in|mm|cm|dm|m)?";
-        var matches = Regex.Matches(group, pattern, RegexOptions.IgnoreCase);
+        var matches = NumberWithOptionalUnitPattern.Matches(group);
 
         foreach (Match match in matches)
         {
@@ -204,7 +218,9 @@ public static class SizeHelper
             {
                 if (decimal.TryParse(match.Groups[1].Value, out decimal value))
                 {
-                    string unit = match.Groups[2].Success ? match.Groups[2].Value : "CM";
+                    string unit = match.Groups[2].Success && !string.IsNullOrEmpty(match.Groups[2].Value) 
+                        ? match.Groups[2].Value 
+                        : "CM";
                     decimal converted = ConvertToCentimeters(value, unit);
                     results.Add(converted);
                 }
@@ -222,45 +238,21 @@ public static class SizeHelper
         var results = new List<decimal>();
 
         // Determine the unit (default is CM)
-        string unit = "CM";
-        if (ContainsIgnoreCase(group, "INCH", "IN"))
-        {
-            unit = "INCH";
-        }
-        else if (ContainsIgnoreCase(group, "MM"))
-        {
-            unit = "MM";
-        }
-        else if (ContainsIgnoreCase(group, "DM"))
-        {
-            unit = "DM";
-        }
-        else if (ContainsIgnoreCase(group, "M") && !ContainsIgnoreCase(group, "CM", "MM", "DM"))
-        {
-            unit = "M";
-        }
-        else if (ContainsIgnoreCase(group, "CM"))
-        {
-            unit = "CM";
-        }
+        string unit = DetermineUnit(group);
 
         // Remove unit suffixes
-        var cleaned = Regex.Replace(group, @"(inch|in|mm|cm|dm|m)\b", string.Empty, RegexOptions.IgnoreCase);
+        var cleaned = UnitPattern.Replace(group, string.Empty);
 
         // Extract all numbers separated by x or *
         // Use a more robust pattern that looks for numbers around separators
-        var numberPattern = @"(\d+\.?\d*)";
-        var matches = Regex.Matches(cleaned, numberPattern);
+        var matches = NumberPattern.Matches(cleaned);
 
         foreach (Match match in matches)
         {
-            if (decimal.TryParse(match.Value, out decimal value))
+            if (decimal.TryParse(match.Value, out decimal value) && value != 0)
             {
-                if (value != 0)
-                {
-                    decimal converted = ConvertToCentimeters(value, unit);
-                    results.Add(converted);
-                }
+                decimal converted = ConvertToCentimeters(value, unit);
+                results.Add(converted);
             }
         }
 
@@ -268,26 +260,33 @@ public static class SizeHelper
     }
 
     /// <summary>
+    /// 确定字符串中的单位类型。
+    /// </summary>
+    private static string DetermineUnit(string group)
+    {
+        // Priority order: INCH/IN > MM > DM > M > CM
+        if (ContainsIgnoreCase(group, "INCH", "IN"))
+            return "INCH";
+        if (ContainsIgnoreCase(group, "MM"))
+            return "MM";
+        if (ContainsIgnoreCase(group, "DM"))
+            return "DM";
+        if (ContainsIgnoreCase(group, "M") && !ContainsIgnoreCase(group, "CM", "MM", "DM"))
+            return "M";
+        
+        return "CM"; // Default
+    }
+
+    /// <summary>
     /// 将指定单位的值转换为厘米。
     /// </summary>
     private static decimal ConvertToCentimeters(decimal value, string unit)
     {
-        switch (unit.ToUpperInvariant())
+        if (UnitConversions.TryGetValue(unit, out decimal factor))
         {
-            case "CM":
-                return value;
-            case "MM":
-                return value / 10m; // 1 cm = 10 mm
-            case "INCH":
-            case "IN":
-                return value * 2.54m; // 1 inch = 2.54 cm
-            case "DM":
-                return value * 10m; // 1 dm = 10 cm
-            case "M":
-                return value * 100m; // 1 m = 100 cm
-            default:
-                return value; // Default to CM
+            return value * factor;
         }
+        return value; // Default to CM if unit not found
     }
 
     /// <summary>
