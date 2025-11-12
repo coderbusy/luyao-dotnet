@@ -74,7 +74,7 @@ public class KeyedListTests
         // Arrange, Act & Assert
 
 
-        Assert.ThrowsException<ArgumentNullException>(() => new KeyedList<int, TestItem>(null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => new KeyedList<int, TestItem>(null!));
 
 
     }
@@ -105,7 +105,7 @@ public class KeyedListTests
         // Arrange, Act & Assert
 
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _keyedList[-1]);
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _keyedList[-1]);
 
 
     }
@@ -142,7 +142,7 @@ public class KeyedListTests
         // Act & Assert
 
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _keyedList[10] = newItem);
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _keyedList[10] = newItem);
 
 
     }
@@ -403,7 +403,7 @@ public class KeyedListTests
     public void CopyTo_NullArray_ThrowsArgumentNullException()
     {
         // Arrange, Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => _keyedList.CopyTo(null!, 0));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _keyedList.CopyTo(null!, 0));
     }
 
     [TestMethod]
@@ -413,7 +413,7 @@ public class KeyedListTests
         var array = new TestItem[_keyedList.Count];
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _keyedList.CopyTo(array, -1));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _keyedList.CopyTo(array, -1));
     }
 
     [TestMethod]
@@ -423,7 +423,7 @@ public class KeyedListTests
         var array = new TestItem[_keyedList.Count - 1];
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentException>(() => _keyedList.CopyTo(array, 0));
+        Assert.ThrowsExactly<ArgumentException>(() => _keyedList.CopyTo(array, 0));
     }
 
     #endregion
@@ -504,7 +504,7 @@ public class KeyedListTests
         var newItem = new TestItem { Id = 4, Name = "Item 4" };
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _keyedList.Insert(-1, newItem));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _keyedList.Insert(-1, newItem));
     }
 
     [TestMethod]
@@ -514,7 +514,7 @@ public class KeyedListTests
         var newItem = new TestItem { Id = 4, Name = "Item 4" };
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _keyedList.Insert(_keyedList.Count + 1, newItem));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _keyedList.Insert(_keyedList.Count + 1, newItem));
     }
 
     #endregion
@@ -575,14 +575,14 @@ public class KeyedListTests
     public void RemoveAt_NegativeIndex_ThrowsArgumentOutOfRangeException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _keyedList.RemoveAt(-1));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _keyedList.RemoveAt(-1));
     }
 
     [TestMethod]
     public void RemoveAt_IndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => _keyedList.RemoveAt(_keyedList.Count));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => _keyedList.RemoveAt(_keyedList.Count));
     }
 
     #endregion

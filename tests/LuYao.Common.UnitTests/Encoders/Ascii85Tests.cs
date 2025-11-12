@@ -46,11 +46,11 @@ public class Ascii85Tests
     }
 
     [TestMethod]
-    public void Decode_EnforceMarksTrue_MissingMarks_ThrowsException()
+    public void Decode_EnforceMarksTrue_MissingMarks_ThrowsExactly()
     {
         var ascii85 = new Ascii85 { EnforceMarks = true };
         string encoded = "87cURD_*#4DfTZ";
-        Assert.ThrowsException<Exception>(() => ascii85.Decode(encoded));
+        Assert.ThrowsExactly<Exception>(() => ascii85.Decode(encoded));
     }
 
     [TestMethod]

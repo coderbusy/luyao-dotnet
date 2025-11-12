@@ -45,7 +45,7 @@ public class Base32Tests
     [TestMethod]
     public void FromBase32_InvalidCharacter_ThrowsArgumentException()
     {
-        Assert.ThrowsException<ArgumentException>(() => Base32.FromBase32("INVALID*"));
+        Assert.ThrowsExactly<ArgumentException>(() => Base32.FromBase32("INVALID*"));
     }
 
     [TestMethod]

@@ -129,7 +129,7 @@ public class CSharpStringBuilderTests
     public void SetNamespace_NullOrWhitespace_ThrowsArgumentNullException()
     {
         var builder = new CSharpStringBuilder();
-        Assert.ThrowsException<ArgumentNullException>(() => builder.SetNamespace(" "));
+        Assert.ThrowsExactly<ArgumentNullException>(() => builder.SetNamespace(" "));
     }
 
     [TestMethod]

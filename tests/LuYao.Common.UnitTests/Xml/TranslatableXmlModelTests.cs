@@ -50,6 +50,6 @@ public class TranslatableXmlModelTests
         var xml = "<Invalid>XML</Invalid>";
 
         // Act & Assert
-        Assert.ThrowsException<InvalidOperationException>(() => TestXmlModelNoResource.Transform(xml));
+        Assert.ThrowsExactly<InvalidOperationException>(() => TestXmlModelNoResource.Transform(xml));
     }
 }

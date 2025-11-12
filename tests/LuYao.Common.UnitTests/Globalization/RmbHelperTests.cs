@@ -45,7 +45,7 @@ public class RmbHelperTests
     [TestMethod]
     public void ToRmbUpper_OutOfRangeAmount_ThrowsArgumentOutOfRangeException()
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(10000000000000000M));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(10000000000000000M));
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class RmbHelperTests
     [TestMethod]
     public void ToRmbUpper_NegativeAmount_ThrowsArgumentOutOfRangeException()
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(-1M));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(-1M));
     }
 
     /// <summary>
@@ -63,6 +63,6 @@ public class RmbHelperTests
     [TestMethod]
     public void ToRmbUpper_MaxValidAmount_ThrowsArgumentOutOfRangeException()
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(9999999999999999.99M));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(9999999999999999.99M));
     }
 }

@@ -62,7 +62,7 @@ public class GZipStringTests
         string encoder = "base64";
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
+        Assert.ThrowsExactly<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
@@ -74,7 +74,7 @@ public class GZipStringTests
         string encoder = null;
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
+        Assert.ThrowsExactly<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
@@ -86,7 +86,7 @@ public class GZipStringTests
         string encoder = "base64";
 
         // Act & Assert
-        Assert.ThrowsException<KeyNotFoundException>(() => GZipString.Compress(input, compressor, encoder));
+        Assert.ThrowsExactly<KeyNotFoundException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
@@ -98,7 +98,7 @@ public class GZipStringTests
         string encoder = "invalid";
 
         // Act & Assert
-        Assert.ThrowsException<KeyNotFoundException>(() => GZipString.Compress(input, compressor, encoder));
+        Assert.ThrowsExactly<KeyNotFoundException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
@@ -126,7 +126,7 @@ public class GZipStringTests
         var encoder = GZipString.Base64;
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
+        Assert.ThrowsExactly<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
@@ -138,7 +138,7 @@ public class GZipStringTests
         GZipString.IEncoder encoder = null;
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
+        Assert.ThrowsExactly<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
@@ -211,7 +211,7 @@ public class GZipStringTests
         string invalidCompressedString = "data:text/x-invalid;base64,ABCDEF";
 
         // Act & Assert
-        Assert.ThrowsException<KeyNotFoundException>(() => GZipString.Decompress(invalidCompressedString));
+        Assert.ThrowsExactly<KeyNotFoundException>(() => GZipString.Decompress(invalidCompressedString));
     }
 
     [TestMethod]
@@ -221,6 +221,6 @@ public class GZipStringTests
         string invalidCompressedString = "data:text/x-gzip;invalid,ABCDEF";
 
         // Act & Assert
-        Assert.ThrowsException<KeyNotFoundException>(() => GZipString.Decompress(invalidCompressedString));
+        Assert.ThrowsExactly<KeyNotFoundException>(() => GZipString.Decompress(invalidCompressedString));
     }
 }

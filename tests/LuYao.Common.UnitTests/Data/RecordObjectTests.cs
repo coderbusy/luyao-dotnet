@@ -90,7 +90,7 @@ public class RecordObjectTests
         var record = new Record();
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => record.Add<TestModel>(null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => record.Add<TestModel>(null!));
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ public class RecordObjectTests
     public void From_SingleObject_Null_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => Record.From<TestModel>((TestModel)null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => Record.From<TestModel>((TestModel)null!));
     }
 
     /// <summary>
@@ -298,7 +298,7 @@ public class RecordObjectTests
     public void From_NullCollection_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => Record.FromList<TestModel>((TestModel[])null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => Record.FromList<TestModel>((TestModel[])null!));
     }
 
     #endregion

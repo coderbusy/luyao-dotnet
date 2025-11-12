@@ -8,9 +8,9 @@ public class AutoCleanTempFileTests
     [TestMethod]
     public void Constructor_FileNameIsNullOrWhiteSpace_ThrowsArgumentException()
     {
-        Assert.ThrowsException<ArgumentException>(() => new AutoCleanTempFile(null));
-        Assert.ThrowsException<ArgumentException>(() => new AutoCleanTempFile(""));
-        Assert.ThrowsException<ArgumentException>(() => new AutoCleanTempFile("   "));
+        Assert.ThrowsExactly<ArgumentException>(() => new AutoCleanTempFile(null));
+        Assert.ThrowsExactly<ArgumentException>(() => new AutoCleanTempFile(""));
+        Assert.ThrowsExactly<ArgumentException>(() => new AutoCleanTempFile("   "));
     }
 
     [TestMethod]

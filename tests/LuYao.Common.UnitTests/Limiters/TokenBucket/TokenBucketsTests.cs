@@ -25,7 +25,7 @@ public class TokenBucketsTests
     [TestMethod]
     public void Builder_WithCapacity_NonPositive_ThrowsArgumentOutOfRangeException()
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => TokenBuckets.Construct().WithCapacity(0));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => TokenBuckets.Construct().WithCapacity(0));
     }
 
     [TestMethod]
@@ -40,7 +40,7 @@ public class TokenBucketsTests
     [TestMethod]
     public void Builder_WithRefillStrategy_Null_ThrowsArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => TokenBuckets.Construct().WithRefillStrategy(null));
+        Assert.ThrowsExactly<ArgumentNullException>(() => TokenBuckets.Construct().WithRefillStrategy(null));
     }
 
     [TestMethod]
@@ -68,7 +68,7 @@ public class TokenBucketsTests
     [TestMethod]
     public void Builder_WithSleepStrategy_Null_ThrowsArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => TokenBuckets.Construct().WithSleepStrategy(null));
+        Assert.ThrowsExactly<ArgumentNullException>(() => TokenBuckets.Construct().WithSleepStrategy(null));
     }
 
     [TestMethod]
@@ -81,7 +81,7 @@ public class TokenBucketsTests
     [TestMethod]
     public void Builder_Build_WithoutCapacity_ThrowsInvalidOperationException()
     {
-        Assert.ThrowsException<InvalidOperationException>(() => TokenBuckets.Construct().Build());
+        Assert.ThrowsExactly<InvalidOperationException>(() => TokenBuckets.Construct().Build());
     }
 
     // Dummy implementations for test
