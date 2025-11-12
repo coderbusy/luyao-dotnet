@@ -44,13 +44,12 @@ public class TranslatableXmlModelTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void Transform_NoResource_ShouldThrowException()
     {
         // Arrange
         var xml = "<Invalid>XML</Invalid>";
 
-        // Act
-        TestXmlModelNoResource.Transform(xml);
+        // Act & Assert
+        Assert.ThrowsException<InvalidOperationException>(() => TestXmlModelNoResource.Transform(xml));
     }
 }

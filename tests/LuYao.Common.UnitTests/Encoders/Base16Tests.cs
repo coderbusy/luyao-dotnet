@@ -42,19 +42,17 @@ namespace LuYao.Encoders.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
         public void FromBase16_InvalidHex_ThrowsFormatException()
         {
             string input = "ZZ";
-            Base16.FromBase16(input);
+            Assert.ThrowsException<FormatException>(() => Base16.FromBase16(input));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void FromBase16_OddLength_ThrowsArgumentOutOfRangeException()
         {
             string input = "ABC";
-            Base16.FromBase16(input);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => Base16.FromBase16(input));
         }
     }
 }
