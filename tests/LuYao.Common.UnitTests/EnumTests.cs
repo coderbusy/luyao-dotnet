@@ -80,10 +80,9 @@ public class EnumTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void Parse_InvalidString_ThrowsException()
     {
-        Enum<TestEnum>.Parse("NonExistent");
+        Assert.ThrowsException<ArgumentException>(() => Enum<TestEnum>.Parse("NonExistent"));
     }
 
     [TestMethod]

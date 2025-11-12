@@ -43,29 +43,26 @@ public class RmbHelperTests
     /// 测试金额超出范围时，期望抛出 ArgumentOutOfRangeException
     /// </summary>
     [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void ToRmbUpper_OutOfRangeAmount_ThrowsArgumentOutOfRangeException()
     {
-        RmbHelper.ToRmbUpper(10000000000000000M);
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(10000000000000000M));
     }
 
     /// <summary>
     /// 测试金额为负数时，期望抛出 ArgumentOutOfRangeException
     /// </summary>
     [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void ToRmbUpper_NegativeAmount_ThrowsArgumentOutOfRangeException()
     {
-        RmbHelper.ToRmbUpper(-1M);
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(-1M));
     }
 
     /// <summary>
     /// 测试金额为最大值时，期望抛出 ArgumentOutOfRangeException
     /// </summary>
     [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void ToRmbUpper_MaxValidAmount_ThrowsArgumentOutOfRangeException()
     {
-        RmbHelper.ToRmbUpper(9999999999999999.99M);
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => RmbHelper.ToRmbUpper(9999999999999999.99M));
     }
 }

@@ -1007,7 +1007,6 @@ public class RecordTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(DuplicateNameException))]
     public void Columns_AddDuplicateName_ThrowsException()
     {
         // Arrange
@@ -1015,11 +1014,10 @@ public class RecordTests
         table.Columns.Add<String>("TestColumn");
 
         // Act & Assert
-        table.Columns.Add<String>("TestColumn"); // 应该抛出异常
+        Assert.ThrowsException<DuplicateNameException>(() => table.Columns.Add<String>("TestColumn")); // 应该抛出异常
     }
 
     [TestMethod]
-    [ExpectedException(typeof(DuplicateNameException))]
     public void Columns_AddDuplicateNameDifferentType_ThrowsException()
     {
         // Arrange
@@ -1027,7 +1025,7 @@ public class RecordTests
         table.Columns.Add<String>("TestColumn");
 
         // Act & Assert
-        table.Columns.Add<Int32>("TestColumn"); // 应该抛出异常
+        Assert.ThrowsException<DuplicateNameException>(() => table.Columns.Add<Int32>("TestColumn")); // 应该抛出异常
     }
 
     public class Student

@@ -10,7 +10,7 @@ namespace LuYao.Encoders
         public void ToBase64_StandardEncoding_ReturnsCorrectBase64()
         {
             // Arrange
-            var data = Encoding.UTF8.GetBytes("Hello, ÊÀ½ç!");
+            var data = Encoding.UTF8.GetBytes("Hello, ï¿½ï¿½ï¿½ï¿½!");
             var expected = Convert.ToBase64String(data);
 
             // Act
@@ -38,7 +38,7 @@ namespace LuYao.Encoders
         public void FromBase64_StandardBase64_ReturnsOriginalBytes()
         {
             // Arrange
-            var original = Encoding.UTF8.GetBytes("Hello, ÊÀ½ç!");
+            var original = Encoding.UTF8.GetBytes("Hello, ï¿½ï¿½ï¿½ï¿½!");
             var base64 = Convert.ToBase64String(original);
 
             // Act
@@ -53,7 +53,7 @@ namespace LuYao.Encoders
         {
             // Arrange
             var original = Encoding.UTF8.GetBytes("test");
-            var trimmedBase64 = "dGVzdA"; // È¥µôÁË"=="
+            var trimmedBase64 = "dGVzdA"; // È¥ï¿½ï¿½ï¿½ï¿½"=="
 
             // Act
             var result = Base64.FromBase64(trimmedBase64);
@@ -73,11 +73,10 @@ namespace LuYao.Encoders
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
         public void FromBase64_InvalidString_ThrowsFormatException()
         {
-            // Act
-            Base64.FromBase64("!@#$");
+            // Act & Assert
+            Assert.ThrowsException<FormatException>(() => Base64.FromBase64("!@#$"));
         }
     }
 }

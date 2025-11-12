@@ -43,10 +43,9 @@ public class Base32Tests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void FromBase32_InvalidCharacter_ThrowsArgumentException()
     {
-        Base32.FromBase32("INVALID*");
+        Assert.ThrowsException<ArgumentException>(() => Base32.FromBase32("INVALID*"));
     }
 
     [TestMethod]

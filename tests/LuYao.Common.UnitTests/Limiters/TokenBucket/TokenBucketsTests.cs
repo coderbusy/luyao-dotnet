@@ -23,10 +23,9 @@ public class TokenBucketsTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void Builder_WithCapacity_NonPositive_ThrowsArgumentOutOfRangeException()
     {
-        TokenBuckets.Construct().WithCapacity(0);
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => TokenBuckets.Construct().WithCapacity(0));
     }
 
     [TestMethod]
@@ -39,10 +38,9 @@ public class TokenBucketsTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Builder_WithRefillStrategy_Null_ThrowsArgumentNullException()
     {
-        TokenBuckets.Construct().WithRefillStrategy(null);
+        Assert.ThrowsException<ArgumentNullException>(() => TokenBuckets.Construct().WithRefillStrategy(null));
     }
 
     [TestMethod]
@@ -68,10 +66,9 @@ public class TokenBucketsTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Builder_WithSleepStrategy_Null_ThrowsArgumentNullException()
     {
-        TokenBuckets.Construct().WithSleepStrategy(null);
+        Assert.ThrowsException<ArgumentNullException>(() => TokenBuckets.Construct().WithSleepStrategy(null));
     }
 
     [TestMethod]
@@ -82,10 +79,9 @@ public class TokenBucketsTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void Builder_Build_WithoutCapacity_ThrowsInvalidOperationException()
     {
-        TokenBuckets.Construct().Build();
+        Assert.ThrowsException<InvalidOperationException>(() => TokenBuckets.Construct().Build());
     }
 
     // Dummy implementations for test
