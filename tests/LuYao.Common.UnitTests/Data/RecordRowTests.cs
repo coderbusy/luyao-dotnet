@@ -59,7 +59,7 @@ public class RecordRowTests
     public void Constructor_NullRecord_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => new RecordRow(null!, 0));
+        Assert.ThrowsExactly<ArgumentNullException>(() => new RecordRow(null!, 0));
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public class RecordRowTests
         var (record, _, _, _) = CreateTestRecord();
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new RecordRow(record, -1));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new RecordRow(record, -1));
     }
 
     /// <summary>
@@ -85,8 +85,8 @@ public class RecordRowTests
         var (record, _, _, _) = CreateTestRecord();
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count + 1));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count + 1));
     }
 
     #endregion

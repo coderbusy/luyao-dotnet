@@ -44,11 +44,10 @@ public class JsonReaderTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Constructor_WithNullTextReader_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        new JsonReader((TextReader)null);
+        Assert.ThrowsExactly<ArgumentNullException>(() => new JsonReader((TextReader)null));
     }
 
     [TestMethod]
@@ -154,36 +153,33 @@ public class JsonReaderTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
     public void Read_StringWithInvalidUnicodeEscape_ShouldThrowException()
     {
         // Arrange
         using var jsonReader = new JsonReader("\"\\uGGGG\"");
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<JsonException>(() => jsonReader.Read());
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
     public void Read_StringWithInvalidEscape_ShouldThrowException()
     {
         // Arrange
         using var jsonReader = new JsonReader("\"\\x\"");
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<JsonException>(() => jsonReader.Read());
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
     public void Read_UnterminatedString_ShouldThrowException()
     {
         // Arrange
         using var jsonReader = new JsonReader("\"unterminated");
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<JsonException>(() => jsonReader.Read());
     }
 
     [TestMethod]
@@ -271,14 +267,13 @@ public class JsonReaderTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
     public void Read_InvalidNumber_ShouldThrowException()
     {
         // Arrange
         using var jsonReader = new JsonReader("-");
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<JsonException>(() => jsonReader.Read());
     }
 
     [TestMethod]
@@ -310,14 +305,13 @@ public class JsonReaderTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
     public void Read_InvalidBoolean_ShouldThrowException()
     {
         // Arrange
         using var jsonReader = new JsonReader("tru");
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<JsonException>(() => jsonReader.Read());
     }
 
     [TestMethod]
@@ -335,14 +329,13 @@ public class JsonReaderTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
     public void Read_InvalidNull_ShouldThrowException()
     {
         // Arrange
         using var jsonReader = new JsonReader("nul");
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<JsonException>(() => jsonReader.Read());
     }
 
     [TestMethod]
@@ -457,26 +450,24 @@ public class JsonReaderTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
     public void Read_UnexpectedCharacter_ShouldThrowException()
     {
         // Arrange
         using var jsonReader = new JsonReader("@");
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<JsonException>(() => jsonReader.Read());
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ObjectDisposedException))]
     public void Read_AfterDispose_ShouldThrowObjectDisposedException()
     {
         // Arrange
         var jsonReader = new JsonReader("{}");
         jsonReader.Dispose();
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<ObjectDisposedException>(() => jsonReader.Read());
     }
 
     [TestMethod]
@@ -537,14 +528,13 @@ public class JsonReaderTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
     public void Read_StringWithUnescapedControlCharacter_ShouldThrowException()
     {
         // Arrange
         using var jsonReader = new JsonReader("\"\u0001\""); // 未转义的控制字符
 
-        // Act
-        jsonReader.Read();
+        // Act & Assert
+        Assert.ThrowsExactly<JsonException>(() => jsonReader.Read());
     }
 
     [TestMethod]

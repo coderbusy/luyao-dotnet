@@ -82,7 +82,7 @@ public class PathHelperTests
         // Arrange
         string extension = string.Empty;
         // Act & Assert
-        Assert.ThrowsException<ArgumentException>(() => PathHelper.GetMimeType(extension));
+        Assert.ThrowsExactly<ArgumentException>(() => PathHelper.GetMimeType(extension));
     }
 
     [TestMethod]

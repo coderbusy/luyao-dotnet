@@ -12,15 +12,15 @@ public class StringHelperTests
     public void Truncate_ThrowsArgumentNullException_WhenTextIsNull()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => StringHelper.Truncate(null, 10, out _));
+        Assert.ThrowsExactly<ArgumentNullException>(() => StringHelper.Truncate(null, 10, out _));
     }
 
     [TestMethod]
     public void Truncate_ThrowsArgumentOutOfRangeException_WhenMaxLengthIsLessThanOne()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => StringHelper.Truncate("test", 0, out _));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => StringHelper.Truncate("test", -1, out _));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => StringHelper.Truncate("test", 0, out _));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => StringHelper.Truncate("test", -1, out _));
     }
 
     [TestMethod]

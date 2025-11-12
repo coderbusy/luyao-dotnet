@@ -79,7 +79,7 @@ public class StringExtensionsTests
         var slices = text.FindAll("<div>", "</div>").ToArray();
 
         // Assert
-        Assert.AreEqual(0, slices.Length);
+        Assert.IsEmpty(slices);
     }
 
     [TestMethod]

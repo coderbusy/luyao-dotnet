@@ -6,7 +6,7 @@ namespace LuYao;
 [TestClass]
 public class GZipStringTests
 {
-    private const string TestString = "ÕâÊÇÒ»¸ö²âÊÔ×Ö·û´® This is a test string 12345!@#$%";
+    private const string TestString = "ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ This is a test string 12345!@#$%";
 
     [TestMethod]
     public void Compress_WithValidInputAndGzipBase64_ReturnsCompressedString()
@@ -54,7 +54,6 @@ public class GZipStringTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Compress_WithNullCompressor_ThrowsArgumentNullException()
     {
         // Arrange
@@ -62,12 +61,11 @@ public class GZipStringTests
         string compressor = null;
         string encoder = "base64";
 
-        // Act
-        GZipString.Compress(input, compressor, encoder);
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Compress_WithNullEncoder_ThrowsArgumentNullException()
     {
         // Arrange
@@ -75,12 +73,11 @@ public class GZipStringTests
         string compressor = "gzip";
         string encoder = null;
 
-        // Act
-        GZipString.Compress(input, compressor, encoder);
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KeyNotFoundException))]
     public void Compress_WithInvalidCompressor_ThrowsKeyNotFoundException()
     {
         // Arrange
@@ -88,12 +85,11 @@ public class GZipStringTests
         string compressor = "invalid";
         string encoder = "base64";
 
-        // Act
-        GZipString.Compress(input, compressor, encoder);
+        // Act & Assert
+        Assert.ThrowsExactly<KeyNotFoundException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KeyNotFoundException))]
     public void Compress_WithInvalidEncoder_ThrowsKeyNotFoundException()
     {
         // Arrange
@@ -101,8 +97,8 @@ public class GZipStringTests
         string compressor = "gzip";
         string encoder = "invalid";
 
-        // Act
-        GZipString.Compress(input, compressor, encoder);
+        // Act & Assert
+        Assert.ThrowsExactly<KeyNotFoundException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
@@ -122,7 +118,6 @@ public class GZipStringTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Compress_WithNullCompressorInterface_ThrowsArgumentNullException()
     {
         // Arrange
@@ -130,12 +125,11 @@ public class GZipStringTests
         GZipString.ICompressor compressor = null;
         var encoder = GZipString.Base64;
 
-        // Act
-        GZipString.Compress(input, compressor, encoder);
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Compress_WithNullEncoderInterface_ThrowsArgumentNullException()
     {
         // Arrange
@@ -143,8 +137,8 @@ public class GZipStringTests
         var compressor = GZipString.GZip;
         GZipString.IEncoder encoder = null;
 
-        // Act
-        GZipString.Compress(input, compressor, encoder);
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => GZipString.Compress(input, compressor, encoder));
     }
 
     [TestMethod]
@@ -211,24 +205,22 @@ public class GZipStringTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KeyNotFoundException))]
     public void Decompress_WithInvalidCompressorIdentifier_ThrowsKeyNotFoundException()
     {
         // Arrange
         string invalidCompressedString = "data:text/x-invalid;base64,ABCDEF";
 
-        // Act
-        GZipString.Decompress(invalidCompressedString);
+        // Act & Assert
+        Assert.ThrowsExactly<KeyNotFoundException>(() => GZipString.Decompress(invalidCompressedString));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KeyNotFoundException))]
     public void Decompress_WithInvalidEncoderIdentifier_ThrowsKeyNotFoundException()
     {
         // Arrange
         string invalidCompressedString = "data:text/x-gzip;invalid,ABCDEF";
 
-        // Act
-        GZipString.Decompress(invalidCompressedString);
+        // Act & Assert
+        Assert.ThrowsExactly<KeyNotFoundException>(() => GZipString.Decompress(invalidCompressedString));
     }
 }

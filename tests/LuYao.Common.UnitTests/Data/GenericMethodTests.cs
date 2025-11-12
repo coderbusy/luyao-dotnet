@@ -159,10 +159,10 @@ public class GenericMethodTests
         record.AddRow(); // 只有一行，有效索引是 0
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
             intColumn.Set(42, 1)); // 无效索引
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
             intColumn.Set(42, -1)); // 负索引
     }
 

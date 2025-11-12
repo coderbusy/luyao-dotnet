@@ -92,6 +92,6 @@ public class HashAgentTests
     public void HashFile_FileNotExist_ThrowsFileNotFoundException()
     {
         // Act & Assert
-        Assert.ThrowsException<FileNotFoundException>(() => _md5Agent.HashFile("not_exist_file.txt"));
+        Assert.ThrowsExactly<FileNotFoundException>(() => _md5Agent.HashFile("not_exist_file.txt"));
     }
 }

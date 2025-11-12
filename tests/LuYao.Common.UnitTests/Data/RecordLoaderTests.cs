@@ -474,7 +474,7 @@ public class RecordLoaderTests
 
         // Act & Assert
         // 第二次调用应该抛出异常，因为列已经存在
-        Assert.ThrowsException<DuplicateNameException>(() =>
+        Assert.ThrowsExactly<DuplicateNameException>(() =>
         {
             RecordLoader<TestEntity>.WriteHeader(record);
         });

@@ -53,7 +53,7 @@ public class Base62Tests
         string input = "";
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => Base62.FromBase62(input));
+        Assert.ThrowsExactly<ArgumentNullException>(() => Base62.FromBase62(input));
     }
 
     [TestMethod]
@@ -63,7 +63,7 @@ public class Base62Tests
         string input = "   ";
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => Base62.FromBase62(input));
+        Assert.ThrowsExactly<ArgumentNullException>(() => Base62.FromBase62(input));
     }
 
     [TestMethod]
