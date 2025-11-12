@@ -3,7 +3,7 @@
 	<Import Project="..\..\build\common.props" />
 	<Import Project="..\..\build\configureawait.props" />
 	<PropertyGroup>
-		<TargetFrameworks>net45;net461;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net45;net461;netstandard2.0;netstandard2.1;net6.0;net8.0;net10.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<SignAssembly>True</SignAssembly>
@@ -15,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
 
 </Project>
