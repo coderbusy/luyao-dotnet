@@ -51,19 +51,6 @@ public partial class MachineInfo
         }
 #endif
 
-        // 通过 wmic 获取更多信息
-        if (String.IsNullOrEmpty(Vendor) || String.IsNullOrEmpty(Product))
-        {
-            var csproduct = ReadWmic("csproduct", "Name", "Vendor");
-            if (csproduct != null)
-            {
-                if (csproduct.TryGetValue("Name", out str) && !String.IsNullOrEmpty(str) && String.IsNullOrEmpty(Product)) 
-                    Product = str;
-                if (csproduct.TryGetValue("Vendor", out str) && !String.IsNullOrEmpty(str)) 
-                    Vendor = str;
-            }
-        }
-
         // 获取操作系统名称和版本
         try
         {
@@ -83,31 +70,46 @@ public partial class MachineInfo
             // 使用默认值
         }
 
-        // 通过 wmic 获取更多信息
-        var os = ReadWmic("os", "Caption", "Version");
-        if (os != null && os.Count > 0)
+        // 一次性通过 WMIC 批量获取所有信息以提高性能
+        var wmicNeeded = String.IsNullOrEmpty(Vendor) || String.IsNullOrEmpty(Product) || 
+                         String.IsNullOrEmpty(OSName) || String.IsNullOrEmpty(Serial) || 
+                         String.IsNullOrEmpty(Board) || String.IsNullOrEmpty(DiskID);
+        
+        if (wmicNeeded)
         {
-            if (os.TryGetValue("Caption", out str)) 
-                OSName = str.Replace("Microsoft", "").Trim();
-            if (os.TryGetValue("Version", out str)) 
-                OSVersion = str;
+            var wmicData = ReadWmicBatch();
+            
+            // 处理 csproduct 数据
+            if (wmicData.TryGetValue("csproduct", out var csproduct))
+            {
+                if (csproduct.TryGetValue("Name", out str) && !String.IsNullOrEmpty(str) && String.IsNullOrEmpty(Product)) 
+                    Product = str;
+                if (csproduct.TryGetValue("Vendor", out str) && !String.IsNullOrEmpty(str) && String.IsNullOrEmpty(Vendor)) 
+                    Vendor = str;
+            }
+            
+            // 处理 OS 数据
+            if (wmicData.TryGetValue("os", out var os))
+            {
+                if (String.IsNullOrEmpty(OSName) && os.TryGetValue("Caption", out str)) 
+                    OSName = str.Replace("Microsoft", "").Trim();
+                if (os.TryGetValue("Version", out str)) 
+                    OSVersion = str;
+            }
+            
+            // 处理磁盘数据
+            if (wmicData.TryGetValue("diskdrive", out var disk) && disk.TryGetValue("SerialNumber", out str))
+                DiskID = str?.Trim();
+            
+            // 处理 BIOS 序列号
+            if (wmicData.TryGetValue("bios", out var bios) && bios.TryGetValue("SerialNumber", out str) && 
+                !str.Equals("System Serial Number", StringComparison.OrdinalIgnoreCase))
+                Serial = str?.Trim();
+            
+            // 处理主板序列号
+            if (wmicData.TryGetValue("baseboard", out var board) && board.TryGetValue("SerialNumber", out str))
+                Board = str?.Trim();
         }
-
-        // 获取磁盘信息
-        var disk = ReadWmic("diskdrive where mediatype=\"Fixed hard disk media\"", "serialnumber");
-        if (disk != null && disk.TryGetValue("serialnumber", out str))
-            DiskID = str?.Trim();
-
-        // 获取BIOS序列号
-        var bios = ReadWmic("bios", "serialnumber");
-        if (bios != null && bios.TryGetValue("serialnumber", out str) && 
-            !str.Equals("System Serial Number", StringComparison.OrdinalIgnoreCase))
-            Serial = str?.Trim();
-
-        // 获取主板序列号
-        var board = ReadWmic("baseboard", "serialnumber");
-        if (board != null && board.TryGetValue("serialnumber", out str))
-            Board = str?.Trim();
 
         if (String.IsNullOrEmpty(OSName))
         {
@@ -122,6 +124,35 @@ public partial class MachineInfo
     }
 
     #region Windows辅助方法
+    /// <summary>批量读取 WMIC 信息以提高性能</summary>
+    /// <returns>包含所有 WMI 数据的嵌套字典</returns>
+    private static Dictionary<String, Dictionary<String, String>> ReadWmicBatch()
+    {
+        var result = new Dictionary<String, Dictionary<String, String>>(StringComparer.OrdinalIgnoreCase);
+        
+        // csproduct
+        var data = ReadWmic("csproduct", "Name", "Vendor");
+        if (data.Count > 0) result["csproduct"] = data;
+        
+        // os
+        data = ReadWmic("os", "Caption", "Version");
+        if (data.Count > 0) result["os"] = data;
+        
+        // diskdrive
+        data = ReadWmic("diskdrive where mediatype=\"Fixed hard disk media\"", "SerialNumber");
+        if (data.Count > 0) result["diskdrive"] = data;
+        
+        // bios
+        data = ReadWmic("bios", "SerialNumber");
+        if (data.Count > 0) result["bios"] = data;
+        
+        // baseboard
+        data = ReadWmic("baseboard", "SerialNumber");
+        if (data.Count > 0) result["baseboard"] = data;
+        
+        return result;
+    }
+    
     /// <summary>通过WMIC命令读取信息</summary>
     /// <param name="type">WMI类型</param>
     /// <param name="keys">查询字段</param>
@@ -147,7 +178,12 @@ public partial class MachineInfo
             if (process != null)
             {
                 var output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
+                // 添加超时以避免挂起（5秒）
+                if (!process.WaitForExit(5000))
+                {
+                    try { process.Kill(); } catch { }
+                    return dic2;
+                }
 
                 if (!String.IsNullOrEmpty(output))
                 {

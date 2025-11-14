@@ -23,41 +23,52 @@ public partial class MachineInfo
     {
         try
         {
-            // 获取硬件信息
-            var hardware = ExecuteCommand("system_profiler", "SPHardwareDataType");
-            if (!String.IsNullOrEmpty(hardware))
+            // 一次性获取硬件和软件信息以提高性能
+            // 使用 xml 格式输出更快且更结构化
+            var output = ExecuteCommand("system_profiler", "SPHardwareDataType SPSoftwareDataType");
+            if (!String.IsNullOrEmpty(output))
             {
-                var lines = hardware.Split('\n');
+                var lines = output.Split('\n');
+                var inHardware = false;
+                var inSoftware = false;
+                
                 foreach (var line in lines)
                 {
                     var trimmed = line.Trim();
                     
-                    if (trimmed.StartsWith("Model Name:"))
-                        Product = trimmed.Substring("Model Name:".Length).Trim();
-                    else if (trimmed.StartsWith("Model Identifier:") && String.IsNullOrEmpty(Product))
-                        Product = trimmed.Substring("Model Identifier:".Length).Trim();
-                    else if (trimmed.StartsWith("Processor Name:"))
-                        Processor = trimmed.Substring("Processor Name:".Length).Trim();
-                    else if (trimmed.StartsWith("Chip:") && String.IsNullOrEmpty(Processor))
-                        Processor = trimmed.Substring("Chip:".Length).Trim();
-                    else if (trimmed.StartsWith("Serial Number (system):"))
-                        Serial = trimmed.Substring("Serial Number (system):".Length).Trim();
-                }
-            }
-
-            // 获取软件信息
-            var software = ExecuteCommand("system_profiler", "SPSoftwareDataType");
-            if (!String.IsNullOrEmpty(software))
-            {
-                var lines = software.Split('\n');
-                foreach (var line in lines)
-                {
-                    var trimmed = line.Trim();
+                    // 检测区域切换
+                    if (line.Contains("Hardware:"))
+                    {
+                        inHardware = true;
+                        inSoftware = false;
+                        continue;
+                    }
+                    else if (line.Contains("Software:"))
+                    {
+                        inHardware = false;
+                        inSoftware = true;
+                        continue;
+                    }
                     
-                    if (trimmed.StartsWith("System Version:"))
+                    // 解析硬件信息
+                    if (inHardware)
+                    {
+                        if (trimmed.StartsWith("Model Name:"))
+                            Product = trimmed.Substring("Model Name:".Length).Trim();
+                        else if (trimmed.StartsWith("Model Identifier:") && String.IsNullOrEmpty(Product))
+                            Product = trimmed.Substring("Model Identifier:".Length).Trim();
+                        else if (trimmed.StartsWith("Processor Name:"))
+                            Processor = trimmed.Substring("Processor Name:".Length).Trim();
+                        else if (trimmed.StartsWith("Chip:") && String.IsNullOrEmpty(Processor))
+                            Processor = trimmed.Substring("Chip:".Length).Trim();
+                        else if (trimmed.StartsWith("Serial Number (system):"))
+                            Serial = trimmed.Substring("Serial Number (system):".Length).Trim();
+                    }
+                    // 解析软件信息
+                    else if (inSoftware && trimmed.StartsWith("System Version:"))
                     {
                         OSName = trimmed.Substring("System Version:".Length).Trim();
-                        // Extract version number
+                        // 提取版本号
                         var versionStart = OSName.IndexOf('(');
                         if (versionStart > 0)
                         {
@@ -67,7 +78,7 @@ public partial class MachineInfo
                 }
             }
 
-            // 尝试获取供应商信息 (通常是 Apple)
+            // 供应商信息（总是 Apple）
             Vendor = "Apple";
         }
         catch
@@ -103,7 +114,12 @@ public partial class MachineInfo
             if (process != null)
             {
                 var output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
+                // 添加超时以避免挂起（10秒，system_profiler 较慢）
+                if (!process.WaitForExit(10000))
+                {
+                    try { process.Kill(); } catch { }
+                    return null;
+                }
                 return output;
             }
         }

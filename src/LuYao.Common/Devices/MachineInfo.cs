@@ -129,10 +129,25 @@ public partial class MachineInfo
     {
         if (String.IsNullOrEmpty(value)) return value;
         
-        var sb = new StringBuilder();
+        // 快速检查是否需要清理
+        var needsCleaning = false;
         foreach (var c in value)
         {
-            if (c >= 32 && c != 127) // 过滤控制字符
+            if (c < 32 || c == 127)
+            {
+                needsCleaning = true;
+                break;
+            }
+        }
+        
+        if (!needsCleaning)
+            return value.Trim();
+        
+        // 只有在需要时才使用 StringBuilder
+        var sb = new StringBuilder(value.Length);
+        foreach (var c in value)
+        {
+            if (c >= 32 && c != 127)
                 sb.Append(c);
         }
         return sb.ToString().Trim();

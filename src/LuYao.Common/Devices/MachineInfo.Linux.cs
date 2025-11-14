@@ -22,70 +22,110 @@ public partial class MachineInfo
 #endif
     private void LoadLinuxInfo()
     {
-        var str = GetLinuxName();
-        if (!String.IsNullOrEmpty(str)) OSName = str;
-
-        // 读取 /proc/cpuinfo
-        var cpuinfo = ReadInfo("/proc/cpuinfo");
-        if (cpuinfo != null)
+        // 优先从 DMI 读取信息（更快且更可靠）
+        var hasDMI = TryReadDMIInfo();
+        
+        // 只有在 DMI 信息不完整时才读取其他来源
+        if (String.IsNullOrEmpty(Processor))
         {
-            if (cpuinfo.TryGetValue("Hardware", out str) ||
-                cpuinfo.TryGetValue("cpu model", out str) ||
-                cpuinfo.TryGetValue("model name", out str))
+            var cpuinfo = ReadInfo("/proc/cpuinfo");
+            if (cpuinfo != null)
             {
-                Processor = str;
-                if (Processor != null && Processor.StartsWith("vendor "))
-                    Processor = Processor.Substring(7);
+                if (cpuinfo.TryGetValue("Hardware", out var str) ||
+                    cpuinfo.TryGetValue("cpu model", out str) ||
+                    cpuinfo.TryGetValue("model name", out str))
+                {
+                    Processor = str;
+                    if (Processor != null && Processor.StartsWith("vendor "))
+                        Processor = Processor.Substring(7);
+                }
+
+                if (String.IsNullOrEmpty(Product) && cpuinfo.TryGetValue("Model", out str))
+                    Product = str;
+
+                if (String.IsNullOrEmpty(Vendor) && cpuinfo.TryGetValue("vendor_id", out str))
+                    Vendor = str;
             }
-
-            if (cpuinfo.TryGetValue("Model", out str))
-                Product = str;
-
-            if (cpuinfo.TryGetValue("vendor_id", out str))
-                Vendor = str;
         }
 
-        // 从release文件读取产品
-        var prd = GetProductByRelease();
-        if (!String.IsNullOrEmpty(prd)) Product = prd;
+        // 获取 OS 名称
+        if (String.IsNullOrEmpty(OSName))
+        {
+            var str = GetLinuxName();
+            if (!String.IsNullOrEmpty(str)) OSName = str;
+        }
 
-        if (String.IsNullOrEmpty(prd) && TryRead("/sys/class/dmi/id/product_name", out var product_name))
+        // 从 release 文件读取产品（仅在需要时）
+        if (String.IsNullOrEmpty(Product) && !hasDMI)
+        {
+            var prd = GetProductByRelease();
+            if (!String.IsNullOrEmpty(prd)) Product = prd;
+        }
+
+        // 获取磁盘序列号（仅在需要时）
+        if (String.IsNullOrEmpty(DiskID))
+        {
+            TryReadDiskSerial();
+        }
+    }
+    
+    /// <summary>尝试读取 DMI 信息（一次性读取多个字段以提高性能）</summary>
+    private Boolean TryReadDMIInfo()
+    {
+        var dmiPath = "/sys/class/dmi/id/";
+        if (!Directory.Exists(dmiPath))
+            return false;
+        
+        var hasData = false;
+        
+        // 一次性尝试读取所有 DMI 字段
+        if (TryRead(Path.Combine(dmiPath, "product_name"), out var product_name))
         {
             Product = product_name;
+            hasData = true;
         }
-
-        if (TryRead("/sys/class/dmi/id/sys_vendor", out var sys_vendor))
+        
+        if (TryRead(Path.Combine(dmiPath, "sys_vendor"), out var sys_vendor))
         {
             Vendor = sys_vendor;
+            hasData = true;
         }
-
-        if (TryRead("/sys/class/dmi/id/board_serial", out var board_serial))
+        
+        if (TryRead(Path.Combine(dmiPath, "board_serial"), out var board_serial))
         {
             Board = board_serial;
+            hasData = true;
         }
-
-        if (TryRead("/sys/class/dmi/id/product_serial", out var product_serial))
+        
+        if (TryRead(Path.Combine(dmiPath, "product_serial"), out var product_serial))
         {
             Serial = product_serial;
+            hasData = true;
         }
-
-        // 获取磁盘序列号 (简化版，仅获取第一个硬盘)
+        
+        return hasData;
+    }
+    
+    /// <summary>尝试读取磁盘序列号</summary>
+    private void TryReadDiskSerial()
+    {
         try
         {
             var diskDir = "/sys/block/";
-            if (Directory.Exists(diskDir))
+            if (!Directory.Exists(diskDir))
+                return;
+            
+            // 只检查物理磁盘（跳过循环设备等）
+            foreach (var disk in Directory.GetDirectories(diskDir))
             {
-                foreach (var disk in Directory.GetDirectories(diskDir))
+                var diskName = Path.GetFileName(disk);
+                if (diskName.StartsWith("sd") || diskName.StartsWith("nvme") || diskName.StartsWith("hd"))
                 {
-                    var diskName = Path.GetFileName(disk);
-                    if (diskName.StartsWith("sd") || diskName.StartsWith("nvme") || diskName.StartsWith("hd"))
+                    var serialFile = Path.Combine(disk, "device", "serial");
+                    if (TryRead(serialFile, out var diskSerial))
                     {
-                        var serialFile = Path.Combine(disk, "device", "serial");
-                        if (TryRead(serialFile, out var diskSerial))
-                        {
-                            DiskID = diskSerial;
-                            break;
-                        }
+                        DiskID = diskSerial;
+                        return; // 找到第一个就返回
                     }
                 }
             }
@@ -132,7 +172,12 @@ public partial class MachineInfo
             if (process != null)
             {
                 var uname = process.StandardOutput.ReadToEnd()?.Trim();
-                process.WaitForExit();
+                // 添加超时（2秒）
+                if (!process.WaitForExit(2000))
+                {
+                    try { process.Kill(); } catch { }
+                    return null;
+                }
                 
                 if (!String.IsNullOrEmpty(uname))
                 {
