@@ -125,32 +125,34 @@ public partial class MachineInfo
 
     #region Windows辅助方法
     /// <summary>批量读取 WMIC 信息以提高性能</summary>
-    /// <returns>包含所有 WMI 数据的嵌套字典</returns>
+    /// <returns>包含所有 WMI 数据的嵌套字典，键为WMI类名</returns>
     private static Dictionary<String, Dictionary<String, String>> ReadWmicBatch()
     {
         var result = new Dictionary<String, Dictionary<String, String>>(StringComparer.OrdinalIgnoreCase);
         
-        // csproduct
-        var data = ReadWmic("csproduct", "Name", "Vendor");
-        if (data.Count > 0) result["csproduct"] = data;
+        // 读取计算机系统产品信息
+        AddWmicData(result, "csproduct", ReadWmic("csproduct", "Name", "Vendor"));
         
-        // os
-        data = ReadWmic("os", "Caption", "Version");
-        if (data.Count > 0) result["os"] = data;
+        // 读取操作系统信息
+        AddWmicData(result, "os", ReadWmic("os", "Caption", "Version"));
         
-        // diskdrive
-        data = ReadWmic("diskdrive where mediatype=\"Fixed hard disk media\"", "SerialNumber");
-        if (data.Count > 0) result["diskdrive"] = data;
+        // 读取磁盘驱动器信息
+        AddWmicData(result, "diskdrive", ReadWmic("diskdrive where mediatype=\"Fixed hard disk media\"", "SerialNumber"));
         
-        // bios
-        data = ReadWmic("bios", "SerialNumber");
-        if (data.Count > 0) result["bios"] = data;
+        // 读取BIOS信息
+        AddWmicData(result, "bios", ReadWmic("bios", "SerialNumber"));
         
-        // baseboard
-        data = ReadWmic("baseboard", "SerialNumber");
-        if (data.Count > 0) result["baseboard"] = data;
+        // 读取主板信息
+        AddWmicData(result, "baseboard", ReadWmic("baseboard", "SerialNumber"));
         
         return result;
+    }
+
+    /// <summary>将WMIC数据添加到结果字典</summary>
+    private static void AddWmicData(Dictionary<String, Dictionary<String, String>> result, String key, Dictionary<String, String> data)
+    {
+        if (data.Count > 0)
+            result[key] = data;
     }
     
     /// <summary>通过WMIC命令读取信息</summary>
@@ -159,70 +161,88 @@ public partial class MachineInfo
     /// <returns>解析后的字典</returns>
     private static Dictionary<String, String> ReadWmic(String type, params String[] keys)
     {
-        var dic = new Dictionary<String, List<String>>(StringComparer.OrdinalIgnoreCase);
-        var dic2 = new Dictionary<String, String>(StringComparer.OrdinalIgnoreCase);
+        const Int32 WmicTimeoutMilliseconds = 5000;
+        
+        var rawData = new Dictionary<String, List<String>>(StringComparer.OrdinalIgnoreCase);
+        var result = new Dictionary<String, String>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
-            var args = $"{type} get {String.Join(",", keys)} /format:list";
-            var psi = new ProcessStartInfo
-            {
-                FileName = "wmic",
-                Arguments = args,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+            var output = ExecuteWmicCommand(type, keys, WmicTimeoutMilliseconds);
+            if (String.IsNullOrEmpty(output))
+                return result;
 
-            using var process = Process.Start(psi);
-            if (process != null)
-            {
-                var output = process.StandardOutput.ReadToEnd();
-                // 添加超时以避免挂起（5秒）
-                if (!process.WaitForExit(5000))
-                {
-                    try { process.Kill(); } catch { }
-                    return dic2;
-                }
-
-                if (!String.IsNullOrEmpty(output))
-                {
-                    var lines = output.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-                    foreach (var line in lines)
-                    {
-                        var parts = line.Split('=');
-                        if (parts.Length >= 2)
-                        {
-                            var key = parts[0].Trim();
-                            var value = parts[1].Trim();
-                            
-                            // 清理不可见字符
-                            value = Clean(value) ?? "";
-
-                            if (!String.IsNullOrEmpty(key) && !String.IsNullOrEmpty(value))
-                            {
-                                if (!dic.TryGetValue(key, out var list))
-                                    dic[key] = list = new List<String>();
-
-                                list.Add(value);
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 排序，避免多个磁盘序列号时，顺序变动
-            foreach (var item in dic)
-            {
-                dic2[item.Key] = String.Join(",", item.Value.OrderBy(e => e));
-            }
+            ParseWmicOutput(output, rawData);
+            ConsolidateWmicData(rawData, result);
         }
         catch
         {
-            // 忽略错误
+            // 忽略错误，返回空结果
         }
 
-        return dic2;
+        return result;
+    }
+
+    /// <summary>执行WMIC命令并返回输出</summary>
+    private static String? ExecuteWmicCommand(String type, String[] keys, Int32 timeoutMs)
+    {
+        var args = $"{type} get {String.Join(",", keys)} /format:list";
+        var psi = new ProcessStartInfo
+        {
+            FileName = "wmic",
+            Arguments = args,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using var process = Process.Start(psi);
+        if (process == null)
+            return null;
+
+        var output = process.StandardOutput.ReadToEnd();
+        
+        if (!process.WaitForExit(timeoutMs))
+        {
+            try { process.Kill(); } catch { }
+            return null;
+        }
+
+        return output;
+    }
+
+    /// <summary>解析WMIC输出为键值对</summary>
+    private static void ParseWmicOutput(String output, Dictionary<String, List<String>> rawData)
+    {
+        var lines = output.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+        
+        foreach (var line in lines)
+        {
+            var parts = line.Split('=');
+            if (parts.Length < 2)
+                continue;
+
+            var key = parts[0].Trim();
+            var value = Clean(parts[1].Trim()) ?? "";
+
+            if (String.IsNullOrEmpty(key) || String.IsNullOrEmpty(value))
+                continue;
+
+            if (!rawData.TryGetValue(key, out var list))
+                rawData[key] = list = new List<String>();
+
+            list.Add(value);
+        }
+    }
+
+    /// <summary>合并多个值的WMIC数据（如多个磁盘）</summary>
+    private static void ConsolidateWmicData(Dictionary<String, List<String>> rawData, Dictionary<String, String> result)
+    {
+        foreach (var item in rawData)
+        {
+            // 排序以保证一致性，用逗号连接多个值
+            result[item.Key] = String.Join(",", item.Value.OrderBy(e => e));
+        }
     }
     #endregion
 }

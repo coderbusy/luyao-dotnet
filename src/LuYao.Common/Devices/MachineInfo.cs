@@ -125,32 +125,48 @@ public partial class MachineInfo
     }
 
     /// <summary>裁剪不可见字符并去除两端空白</summary>
+    /// <param name="value">待清理的字符串</param>
+    /// <returns>清理后的字符串</returns>
     private static String? Clean(String? value)
     {
-        if (String.IsNullOrEmpty(value)) return value;
+        if (String.IsNullOrEmpty(value)) 
+            return value;
         
-        // 快速检查是否需要清理
-        var needsCleaning = false;
-        foreach (var c in value)
-        {
-            if (c < 32 || c == 127)
-            {
-                needsCleaning = true;
-                break;
-            }
-        }
-        
-        if (!needsCleaning)
+        // 快速路径：检查是否包含控制字符
+        if (!ContainsControlCharacters(value))
             return value.Trim();
         
-        // 只有在需要时才使用 StringBuilder
+        // 慢速路径：清理控制字符后返回
+        return RemoveControlCharacters(value).Trim();
+    }
+
+    /// <summary>检查字符串是否包含控制字符</summary>
+    private static Boolean ContainsControlCharacters(String value)
+    {
+        const Int32 MinPrintableChar = 32;
+        const Int32 DeleteChar = 127;
+        
+        foreach (var c in value)
+        {
+            if (c < MinPrintableChar || c == DeleteChar)
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>移除字符串中的控制字符</summary>
+    private static String RemoveControlCharacters(String value)
+    {
+        const Int32 MinPrintableChar = 32;
+        const Int32 DeleteChar = 127;
+        
         var sb = new StringBuilder(value.Length);
         foreach (var c in value)
         {
-            if (c >= 32 && c != 127)
+            if (c >= MinPrintableChar && c != DeleteChar)
                 sb.Append(c);
         }
-        return sb.ToString().Trim();
+        return sb.ToString();
     }
     #endregion
 

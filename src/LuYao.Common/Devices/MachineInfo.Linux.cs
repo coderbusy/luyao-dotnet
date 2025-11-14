@@ -70,63 +70,76 @@ public partial class MachineInfo
     }
     
     /// <summary>尝试读取 DMI 信息（一次性读取多个字段以提高性能）</summary>
+    /// <returns>如果成功读取任何DMI信息则返回true</returns>
     private Boolean TryReadDMIInfo()
     {
-        var dmiPath = "/sys/class/dmi/id/";
-        if (!Directory.Exists(dmiPath))
+        const String DmiBasePath = "/sys/class/dmi/id/";
+        
+        if (!Directory.Exists(DmiBasePath))
             return false;
         
         var hasData = false;
         
-        // 一次性尝试读取所有 DMI 字段
-        if (TryRead(Path.Combine(dmiPath, "product_name"), out var product_name))
+        // 读取产品名称
+        if (TryReadDmiField(DmiBasePath, "product_name", out var productName))
         {
-            Product = product_name;
+            Product = productName;
             hasData = true;
         }
         
-        if (TryRead(Path.Combine(dmiPath, "sys_vendor"), out var sys_vendor))
+        // 读取系统供应商
+        if (TryReadDmiField(DmiBasePath, "sys_vendor", out var sysVendor))
         {
-            Vendor = sys_vendor;
+            Vendor = sysVendor;
             hasData = true;
         }
         
-        if (TryRead(Path.Combine(dmiPath, "board_serial"), out var board_serial))
+        // 读取主板序列号
+        if (TryReadDmiField(DmiBasePath, "board_serial", out var boardSerial))
         {
-            Board = board_serial;
+            Board = boardSerial;
             hasData = true;
         }
         
-        if (TryRead(Path.Combine(dmiPath, "product_serial"), out var product_serial))
+        // 读取产品序列号
+        if (TryReadDmiField(DmiBasePath, "product_serial", out var productSerial))
         {
-            Serial = product_serial;
+            Serial = productSerial;
             hasData = true;
         }
         
         return hasData;
     }
+
+    /// <summary>尝试读取DMI字段</summary>
+    private static Boolean TryReadDmiField(String basePath, String fileName, out String? value)
+    {
+        return TryRead(Path.Combine(basePath, fileName), out value);
+    }
     
     /// <summary>尝试读取磁盘序列号</summary>
     private void TryReadDiskSerial()
     {
+        const String BlockDevicePath = "/sys/block/";
+        
         try
         {
-            var diskDir = "/sys/block/";
-            if (!Directory.Exists(diskDir))
+            if (!Directory.Exists(BlockDevicePath))
                 return;
             
             // 只检查物理磁盘（跳过循环设备等）
-            foreach (var disk in Directory.GetDirectories(diskDir))
+            foreach (var diskPath in Directory.GetDirectories(BlockDevicePath))
             {
-                var diskName = Path.GetFileName(disk);
-                if (diskName.StartsWith("sd") || diskName.StartsWith("nvme") || diskName.StartsWith("hd"))
+                var diskName = Path.GetFileName(diskPath);
+                
+                if (!IsPhysicalDisk(diskName))
+                    continue;
+
+                var serialFile = Path.Combine(diskPath, "device", "serial");
+                if (TryRead(serialFile, out var diskSerial))
                 {
-                    var serialFile = Path.Combine(disk, "device", "serial");
-                    if (TryRead(serialFile, out var diskSerial))
-                    {
-                        DiskID = diskSerial;
-                        return; // 找到第一个就返回
-                    }
+                    DiskID = diskSerial;
+                    return; // 找到第一个物理磁盘序列号即返回
                 }
             }
         }
@@ -136,27 +149,62 @@ public partial class MachineInfo
         }
     }
 
+    /// <summary>判断是否为物理磁盘</summary>
+    private static Boolean IsPhysicalDisk(String diskName)
+    {
+        return diskName.StartsWith("sd") ||    // SCSI/SATA磁盘
+               diskName.StartsWith("nvme") ||  // NVMe磁盘
+               diskName.StartsWith("hd");      // IDE磁盘
+    }
+
     #region Linux辅助方法
     /// <summary>获取Linux发行版名称</summary>
     /// <returns>Linux发行版名称</returns>
     private static String? GetLinuxName()
     {
-        var fr = "/etc/redhat-release";
-        if (TryRead(fr, out var value)) return value;
+        // 按优先级尝试各种方式获取OS名称
+        return TryGetFromReleaseFiles() ?? TryGetFromUname();
+    }
 
-        var dr = "/etc/debian-release";
-        if (TryRead(dr, out value)) return value;
+    /// <summary>从发行版文件获取OS名称</summary>
+    private static String? TryGetFromReleaseFiles()
+    {
+        // 尝试 RedHat 系列
+        if (TryRead("/etc/redhat-release", out var value))
+            return value;
 
-        var sr = "/etc/os-release";
-        if (TryRead(sr, out value))
-        {
-            var dic = SplitAsDictionary(value, "=", "\n");
-            if (dic.TryGetValue("PRETTY_NAME", out var pretty) && !String.IsNullOrEmpty(pretty)) 
-                return pretty.Trim('"');
-            if (dic.TryGetValue("NAME", out var name) && !String.IsNullOrEmpty(name)) 
-                return name.Trim('"');
-        }
+        // 尝试 Debian 系列
+        if (TryRead("/etc/debian-release", out value))
+            return value;
 
+        // 尝试通用 os-release 文件
+        if (TryRead("/etc/os-release", out value))
+            return ParseOsRelease(value);
+
+        return null;
+    }
+
+    /// <summary>解析 os-release 文件内容</summary>
+    private static String? ParseOsRelease(String content)
+    {
+        var dic = SplitAsDictionary(content, "=", "\n");
+        
+        // 优先使用 PRETTY_NAME
+        if (dic.TryGetValue("PRETTY_NAME", out var pretty) && !String.IsNullOrEmpty(pretty))
+            return pretty.Trim('"');
+        
+        // 退而求其次使用 NAME
+        if (dic.TryGetValue("NAME", out var name) && !String.IsNullOrEmpty(name))
+            return name.Trim('"');
+
+        return null;
+    }
+
+    /// <summary>从 uname 命令获取OS名称</summary>
+    private static String? TryGetFromUname()
+    {
+        const Int32 UnameTimeoutMs = 2000;
+        
         try
         {
             var psi = new ProcessStartInfo
@@ -169,35 +217,39 @@ public partial class MachineInfo
             };
 
             using var process = Process.Start(psi);
-            if (process != null)
+            if (process == null)
+                return null;
+
+            var uname = process.StandardOutput.ReadToEnd()?.Trim();
+            
+            if (!process.WaitForExit(UnameTimeoutMs))
             {
-                var uname = process.StandardOutput.ReadToEnd()?.Trim();
-                // 添加超时（2秒）
-                if (!process.WaitForExit(2000))
-                {
-                    try { process.Kill(); } catch { }
-                    return null;
-                }
-                
-                if (!String.IsNullOrEmpty(uname))
-                {
-                    // 支持Android系统名
-                    var ss = uname.Split('-');
-                    foreach (var item in ss)
-                    {
-                        if (!String.IsNullOrEmpty(item) && 
-                            item.StartsWith("Android", StringComparison.OrdinalIgnoreCase))
-                            return item;
-                    }
-                    return uname;
-                }
+                try { process.Kill(); } catch { }
+                return null;
             }
+            
+            if (String.IsNullOrEmpty(uname))
+                return null;
+
+            // 特殊处理：提取 Android 系统名
+            return ExtractAndroidName(uname) ?? uname;
         }
         catch
         {
-            // 忽略错误
+            return null;
         }
+    }
 
+    /// <summary>从 uname 输出中提取 Android 系统名</summary>
+    private static String? ExtractAndroidName(String uname)
+    {
+        var parts = uname.Split('-');
+        foreach (var part in parts)
+        {
+            if (!String.IsNullOrEmpty(part) && 
+                part.StartsWith("Android", StringComparison.OrdinalIgnoreCase))
+                return part;
+        }
         return null;
     }
 
