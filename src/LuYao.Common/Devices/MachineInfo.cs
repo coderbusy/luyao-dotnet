@@ -42,14 +42,6 @@ public partial class MachineInfo
     [DisplayName("处理器型号")]
     public String? Processor { get; set; }
 
-    /// <summary>硬件唯一标识。取主板编码，部分品牌存在重复</summary>
-    [DisplayName("硬件唯一标识")]
-    public String? UUID { get; set; }
-
-    /// <summary>软件唯一标识。系统标识，操作系统重装后更新，Linux系统的machine_id，Android的android_id，Ghost系统存在重复</summary>
-    [DisplayName("软件唯一标识")]
-    public String? Guid { get; set; }
-
     /// <summary>计算机序列号。适用于品牌机，跟笔记本标签显示一致</summary>
     [DisplayName("计算机序列号")]
     public String? Serial { get; set; }
@@ -61,49 +53,6 @@ public partial class MachineInfo
     /// <summary>磁盘序列号</summary>
     [DisplayName("磁盘序列号")]
     public String? DiskID { get; set; }
-
-    /// <summary>内存总量。单位Byte</summary>
-    [DisplayName("内存总量")]
-    public UInt64 Memory { get; set; }
-
-    /// <summary>可用内存。单位Byte</summary>
-    [DisplayName("可用内存")]
-    public UInt64 AvailableMemory { get; set; }
-
-    /// <summary>空闲内存。在Linux上空闲内存不一定可用，单位Byte</summary>
-    [DisplayName("空闲内存")]
-    public UInt64 FreeMemory { get; set; }
-
-    /// <summary>CPU占用率</summary>
-    [DisplayName("CPU占用率")]
-    public Double CpuRate { get; set; }
-
-    /// <summary>网络上行速度。字节每秒，初始化后首次读取为0</summary>
-    [DisplayName("网络上行速度")]
-    public UInt64 UplinkSpeed { get; set; }
-
-    /// <summary>网络下行速度。字节每秒，初始化后首次读取为0</summary>
-    [DisplayName("网络下行速度")]
-    public UInt64 DownlinkSpeed { get; set; }
-
-    /// <summary>温度。单位度</summary>
-    [DisplayName("温度")]
-    public Double Temperature { get; set; }
-
-    /// <summary>电池剩余。小于1的小数，常用百分比表示</summary>
-    [DisplayName("电池剩余")]
-    public Double Battery { get; set; }
-
-    private readonly Dictionary<String, Object?> _items = new Dictionary<String, Object?>();
-
-    /// <summary>获取 或 设置 扩展属性数据</summary>
-    /// <param name="key">属性键名</param>
-    /// <returns>属性值</returns>
-    public Object? this[String key] 
-    { 
-        get => _items.TryGetValue(key, out var obj) ? obj : null; 
-        set => _items[key] = value; 
-    }
     #endregion
 
     #region 静态方法
@@ -151,52 +100,17 @@ public partial class MachineInfo
         Product = Clean(Product);
         Vendor = Clean(Vendor);
         Processor = Clean(Processor);
-        UUID = Clean(UUID);
-        Guid = Clean(Guid);
         Serial = Clean(Serial);
         Board = Clean(Board);
         DiskID = Clean(DiskID);
-
-        // 无法读取系统标识时，随机生成一个guid
-        if (String.IsNullOrEmpty(Guid)) 
-            Guid = "0-" + System.Guid.NewGuid().ToString();
-        if (String.IsNullOrEmpty(UUID)) 
-            UUID = "0-" + System.Guid.NewGuid().ToString();
-
-        try
-        {
-            Refresh();
-        }
-        catch
-        {
-            // 忽略刷新错误
-        }
     }
 
     /// <summary>
-    /// 刷新动态性能信息（CPU、内存、网络等）
+    /// 重新加载机器信息
     /// </summary>
-    public void Refresh()
+    public void Reload()
     {
-#if NETFRAMEWORK
-        // .NET Framework only runs on Windows
-        RefreshWindows();
-#else
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            RefreshWindows();
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            RefreshLinux();
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            RefreshMacOS();
-        }
-#endif
-
-        RefreshSpeed();
+        Init();
     }
 
     private void Reset()
@@ -225,13 +139,4 @@ public partial class MachineInfo
     }
     #endregion
 
-    #region 平台相关私有类
-    private class SystemTime
-    {
-        public Int64 IdleTime;
-        public Int64 TotalTime;
-    }
-
-    private SystemTime? _systemTime;
-    #endregion
 }

@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security;
 using System.Text;
 
 #if NET5_0_OR_GREATER
@@ -29,32 +27,11 @@ public partial class MachineInfo
     {
         var str = "";
 
-        // 从注册表读取 MachineGuid
+        // 从注册表读取硬件信息
 #if NETFRAMEWORK || NET6_0_OR_GREATER
         try
         {
-            var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
-            if (reg != null) str = reg.GetValue("MachineGuid")?.ToString() ?? "";
-            if (String.IsNullOrEmpty(str))
-            {
-                reg = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-                reg = reg?.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
-                if (reg != null) str = reg.GetValue("MachineGuid")?.ToString() ?? "";
-            }
-
-            if (!String.IsNullOrEmpty(str)) Guid = str;
-
-            reg = Registry.LocalMachine.OpenSubKey(@"SYSTEM\HardwareConfig");
-            if (reg != null)
-            {
-                str = (reg.GetValue("LastConfig")?.ToString() ?? "")?.Trim('{', '}').ToUpper();
-
-                // UUID取不到时返回 FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF
-                if (!String.IsNullOrEmpty(str) && !str.Equals("FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF", StringComparison.OrdinalIgnoreCase))
-                    UUID = str;
-            }
-
-            reg = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\BIOS");
+            var reg = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\BIOS");
             reg ??= Registry.LocalMachine.OpenSubKey(@"SYSTEM\HardwareConfig\Current");
             if (reg != null)
             {
@@ -74,16 +51,14 @@ public partial class MachineInfo
         }
 #endif
 
-        // 旧版系统（如win2008）没有UUID的注册表项，需要用wmic查询
-        if (String.IsNullOrEmpty(UUID) || UUID == Guid || String.IsNullOrEmpty(Vendor))
+        // 通过 wmic 获取更多信息
+        if (String.IsNullOrEmpty(Vendor) || String.IsNullOrEmpty(Product))
         {
-            var csproduct = ReadWmic("csproduct", "Name", "UUID", "Vendor");
+            var csproduct = ReadWmic("csproduct", "Name", "Vendor");
             if (csproduct != null)
             {
                 if (csproduct.TryGetValue("Name", out str) && !String.IsNullOrEmpty(str) && String.IsNullOrEmpty(Product)) 
                     Product = str;
-                if (csproduct.TryGetValue("UUID", out str) && !String.IsNullOrEmpty(str)) 
-                    UUID = str;
                 if (csproduct.TryGetValue("Vendor", out str) && !String.IsNullOrEmpty(str)) 
                     Vendor = str;
             }
@@ -145,98 +120,6 @@ public partial class MachineInfo
         if (String.IsNullOrEmpty(OSVersion))
             OSVersion = Environment.OSVersion.Version.ToString();
     }
-
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-#endif
-    private void RefreshWindows()
-    {
-        // 获取内存信息
-        try
-        {
-            var memStatus = new MEMORYSTATUSEX();
-            memStatus.Init();
-            if (GlobalMemoryStatusEx(ref memStatus))
-            {
-                Memory = memStatus.ullTotalPhys;
-                AvailableMemory = memStatus.ullAvailPhys;
-            }
-        }
-        catch
-        {
-            // 忽略内存获取错误
-        }
-
-        // 获取CPU使用率
-        try
-        {
-            if (GetSystemTimes(out var idleTime, out var kernelTime, out var userTime))
-            {
-                var idle = idleTime.ToLong();
-                var kernel = kernelTime.ToLong();
-                var user = userTime.ToLong();
-                var total = kernel + user;
-
-                if (_systemTime != null)
-                {
-                    var idleDelta = idle - _systemTime.IdleTime;
-                    var totalDelta = total - _systemTime.TotalTime;
-
-                    if (totalDelta > 0)
-                    {
-                        CpuRate = 1.0 - ((double)idleDelta / totalDelta);
-                        if (CpuRate < 0) CpuRate = 0;
-                        if (CpuRate > 1) CpuRate = 1;
-                    }
-                }
-
-                _systemTime = new SystemTime { IdleTime = idle, TotalTime = total };
-            }
-        }
-        catch
-        {
-            // 忽略CPU使用率获取错误
-        }
-    }
-
-    #region Windows API
-    [DllImport("Kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    [SecurityCritical]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern Boolean GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
-
-    internal struct MEMORYSTATUSEX
-    {
-        internal UInt32 dwLength;
-        internal UInt32 dwMemoryLoad;
-        internal UInt64 ullTotalPhys;
-        internal UInt64 ullAvailPhys;
-        internal UInt64 ullTotalPageFile;
-        internal UInt64 ullAvailPageFile;
-        internal UInt64 ullTotalVirtual;
-        internal UInt64 ullAvailVirtual;
-        internal UInt64 ullAvailExtendedVirtual;
-
-        internal void Init() => dwLength = checked((UInt32)Marshal.SizeOf(typeof(MEMORYSTATUSEX)));
-    }
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern Boolean GetSystemTimes(out FILETIME idleTime, out FILETIME kernelTime, out FILETIME userTime);
-
-    private struct FILETIME
-    {
-        public UInt32 Low;
-        public UInt32 High;
-
-        public FILETIME(Int64 time)
-        {
-            Low = (UInt32)time;
-            High = (UInt32)(time >> 32);
-        }
-
-        public Int64 ToLong() => (Int64)(((UInt64)High << 32) | Low);
-    }
-    #endregion
 
     #region Windows辅助方法
     /// <summary>通过WMIC命令读取信息</summary>

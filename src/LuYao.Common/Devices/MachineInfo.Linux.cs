@@ -43,27 +43,7 @@ public partial class MachineInfo
 
             if (cpuinfo.TryGetValue("vendor_id", out str))
                 Vendor = str;
-
-            if (cpuinfo.TryGetValue("Serial", out str) && 
-                !String.IsNullOrEmpty(str) && 
-                str.Trim('0') != "")
-                UUID = str;
         }
-
-        // 读取 machine-id
-        var mid = "/etc/machine-id";
-        if (!File.Exists(mid)) mid = "/var/lib/dbus/machine-id";
-        if (TryRead(mid, out var value))
-            Guid = value;
-
-        // 读取 UUID
-        var uuid = "";
-        var file = "/sys/class/dmi/id/product_uuid";
-        if (!File.Exists(file)) file = "/etc/uuid";
-        if (!File.Exists(file)) file = "/proc/serial_num";
-        if (TryRead(file, out value))
-            uuid = value;
-        if (!String.IsNullOrEmpty(uuid)) UUID = uuid;
 
         // 从release文件读取产品
         var prd = GetProductByRelease();
@@ -89,91 +69,30 @@ public partial class MachineInfo
             Serial = product_serial;
         }
 
-        // 获取内存信息
-        var meminfo = ReadInfo("/proc/meminfo");
-        if (meminfo != null)
-        {
-            if (meminfo.TryGetValue("MemTotal", out str))
-            {
-                var match = System.Text.RegularExpressions.Regex.Match(str, @"(\d+)");
-                if (match.Success && UInt64.TryParse(match.Groups[1].Value, out var mem))
-                    Memory = mem * 1024; // kB to Bytes
-            }
-        }
-    }
-
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("linux")]
-#endif
-    private void RefreshLinux()
-    {
-        // 刷新内存信息
-        var meminfo = ReadInfo("/proc/meminfo");
-        if (meminfo != null)
-        {
-            if (meminfo.TryGetValue("MemTotal", out var str))
-            {
-                var match = System.Text.RegularExpressions.Regex.Match(str, @"(\d+)");
-                if (match.Success && UInt64.TryParse(match.Groups[1].Value, out var mem))
-                    Memory = mem * 1024;
-            }
-
-            if (meminfo.TryGetValue("MemAvailable", out str))
-            {
-                var match = System.Text.RegularExpressions.Regex.Match(str, @"(\d+)");
-                if (match.Success && UInt64.TryParse(match.Groups[1].Value, out var mem))
-                    AvailableMemory = mem * 1024;
-            }
-
-            if (meminfo.TryGetValue("MemFree", out str))
-            {
-                var match = System.Text.RegularExpressions.Regex.Match(str, @"(\d+)");
-                if (match.Success && UInt64.TryParse(match.Groups[1].Value, out var mem))
-                    FreeMemory = mem * 1024;
-            }
-        }
-
-        // 获取CPU使用率
+        // 获取磁盘序列号 (简化版，仅获取第一个硬盘)
         try
         {
-            var stat = File.ReadAllText("/proc/stat");
-            var lines = stat.Split('\n');
-            foreach (var line in lines)
+            var diskDir = "/sys/block/";
+            if (Directory.Exists(diskDir))
             {
-                if (line.StartsWith("cpu "))
+                foreach (var disk in Directory.GetDirectories(diskDir))
                 {
-                    var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length >= 5)
+                    var diskName = Path.GetFileName(disk);
+                    if (diskName.StartsWith("sd") || diskName.StartsWith("nvme") || diskName.StartsWith("hd"))
                     {
-                        var user = Int64.Parse(parts[1]);
-                        var nice = Int64.Parse(parts[2]);
-                        var system = Int64.Parse(parts[3]);
-                        var idle = Int64.Parse(parts[4]);
-
-                        var total = user + nice + system + idle;
-
-                        if (_systemTime != null)
+                        var serialFile = Path.Combine(disk, "device", "serial");
+                        if (TryRead(serialFile, out var diskSerial))
                         {
-                            var idleDelta = idle - _systemTime.IdleTime;
-                            var totalDelta = total - _systemTime.TotalTime;
-
-                            if (totalDelta > 0)
-                            {
-                                CpuRate = 1.0 - ((double)idleDelta / totalDelta);
-                                if (CpuRate < 0) CpuRate = 0;
-                                if (CpuRate > 1) CpuRate = 1;
-                            }
+                            DiskID = diskSerial;
+                            break;
                         }
-
-                        _systemTime = new SystemTime { IdleTime = idle, TotalTime = total };
                     }
-                    break;
                 }
             }
         }
         catch
         {
-            // 忽略CPU使用率获取错误
+            // 忽略磁盘序列号读取错误
         }
     }
 

@@ -1,6 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Threading;
 using LuYao.Devices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -43,151 +41,75 @@ public class MachineInfoTests
     }
 
     [TestMethod]
-    public void Guid_ShouldNotBeNullOrEmpty()
+    public void Processor_CanBeRead()
     {
         // Arrange
         var machineInfo = MachineInfo.Get();
 
-        // Assert
-        Assert.IsFalse(String.IsNullOrEmpty(machineInfo.Guid), "Guid should not be null or empty");
-    }
-
-    [TestMethod]
-    public void UUID_ShouldNotBeNullOrEmpty()
-    {
-        // Arrange
-        var machineInfo = MachineInfo.Get();
-
-        // Assert
-        Assert.IsFalse(String.IsNullOrEmpty(machineInfo.UUID), "UUID should not be null or empty");
-    }
-
-    [TestMethod]
-    public void Memory_ShouldBeGreaterThanZero()
-    {
-        // Arrange
-        var machineInfo = MachineInfo.Get();
-
-        // Assert
-        Assert.IsTrue(machineInfo.Memory > 0, "Memory should be greater than 0");
-    }
-
-    [TestMethod]
-    public void Refresh_ShouldUpdateDynamicProperties()
-    {
-        // Arrange
-        var machineInfo = MachineInfo.Get();
-        var initialMemory = machineInfo.Memory;
-
-        // Act
-        machineInfo.Refresh();
-
-        // Assert - Memory should still be > 0 after refresh
-        Assert.IsTrue(machineInfo.Memory > 0, "Memory should be greater than 0 after refresh");
-    }
-
-    [TestMethod]
-    public void CpuRate_ShouldBeInValidRange()
-    {
-        // Arrange
-        var machineInfo = MachineInfo.Get();
-        
-        // Need to refresh twice to get CPU rate
-        machineInfo.Refresh();
-        Thread.Sleep(1000);
-        machineInfo.Refresh();
-
-        // Assert - CPU rate should be between 0 and 1
-        Assert.IsTrue(machineInfo.CpuRate >= 0 && machineInfo.CpuRate <= 1, 
-            $"CPU rate should be between 0 and 1, got {machineInfo.CpuRate}");
-    }
-
-    [TestMethod]
-    public void ExtensionProperties_ShouldWork()
-    {
-        // Arrange
-        var machineInfo = MachineInfo.Get();
-
-        // Act
-        machineInfo["TestKey"] = "TestValue";
-        var value = machineInfo["TestKey"];
-
-        // Assert
-        Assert.AreEqual("TestValue", value);
-    }
-
-    [TestMethod]
-    public void ExtensionProperties_ShouldReturnNullForNonExistentKey()
-    {
-        // Arrange
-        var machineInfo = MachineInfo.Get();
-
-        // Act
-        var value = machineInfo["NonExistentKey"];
-
-        // Assert
-        Assert.IsNull(value);
-    }
-
-    [TestMethod]
-    public void RefreshSpeed_ShouldNotThrow()
-    {
-        // Arrange
-        var machineInfo = MachineInfo.Get();
-
-        // Act & Assert - Should not throw
-        machineInfo.RefreshSpeed();
-        Thread.Sleep(1000);
-        machineInfo.RefreshSpeed();
-        
-        // Network speeds should be non-negative
-        Assert.IsTrue(machineInfo.UplinkSpeed >= 0, "Uplink speed should be non-negative");
-        Assert.IsTrue(machineInfo.DownlinkSpeed >= 0, "Downlink speed should be non-negative");
-    }
-
-    [TestMethod]
-    public void Processor_ShouldNotBeNull()
-    {
-        // Arrange
-        var machineInfo = MachineInfo.Get();
-
-        // Assert - Processor might be null on some platforms, but usually isn't
-        // Just checking it doesn't throw
+        // Assert - Processor might be null on some platforms, just verify it doesn't throw
         var processor = machineInfo.Processor;
-        Assert.IsTrue(true); // Test passes if we get here
+        Assert.IsTrue(true);
     }
 
     [TestMethod]
-    public void AvailableMemory_ShouldBeLessThanOrEqualToTotalMemory()
+    public void Reload_ShouldNotThrow()
+    {
+        // Arrange
+        var machineInfo = MachineInfo.Get();
+        var originalOSName = machineInfo.OSName;
+
+        // Act
+        machineInfo.Reload();
+
+        // Assert - OSName should still be set after reload
+        Assert.IsFalse(String.IsNullOrEmpty(machineInfo.OSName), "OSName should not be null or empty after reload");
+    }
+
+    [TestMethod]
+    public void AllBasicProperties_CanBeAccessed()
+    {
+        // Arrange
+        var machineInfo = MachineInfo.Get();
+
+        // Act & Assert - All properties should be accessible
+        var osName = machineInfo.OSName;
+        var osVersion = machineInfo.OSVersion;
+        var product = machineInfo.Product;
+        var vendor = machineInfo.Vendor;
+        var processor = machineInfo.Processor;
+        var serial = machineInfo.Serial;
+        var board = machineInfo.Board;
+        var diskId = machineInfo.DiskID;
+
+        // Test passes if we get here without exceptions
+        Assert.IsTrue(true);
+    }
+
+    [TestMethod]
+    public void Product_MayBeNullOnSomePlatforms()
     {
         // Arrange
         var machineInfo = MachineInfo.Get();
 
         // Act
-        machineInfo.Refresh();
+        var product = machineInfo.Product;
 
-        // Assert
-        if (machineInfo.AvailableMemory > 0)
-        {
-            Assert.IsTrue(machineInfo.AvailableMemory <= machineInfo.Memory,
-                $"Available memory ({machineInfo.AvailableMemory}) should be <= total memory ({machineInfo.Memory})");
-        }
+        // Assert - Product can be null on some platforms (e.g., virtual machines)
+        // Just verify it doesn't throw
+        Assert.IsTrue(true);
     }
 
     [TestMethod]
-    public void FreeMemory_ShouldBeLessThanOrEqualToTotalMemory()
+    public void Serial_MayBeNullOnSomePlatforms()
     {
         // Arrange
         var machineInfo = MachineInfo.Get();
 
         // Act
-        machineInfo.Refresh();
+        var serial = machineInfo.Serial;
 
-        // Assert
-        if (machineInfo.FreeMemory > 0)
-        {
-            Assert.IsTrue(machineInfo.FreeMemory <= machineInfo.Memory,
-                $"Free memory ({machineInfo.FreeMemory}) should be <= total memory ({machineInfo.Memory})");
-        }
+        // Assert - Serial can be null on some platforms
+        // Just verify it doesn't throw
+        Assert.IsTrue(true);
     }
 }
