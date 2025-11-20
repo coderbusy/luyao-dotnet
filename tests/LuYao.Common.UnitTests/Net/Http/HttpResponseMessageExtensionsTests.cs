@@ -18,7 +18,7 @@ public class HttpResponseMessageExtensionsTests
         HttpResponseMessage? response = null;
 
         // Act & Assert
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
+        await Assert.ThrowsExactlyAsync<ArgumentNullException>(async () =>
         {
             await HttpResponseMessageExtensions.ReadAsHtmlAsync(response);
         });

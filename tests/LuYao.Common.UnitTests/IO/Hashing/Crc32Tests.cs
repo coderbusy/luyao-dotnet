@@ -66,7 +66,8 @@ public class Crc32Tests
             // 结果应为 0xCBF43926
             Assert.IsNotNull(hash);
             Assert.AreEqual(4, hash.Length);
-            var value = BitConverter.ToUInt32(hash.Reverse().ToArray(), 0);
+            Array.Reverse(hash);
+            var value = BitConverter.ToUInt32(hash, 0);
             Assert.AreEqual(0xCBF43926u, value);
         }
     }
@@ -77,7 +78,7 @@ public class Crc32Tests
         // 仅在非小端平台抛出异常，通常不会触发
         if (!BitConverter.IsLittleEndian)
         {
-            Assert.ThrowsException<PlatformNotSupportedException>(() =>
+            Assert.ThrowsExactly<PlatformNotSupportedException>(() =>
             {
                 var crc32 = new Crc32();
             });

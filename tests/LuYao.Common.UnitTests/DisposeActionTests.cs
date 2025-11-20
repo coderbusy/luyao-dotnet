@@ -8,7 +8,7 @@ public class DisposeActionTests
     [TestMethod]
     public void Constructor_WhenActionIsNull_ShouldThrowArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => new DisposeAction(null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => new DisposeAction(null!));
     }
 
     [TestMethod]

@@ -34,7 +34,7 @@ public class KeyedLockerTests
         string? key = null;
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => KeyedLocker<object>.GetLock(key), "应抛出 ArgumentNullException。");
+        Assert.ThrowsExactly<ArgumentNullException>(() => KeyedLocker<object>.GetLock(key), "应抛出 ArgumentNullException。");
     }
 
     /// <summary>

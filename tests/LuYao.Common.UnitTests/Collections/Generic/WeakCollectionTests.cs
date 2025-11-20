@@ -16,7 +16,7 @@ public class WeakCollectionTests
         var collection = new WeakCollection<object>();
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => collection.Add(null));
+        Assert.ThrowsExactly<ArgumentNullException>(() => collection.Add(null!));
     }
 
     [TestMethod]
@@ -31,7 +31,7 @@ public class WeakCollectionTests
 
         // Assert
         var items = collection.TryGetItems(x => true);
-        Assert.AreEqual(1, items.Length);
+        Assert.HasCount(1, items);
         Assert.AreSame(item, items[0]);
     }
 
@@ -48,7 +48,7 @@ public class WeakCollectionTests
 
         // Assert
         Assert.IsTrue(result);
-        Assert.AreEqual(0, collection.TryGetItems(x => true).Length);
+        Assert.IsEmpty(collection.TryGetItems(x => true));
     }
 
     [TestMethod]
@@ -77,7 +77,7 @@ public class WeakCollectionTests
         var items = collection.TryGetItems(x => x == "Item1");
 
         // Assert
-        Assert.AreEqual(1, items.Length);
+        Assert.HasCount(1, items);
         Assert.AreEqual("Item1", items[0]);
     }
 
@@ -93,9 +93,9 @@ public class WeakCollectionTests
         var items = collection.TryGetItems();
 
         // Assert
-        Assert.AreEqual(2, items.Length);
-        CollectionAssert.Contains(items, "Item1");
-        CollectionAssert.Contains(items, "Item2");
+        Assert.HasCount(2, items);
+        Assert.Contains(items, "Item1");
+        Assert.Contains(items, "Item2");
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class WeakCollectionTests
         // Assert
         Assert.AreEqual("NewItem", item);
         var items = collection.TryGetItems();
-        Assert.AreEqual(1, items.Length);
+        Assert.HasCount(1, items);
         Assert.AreEqual("NewItem", items[0]);
     }
 
@@ -140,7 +140,7 @@ public class WeakCollectionTests
         collection.Clear();
 
         // Assert
-        Assert.AreEqual(0, collection.TryGetItems(x => true).Length);
+        Assert.IsEmpty(collection.TryGetItems(x => true));
     }
 
     [TestMethod]
@@ -159,7 +159,7 @@ public class WeakCollectionTests
 
         // Assert
         var items = collection.TryGetItems(x => true);
-        Assert.AreEqual(2, items.Length);
+        Assert.HasCount(2, items);
         Assert.AreSame(strongReference, items[1]);
     }
 }
