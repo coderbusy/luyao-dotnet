@@ -66,7 +66,8 @@ public class Crc32Tests
             // 结果应为 0xCBF43926
             Assert.IsNotNull(hash);
             Assert.AreEqual(4, hash.Length);
-            var value = BitConverter.ToUInt32(hash.Reverse().ToArray(), 0);
+            hash.Reverse();
+            var value = BitConverter.ToUInt32(hash, 0);
             Assert.AreEqual(0xCBF43926u, value);
         }
     }
