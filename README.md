@@ -28,6 +28,7 @@ LuYao 是一个面向企业级应用的 .NET 实用工具库集合，提供丰�
 - .NET Standard 2.1
 - .NET 6.0
 - .NET 8.0
+- .NET 10.0
 
 ### 安装
 
@@ -324,6 +325,7 @@ The project consists of three main packages:
 - .NET Standard 2.1
 - .NET 6.0
 - .NET 8.0
+- .NET 10.0
 
 ### Installation
 
