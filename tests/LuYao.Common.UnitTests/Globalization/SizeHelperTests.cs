@@ -272,16 +272,15 @@ public class SizeHelperTests
     }
 
     /// <summary>
-    /// 测试单一数值输入（不带单位），期望默认为厘米
+    /// 测试单一数值输入（不带单位），期望返回 false（必须带单位）
     /// </summary>
     [TestMethod]
-    public void ExtractSize_SingleValueWithoutUnit_DefaultsToCm()
+    public void ExtractSize_SingleValueWithoutUnit_ReturnsFalse()
     {
         var result = SizeHelper.ExtractSize("30", out decimal[] arr);
         
-        Assert.IsTrue(result);
-        Assert.AreEqual(1, arr.Length);
-        Assert.AreEqual(30m, arr[0]);
+        Assert.IsFalse(result);
+        Assert.AreEqual(0, arr.Length);
     }
 
     /// <summary>
@@ -377,5 +376,80 @@ public class SizeHelperTests
         Assert.AreEqual(1m, arr[0]); // 10 mm = 1 cm
         Assert.AreEqual(5m, arr[1]); // 5 cm = 5 cm
         Assert.AreEqual(5.08m, arr[2]); // 2 inch = 5.08 cm
+    }
+
+    /// <summary>
+    /// 测试单一数值带米单位，期望成功解析
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SingleValueWithMeterUnit_ReturnsCorrectValue()
+    {
+        var result = SizeHelper.ExtractSize("1m", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, arr.Length);
+        Assert.AreEqual(100m, arr[0]); // 1 m = 100 cm
+    }
+
+    /// <summary>
+    /// 测试单一小数数值带英寸单位（in），期望成功解析
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SingleDecimalValueWithInchUnit_ReturnsCorrectValue()
+    {
+        var result = SizeHelper.ExtractSize("1.1in", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, arr.Length);
+        Assert.AreEqual(2.794m, arr[0]); // 1.1 inch = 2.794 cm
+    }
+
+    /// <summary>
+    /// 测试单一小数数值带英寸单位（inch），期望成功解析
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SingleDecimalValueWithInchUnitLongForm_ReturnsCorrectValue()
+    {
+        var result = SizeHelper.ExtractSize("1.1 inch", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, arr.Length);
+        Assert.AreEqual(2.794m, arr[0]); // 1.1 inch = 2.794 cm
+    }
+
+    /// <summary>
+    /// 测试单一小数数值不带单位，期望返回 false
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SingleDecimalValueWithoutUnit_ReturnsFalse()
+    {
+        var result = SizeHelper.ExtractSize("1.1", out decimal[] arr);
+        
+        Assert.IsFalse(result);
+        Assert.AreEqual(0, arr.Length);
+    }
+
+    /// <summary>
+    /// 测试数值带单位后面还有其他字符，期望返回 false
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_ValueWithUnitFollowedByOtherCharacters_ReturnsFalse()
+    {
+        var result = SizeHelper.ExtractSize("5m1", out decimal[] arr);
+        
+        Assert.IsFalse(result);
+        Assert.AreEqual(0, arr.Length);
+    }
+
+    /// <summary>
+    /// 测试包含多个数字和字母的复杂字符串（无分隔符），期望返回 false
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_ComplexStringWithoutSeparator_ReturnsFalse()
+    {
+        var result = SizeHelper.ExtractSize("1109020P3060", out decimal[] arr);
+        
+        Assert.IsFalse(result);
+        Assert.AreEqual(0, arr.Length);
     }
 }

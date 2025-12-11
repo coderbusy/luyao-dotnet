@@ -47,16 +47,22 @@ if (SizeHelper.ExtractSize("10x10x10cm", out decimal[] result))
 // 10 cm
 ```
 
-### 无单位（默认为厘米）
+### 无单位（仅在使用分隔符时默认为厘米）
 
 ```csharp
-// 当没有明确单位时，默认使用厘米
+// 当使用分隔符（x 或 *）且没有明确单位时，默认使用厘米
 if (SizeHelper.ExtractSize("10x20x30", out decimal[] result))
 {
     // result = [10, 20, 30]
     Console.WriteLine($"长: {result[0]}cm, 宽: {result[1]}cm, 高: {result[2]}cm");
 }
 // 输出: 长: 10cm, 宽: 20cm, 高: 30cm
+
+// 单一数值必须带单位，否则解析失败
+if (!SizeHelper.ExtractSize("10", out decimal[] result2))
+{
+    Console.WriteLine("解析失败：单一数值必须带单位");
+}
 ```
 
 ### 多个统一单位
@@ -176,15 +182,34 @@ if (!SizeHelper.ExtractSize("", out decimal[] result))
     // result = []
 }
 
-// 没有分隔符
-if (!SizeHelper.ExtractSize("10cm", out decimal[] result))
+// 单一数值必须带单位
+if (SizeHelper.ExtractSize("10cm", out decimal[] result))
 {
-    Console.WriteLine("提取失败：需要至少两个尺寸值");
-    // result = []
+    Console.WriteLine("单一数值带单位：成功");
+    // result = [10]
+}
+
+if (!SizeHelper.ExtractSize("10", out decimal[] result2))
+{
+    Console.WriteLine("单一数值不带单位：失败");
+    // result2 = []
+}
+
+// 单一数值不能有其他无关字符
+if (!SizeHelper.ExtractSize("5m1", out decimal[] result3))
+{
+    Console.WriteLine("单位后有其他字符：失败");
+    // result3 = []
+}
+
+if (!SizeHelper.ExtractSize("1109020P3060", out decimal[] result4))
+{
+    Console.WriteLine("复杂字符串无分隔符：失败");
+    // result4 = []
 }
 
 // 仅包含文字
-if (!SizeHelper.ExtractSize("abc x def", out decimal[] result))
+if (!SizeHelper.ExtractSize("abc x def", out decimal[] result5))
 {
     Console.WriteLine("提取失败或返回空数组");
     // result = [] 或返回 false

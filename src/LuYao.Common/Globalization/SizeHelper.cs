@@ -80,9 +80,9 @@ public static class SizeHelper
     /// <remarks>
     /// <para>提取规则：</para>
     /// <list type="bullet">
-    /// <item><description>支持单一数值输入：50cm，结果为 [50]</description></item>
+    /// <item><description>支持单一数值输入（必须带单位）：50cm，结果为 [50]</description></item>
     /// <item><description>使用 'x' 或 '*' 分隔多个尺寸值</description></item>
-    /// <item><description>如果没有明确单位，默认单位为厘米（CM）</description></item>
+    /// <item><description>单一数值必须带单位；有分隔符时，如果没有明确单位，默认单位为厘米（CM）</description></item>
     /// <item><description>支持小数输入，例如 "10.5cm"</description></item>
     /// <item><description>支持单一单位：10x10x10cm</description></item>
     /// <item><description>支持多个统一单位：10cmx10cmx10cm</description></item>
@@ -222,17 +222,22 @@ public static class SizeHelper
         if (string.IsNullOrWhiteSpace(input))
             return null;
 
-        // Use the same pattern as multi-value extraction for consistency
-        // This allows extracting size from text like "Size: 50cm"
-        var match = NumberWithOptionalUnitPattern.Match(input);
+        // When there's no separator, we must be strict:
+        // 1. The entire input (after trimming) must be just number + unit
+        // 2. A unit must be present (no bare numbers allowed)
+        var match = SingleValuePattern.Match(input);
         
         if (match.Success && match.Groups[1].Success && !string.IsNullOrWhiteSpace(match.Groups[1].Value))
         {
+            // Require a unit to be present when there's no separator
+            if (!match.Groups[2].Success || string.IsNullOrEmpty(match.Groups[2].Value))
+            {
+                return null;
+            }
+            
             if (decimal.TryParse(match.Groups[1].Value, out decimal value))
             {
-                string unit = match.Groups[2].Success && !string.IsNullOrEmpty(match.Groups[2].Value) 
-                    ? match.Groups[2].Value 
-                    : "CM";
+                string unit = match.Groups[2].Value;
                 return ConvertToCentimeters(value, unit);
             }
         }

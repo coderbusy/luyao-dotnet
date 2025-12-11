@@ -47,16 +47,22 @@ if (SizeHelper.ExtractSize("10x10x10cm", out decimal[] result))
 // 10 cm
 ```
 
-### No Unit (Defaults to Centimeters)
+### No Unit (Defaults to Centimeters Only with Separators)
 
 ```csharp
-// When no unit is specified, defaults to centimeters
+// When using separators (x or *) without explicit units, defaults to centimeters
 if (SizeHelper.ExtractSize("10x20x30", out decimal[] result))
 {
     // result = [10, 20, 30]
     Console.WriteLine($"Length: {result[0]}cm, Width: {result[1]}cm, Height: {result[2]}cm");
 }
 // Output: Length: 10cm, Width: 20cm, Height: 30cm
+
+// Single value must have a unit, otherwise parsing fails
+if (!SizeHelper.ExtractSize("10", out decimal[] result2))
+{
+    Console.WriteLine("Parsing failed: single value must have a unit");
+}
 ```
 
 ### Multiple Uniform Units
@@ -176,15 +182,34 @@ if (!SizeHelper.ExtractSize("", out decimal[] result))
     // result = []
 }
 
-// No separator
-if (!SizeHelper.ExtractSize("10cm", out decimal[] result))
+// Single value must have a unit
+if (SizeHelper.ExtractSize("10cm", out decimal[] result))
 {
-    Console.WriteLine("Extraction failed: needs at least two size values");
-    // result = []
+    Console.WriteLine("Single value with unit: success");
+    // result = [10]
+}
+
+if (!SizeHelper.ExtractSize("10", out decimal[] result2))
+{
+    Console.WriteLine("Single value without unit: failed");
+    // result2 = []
+}
+
+// Single value cannot have other extraneous characters
+if (!SizeHelper.ExtractSize("5m1", out decimal[] result3))
+{
+    Console.WriteLine("Characters after unit: failed");
+    // result3 = []
+}
+
+if (!SizeHelper.ExtractSize("1109020P3060", out decimal[] result4))
+{
+    Console.WriteLine("Complex string without separator: failed");
+    // result4 = []
 }
 
 // Only text
-if (!SizeHelper.ExtractSize("abc x def", out decimal[] result))
+if (!SizeHelper.ExtractSize("abc x def", out decimal[] result5))
 {
     Console.WriteLine("Extraction failed or returns empty array");
     // result = [] or returns false
