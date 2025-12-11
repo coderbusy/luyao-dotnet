@@ -3,7 +3,7 @@
 	<Import Project="..\..\build\common.props" />
 	<Import Project="..\..\build\configureawait.props" />
 	<PropertyGroup>
-		<TargetFrameworks>net461;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net461;netstandard2.0;netstandard2.1;net6.0;net8.0;net10.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<RootNamespace>LuYao.Text.Json</RootNamespace>
