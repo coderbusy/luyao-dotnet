@@ -60,6 +60,7 @@ public static class SizeHelper
     private static readonly Regex UnitPattern = new Regex(@"(inch|in|mm|cm|dm|m)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex NumberPattern = new Regex(@"(\d+(?:\.\d+)?)", RegexOptions.Compiled);
     private static readonly Regex SingleValuePattern = new Regex(@"^\s*(\d+(?:\.\d+)?)\s*(inch|in|mm|cm|dm|m)?\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex GroupSeparatorPattern = new Regex(@"[/,;|]", RegexOptions.Compiled);
     
     // Unit conversion factors (relative to centimeters)
     private static readonly Dictionary<string, decimal> UnitConversions = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
@@ -194,14 +195,14 @@ public static class SizeHelper
     }
 
     /// <summary>
-    /// 将字符串分割为子组，使用常见的组分隔符（如斜杠）。
+    /// 将字符串分割为子组，使用常见的组分隔符（斜杠、逗号、分号、竖线）。
     /// </summary>
     private static List<string> SplitIntoSubGroups(string text)
     {
         var result = new List<string>();
         
         // Split by common separators: / , ; |
-        var potentialGroups = Regex.Split(text, @"[/,;|]");
+        var potentialGroups = GroupSeparatorPattern.Split(text);
         
         foreach (var group in potentialGroups)
         {
