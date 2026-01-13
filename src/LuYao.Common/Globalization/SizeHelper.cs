@@ -60,7 +60,6 @@ public static class SizeHelper
     private static readonly Regex UnitPattern = new Regex(@"(inch|in|mm|cm|dm|m)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex NumberPattern = new Regex(@"(\d+(?:\.\d+)?)", RegexOptions.Compiled);
     private static readonly Regex SingleValuePattern = new Regex(@"^\s*(\d+(?:\.\d+)?)\s*(inch|in|mm|cm|dm|m)?\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static readonly Regex GroupSeparatorPattern = new Regex(@"[/,;|]", RegexOptions.Compiled);
     
     // Unit conversion factors (relative to centimeters)
     private static readonly Dictionary<string, decimal> UnitConversions = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
@@ -200,17 +199,31 @@ public static class SizeHelper
     private static List<string> SplitIntoSubGroups(string text)
     {
         var result = new List<string>();
+        var currentGroup = new System.Text.StringBuilder();
         
-        // Split by common separators: / , ; |
-        var potentialGroups = GroupSeparatorPattern.Split(text);
-        
-        foreach (var group in potentialGroups)
+        // Split by common separators: / , ; | using simple character iteration
+        foreach (char c in text)
         {
-            var trimmed = group.Trim();
-            if (!string.IsNullOrWhiteSpace(trimmed) && ContainsIgnoreCase(trimmed, "x", "*"))
+            if (c == '/' || c == ',' || c == ';' || c == '|')
             {
-                result.Add(trimmed);
+                var trimmed = currentGroup.ToString().Trim();
+                if (!string.IsNullOrWhiteSpace(trimmed) && ContainsIgnoreCase(trimmed, "x", "*"))
+                {
+                    result.Add(trimmed);
+                }
+                currentGroup.Clear();
             }
+            else
+            {
+                currentGroup.Append(c);
+            }
+        }
+        
+        // Add the last group if any
+        var lastGroup = currentGroup.ToString().Trim();
+        if (!string.IsNullOrWhiteSpace(lastGroup) && ContainsIgnoreCase(lastGroup, "x", "*"))
+        {
+            result.Add(lastGroup);
         }
         
         // If no valid groups found, return the original text as a single group
