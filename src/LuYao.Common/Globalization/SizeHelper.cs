@@ -180,14 +180,59 @@ public static class SizeHelper
             }
         }
 
-        // Then, remove parentheses content and add the remaining as a group
+        // Then, remove parentheses content and process the remaining
         var withoutParentheses = ParenthesesPattern.Replace(size, string.Empty);
         if (!string.IsNullOrWhiteSpace(withoutParentheses))
         {
-            groups.Insert(0, withoutParentheses);
+            // Split by common group separators like slash, comma, semicolon, or pipe
+            // But only if they appear to separate complete size groups (with x or * separators)
+            var subGroups = SplitIntoSubGroups(withoutParentheses);
+            groups.InsertRange(0, subGroups);
         }
 
         return groups;
+    }
+
+    /// <summary>
+    /// 将字符串分割为子组，使用常见的组分隔符（斜杠、逗号、分号、竖线）。
+    /// </summary>
+    private static List<string> SplitIntoSubGroups(string text)
+    {
+        var result = new List<string>();
+        var currentGroup = new System.Text.StringBuilder();
+        
+        // Split by common separators: / , ; | using simple character iteration
+        foreach (char c in text)
+        {
+            if (c == '/' || c == ',' || c == ';' || c == '|')
+            {
+                var trimmed = currentGroup.ToString().Trim();
+                if (!string.IsNullOrWhiteSpace(trimmed) && ContainsIgnoreCase(trimmed, "x", "*"))
+                {
+                    result.Add(trimmed);
+                }
+                currentGroup.Clear();
+            }
+            else
+            {
+                currentGroup.Append(c);
+            }
+        }
+        
+        // Add the last group if any
+        var lastGroup = currentGroup.ToString().Trim();
+        if (!string.IsNullOrWhiteSpace(lastGroup) && ContainsIgnoreCase(lastGroup, "x", "*"))
+        {
+            result.Add(lastGroup);
+        }
+        
+        // If no valid groups found, return the original text as a single group
+        if (result.Count == 0 && ContainsIgnoreCase(text, "x", "*"))
+        {
+            result.Add(text);
+        }
+        
+        return result;
     }
 
     /// <summary>

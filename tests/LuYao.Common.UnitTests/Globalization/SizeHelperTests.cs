@@ -452,4 +452,55 @@ public class SizeHelperTests
         Assert.IsFalse(result);
         Assert.AreEqual(0, arr.Length);
     }
+
+    /// <summary>
+    /// 测试使用斜杠分隔的多组尺寸：120x200cm/47x78.7in
+    /// 期望返回 [120, 200, 119.38, 199.898]
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SlashSeparatedGroups_ReturnsCorrectArray()
+    {
+        var result = SizeHelper.ExtractSize("120x200cm/47x78.7in", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(4, arr.Length);
+        Assert.AreEqual(120m, arr[0]); // 120 cm
+        Assert.AreEqual(200m, arr[1]); // 200 cm
+        Assert.AreEqual(119.38m, arr[2]); // 47 inch = 119.38 cm
+        Assert.AreEqual(199.898m, arr[3]); // 78.7 inch = 199.898 cm
+    }
+
+    /// <summary>
+    /// 测试使用逗号分隔的多组尺寸：10x20cm,5x10in
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_CommaSeparatedGroups_ReturnsCorrectArray()
+    {
+        var result = SizeHelper.ExtractSize("10x20cm,5x10in", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(4, arr.Length);
+        Assert.AreEqual(10m, arr[0]); // 10 cm
+        Assert.AreEqual(20m, arr[1]); // 20 cm
+        Assert.AreEqual(12.7m, arr[2]); // 5 inch = 12.7 cm
+        Assert.AreEqual(25.4m, arr[3]); // 10 inch = 25.4 cm
+    }
+
+    /// <summary>
+    /// 测试混合使用斜杠和括号：100x150cm/40x60in(10x15mm)
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_MixedSlashAndParentheses_ReturnsCorrectArray()
+    {
+        var result = SizeHelper.ExtractSize("100x150cm/40x60in(10x15mm)", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(6, arr.Length);
+        Assert.AreEqual(100m, arr[0]); // 100 cm
+        Assert.AreEqual(150m, arr[1]); // 150 cm
+        Assert.AreEqual(101.6m, arr[2]); // 40 inch = 101.6 cm
+        Assert.AreEqual(152.4m, arr[3]); // 60 inch = 152.4 cm
+        Assert.AreEqual(1m, arr[4]); // 10 mm = 1 cm
+        Assert.AreEqual(1.5m, arr[5]); // 15 mm = 1.5 cm
+    }
 }
