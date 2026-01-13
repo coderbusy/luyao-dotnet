@@ -180,14 +180,45 @@ public static class SizeHelper
             }
         }
 
-        // Then, remove parentheses content and add the remaining as a group
+        // Then, remove parentheses content and process the remaining
         var withoutParentheses = ParenthesesPattern.Replace(size, string.Empty);
         if (!string.IsNullOrWhiteSpace(withoutParentheses))
         {
-            groups.Insert(0, withoutParentheses);
+            // Split by common group separators like slash, comma, semicolon, or pipe
+            // But only if they appear to separate complete size groups (with x or * separators)
+            var subGroups = SplitIntoSubGroups(withoutParentheses);
+            groups.InsertRange(0, subGroups);
         }
 
         return groups;
+    }
+
+    /// <summary>
+    /// 将字符串分割为子组，使用常见的组分隔符（如斜杠）。
+    /// </summary>
+    private static List<string> SplitIntoSubGroups(string text)
+    {
+        var result = new List<string>();
+        
+        // Split by common separators: / , ; |
+        var potentialGroups = Regex.Split(text, @"[/,;|]");
+        
+        foreach (var group in potentialGroups)
+        {
+            var trimmed = group.Trim();
+            if (!string.IsNullOrWhiteSpace(trimmed) && ContainsIgnoreCase(trimmed, "x", "*"))
+            {
+                result.Add(trimmed);
+            }
+        }
+        
+        // If no valid groups found, return the original text as a single group
+        if (result.Count == 0 && ContainsIgnoreCase(text, "x", "*"))
+        {
+            result.Add(text);
+        }
+        
+        return result;
     }
 
     /// <summary>
