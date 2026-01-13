@@ -452,4 +452,21 @@ public class SizeHelperTests
         Assert.IsFalse(result);
         Assert.AreEqual(0, arr.Length);
     }
+
+    /// <summary>
+    /// 测试使用斜杠分隔的多组尺寸：120x200cm/47x78.7in
+    /// 期望返回 [120, 200, 119.38, 199.898]
+    /// </summary>
+    [TestMethod]
+    public void ExtractSize_SlashSeparatedGroups_ReturnsCorrectArray()
+    {
+        var result = SizeHelper.ExtractSize("120x200cm/47x78.7in", out decimal[] arr);
+        
+        Assert.IsTrue(result);
+        Assert.AreEqual(4, arr.Length);
+        Assert.AreEqual(120m, arr[0]); // 120 cm
+        Assert.AreEqual(200m, arr[1]); // 200 cm
+        Assert.AreEqual(119.38m, arr[2]); // 47 inch = 119.38 cm
+        Assert.AreEqual(199.898m, arr[3]); // 78.7 inch = 199.898 cm
+    }
 }
