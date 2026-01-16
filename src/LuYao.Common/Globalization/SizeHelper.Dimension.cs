@@ -234,16 +234,17 @@ partial class SizeHelper
         // 移除英寸标记
         cleaned = cleaned.Replace("''", "").Replace("\"", "");
         
-        // 提取所有数值和可能的维度标签
-        var pattern = @"(\d+(?:\.\d+)?)\s*([WwHhLl]|Width|Height|Length)?";
+        // 提取所有数值和可能的维度标签（支持前缀和后缀）
+        // 修改模式以支持前缀标签（如 W180）和后缀标签（如 180W）
+        var pattern = @"(?:([WwHhLl]|Width|Height|Length)\s*)?(\d+(?:\.\d+)?)\s*([WwHhLl]|Width|Height|Length)?";
         var matches = System.Text.RegularExpressions.Regex.Matches(cleaned, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         
         foreach (System.Text.RegularExpressions.Match match in matches)
         {
-            if (!match.Groups[1].Success || string.IsNullOrWhiteSpace(match.Groups[1].Value))
+            if (!match.Groups[2].Success || string.IsNullOrWhiteSpace(match.Groups[2].Value))
                 continue;
                 
-            if (!decimal.TryParse(match.Groups[1].Value, out decimal value))
+            if (!decimal.TryParse(match.Groups[2].Value, out decimal value))
                 continue;
                 
             if (value == 0)
@@ -253,11 +254,15 @@ partial class SizeHelper
             bool hasInchMarker = group.Contains("''") || group.Contains("\"");
             decimal convertedValue = ConvertValueToUnit(value, detectedUnitStr, hasInchMarker, targetUnit);
             
-            // 检测维度类型
+            // 检测维度类型：优先使用后缀标签（group 3），然后是前缀标签（group 1）
             DimensionKind kind = DimensionKind.Unspecified;
-            if (match.Groups[2].Success && !string.IsNullOrEmpty(match.Groups[2].Value))
+            if (match.Groups[3].Success && !string.IsNullOrEmpty(match.Groups[3].Value))
             {
-                kind = ParseDimensionKind(match.Groups[2].Value);
+                kind = ParseDimensionKind(match.Groups[3].Value);
+            }
+            else if (match.Groups[1].Success && !string.IsNullOrEmpty(match.Groups[1].Value))
+            {
+                kind = ParseDimensionKind(match.Groups[1].Value);
             }
             
             items.Add(new DimensionItem(kind, convertedValue));

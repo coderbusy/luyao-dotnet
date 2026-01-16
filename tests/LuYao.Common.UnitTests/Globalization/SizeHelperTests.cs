@@ -16,7 +16,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleUnitCm_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10x10x10cm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -31,7 +31,7 @@ public class SizeHelperTests
     public void ExtractSize_MultipleUniformUnitsCm_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10cmx10cmx10cm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -46,7 +46,7 @@ public class SizeHelperTests
     public void ExtractSize_MultipleNonUniformUnits_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10cmx5inx10m", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]); // 10 cm
@@ -62,7 +62,7 @@ public class SizeHelperTests
     public void ExtractSize_MultipleGroupsWithDifferentUnits_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10cmx10cmx10cm(3.94x3.94x3.94in)", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(6, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -80,7 +80,7 @@ public class SizeHelperTests
     public void ExtractSize_IgnoreUnsupportedText_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("尺寸(cm)：10x10x10", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -95,7 +95,7 @@ public class SizeHelperTests
     public void ExtractSize_NoUnitSpecified_DefaultsToCm()
     {
         var result = SizeHelper.ExtractSize("10x10x10", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -110,7 +110,7 @@ public class SizeHelperTests
     public void ExtractSize_DecimalInput_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10.5x20.3x30.7cm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10.5m, arr[0]);
@@ -125,7 +125,7 @@ public class SizeHelperTests
     public void ExtractSize_AsteriskSeparator_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10*20*30cm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -140,7 +140,7 @@ public class SizeHelperTests
     public void ExtractSize_InchUnit_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10x10x10in", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(25.4m, arr[0]); // 10 inch = 25.4 cm
@@ -155,7 +155,7 @@ public class SizeHelperTests
     public void ExtractSize_InchUnitLongForm_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10x10x10inch", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(25.4m, arr[0]); // 10 inch = 25.4 cm
@@ -170,7 +170,7 @@ public class SizeHelperTests
     public void ExtractSize_MillimeterUnit_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("100x100x100mm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]); // 100 mm = 10 cm
@@ -185,7 +185,7 @@ public class SizeHelperTests
     public void ExtractSize_DecimeterUnit_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("1x2x3dm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]); // 1 dm = 10 cm
@@ -200,7 +200,7 @@ public class SizeHelperTests
     public void ExtractSize_MeterUnit_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("1x2x3m", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(100m, arr[0]); // 1 m = 100 cm
@@ -215,7 +215,7 @@ public class SizeHelperTests
     public void ExtractSize_EmptyString_ReturnsFalse()
     {
         var result = SizeHelper.ExtractSize("", out decimal[] arr);
-        
+
         Assert.IsFalse(result);
         Assert.AreEqual(0, arr.Length);
     }
@@ -227,7 +227,7 @@ public class SizeHelperTests
     public void ExtractSize_NullString_ReturnsFalse()
     {
         var result = SizeHelper.ExtractSize(null, out decimal[] arr);
-        
+
         Assert.IsFalse(result);
         Assert.AreEqual(0, arr.Length);
     }
@@ -239,7 +239,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleValueWithCm_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("50cm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(1, arr.Length);
         Assert.AreEqual(50m, arr[0]);
@@ -252,7 +252,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleValueWithInch_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10in", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(1, arr.Length);
         Assert.AreEqual(25.4m, arr[0]); // 10 inch = 25.4 cm
@@ -265,7 +265,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleValueWithMm_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("100mm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(1, arr.Length);
         Assert.AreEqual(10m, arr[0]); // 100 mm = 10 cm
@@ -278,7 +278,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleValueWithoutUnit_ReturnsFalse()
     {
         var result = SizeHelper.ExtractSize("30", out decimal[] arr);
-        
+
         Assert.IsFalse(result);
         Assert.AreEqual(0, arr.Length);
     }
@@ -290,7 +290,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleDecimalValue_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("25.5cm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(1, arr.Length);
         Assert.AreEqual(25.5m, arr[0]);
@@ -303,7 +303,7 @@ public class SizeHelperTests
     public void ExtractSize_OnlyText_ReturnsFalseOrEmpty()
     {
         var result = SizeHelper.ExtractSize("abc x def", out decimal[] arr);
-        
+
         // Either returns false or returns true with empty array
         if (result)
         {
@@ -322,7 +322,7 @@ public class SizeHelperTests
     public void ExtractSize_CaseInsensitive_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10X10X10CM", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -337,7 +337,7 @@ public class SizeHelperTests
     public void ExtractSize_MixedCaseWithSpaces_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10 x 20 X 30 Cm", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -352,7 +352,7 @@ public class SizeHelperTests
     public void ExtractSize_MultipleParenthesesGroups_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10x20cm(5x6in)(7x8mm)", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(6, arr.Length);
         Assert.AreEqual(10m, arr[0]);
@@ -370,7 +370,7 @@ public class SizeHelperTests
     public void ExtractSize_EachValueWithUnit_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10mmx5cmx2in", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(3, arr.Length);
         Assert.AreEqual(1m, arr[0]); // 10 mm = 1 cm
@@ -385,7 +385,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleValueWithMeterUnit_ReturnsCorrectValue()
     {
         var result = SizeHelper.ExtractSize("1m", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(1, arr.Length);
         Assert.AreEqual(100m, arr[0]); // 1 m = 100 cm
@@ -398,7 +398,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleDecimalValueWithInchUnit_ReturnsCorrectValue()
     {
         var result = SizeHelper.ExtractSize("1.1in", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(1, arr.Length);
         Assert.AreEqual(2.794m, arr[0]); // 1.1 inch = 2.794 cm
@@ -411,7 +411,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleDecimalValueWithInchUnitLongForm_ReturnsCorrectValue()
     {
         var result = SizeHelper.ExtractSize("1.1 inch", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(1, arr.Length);
         Assert.AreEqual(2.794m, arr[0]); // 1.1 inch = 2.794 cm
@@ -424,7 +424,7 @@ public class SizeHelperTests
     public void ExtractSize_SingleDecimalValueWithoutUnit_ReturnsFalse()
     {
         var result = SizeHelper.ExtractSize("1.1", out decimal[] arr);
-        
+
         Assert.IsFalse(result);
         Assert.AreEqual(0, arr.Length);
     }
@@ -436,7 +436,7 @@ public class SizeHelperTests
     public void ExtractSize_ValueWithUnitFollowedByOtherCharacters_ReturnsFalse()
     {
         var result = SizeHelper.ExtractSize("5m1", out decimal[] arr);
-        
+
         Assert.IsFalse(result);
         Assert.AreEqual(0, arr.Length);
     }
@@ -448,7 +448,7 @@ public class SizeHelperTests
     public void ExtractSize_ComplexStringWithoutSeparator_ReturnsFalse()
     {
         var result = SizeHelper.ExtractSize("1109020P3060", out decimal[] arr);
-        
+
         Assert.IsFalse(result);
         Assert.AreEqual(0, arr.Length);
     }
@@ -461,7 +461,7 @@ public class SizeHelperTests
     public void ExtractSize_SlashSeparatedGroups_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("120x200cm/47x78.7in", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(4, arr.Length);
         Assert.AreEqual(120m, arr[0]); // 120 cm
@@ -477,7 +477,7 @@ public class SizeHelperTests
     public void ExtractSize_CommaSeparatedGroups_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("10x20cm,5x10in", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(4, arr.Length);
         Assert.AreEqual(10m, arr[0]); // 10 cm
@@ -493,7 +493,7 @@ public class SizeHelperTests
     public void ExtractSize_MixedSlashAndParentheses_ReturnsCorrectArray()
     {
         var result = SizeHelper.ExtractSize("100x150cm/40x60in(10x15mm)", out decimal[] arr);
-        
+
         Assert.IsTrue(result);
         Assert.AreEqual(6, arr.Length);
         Assert.AreEqual(100m, arr[0]); // 100 cm
@@ -513,7 +513,7 @@ public class SizeHelperTests
     public void Extract_UnmarkedInput_ReturnsUnspecifiedKind()
     {
         var result = SizeHelper.Extract("1x2x3");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
@@ -533,15 +533,15 @@ public class SizeHelperTests
     public void Extract_InchWithDimensionLabels_ParsesCorrectly()
     {
         var result = SizeHelper.Extract("10''W X 36''H");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Inch, dimension.Unit);
         Assert.AreEqual(2, dimension.Items.Count);
-        
+
         Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
         Assert.AreEqual(10m, dimension.Items[0].Value);
-        
+
         Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
         Assert.AreEqual(36m, dimension.Items[1].Value);
     }
@@ -553,9 +553,9 @@ public class SizeHelperTests
     public void Extract_TwoGroups_ReturnsTwoDimensions()
     {
         var result = SizeHelper.Extract("10cmx10cmx10cm(3.94x3.94x3.94in)");
-        
+
         Assert.AreEqual(2, result.Count);
-        
+
         // 第一组：厘米
         var dim1 = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dim1.Unit);
@@ -563,7 +563,7 @@ public class SizeHelperTests
         Assert.AreEqual(10m, dim1.Items[0].Value);
         Assert.AreEqual(10m, dim1.Items[1].Value);
         Assert.AreEqual(10m, dim1.Items[2].Value);
-        
+
         // 第二组：英寸
         var dim2 = result[1];
         Assert.AreEqual(DimensionUnit.Inch, dim2.Unit);
@@ -580,7 +580,7 @@ public class SizeHelperTests
     public void Extract_CentimeterInput_PreservesUnit()
     {
         var result = SizeHelper.Extract("10x20x30cm");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
@@ -597,7 +597,7 @@ public class SizeHelperTests
     public void Extract_InchInput_PreservesUnit()
     {
         var result = SizeHelper.Extract("10x20x30in");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Inch, dimension.Unit);
@@ -614,7 +614,7 @@ public class SizeHelperTests
     public void Extract_MillimeterInput_ConvertsToCentimeter()
     {
         var result = SizeHelper.Extract("100x200x300mm");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
@@ -631,7 +631,7 @@ public class SizeHelperTests
     public void Extract_MeterInput_ConvertsToCentimeter()
     {
         var result = SizeHelper.Extract("1x2x3m");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
@@ -648,7 +648,7 @@ public class SizeHelperTests
     public void Extract_DoubleQuoteInch_ParsesCorrectly()
     {
         var result = SizeHelper.Extract("10\"x20\"x30\"");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Inch, dimension.Unit);
@@ -665,7 +665,7 @@ public class SizeHelperTests
     public void Extract_EmptyString_ReturnsEmptyList()
     {
         var result = SizeHelper.Extract("");
-        
+
         Assert.IsNotNull(result);
         Assert.AreEqual(0, result.Count);
     }
@@ -677,7 +677,7 @@ public class SizeHelperTests
     public void Extract_NullString_ReturnsEmptyList()
     {
         var result = SizeHelper.Extract(null);
-        
+
         Assert.IsNotNull(result);
         Assert.AreEqual(0, result.Count);
     }
@@ -689,18 +689,18 @@ public class SizeHelperTests
     public void Extract_DimensionLabels_ParsesCorrectly()
     {
         var result = SizeHelper.Extract("10cmW x 20cmH x 30cmL");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
         Assert.AreEqual(3, dimension.Items.Count);
-        
+
         Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
         Assert.AreEqual(10m, dimension.Items[0].Value);
-        
+
         Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
         Assert.AreEqual(20m, dimension.Items[1].Value);
-        
+
         Assert.AreEqual(DimensionKind.Length, dimension.Items[2].Kind);
         Assert.AreEqual(30m, dimension.Items[2].Value);
     }
@@ -712,12 +712,12 @@ public class SizeHelperTests
     public void Extract_FullDimensionLabels_ParsesCorrectly()
     {
         var result = SizeHelper.Extract("10Width x 20Height x 30Length cm");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
         Assert.AreEqual(3, dimension.Items.Count);
-        
+
         Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
         Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
         Assert.AreEqual(DimensionKind.Length, dimension.Items[2].Kind);
@@ -730,12 +730,12 @@ public class SizeHelperTests
     public void Extract_MixedUnitsWithLabels_ParsesCorrectly()
     {
         var result = SizeHelper.Extract("10cmW x 20''H");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         // 当有多种单位时，优先检测到的单位作为主单位
         Assert.AreEqual(2, dimension.Items.Count);
-        
+
         Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
         Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
     }
@@ -747,7 +747,7 @@ public class SizeHelperTests
     public void Extract_DecimalValues_ParsesCorrectly()
     {
         var result = SizeHelper.Extract("10.5x20.3x30.7cm");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
@@ -764,7 +764,7 @@ public class SizeHelperTests
     public void Extract_DecimeterInput_ConvertsToCentimeter()
     {
         var result = SizeHelper.Extract("1x2x3dm");
-        
+
         Assert.AreEqual(1, result.Count);
         var dimension = result[0];
         Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
@@ -781,21 +781,70 @@ public class SizeHelperTests
     public void Extract_MultipleParenthesesGroups_ParsesCorrectly()
     {
         var result = SizeHelper.Extract("10x20cm(5x6in)(7x8mm)");
-        
+
         Assert.AreEqual(3, result.Count);
-        
+
         // 第一组：厘米
         Assert.AreEqual(DimensionUnit.Centimeter, result[0].Unit);
         Assert.AreEqual(2, result[0].Items.Count);
-        
+
         // 第二组：英寸
         Assert.AreEqual(DimensionUnit.Inch, result[1].Unit);
         Assert.AreEqual(2, result[1].Items.Count);
-        
+
         // 第三组：毫米转厘米
         Assert.AreEqual(DimensionUnit.Centimeter, result[2].Unit);
         Assert.AreEqual(2, result[2].Items.Count);
     }
 
+
+    /// <summary>
+    /// 测试带维度标签和斜杠分隔的多组尺寸：W180xH100cm/71x39in
+    /// 期望返回两个Dimension对象，第一组为厘米单位，第二组为英寸单位
+    /// </summary>
+    [TestMethod]
+    public void Extract_WidthHeightLabelsWithSlashSeparator_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("W180xH100cm/71x39in");
+
+        Assert.HasCount(2, result);
+
+        // 第一组：厘米，带W和H标签
+        var dim1 = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dim1.Unit);
+        Assert.HasCount(2, dim1.Items);
+        Assert.AreEqual(DimensionKind.Width, dim1.Items[0].Kind);
+        Assert.AreEqual(180m, dim1.Items[0].Value);
+        Assert.AreEqual(DimensionKind.Height, dim1.Items[1].Kind);
+        Assert.AreEqual(100m, dim1.Items[1].Value);
+
+        // 第二组：英寸
+        var dim2 = result[1];
+        Assert.AreEqual(DimensionUnit.Inch, dim2.Unit);
+        Assert.HasCount(2, dim2.Items);
+        Assert.AreEqual(71m, dim2.Items[0].Value);
+        Assert.AreEqual(39m, dim2.Items[1].Value);
+    }
+
+    /// <summary>
+    /// 测试双引号标记的英寸带维度标签（后置）：10''W X 36''H
+    /// 期望正确解析出宽度和高度，单位为英寸
+    /// </summary>
+    [TestMethod]
+    public void Extract_DoubleQuoteInchWithPostfixDimensionLabels_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("10''W X 36''H");
+
+        Assert.HasCount(1, result);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Inch, dimension.Unit);
+        Assert.HasCount(2, dimension.Items);
+
+        Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
+        Assert.AreEqual(10m, dimension.Items[0].Value);
+
+        Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
+        Assert.AreEqual(36m, dimension.Items[1].Value);
+    }
     #endregion
 }
