@@ -1,4 +1,4 @@
-ï»¿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 
 namespace LuYao.IO.Hashing;
@@ -13,7 +13,7 @@ public class HashAgentTests
     {
         // Arrange
         string input = "hello";
-        // é¢„æœŸå€¼å¯é€šè¿‡åœ¨çº¿å·¥å…·æˆ– .NET è®¡ç®—å¾—å‡º
+        // Ô¤ÆÚÖµ¿ÉÍ¨¹ıÔÚÏß¹¤¾ß»ò .NET ¼ÆËãµÃ³ö
         string expected = "5d41402abc4b2a76b9719d911017c592";
 
         // Act
@@ -92,6 +92,6 @@ public class HashAgentTests
     public void HashFile_FileNotExist_ThrowsFileNotFoundException()
     {
         // Act & Assert
-        Assert.ThrowsException<FileNotFoundException>(() => _md5Agent.HashFile("not_exist_file.txt"));
+        Assert.Throws<FileNotFoundException>(() => _md5Agent.HashFile("not_exist_file.txt"));
     }
 }

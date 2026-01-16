@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao;
 
@@ -8,7 +8,7 @@ public class DisposeActionTests
     [TestMethod]
     public void Constructor_WhenActionIsNull_ShouldThrowArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => new DisposeAction(null!));
+        Assert.Throws<ArgumentNullException>(() => new DisposeAction(null!));
     }
 
     [TestMethod]

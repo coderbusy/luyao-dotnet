@@ -11,7 +11,7 @@ namespace LuYao.Threading
         [TestMethod]
         public async Task LockAsync_WithNullKey_ThrowsArgumentNullException()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(
+            await Assert.ThrowsAsync<ArgumentNullException>(
                 async () => await AsyncLock.LockAsync(null));
         }
 

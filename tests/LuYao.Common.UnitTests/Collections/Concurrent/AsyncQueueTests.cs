@@ -1,4 +1,4 @@
-﻿namespace LuYao.Collections.Concurrent;
+namespace LuYao.Collections.Concurrent;
 
 [TestClass]
 public class AsyncQueueTests
@@ -53,7 +53,7 @@ public class AsyncQueueTests
         cts.Cancel();
 
         // Act & Assert
-        await Assert.ThrowsExceptionAsync<TaskCanceledException>(async () =>
+        await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
             await queue.DequeueAsync(cts.Token);
         });

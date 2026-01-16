@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace LuYao.Data;
 public class RecordLoaderTests
 {
     /// <summary>
-    /// æµ‹è¯•ç”¨çš„å®ä½“ç±»
+    /// ²âÊÔÓÃµÄÊµÌåÀà
     /// </summary>
     public class TestEntity
     {
@@ -29,7 +29,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯•ç”¨çš„ç®€å•å®ä½“ç±»
+    /// ²âÊÔÓÃµÄ¼òµ¥ÊµÌåÀà
     /// </summary>
     public class SimpleEntity
     {
@@ -38,13 +38,13 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// åˆ›å»ºæµ‹è¯•ç”¨çš„ Record å’Œæ•°æ®
+    /// ´´½¨²âÊÔÓÃµÄ Record ºÍÊı¾İ
     /// </summary>
     private (Record record, RecordRow row) CreateTestRecord()
     {
         var record = new Record("TestTable", 1);
 
-        // æ·»åŠ åˆ—
+        // Ìí¼ÓÁĞ
         var idColumn = record.Columns.Add<Int32>("Id");
         var nameColumn = record.Columns.Add<String>("Name");
         var createTimeColumn = record.Columns.Add<DateTime>("CreateTime");
@@ -54,16 +54,16 @@ public class RecordLoaderTests
         var nullableIntColumn = record.Columns.Add<Int32>("NullableInt");
         var nullableDateTimeColumn = record.Columns.Add<DateTime>("NullableDateTime");
 
-        // æ·»åŠ ä¸€è¡Œæ•°æ®
+        // Ìí¼ÓÒ»ĞĞÊı¾İ
         var row = record.AddRow();
 
-        // è®¾ç½®æ•°æ®
+        // ÉèÖÃÊı¾İ
         idColumn.Set(123);
-        nameColumn.Set("æµ‹è¯•åç§°");
+        nameColumn.Set("²âÊÔÃû³Æ");
         createTimeColumn.Set(new DateTime(2023, 7, 28, 10, 30, 0));
         isActiveColumn.Set(true);
         scoreColumn.Set(95.5);
-        customColumn.Set("è‡ªå®šä¹‰å€¼");
+        customColumn.Set("×Ô¶¨ÒåÖµ");
         nullableIntColumn.Set(456);
         nullableDateTimeColumn.Set(new DateTime(2023, 8, 1));
 
@@ -71,7 +71,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯• Populate æ–¹æ³• - åŸºæœ¬æ•°æ®ç±»å‹å¡«å……
+    /// ²âÊÔ Populate ·½·¨ - »ù±¾Êı¾İÀàĞÍÌî³ä
     /// </summary>
     [TestMethod]
     public void Populate_BasicDataTypes_ShouldFillEntityCorrectly()
@@ -85,17 +85,17 @@ public class RecordLoaderTests
 
         // Assert
         Assert.AreEqual(123, entity.Id);
-        Assert.AreEqual("æµ‹è¯•åç§°", entity.Name);
+        Assert.AreEqual("²âÊÔÃû³Æ", entity.Name);
         Assert.AreEqual(new DateTime(2023, 7, 28, 10, 30, 0), entity.CreateTime);
         Assert.AreEqual(true, entity.IsActive);
-        Assert.AreEqual(95.5, entity.Score, 0.001); // æµ®ç‚¹æ•°æ¯”è¾ƒ
-        Assert.AreEqual("è‡ªå®šä¹‰å€¼", entity.CustomField);
+        Assert.AreEqual(95.5, entity.Score, 0.001); // ¸¡µãÊı±È½Ï
+        Assert.AreEqual("×Ô¶¨ÒåÖµ", entity.CustomField);
         Assert.AreEqual(456, entity.NullableInt);
         Assert.AreEqual(new DateTime(2023, 8, 1), entity.NullableDateTime);
     }
 
     /// <summary>
-    /// æµ‹è¯• Populate æ–¹æ³• - åˆ—ä¸å­˜åœ¨çš„æƒ…å†µ
+    /// ²âÊÔ Populate ·½·¨ - ÁĞ²»´æÔÚµÄÇé¿ö
     /// </summary>
     [TestMethod]
     public void Populate_MissingColumns_ShouldNotThrowException()
@@ -108,7 +108,7 @@ public class RecordLoaderTests
 
         var entity = new TestEntity
         {
-            Name = "åŸå§‹åç§°",
+            Name = "Ô­Ê¼Ãû³Æ",
             Score = 50.0
         };
 
@@ -116,13 +116,13 @@ public class RecordLoaderTests
         RecordLoader<TestEntity>.Populate(row, entity);
 
         // Assert
-        Assert.AreEqual(100, entity.Id); // Id åˆ—å­˜åœ¨ï¼Œåº”è¯¥è¢«å¡«å……
-        Assert.AreEqual("åŸå§‹åç§°", entity.Name); // Name åˆ—ä¸å­˜åœ¨ï¼Œä¿æŒåŸå€¼
-        Assert.AreEqual(50.0, entity.Score); // Score åˆ—ä¸å­˜åœ¨ï¼Œä¿æŒåŸå€¼
+        Assert.AreEqual(100, entity.Id); // Id ÁĞ´æÔÚ£¬Ó¦¸Ã±»Ìî³ä
+        Assert.AreEqual("Ô­Ê¼Ãû³Æ", entity.Name); // Name ÁĞ²»´æÔÚ£¬±£³ÖÔ­Öµ
+        Assert.AreEqual(50.0, entity.Score); // Score ÁĞ²»´æÔÚ£¬±£³ÖÔ­Öµ
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteData æ–¹æ³• - åŸºæœ¬æ•°æ®å†™å…¥
+    /// ²âÊÔ WriteData ·½·¨ - »ù±¾Êı¾İĞ´Èë
     /// </summary>
     [TestMethod]
     public void WriteData_BasicDataTypes_ShouldWriteToRecordCorrectly()
@@ -130,7 +130,7 @@ public class RecordLoaderTests
         // Arrange
         var record = new Record("TestTable", 1);
 
-        // æ·»åŠ åˆ—
+        // Ìí¼ÓÁĞ
         var idColumn = record.Columns.Add<Int32>("Id");
         var nameColumn = record.Columns.Add<String>("Name");
         var createTimeColumn = record.Columns.Add<DateTime>("CreateTime");
@@ -144,11 +144,11 @@ public class RecordLoaderTests
         var entity = new TestEntity
         {
             Id = 789,
-            Name = "å†™å…¥æµ‹è¯•",
+            Name = "Ğ´Èë²âÊÔ",
             CreateTime = new DateTime(2023, 9, 15, 14, 20, 30),
             IsActive = false,
             Score = 88.8,
-            CustomField = "å†™å…¥è‡ªå®šä¹‰",
+            CustomField = "Ğ´Èë×Ô¶¨Òå",
             NullableInt = 999
         };
 
@@ -157,16 +157,16 @@ public class RecordLoaderTests
 
         // Assert
         Assert.AreEqual(789, row.Get<Int32>(idColumn));
-        Assert.AreEqual("å†™å…¥æµ‹è¯•", row.Get<String>(nameColumn));
+        Assert.AreEqual("Ğ´Èë²âÊÔ", row.Get<String>(nameColumn));
         Assert.AreEqual(new DateTime(2023, 9, 15, 14, 20, 30), row.Get<DateTime>(createTimeColumn));
         Assert.AreEqual(false, row.Get<Boolean>(isActiveColumn));
         Assert.AreEqual(88.8, row.Get<Double>(scoreColumn), 0.001);
-        Assert.AreEqual("å†™å…¥è‡ªå®šä¹‰", row.Get<String>(customColumn));
+        Assert.AreEqual("Ğ´Èë×Ô¶¨Òå", row.Get<String>(customColumn));
         Assert.AreEqual(999, row.Get<Int32>(nullableIntColumn));
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteData æ–¹æ³• - åˆ—ä¸å­˜åœ¨çš„æƒ…å†µ
+    /// ²âÊÔ WriteData ·½·¨ - ÁĞ²»´æÔÚµÄÇé¿ö
     /// </summary>
     [TestMethod]
     public void WriteData_MissingColumns_ShouldNotThrowException()
@@ -179,28 +179,28 @@ public class RecordLoaderTests
         var entity = new TestEntity
         {
             Id = 555,
-            Name = "éƒ¨åˆ†å†™å…¥",
+            Name = "²¿·ÖĞ´Èë",
             Score = 77.7
         };
 
-        // Act & Assert - ä¸åº”è¯¥æŠ›å‡ºå¼‚å¸¸
+        // Act & Assert - ²»Ó¦¸ÃÅ×³öÒì³£
         RecordLoader<TestEntity>.WriteToRow(entity, row);
 
-        // éªŒè¯å­˜åœ¨çš„åˆ—è¢«æ­£ç¡®å†™å…¥
+        // ÑéÖ¤´æÔÚµÄÁĞ±»ÕıÈ·Ğ´Èë
         Assert.AreEqual(555, row.Get<Int32>(idColumn));
     }
 
     /// <summary>
-    /// æµ‹è¯• RecordColumnNameAttribute ç‰¹æ€§
+    /// ²âÊÔ RecordColumnNameAttribute ÌØĞÔ
     /// </summary>
     [TestMethod]
     public void Populate_WithRecordColumnNameAttribute_ShouldUseAttributeName()
     {
         // Arrange
         var record = new Record("TestTable", 1);
-        var customColumn = record.Columns.Add<String>("custom_column"); // ä½¿ç”¨ç‰¹æ€§æŒ‡å®šçš„åç§°
+        var customColumn = record.Columns.Add<String>("custom_column"); // Ê¹ÓÃÌØĞÔÖ¸¶¨µÄÃû³Æ
         var row = record.AddRow();
-        customColumn.Set("ç‰¹æ€§æµ‹è¯•å€¼");
+        customColumn.Set("ÌØĞÔ²âÊÔÖµ");
 
         var entity = new TestEntity();
 
@@ -208,11 +208,11 @@ public class RecordLoaderTests
         RecordLoader<TestEntity>.Populate(row, entity);
 
         // Assert
-        Assert.AreEqual("ç‰¹æ€§æµ‹è¯•å€¼", entity.CustomField);
+        Assert.AreEqual("ÌØĞÔ²âÊÔÖµ", entity.CustomField);
     }
 
     /// <summary>
-    /// æµ‹è¯•å¯ç©ºç±»å‹çš„å¤„ç†
+    /// ²âÊÔ¿É¿ÕÀàĞÍµÄ´¦Àí
     /// </summary>
     [TestMethod]
     public void Populate_NullableTypes_ShouldHandleNullValues()
@@ -223,26 +223,26 @@ public class RecordLoaderTests
         var nullableDateTimeColumn = record.Columns.Add<DateTime>("NullableDateTime");
         var row = record.AddRow();
 
-        // è®¾ç½®ä¸º null å€¼ï¼ˆé€šè¿‡ä¸è®¾ç½®ä»»ä½•å€¼æ¥æ¨¡æ‹Ÿ nullï¼‰
+        // ÉèÖÃÎª null Öµ£¨Í¨¹ı²»ÉèÖÃÈÎºÎÖµÀ´Ä£Äâ null£©
 
         var entity = new TestEntity
         {
-            NullableInt = 100, // è®¾ç½®åˆå§‹å€¼
-            NullableDateTime = DateTime.Now // è®¾ç½®åˆå§‹å€¼
+            NullableInt = 100, // ÉèÖÃ³õÊ¼Öµ
+            NullableDateTime = DateTime.Now // ÉèÖÃ³õÊ¼Öµ
         };
 
         // Act
         RecordLoader<TestEntity>.Populate(row, entity);
 
         // Assert
-        // æ³¨æ„ï¼šç”±äº Record ç³»ç»Ÿçš„å®ç°å¯èƒ½ä¸ç›´æ¥æ”¯æŒ null å€¼ï¼Œ
-        // è¿™é‡Œä¸»è¦æµ‹è¯•ä¸ä¼šæŠ›å‡ºå¼‚å¸¸
-        // å…·ä½“çš„ null å¤„ç†é€»è¾‘å–å†³äºåº•å±‚ ColumnData çš„å®ç°
-        Assert.IsNotNull(entity); // åŸºæœ¬çš„éç©ºéªŒè¯
+        // ×¢Òâ£ºÓÉÓÚ Record ÏµÍ³µÄÊµÏÖ¿ÉÄÜ²»Ö±½ÓÖ§³Ö null Öµ£¬
+        // ÕâÀïÖ÷Òª²âÊÔ²»»áÅ×³öÒì³£
+        // ¾ßÌåµÄ null ´¦ÀíÂß¼­È¡¾öÓÚµ×²ã ColumnData µÄÊµÏÖ
+        Assert.IsNotNull(entity); // »ù±¾µÄ·Ç¿ÕÑéÖ¤
     }
 
     /// <summary>
-    /// æµ‹è¯•å¾€è¿”è½¬æ¢ï¼ˆRound-tripï¼‰
+    /// ²âÊÔÍù·µ×ª»»£¨Round-trip£©
     /// </summary>
     [TestMethod]
     public void PopulateAndWriteData_RoundTrip_ShouldMaintainDataIntegrity()
@@ -251,25 +251,25 @@ public class RecordLoaderTests
         var originalEntity = new TestEntity
         {
             Id = 999,
-            Name = "å¾€è¿”æµ‹è¯•",
+            Name = "Íù·µ²âÊÔ",
             CreateTime = new DateTime(2023, 12, 25, 18, 30, 45),
             IsActive = true,
             Score = 92.3,
-            CustomField = "å¾€è¿”è‡ªå®šä¹‰",
+            CustomField = "Íù·µ×Ô¶¨Òå",
             NullableInt = 777
         };
 
         var record = new Record("TestTable", 1);
 
-        // ä½¿ç”¨ WriteHeader æ–¹æ³•æ·»åŠ åˆ—
+        // Ê¹ÓÃ WriteHeader ·½·¨Ìí¼ÓÁĞ
         RecordLoader<TestEntity>.WriteHeader(record);
 
         var row = record.AddRow();
 
-        // Act - å†™å…¥ Record
+        // Act - Ğ´Èë Record
         RecordLoader<TestEntity>.WriteToRow(originalEntity, row);
 
-        // Act - ä» Record è¯»å–åˆ°æ–°å®ä½“
+        // Act - ´Ó Record ¶ÁÈ¡µ½ĞÂÊµÌå
         var newEntity = new TestEntity();
         RecordLoader<TestEntity>.Populate(row, newEntity);
 
@@ -284,7 +284,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯•ç®€å•å®ä½“ç±»
+    /// ²âÊÔ¼òµ¥ÊµÌåÀà
     /// </summary>
     [TestMethod]
     public void SimpleEntity_PopulateAndWrite_ShouldWorkCorrectly()
@@ -296,7 +296,7 @@ public class RecordLoaderTests
         var row = record.AddRow();
 
         valueColumn.Set(42);
-        textColumn.Set("ç®€å•æµ‹è¯•");
+        textColumn.Set("¼òµ¥²âÊÔ");
 
         var entity = new SimpleEntity();
 
@@ -305,35 +305,35 @@ public class RecordLoaderTests
 
         // Assert
         Assert.AreEqual(42, entity.Value);
-        Assert.AreEqual("ç®€å•æµ‹è¯•", entity.Text);
+        Assert.AreEqual("¼òµ¥²âÊÔ", entity.Text);
     }
 
     /// <summary>
-    /// æµ‹è¯•é™æ€æ„é€ å‡½æ•°åªæ‰§è¡Œä¸€æ¬¡
+    /// ²âÊÔ¾²Ì¬¹¹Ôìº¯ÊıÖ»Ö´ĞĞÒ»´Î
     /// </summary>
     [TestMethod]
     public void StaticConstructor_ShouldExecuteOnlyOnce()
     {
         // Arrange & Act
         var record = new Record("TestTable", 1);
-        var idColumn = record.Columns.Add<Int32>("Value"); // ä¿®æ­£åˆ—å
+        var idColumn = record.Columns.Add<Int32>("Value"); // ĞŞÕıÁĞÃû
         var row = record.AddRow();
         idColumn.Set(1);
 
         var entity1 = new SimpleEntity();
         var entity2 = new SimpleEntity();
 
-        // Act - å¤šæ¬¡è°ƒç”¨åº”è¯¥ä½¿ç”¨åŒä¸€ä¸ªç¼–è¯‘åçš„å§”æ‰˜
+        // Act - ¶à´Îµ÷ÓÃÓ¦¸ÃÊ¹ÓÃÍ¬Ò»¸ö±àÒëºóµÄÎ¯ÍĞ
         RecordLoader<SimpleEntity>.Populate(row, entity1);
         RecordLoader<SimpleEntity>.Populate(row, entity2);
 
-        // Assert - éªŒè¯ä¸¤æ¬¡è°ƒç”¨éƒ½æˆåŠŸï¼ˆé—´æ¥éªŒè¯é™æ€æ„é€ å‡½æ•°æ­£ç¡®æ‰§è¡Œï¼‰
+        // Assert - ÑéÖ¤Á½´Îµ÷ÓÃ¶¼³É¹¦£¨¼ä½ÓÑéÖ¤¾²Ì¬¹¹Ôìº¯ÊıÕıÈ·Ö´ĞĞ£©
         Assert.AreEqual(1, entity1.Value);
         Assert.AreEqual(1, entity2.Value);
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³•
+    /// ²âÊÔ WriteHeader ·½·¨
     /// </summary>
     [TestMethod]
     public void WriteHeader_ShouldCreateCorrectColumns()
@@ -350,13 +350,13 @@ public class RecordLoaderTests
         Assert.IsTrue(record.Columns.Contains("CreateTime"));
         Assert.IsTrue(record.Columns.Contains("IsActive"));
         Assert.IsTrue(record.Columns.Contains("Score"));
-        Assert.IsTrue(record.Columns.Contains("custom_column")); // ä½¿ç”¨ç‰¹æ€§æŒ‡å®šçš„åç§°
+        Assert.IsTrue(record.Columns.Contains("custom_column")); // Ê¹ÓÃÌØĞÔÖ¸¶¨µÄÃû³Æ
         Assert.IsTrue(record.Columns.Contains("NullableInt"));
         Assert.IsTrue(record.Columns.Contains("NullableDateTime"));
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³• - éªŒè¯åˆ—çš„æ•°æ®ç±»å‹
+    /// ²âÊÔ WriteHeader ·½·¨ - ÑéÖ¤ÁĞµÄÊı¾İÀàĞÍ
     /// </summary>
     [TestMethod]
     public void WriteHeader_ShouldCreateColumnsWithCorrectTypes()
@@ -402,7 +402,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³• - éªŒè¯åˆ—çš„æ•°é‡
+    /// ²âÊÔ WriteHeader ·½·¨ - ÑéÖ¤ÁĞµÄÊıÁ¿
     /// </summary>
     [TestMethod]
     public void WriteHeader_ShouldCreateCorrectNumberOfColumns()
@@ -414,12 +414,12 @@ public class RecordLoaderTests
         RecordLoader<TestEntity>.WriteHeader(record);
 
         // Assert
-        // TestEntity æœ‰ 8 ä¸ªå¯è¯»å†™å±æ€§
+        // TestEntity ÓĞ 8 ¸ö¿É¶ÁĞ´ÊôĞÔ
         Assert.AreEqual(8, record.Columns.Count);
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³• - ç®€å•å®ä½“ç±»
+    /// ²âÊÔ WriteHeader ·½·¨ - ¼òµ¥ÊµÌåÀà
     /// </summary>
     [TestMethod]
     public void WriteHeader_SimpleEntity_ShouldCreateCorrectColumns()
@@ -445,7 +445,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³• - ç©º Record
+    /// ²âÊÔ WriteHeader ·½·¨ - ¿Õ Record
     /// </summary>
     [TestMethod]
     public void WriteHeader_EmptyRecord_ShouldPopulateColumns()
@@ -463,7 +463,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³• - å¤šæ¬¡è°ƒç”¨ä¸ä¼šé‡å¤æ·»åŠ åˆ—
+    /// ²âÊÔ WriteHeader ·½·¨ - ¶à´Îµ÷ÓÃ²»»áÖØ¸´Ìí¼ÓÁĞ
     /// </summary>
     [TestMethod]
     public void WriteHeader_CalledTwice_ShouldThrowException()
@@ -473,15 +473,15 @@ public class RecordLoaderTests
         RecordLoader<TestEntity>.WriteHeader(record);
 
         // Act & Assert
-        // ç¬¬äºŒæ¬¡è°ƒç”¨åº”è¯¥æŠ›å‡ºå¼‚å¸¸ï¼Œå› ä¸ºåˆ—å·²ç»å­˜åœ¨
-        Assert.ThrowsException<DuplicateNameException>(() =>
+        // µÚ¶ş´Îµ÷ÓÃÓ¦¸ÃÅ×³öÒì³££¬ÒòÎªÁĞÒÑ¾­´æÔÚ
+        Assert.Throws<DuplicateNameException>(() =>
         {
             RecordLoader<TestEntity>.WriteHeader(record);
         });
     }
 
     /// <summary>
-    /// æµ‹è¯•ç”¨çš„åªè¯»å±æ€§å®ä½“ç±»
+    /// ²âÊÔÓÃµÄÖ»¶ÁÊôĞÔÊµÌåÀà
     /// </summary>
     public class ReadOnlyEntity
     {
@@ -491,7 +491,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³• - åªåŒ…å«å¯è¯»å†™å±æ€§
+    /// ²âÊÔ WriteHeader ·½·¨ - Ö»°üº¬¿É¶ÁĞ´ÊôĞÔ
     /// </summary>
     [TestMethod]
     public void WriteHeader_ReadOnlyEntity_ShouldOnlyIncludeReadWriteProperties()
@@ -503,15 +503,15 @@ public class RecordLoaderTests
         RecordLoader<ReadOnlyEntity>.WriteHeader(record);
 
         // Assert
-        // åªæœ‰ Name å±æ€§æ˜¯å¯è¯»å†™çš„
+        // Ö»ÓĞ Name ÊôĞÔÊÇ¿É¶ÁĞ´µÄ
         Assert.AreEqual(1, record.Columns.Count);
         Assert.IsTrue(record.Columns.Contains("Name"));
-        Assert.IsFalse(record.Columns.Contains("Id")); // åªè¯»å±æ€§
-        Assert.IsFalse(record.Columns.Contains("WriteOnlyProperty")); // åªå†™å±æ€§
+        Assert.IsFalse(record.Columns.Contains("Id")); // Ö»¶ÁÊôĞÔ
+        Assert.IsFalse(record.Columns.Contains("WriteOnlyProperty")); // Ö»Ğ´ÊôĞÔ
     }
 
     /// <summary>
-    /// æµ‹è¯•ç”¨çš„å¤æ‚ç±»å‹å®ä½“ç±»
+    /// ²âÊÔÓÃµÄ¸´ÔÓÀàĞÍÊµÌåÀà
     /// </summary>
     public class ComplexTypeEntity
     {
@@ -522,7 +522,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³• - å¤æ‚æ•°æ®ç±»å‹
+    /// ²âÊÔ WriteHeader ·½·¨ - ¸´ÔÓÊı¾İÀàĞÍ
     /// </summary>
     [TestMethod]
     public void WriteHeader_ComplexTypeEntity_ShouldHandleComplexTypes()
@@ -558,7 +558,7 @@ public class RecordLoaderTests
     }
 
     /// <summary>
-    /// æµ‹è¯• WriteHeader æ–¹æ³•ä¸ WriteData æ–¹æ³•çš„å…¼å®¹æ€§
+    /// ²âÊÔ WriteHeader ·½·¨Óë WriteData ·½·¨µÄ¼æÈİĞÔ
     /// </summary>
     [TestMethod]
     public void WriteHeader_WithWriteData_ShouldBeCompatible()
@@ -568,11 +568,11 @@ public class RecordLoaderTests
         var entity = new TestEntity
         {
             Id = 123,
-            Name = "å…¼å®¹æ€§æµ‹è¯•",
+            Name = "¼æÈİĞÔ²âÊÔ",
             CreateTime = DateTime.Now,
             IsActive = true,
             Score = 95.5,
-            CustomField = "è‡ªå®šä¹‰å€¼",
+            CustomField = "×Ô¶¨ÒåÖµ",
             NullableInt = 456
         };
 
@@ -582,7 +582,7 @@ public class RecordLoaderTests
         RecordLoader<TestEntity>.WriteToRow(entity, row);
 
         // Assert
-        // éªŒè¯æ‰€æœ‰åˆ—éƒ½èƒ½æ­£ç¡®å†™å…¥æ•°æ®
+        // ÑéÖ¤ËùÓĞÁĞ¶¼ÄÜÕıÈ·Ğ´ÈëÊı¾İ
         Assert.AreEqual(entity.Id, row.Get<Int32>("Id"));
         Assert.AreEqual(entity.Name, row.Get<String>(("Name")!));
         Assert.AreEqual(entity.CreateTime, row.Get<DateTime>(("CreateTime")!));

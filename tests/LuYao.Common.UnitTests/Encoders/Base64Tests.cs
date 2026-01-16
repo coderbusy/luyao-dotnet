@@ -73,11 +73,10 @@ namespace LuYao.Encoders
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
         public void FromBase64_InvalidString_ThrowsFormatException()
         {
-            // Act
-            Base64.FromBase64("!@#$");
+            // Act & Assert
+            Assert.Throws<FormatException>(() => Base64.FromBase64("!@#$"));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Globalization;
 using System.IO;
@@ -57,7 +57,7 @@ public class JsonWriterTests
     public void Constructor_WithNullTextWriter_ShouldThrowArgumentNullException()
     {
         // Arrange & Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => new JsonWriter((TextWriter)null));
+        Assert.Throws<ArgumentNullException>(() => new JsonWriter((TextWriter)null));
     }
 
     [TestMethod]
@@ -125,7 +125,7 @@ public class JsonWriterTests
     public void WriteEndObject_WithoutStartObject_ShouldThrowInvalidOperationException()
     {
         // Act & Assert
-        Assert.ThrowsException<InvalidOperationException>(() => _writer.WriteEndObject());
+        Assert.Throws<InvalidOperationException>(() => _writer.WriteEndObject());
     }
 
     #endregion
@@ -181,7 +181,7 @@ public class JsonWriterTests
     public void WriteEndArray_WithoutStartArray_ShouldThrowInvalidOperationException()
     {
         // Act & Assert
-        Assert.ThrowsException<InvalidOperationException>(() => _writer.WriteEndArray());
+        Assert.Throws<InvalidOperationException>(() => _writer.WriteEndArray());
     }
 
     #endregion
@@ -221,7 +221,7 @@ public class JsonWriterTests
     public void WritePropertyName_NullName_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => _writer.WritePropertyName(null));
+        Assert.Throws<ArgumentNullException>(() => _writer.WritePropertyName(null));
     }
 
     #endregion
@@ -421,7 +421,7 @@ public class JsonWriterTests
     public void WriteRaw_NullValue_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => _writer.WriteRaw(null));
+        Assert.Throws<ArgumentNullException>(() => _writer.WriteRaw(null));
     }
 
     #endregion
@@ -600,7 +600,7 @@ public class JsonWriterTests
     {
         // Act & Assert
         _writer.WriteStartObject();
-        Assert.ThrowsException<InvalidOperationException>(() => _writer.WriteEndArray());
+        Assert.Throws<InvalidOperationException>(() => _writer.WriteEndArray());
     }
 
     [TestMethod]

@@ -84,14 +84,13 @@ public class RecordObjectTests
     /// 测试 Add 方法传入 null 对象时抛出异常
     /// </summary>
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Add_NullObject_ShouldThrowArgumentNullException()
     {
         // Arrange
         var record = new Record();
 
-        // Act
-        record.Add<TestModel>(null!);
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => record.Add<TestModel>(null!));
     }
 
     /// <summary>
@@ -154,11 +153,10 @@ public class RecordObjectTests
     /// 测试 From 方法传入 null 对象时抛出异常
     /// </summary>
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void From_SingleObject_Null_ShouldThrowArgumentNullException()
     {
-        // Act
-        Record.From<TestModel>((TestModel)null!);
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => Record.From<TestModel>((TestModel)null!));
     }
 
     /// <summary>
@@ -297,11 +295,10 @@ public class RecordObjectTests
     /// 测试 From 方法传入 null 集合时抛出异常
     /// </summary>
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void From_NullCollection_ShouldThrowArgumentNullException()
     {
-        // Act
-        Record.FromList<TestModel>((TestModel[])null!);
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => Record.FromList<TestModel>((TestModel[])null!));
     }
 
     #endregion
