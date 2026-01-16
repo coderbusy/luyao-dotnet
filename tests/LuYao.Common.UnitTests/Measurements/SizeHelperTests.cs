@@ -137,7 +137,9 @@ public class SizeHelperTests
         string? input = null;
 
         // Act
-        var results = SizeHelper.Extract(input!);
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+        var results = SizeHelper.Extract(input);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
         // Assert
         Assert.AreEqual(0, results.Count);

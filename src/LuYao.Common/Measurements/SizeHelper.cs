@@ -39,6 +39,10 @@ public static class SizeHelper
         { "深", DimensionKind.Depth }
     };
 
+    private static readonly Regex DimensionRegex = new Regex(
+        @"(\d+(?:\.\d+)?)\s*(?:(['\""]{1,2})|([cC][mM])|([iI][nN])|厘米|英寸)?\s*([wWhHdD]?)",
+        RegexOptions.Compiled);
+
     /// <summary>
     /// 从字符串中提取尺寸信息。
     /// </summary>
@@ -97,8 +101,7 @@ public static class SizeHelper
 
         // 尝试匹配带有单位标记的模式，如 "10''W X 36''H" 或 "10cmW x 20cmH" 或 "10cmx20cmx30cm"
         // 支持多种格式：数字 + 可选单位 + 可选维度类型标记（W/H/D）
-        var dimensionPattern = @"(\d+(?:\.\d+)?)\s*(?:(['\""]{1,2})|([cC][mM])|([iI][nN])|厘米|英寸)?\s*([wWhHdD]?)";
-        var matches = Regex.Matches(input, dimensionPattern);
+        var matches = DimensionRegex.Matches(input);
 
         if (matches.Count > 0)
         {
