@@ -55,7 +55,7 @@ public static partial class SizeHelper
 {
     // Compiled regex patterns for better performance
     private static readonly Regex ParenthesesPattern = new Regex(@"\(([^)]+)\)", RegexOptions.Compiled);
-    private static readonly Regex PerValueUnitPattern = new Regex(@"\d+(?:\.\d+)?\s*(inch|in|mm|cm|dm|m)\s*([WwHhLl]|Width|HEIGHT|Length)?\s*[x\*]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex PerValueUnitPattern = new Regex(@"\d+(?:\.\d+)?\s*(inch|in|mm|cm|dm|m)\s*([WwHhLl]|Width|Height|Length)?\s*[x\*]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex NumberWithOptionalUnitPattern = new Regex(@"(\d+(?:\.\d+)?)\s*(inch|in|mm|cm|dm|m)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex UnitPattern = new Regex(@"(inch|in|mm|cm|dm|m)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex NumberPattern = new Regex(@"(\d+(?:\.\d+)?)", RegexOptions.Compiled);

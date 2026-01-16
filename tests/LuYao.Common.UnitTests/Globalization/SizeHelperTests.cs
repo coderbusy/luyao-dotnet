@@ -611,7 +611,7 @@ public class SizeHelperTests
     /// 测试毫米转换为厘米
     /// </summary>
     [TestMethod]
-    public void Extract_MillimeterInput_ConvertsTocentimeter()
+    public void Extract_MillimeterInput_ConvertsToCentimeter()
     {
         var result = SizeHelper.Extract("100x200x300mm");
         

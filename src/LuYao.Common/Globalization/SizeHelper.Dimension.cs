@@ -6,7 +6,7 @@ namespace LuYao.Globalization;
 
 partial class SizeHelper
 {
-    private static readonly Regex DimensionLabelPattern = new Regex(@"(\d+(?:\.\d+)?)\s*([''""]*)?\s*([WwHhLl]|Width|HEIGHT|Length)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex DimensionLabelPattern = new Regex(@"(\d+(?:\.\d+)?)\s*([''""]*)?\s*([WwHhLl]|Width|Height|Length)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     
     /// <summary>
     /// 从字符串中提取尺寸信息，返回包含单位和维度信息的Dimension列表
@@ -176,7 +176,7 @@ partial class SizeHelper
             // 解析单个部分: 数字 + 可选英寸标记 + 可选维度标签 + 可选单位 + 可选维度标签
             // 英寸标记可以是: '', ", '
             var match = System.Text.RegularExpressions.Regex.Match(trimmed, 
-                @"^(\d+(?:\.\d+)?)\s*(''|[''""])?\s*([WwHhLl]|Width|HEIGHT|Length)?\s*(inch|in|mm|cm|dm|m)?\s*([WwHhLl]|Width|HEIGHT|Length)?$",
+                @"^(\d+(?:\.\d+)?)\s*(''|[''""])?\s*([WwHhLl]|Width|Height|Length)?\s*(inch|in|mm|cm|dm|m)?\s*([WwHhLl]|Width|Height|Length)?$",
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             
             if (!match.Success || !match.Groups[1].Success)
@@ -235,7 +235,7 @@ partial class SizeHelper
         cleaned = cleaned.Replace("''", "").Replace("\"", "");
         
         // 提取所有数值和可能的维度标签
-        var pattern = @"(\d+(?:\.\d+)?)\s*([WwHhLl]|Width|HEIGHT|Length)?";
+        var pattern = @"(\d+(?:\.\d+)?)\s*([WwHhLl]|Width|Height|Length)?";
         var matches = System.Text.RegularExpressions.Regex.Matches(cleaned, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         
         foreach (System.Text.RegularExpressions.Match match in matches)
