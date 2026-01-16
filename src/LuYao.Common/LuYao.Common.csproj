@@ -27,4 +27,10 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Net\Http\FakeUserAgent\Browsers.dat" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="Fody" Version="6.9.3">
+	    <PrivateAssets>all</PrivateAssets>
+	  </PackageReference>
+	</ItemGroup>
 </Project>
