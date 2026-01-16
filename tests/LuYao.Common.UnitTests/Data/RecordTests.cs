@@ -27,8 +27,8 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colId = table.Columns.Add<int>("Id"); // Ìæ»» Add<Int32> Îª Add<int>
-        var colName = table.Columns.Add<string>("Name"); // Ìæ»» Add<String> Îª Add<string>
+        var colId = table.Columns.Add<int>("Id"); // æ›¿æ¢ Add<Int32> ä¸º Add<int>
+        var colName = table.Columns.Add<string>("Name"); // æ›¿æ¢ Add<String> ä¸º Add<string>
 
         // Act
         var row = table.AddRow();
@@ -38,8 +38,8 @@ public class RecordTests
         // Assert
         Assert.AreEqual(1, table.Count);
         Assert.AreEqual(2, table.Columns.Count);
-        Assert.AreEqual(1, colId.Get<int>(row.Row)); // Ìæ»» GetValue Îª Get<T>
-        Assert.AreEqual("Test", colName.Get<string>(row.Row)); // Ìæ»» GetValue Îª Get<T>
+        Assert.AreEqual(1, colId.Get<int>(row.Row)); // æ›¿æ¢ GetValue ä¸º Get<T>
+        Assert.AreEqual("Test", colName.Get<string>(row.Row)); // æ›¿æ¢ GetValue ä¸º Get<T>
     }
 
     [TestMethod]
@@ -60,9 +60,9 @@ public class RecordTests
     {
         // Arrange
         var table = new Record();
-        var colId = table.Columns.Add<int>("Id"); // Ìæ»» Add<Int32> Îª Add<int>
-        var colName = table.Columns.Add<string>("Name"); // Ìæ»» Add<String> Îª Add<string>
-        var colAge = table.Columns.Add<int>("Age"); // Ìæ»» Add<Int32> Îª Add<int>
+        var colId = table.Columns.Add<int>("Id"); // æ›¿æ¢ Add<Int32> ä¸º Add<int>
+        var colName = table.Columns.Add<string>("Name"); // æ›¿æ¢ Add<String> ä¸º Add<string>
+        var colAge = table.Columns.Add<int>("Age"); // æ›¿æ¢ Add<Int32> ä¸º Add<int>
 
         // Act
         var row1 = table.AddRow();
@@ -79,13 +79,13 @@ public class RecordTests
         Assert.AreEqual(2, table.Count);
         Assert.AreEqual(3, table.Columns.Count);
 
-        Assert.AreEqual(1, colId.Get<int>(row1.Row)); // Ìæ»» GetValue Îª Get<T>
-        Assert.AreEqual("Alice", colName.Get<string>(row1.Row)); // Ìæ»» GetValue Îª Get<T>
-        Assert.AreEqual(25, colAge.Get<int>(row1.Row)); // Ìæ»» GetValue Îª Get<T>
+        Assert.AreEqual(1, colId.Get<int>(row1.Row)); // æ›¿æ¢ GetValue ä¸º Get<T>
+        Assert.AreEqual("Alice", colName.Get<string>(row1.Row)); // æ›¿æ¢ GetValue ä¸º Get<T>
+        Assert.AreEqual(25, colAge.Get<int>(row1.Row)); // æ›¿æ¢ GetValue ä¸º Get<T>
 
-        Assert.AreEqual(2, colId.Get<int>(row2.Row)); // Ìæ»» GetValue Îª Get<T>
-        Assert.AreEqual("Bob", colName.Get<string>(row2.Row)); // Ìæ»» GetValue Îª Get<T>
-        Assert.AreEqual(30, colAge.Get<int>(row2.Row)); // Ìæ»» GetValue Îª Get<T>
+        Assert.AreEqual(2, colId.Get<int>(row2.Row)); // æ›¿æ¢ GetValue ä¸º Get<T>
+        Assert.AreEqual("Bob", colName.Get<string>(row2.Row)); // æ›¿æ¢ GetValue ä¸º Get<T>
+        Assert.AreEqual(30, colAge.Get<int>(row2.Row)); // æ›¿æ¢ GetValue ä¸º Get<T>
     }
 
     [TestMethod]
@@ -277,7 +277,7 @@ public class RecordTests
         var row = rows[1];
 
         // Act
-        int rowIndex = row; // ÒşÊ½×ª»»
+        int rowIndex = row; // éšå¼è½¬æ¢
 
         // Assert
         Assert.AreEqual(1, rowIndex);
@@ -681,7 +681,7 @@ public class RecordTests
         Assert.IsTrue(result.Contains("..") || result.Contains("LongStringTest"));
     }
 
-    // ĞÂÔöµÄ±ß½ç¼ì²é²âÊÔ·½·¨
+    // æ–°å¢çš„è¾¹ç•Œæ£€æŸ¥æµ‹è¯•æ–¹æ³•
 
     [TestMethod]
     public void GetValue_NegativeRowIndex_ThrowsArgumentOutOfRangeException()
@@ -693,7 +693,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(-1));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı -1 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• -1 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -706,7 +706,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(1));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı 1 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• 1 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -719,7 +719,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(5));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı 5 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• 5 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -732,7 +732,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue("test", -1));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı -1 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• -1 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -745,7 +745,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue("test", 1));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı 1 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• 1 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -758,7 +758,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue("test", 5));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı 5 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• 5 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -771,7 +771,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(true, -1));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı -1 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• -1 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -784,7 +784,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(true, 1));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı 1 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• 1 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -797,7 +797,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(42, 5));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı 5 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• 5 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -810,7 +810,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get<Boolean>(-1));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı -1 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• -1 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -823,7 +823,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get<Int32>(1));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı 1 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• 1 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -836,7 +836,7 @@ public class RecordTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get<String>(10));
-        Assert.IsTrue(exception.Message.Contains("ĞĞË÷Òı 10 ³¬³öÓĞĞ§·¶Î§"));
+        Assert.IsTrue(exception.Message.Contains("è¡Œç´¢å¼• 10 è¶…å‡ºæœ‰æ•ˆèŒƒå›´"));
     }
 
     [TestMethod]
@@ -1014,7 +1014,7 @@ public class RecordTests
         table.Columns.Add<String>("TestColumn");
 
         // Act & Assert
-        Assert.Throws<DuplicateNameException>(() => table.Columns.Add<String>("TestColumn")); // Ó¦¸ÃÅ×³öÒì³£
+        Assert.Throws<DuplicateNameException>(() => table.Columns.Add<String>("TestColumn")); // åº”è¯¥æŠ›å‡ºå¼‚å¸¸
     }
 
     [TestMethod]
@@ -1025,7 +1025,7 @@ public class RecordTests
         table.Columns.Add<String>("TestColumn");
 
         // Act & Assert
-        Assert.Throws<DuplicateNameException>(() => table.Columns.Add<Int32>("TestColumn")); // Ó¦¸ÃÅ×³öÒì³£
+        Assert.Throws<DuplicateNameException>(() => table.Columns.Add<Int32>("TestColumn")); // åº”è¯¥æŠ›å‡ºå¼‚å¸¸
     }
 
     public class Student
