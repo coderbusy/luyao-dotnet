@@ -39,6 +39,13 @@ public static class SizeHelper
         { "深", DimensionKind.Depth }
     };
 
+    // 编译后的正则表达式，用于提高性能
+    // 匹配模式：数字 + 可选单位（引号/cm/in/中文） + 可选维度标记（W/H/D）
+    // Group 1: 数字（整数或小数）
+    // Group 2: 单引号或双引号（1-2个字符，表示英寸）
+    // Group 3: cm（厘米单位，不区分大小写）
+    // Group 4: in（英寸单位，不区分大小写）
+    // Group 5: 维度标记（W/H/D，不区分大小写）
     private static readonly Regex DimensionRegex = new Regex(
         @"(\d+(?:\.\d+)?)\s*(?:(['\""]{1,2})|([cC][mM])|([iI][nN])|厘米|英寸)?\s*([wWhHdD]?)",
         RegexOptions.Compiled);
@@ -116,7 +123,10 @@ public static class SizeHelper
                 }
 
                 var valueStr = match.Groups[1].Value;
-                // 组合所有可能的单位组（组2-4）
+                // 从正则表达式的捕获组中提取单位
+                // Group 2: 引号（'' 或 "），表示英寸
+                // Group 3: cm（厘米）
+                // Group 4: in（英寸）
                 var unitStr = "";
                 for (int i = 2; i <= 4; i++)
                 {
@@ -152,8 +162,9 @@ public static class SizeHelper
                     }
                     else if (detectedUnit.Value != currentUnit.Value)
                     {
-                        // 单位不一致的情况，保持第一个检测到的单位
-                        // 这里可以根据需求调整逻辑
+                        // 单位不一致的情况：保持第一个检测到的单位
+                        // 这是一个简化策略，适用于大多数实际场景
+                        // 例如 "10cm x 20in" 会被解析为都是厘米单位
                     }
                 }
 

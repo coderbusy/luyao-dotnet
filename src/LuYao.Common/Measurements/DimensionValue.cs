@@ -8,12 +8,12 @@ public class DimensionValue
     /// <summary>
     /// 尺寸数值。
     /// </summary>
-    public decimal Value { get; set; }
+    public decimal Value { get; }
 
     /// <summary>
     /// 尺寸类型。
     /// </summary>
-    public DimensionKind Kind { get; set; }
+    public DimensionKind Kind { get; }
 
     /// <summary>
     /// 初始化 <see cref="DimensionValue"/> 类的新实例。

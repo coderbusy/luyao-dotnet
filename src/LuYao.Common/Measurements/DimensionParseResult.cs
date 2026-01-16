@@ -10,12 +10,12 @@ public class DimensionParseResult
     /// <summary>
     /// 尺寸单位。
     /// </summary>
-    public DimensionUnit Unit { get; set; }
+    public DimensionUnit Unit { get; }
 
     /// <summary>
     /// 尺寸值列表。
     /// </summary>
-    public IReadOnlyList<DimensionValue> Dimensions { get; set; }
+    public IReadOnlyList<DimensionValue> Dimensions { get; }
 
     /// <summary>
     /// 初始化 <see cref="DimensionParseResult"/> 类的新实例。
