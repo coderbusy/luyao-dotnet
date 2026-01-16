@@ -174,8 +174,9 @@ partial class SizeHelper
             var trimmed = part.Trim();
             
             // 解析单个部分: 数字 + 可选英寸标记 + 可选维度标签 + 可选单位 + 可选维度标签
+            // 英寸标记可以是: '', ", '
             var match = System.Text.RegularExpressions.Regex.Match(trimmed, 
-                @"^(\d+(?:\.\d+)?)\s*([''""])?\s*([WwHhLl]|Width|HEIGHT|Length)?\s*(inch|in|mm|cm|dm|m)?\s*([WwHhLl]|Width|HEIGHT|Length)?$",
+                @"^(\d+(?:\.\d+)?)\s*(''|[''""])?\s*([WwHhLl]|Width|HEIGHT|Length)?\s*(inch|in|mm|cm|dm|m)?\s*([WwHhLl]|Width|HEIGHT|Length)?$",
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             
             if (!match.Success || !match.Groups[1].Success)
