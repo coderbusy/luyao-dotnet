@@ -51,7 +51,7 @@ namespace LuYao.Globalization;
 /// }
 /// </code>
 /// </example>
-public static class SizeHelper
+public static partial class SizeHelper
 {
     // Compiled regex patterns for better performance
     private static readonly Regex ParenthesesPattern = new Regex(@"\(([^)]+)\)", RegexOptions.Compiled);
@@ -60,7 +60,7 @@ public static class SizeHelper
     private static readonly Regex UnitPattern = new Regex(@"(inch|in|mm|cm|dm|m)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex NumberPattern = new Regex(@"(\d+(?:\.\d+)?)", RegexOptions.Compiled);
     private static readonly Regex SingleValuePattern = new Regex(@"^\s*(\d+(?:\.\d+)?)\s*(inch|in|mm|cm|dm|m)?\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    
+
     // Unit conversion factors (relative to centimeters)
     private static readonly Dictionary<string, decimal> UnitConversions = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
     {
@@ -127,7 +127,7 @@ public static class SizeHelper
                 arr = new decimal[] { singleValue.Value };
                 return true;
             }
-            
+
             arr = new decimal[0];
             return false;
         }
@@ -166,7 +166,7 @@ public static class SizeHelper
 
         // First, extract groups in parentheses that contain separators
         var matches = ParenthesesPattern.Matches(size);
-        
+
         foreach (Match match in matches)
         {
             if (match.Groups.Count > 1)
@@ -200,7 +200,7 @@ public static class SizeHelper
     {
         var result = new List<string>();
         var currentGroup = new System.Text.StringBuilder();
-        
+
         // Split by common separators: / , ; | using simple character iteration
         foreach (char c in text)
         {
@@ -218,20 +218,20 @@ public static class SizeHelper
                 currentGroup.Append(c);
             }
         }
-        
+
         // Add the last group if any
         var lastGroup = currentGroup.ToString().Trim();
         if (!string.IsNullOrWhiteSpace(lastGroup) && ContainsIgnoreCase(lastGroup, "x", "*"))
         {
             result.Add(lastGroup);
         }
-        
+
         // If no valid groups found, return the original text as a single group
         if (result.Count == 0 && ContainsIgnoreCase(text, "x", "*"))
         {
             result.Add(text);
         }
-        
+
         return result;
     }
 
@@ -271,7 +271,7 @@ public static class SizeHelper
         // 1. The entire input (after trimming) must be just number + unit
         // 2. A unit must be present (no bare numbers allowed)
         var match = SingleValuePattern.Match(input);
-        
+
         if (match.Success && match.Groups[1].Success && !string.IsNullOrWhiteSpace(match.Groups[1].Value))
         {
             // Require a unit to be present when there's no separator
@@ -279,7 +279,7 @@ public static class SizeHelper
             {
                 return null;
             }
-            
+
             if (decimal.TryParse(match.Groups[1].Value, out decimal value))
             {
                 string unit = match.Groups[2].Value;
@@ -317,8 +317,8 @@ public static class SizeHelper
             {
                 if (decimal.TryParse(match.Groups[1].Value, out decimal value))
                 {
-                    string unit = match.Groups[2].Success && !string.IsNullOrEmpty(match.Groups[2].Value) 
-                        ? match.Groups[2].Value 
+                    string unit = match.Groups[2].Success && !string.IsNullOrEmpty(match.Groups[2].Value)
+                        ? match.Groups[2].Value
                         : "CM";
                     decimal converted = ConvertToCentimeters(value, unit);
                     results.Add(converted);
@@ -372,7 +372,7 @@ public static class SizeHelper
             return "DM";
         if (ContainsIgnoreCase(group, "M") && !ContainsIgnoreCase(group, "CM", "MM", "DM"))
             return "M";
-        
+
         return "CM"; // Default
     }
 
