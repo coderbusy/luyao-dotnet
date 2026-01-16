@@ -97,7 +97,7 @@ public static class SizeHelper
 
         // 尝试匹配带有单位标记的模式，如 "10''W X 36''H" 或 "10cmW x 20cmH" 或 "10cmx20cmx30cm"
         // 支持多种格式：数字 + 可选单位 + 可选维度类型标记（W/H/D）
-        var dimensionPattern = @"(\d+(?:\.\d+)?)\s*(['""cm|in|CM|IN|厘米|英寸]*)\s*([wWhHdD]?)";
+        var dimensionPattern = @"(\d+(?:\.\d+)?)\s*(?:(['\""]{1,2})|([cC][mM])|([iI][nN])|厘米|英寸)?\s*([wWhHdD]?)";
         var matches = Regex.Matches(input, dimensionPattern);
 
         if (matches.Count > 0)
@@ -113,8 +113,17 @@ public static class SizeHelper
                 }
 
                 var valueStr = match.Groups[1].Value;
-                var unitStr = match.Groups[2].Value.Trim();
-                var kindStr = match.Groups[3].Value.Trim();
+                // 组合所有可能的单位组（组2-4）
+                var unitStr = "";
+                for (int i = 2; i <= 4; i++)
+                {
+                    if (match.Groups[i].Success && !string.IsNullOrWhiteSpace(match.Groups[i].Value))
+                    {
+                        unitStr = match.Groups[i].Value.Trim();
+                        break;
+                    }
+                }
+                var kindStr = match.Groups[5].Value.Trim();
 
                 if (!decimal.TryParse(valueStr, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
                 {
