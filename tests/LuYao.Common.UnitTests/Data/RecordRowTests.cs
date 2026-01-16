@@ -1,16 +1,16 @@
-ï»¿using System;
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao.Data;
 
 /// <summary>
-/// RecordRow ç»“æ„ä½“çš„å•å…ƒæµ‹è¯•ç±»
+/// RecordRow ½á¹¹ÌåµÄµ¥Ôª²âÊÔÀà
 /// </summary>
 [TestClass]
 public class RecordRowTests
 {
     /// <summary>
-    /// åˆ›å»ºæµ‹è¯•ç”¨çš„ Record å’Œç›¸å…³æ•°æ®
+    /// ´´½¨²âÊÔÓÃµÄ Record ºÍÏà¹ØÊı¾İ
     /// </summary>
     private (Record record, RecordColumn<int> intColumn, RecordColumn<string> stringColumn, RecordColumn<bool> boolColumn) CreateTestRecord()
     {
@@ -19,7 +19,7 @@ public class RecordRowTests
         var stringColumn = record.Columns.Add<string>("StringColumn");
         var boolColumn = record.Columns.Add<bool>("BoolColumn");
 
-        // æ·»åŠ æµ‹è¯•æ•°æ®
+        // Ìí¼Ó²âÊÔÊı¾İ
         var row1 = record.AddRow();
         var row2 = record.AddRow();
 
@@ -33,10 +33,10 @@ public class RecordRowTests
         return (record, intColumn, stringColumn, boolColumn);
     }
 
-    #region æ„é€ å‡½æ•°æµ‹è¯•
+    #region ¹¹Ôìº¯Êı²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯•æ„é€ å‡½æ•° - æ­£å¸¸å‚æ•°
+    /// ²âÊÔ¹¹Ôìº¯Êı - Õı³£²ÎÊı
     /// </summary>
     [TestMethod]
     public void Constructor_ValidParameters_ShouldInitializeCorrectly()
@@ -53,17 +53,17 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯•æ„é€ å‡½æ•° - Record ä¸º null
+    /// ²âÊÔ¹¹Ôìº¯Êı - Record Îª null
     /// </summary>
     [TestMethod]
     public void Constructor_NullRecord_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => new RecordRow(null!, 0));
+        Assert.Throws<ArgumentNullException>(() => new RecordRow(null!, 0));
     }
 
     /// <summary>
-    /// æµ‹è¯•æ„é€ å‡½æ•° - è¡Œç´¢å¼•å°äº0
+    /// ²âÊÔ¹¹Ôìº¯Êı - ĞĞË÷ÒıĞ¡ÓÚ0
     /// </summary>
     [TestMethod]
     public void Constructor_NegativeRowIndex_ShouldThrowArgumentOutOfRangeException()
@@ -72,11 +72,11 @@ public class RecordRowTests
         var (record, _, _, _) = CreateTestRecord();
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new RecordRow(record, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, -1));
     }
 
     /// <summary>
-    /// æµ‹è¯•æ„é€ å‡½æ•° - è¡Œç´¢å¼•ç­‰äºæˆ–å¤§äº Record.Count
+    /// ²âÊÔ¹¹Ôìº¯Êı - ĞĞË÷ÒıµÈÓÚ»ò´óÓÚ Record.Count
     /// </summary>
     [TestMethod]
     public void Constructor_RowIndexOutOfRange_ShouldThrowArgumentOutOfRangeException()
@@ -85,16 +85,16 @@ public class RecordRowTests
         var (record, _, _, _) = CreateTestRecord();
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count + 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count + 1));
     }
 
     #endregion
 
-    #region å±æ€§æµ‹è¯•
+    #region ÊôĞÔ²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯• Record å±æ€§
+    /// ²âÊÔ Record ÊôĞÔ
     /// </summary>
     [TestMethod]
     public void Record_Property_ShouldReturnCorrectRecord()
@@ -111,7 +111,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• Row å±æ€§
+    /// ²âÊÔ Row ÊôĞÔ
     /// </summary>
     [TestMethod]
     public void Row_Property_ShouldReturnCorrectRowIndex()
@@ -129,10 +129,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region éšå¼è½¬æ¢æµ‹è¯•
+    #region ÒşÊ½×ª»»²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯•éšå¼è½¬æ¢åˆ° int
+    /// ²âÊÔÒşÊ½×ª»»µ½ int
     /// </summary>
     [TestMethod]
     public void ImplicitConversion_ToInt_ShouldReturnRowIndex()
@@ -150,10 +150,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region GetBoolean æµ‹è¯•
+    #region GetBoolean ²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯• GetBoolean(string name) - åˆ—å­˜åœ¨
+    /// ²âÊÔ GetBoolean(string name) - ÁĞ´æÔÚ
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -170,7 +170,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetBoolean(string name) - åˆ—ä¸å­˜åœ¨
+    /// ²âÊÔ GetBoolean(string name) - ÁĞ²»´æÔÚ
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -187,7 +187,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetBoolean(RecordColumn col) - åˆ—å±äºå½“å‰è®°å½•
+    /// ²âÊÔ GetBoolean(RecordColumn col) - ÁĞÊôÓÚµ±Ç°¼ÇÂ¼
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -204,7 +204,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetBoolean(RecordColumn col) - åˆ—å±äºä¸åŒè®°å½•
+    /// ²âÊÔ GetBoolean(RecordColumn col) - ÁĞÊôÓÚ²»Í¬¼ÇÂ¼
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByColumn_DifferentRecord_ShouldFallbackToNameSearch()
@@ -218,15 +218,15 @@ public class RecordRowTests
         var result = recordRow.Get<Boolean>(boolColumn2);
 
         // Assert
-        Assert.AreEqual(true, result); // åº”è¯¥é€šè¿‡åˆ—åæŸ¥æ‰¾åˆ° record1 ä¸­çš„ BoolColumn
+        Assert.AreEqual(true, result); // Ó¦¸ÃÍ¨¹ıÁĞÃû²éÕÒµ½ record1 ÖĞµÄ BoolColumn
     }
 
     #endregion
 
-    #region GetString æµ‹è¯•
+    #region GetString ²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯• GetString(string name) - åˆ—å­˜åœ¨
+    /// ²âÊÔ GetString(string name) - ÁĞ´æÔÚ
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -243,7 +243,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetString(string name) - åˆ—ä¸å­˜åœ¨
+    /// ²âÊÔ GetString(string name) - ÁĞ²»´æÔÚ
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -260,7 +260,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetString(RecordColumn col) - åˆ—å±äºå½“å‰è®°å½•
+    /// ²âÊÔ GetString(RecordColumn col) - ÁĞÊôÓÚµ±Ç°¼ÇÂ¼
     /// </summary>
     [TestMethod]
     public void GetString_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -278,10 +278,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region GetInt32 æµ‹è¯•
+    #region GetInt32 ²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯• GetInt32(string name) - åˆ—å­˜åœ¨
+    /// ²âÊÔ GetInt32(string name) - ÁĞ´æÔÚ
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -298,7 +298,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetInt32(string name) - åˆ—ä¸å­˜åœ¨
+    /// ²âÊÔ GetInt32(string name) - ÁĞ²»´æÔÚ
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -315,7 +315,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetInt32(RecordColumn col) - åˆ—å±äºå½“å‰è®°å½•
+    /// ²âÊÔ GetInt32(RecordColumn col) - ÁĞÊôÓÚµ±Ç°¼ÇÂ¼
     /// </summary>
     [TestMethod]
     public void GetInt32_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -333,10 +333,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region æ³›å‹ Get<T> æµ‹è¯•
+    #region ·ºĞÍ Get<T> ²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯• Get<T>(string name) - åˆ—å­˜åœ¨
+    /// ²âÊÔ Get<T>(string name) - ÁĞ´æÔÚ
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -353,7 +353,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• Get<T>(string name) - åˆ—ä¸å­˜åœ¨
+    /// ²âÊÔ Get<T>(string name) - ÁĞ²»´æÔÚ
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -370,7 +370,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• Get<T>(RecordColumn col) - åˆ—å±äºå½“å‰è®°å½•
+    /// ²âÊÔ Get<T>(RecordColumn col) - ÁĞÊôÓÚµ±Ç°¼ÇÂ¼
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -389,10 +389,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region æ•°å€¼ç±»å‹æµ‹è¯• (æŠ½æ ·æµ‹è¯•)
+    #region ÊıÖµÀàĞÍ²âÊÔ (³éÑù²âÊÔ)
 
     /// <summary>
-    /// æµ‹è¯• GetByte æ–¹æ³•
+    /// ²âÊÔ GetByte ·½·¨
     /// </summary>
     [TestMethod]
     public void GetByte_ByName_ShouldWork()
@@ -412,7 +412,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetDouble æ–¹æ³•
+    /// ²âÊÔ GetDouble ·½·¨
     /// </summary>
     [TestMethod]
     public void GetDouble_ByName_ShouldWork()
@@ -432,7 +432,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯• GetDateTime æ–¹æ³•
+    /// ²âÊÔ GetDateTime ·½·¨
     /// </summary>
     [TestMethod]
     public void GetDateTime_ByName_ShouldWork()
@@ -454,10 +454,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region è¾¹ç•Œæƒ…å†µå’Œå¼‚å¸¸æµ‹è¯•
+    #region ±ß½çÇé¿öºÍÒì³£²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯•ç©ºå­—ç¬¦ä¸²åˆ—å
+    /// ²âÊÔ¿Õ×Ö·û´®ÁĞÃû
     /// </summary>
     [TestMethod]
     public void GetMethods_EmptyColumnName_ShouldReturnDefault()
@@ -473,7 +473,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯•å¤šè¡Œæ•°æ®çš„æ­£ç¡®æ€§
+    /// ²âÊÔ¶àĞĞÊı¾İµÄÕıÈ·ĞÔ
     /// </summary>
     [TestMethod]
     public void GetMethods_MultipleRows_ShouldReturnCorrectValues()
@@ -481,7 +481,7 @@ public class RecordRowTests
         // Arrange
         var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
 
-        // æ·»åŠ æ›´å¤šæµ‹è¯•æ•°æ®
+        // Ìí¼Ó¸ü¶à²âÊÔÊı¾İ
         var row3 = record.AddRow();
         intColumn.Set(300);
         stringColumn.Set("Test3");
@@ -507,10 +507,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region æ€§èƒ½å’Œä¸€è‡´æ€§æµ‹è¯•
+    #region ĞÔÄÜºÍÒ»ÖÂĞÔ²âÊÔ
 
     /// <summary>
-    /// æµ‹è¯•ç›¸åŒæ•°æ®çš„é‡å¤è®¿é—®åº”è¯¥è¿”å›ç›¸åŒç»“æœ
+    /// ²âÊÔÏàÍ¬Êı¾İµÄÖØ¸´·ÃÎÊÓ¦¸Ã·µ»ØÏàÍ¬½á¹û
     /// </summary>
     [TestMethod]
     public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
@@ -531,7 +531,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// æµ‹è¯•ä¸åŒè·å–æ–¹å¼(æŒ‰åç§° vs æŒ‰åˆ—å¯¹è±¡)çš„ç»“æœä¸€è‡´æ€§
+    /// ²âÊÔ²»Í¬»ñÈ¡·½Ê½(°´Ãû³Æ vs °´ÁĞ¶ÔÏó)µÄ½á¹ûÒ»ÖÂĞÔ
     /// </summary>
     [TestMethod]
     public void GetMethods_ByNameVsByColumn_ShouldReturnSameResults()

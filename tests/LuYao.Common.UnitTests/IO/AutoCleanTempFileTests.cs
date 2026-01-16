@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao.IO;
 
@@ -8,9 +8,9 @@ public class AutoCleanTempFileTests
     [TestMethod]
     public void Constructor_FileNameIsNullOrWhiteSpace_ThrowsArgumentException()
     {
-        Assert.ThrowsException<ArgumentException>(() => new AutoCleanTempFile(null));
-        Assert.ThrowsException<ArgumentException>(() => new AutoCleanTempFile(""));
-        Assert.ThrowsException<ArgumentException>(() => new AutoCleanTempFile("   "));
+        Assert.Throws<ArgumentException>(() => new AutoCleanTempFile(null));
+        Assert.Throws<ArgumentException>(() => new AutoCleanTempFile(""));
+        Assert.Throws<ArgumentException>(() => new AutoCleanTempFile("   "));
     }
 
     [TestMethod]

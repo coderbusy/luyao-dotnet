@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +16,7 @@ public class WeakCollectionTests
         var collection = new WeakCollection<object>();
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => collection.Add(null));
+        Assert.Throws<ArgumentNullException>(() => collection.Add(null));
     }
 
     [TestMethod]

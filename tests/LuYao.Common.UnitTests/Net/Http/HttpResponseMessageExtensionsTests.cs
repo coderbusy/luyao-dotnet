@@ -1,4 +1,4 @@
-锘縰sing Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ public class HttpResponseMessageExtensionsTests
         HttpResponseMessage? response = null;
 
         // Act & Assert
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
         {
             await HttpResponseMessageExtensions.ReadAsHtmlAsync(response);
         });
@@ -28,7 +28,7 @@ public class HttpResponseMessageExtensionsTests
     public async Task ReadAsHtmlAsync_CharsetInHeader_UsesHeaderEncoding()
     {
         // Arrange
-        var content = new StringContent("娴嬭瘯鍐呭", Encoding.Unicode);
+        var content = new StringContent("测试内容", Encoding.Unicode);
         if (content.Headers.ContentType != null)
         {
             content.Headers.ContentType.CharSet = "utf-16";
@@ -42,14 +42,14 @@ public class HttpResponseMessageExtensionsTests
         var result = await response.ReadAsHtmlAsync();
 
         // Assert
-        Assert.AreEqual("娴嬭瘯鍐呭", result);
+        Assert.AreEqual("测试内容", result);
     }
 
     [TestMethod]
     public async Task ReadAsHtmlAsync_CharsetInHtml_UsesHtmlEncoding()
     {
         // Arrange
-        var html = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=gb2312\"><div>涓枃鍐呭</div>";
+        var html = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=gb2312\"><div>中文内容</div>";
         var bytes = Encoding.GetEncoding("gb2312").GetBytes(html);
         var content = new ByteArrayContent(bytes);
         content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/html");
@@ -62,14 +62,14 @@ public class HttpResponseMessageExtensionsTests
         var result = await response.ReadAsHtmlAsync();
 
         // Assert
-        Assert.IsTrue(result.Contains("涓枃鍐呭"));
+        Assert.IsTrue(result.Contains("中文内容"));
     }
 
     [TestMethod]
     public async Task ReadAsHtmlAsync_NoCharset_UsesUtf8ByDefault()
     {
         // Arrange
-        var text = "榛樿UTF8鍐呭";
+        var text = "默认UTF8内容";
         var bytes = Encoding.UTF8.GetBytes(text);
         var content = new ByteArrayContent(bytes);
         content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/plain");

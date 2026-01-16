@@ -37,7 +37,7 @@ public class TranslatableJsonModelTests
         string json = "";
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentException>(() => TestJsonModel.Transform(json));
+        Assert.Throws<ArgumentException>(() => TestJsonModel.Transform(json));
     }
 
     /// <summary>
@@ -68,6 +68,6 @@ public class TranslatableJsonModelTests
         object? model = null;
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => TestJsonModel.Transform(model));
+        Assert.Throws<ArgumentNullException>(() => TestJsonModel.Transform(model));
     }
 }

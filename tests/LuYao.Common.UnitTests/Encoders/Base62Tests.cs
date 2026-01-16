@@ -1,4 +1,4 @@
-锘縰sing Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao.Encoders;
 
@@ -28,7 +28,7 @@ public class Base62Tests
         string result = Base62.ToBase62(input);
 
         // Assert
-        // 棰勬湡鍊煎彲閫氳繃 FromBase62 楠岃瘉
+        // 预期值可通过 FromBase62 验证
         CollectionAssert.AreEqual(input, Base62.FromBase62(result));
     }
 
@@ -53,7 +53,7 @@ public class Base62Tests
         string input = "";
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => Base62.FromBase62(input));
+        Assert.Throws<ArgumentNullException>(() => Base62.FromBase62(input));
     }
 
     [TestMethod]
@@ -63,7 +63,7 @@ public class Base62Tests
         string input = "   ";
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => Base62.FromBase62(input));
+        Assert.Throws<ArgumentNullException>(() => Base62.FromBase62(input));
     }
 
     [TestMethod]

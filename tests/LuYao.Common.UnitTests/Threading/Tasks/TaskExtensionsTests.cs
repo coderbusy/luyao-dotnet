@@ -27,7 +27,7 @@ public class TaskExtensionsTests
         var task = Task.Run(() => throw new Exception("Test Exception"));
 
         // Act & Assert
-        await Assert.ThrowsExceptionAsync<Exception>(() => task);
+        await Assert.ThrowsAsync<Exception>(() => task);
         Assert.IsFalse(task.IsCompletedSuccessfully());
     }
 

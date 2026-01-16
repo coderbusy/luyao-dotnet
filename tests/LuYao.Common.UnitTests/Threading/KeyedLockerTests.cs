@@ -1,15 +1,15 @@
-ï»¿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao.Threading;
 
 /// <summary>
-/// æµ‹è¯• KeyedLocker<T> ç±»å‹çš„åŠŸèƒ½ã€‚
+/// ²âÊÔ KeyedLocker<T> ÀàĞÍµÄ¹¦ÄÜ¡£
 /// </summary>
 [TestClass]
 public class KeyedLockerTests
 {
     /// <summary>
-    /// æµ‹è¯•ä½¿ç”¨æœ‰æ•ˆé”®è·å–é”å¯¹è±¡æ—¶ï¼Œé”å¯¹è±¡åº”æ­£ç¡®è¿”å›ã€‚
+    /// ²âÊÔÊ¹ÓÃÓĞĞ§¼ü»ñÈ¡Ëø¶ÔÏóÊ±£¬Ëø¶ÔÏóÓ¦ÕıÈ··µ»Ø¡£
     /// </summary>
     [TestMethod]
     public void GetLock_ValidKey_ReturnsLockObject()
@@ -21,11 +21,11 @@ public class KeyedLockerTests
         var lockObject = KeyedLocker<object>.GetLock(key);
 
         // Assert
-        Assert.IsNotNull(lockObject, "é”å¯¹è±¡ä¸åº”ä¸º nullã€‚");
+        Assert.IsNotNull(lockObject, "Ëø¶ÔÏó²»Ó¦Îª null¡£");
     }
 
     /// <summary>
-    /// æµ‹è¯•ä½¿ç”¨ null é”®è·å–é”å¯¹è±¡æ—¶ï¼Œåº”æŠ›å‡º ArgumentNullExceptionã€‚
+    /// ²âÊÔÊ¹ÓÃ null ¼ü»ñÈ¡Ëø¶ÔÏóÊ±£¬Ó¦Å×³ö ArgumentNullException¡£
     /// </summary>
     [TestMethod]
     public void GetLock_NullKey_ThrowsArgumentNullException()
@@ -34,11 +34,11 @@ public class KeyedLockerTests
         string? key = null;
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => KeyedLocker<object>.GetLock(key), "åº”æŠ›å‡º ArgumentNullExceptionã€‚");
+        Assert.Throws<ArgumentNullException>(() => KeyedLocker<object>.GetLock(key), "Ó¦Å×³ö ArgumentNullException¡£");
     }
 
     /// <summary>
-    /// æµ‹è¯•ä½¿ç”¨ç›¸åŒçš„é”®è·å–é”å¯¹è±¡æ—¶ï¼Œåº”è¿”å›ç›¸åŒçš„é”å¯¹è±¡ã€‚
+    /// ²âÊÔÊ¹ÓÃÏàÍ¬µÄ¼ü»ñÈ¡Ëø¶ÔÏóÊ±£¬Ó¦·µ»ØÏàÍ¬µÄËø¶ÔÏó¡£
     /// </summary>
     [TestMethod]
     public void GetLock_SameKey_ReturnsSameLockObject()
@@ -51,6 +51,6 @@ public class KeyedLockerTests
         var lockObject2 = KeyedLocker<object>.GetLock(key);
 
         // Assert
-        Assert.AreSame(lockObject1, lockObject2, "ç›¸åŒçš„é”®åº”è¿”å›ç›¸åŒçš„é”å¯¹è±¡ã€‚");
+        Assert.AreSame(lockObject1, lockObject2, "ÏàÍ¬µÄ¼üÓ¦·µ»ØÏàÍ¬µÄËø¶ÔÏó¡£");
     }
 }

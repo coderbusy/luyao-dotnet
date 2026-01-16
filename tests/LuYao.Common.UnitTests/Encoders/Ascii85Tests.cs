@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 
 namespace LuYao.Encoders;
@@ -50,7 +50,7 @@ public class Ascii85Tests
     {
         var ascii85 = new Ascii85 { EnforceMarks = true };
         string encoded = "87cURD_*#4DfTZ";
-        Assert.ThrowsException<Exception>(() => ascii85.Decode(encoded));
+        Assert.Throws<Exception>(() => ascii85.Decode(encoded));
     }
 
     [TestMethod]
@@ -59,7 +59,7 @@ public class Ascii85Tests
         var ascii85 = new Ascii85 { EnforceMarks = false };
         byte[] original = Encoding.UTF8.GetBytes("data");
         string encoded = ascii85.Encode(original);
-        // 去掉前后缀
+        // ȥ��ǰ��׺
         encoded = encoded.TrimStart('<', '~').TrimEnd('~', '>');
         byte[] decoded = ascii85.Decode(encoded);
         CollectionAssert.AreEqual(original, decoded);

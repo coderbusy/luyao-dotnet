@@ -1,9 +1,9 @@
-ï»¿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao.IO;
 
 /// <summary>
-/// æµ‹è¯• PathHelper ç±»çš„åŠŸèƒ½ã€‚
+/// ²âÊÔ PathHelper ÀàµÄ¹¦ÄÜ¡£
 /// </summary>
 [TestClass]
 public class PathHelperTests
@@ -82,7 +82,7 @@ public class PathHelperTests
         // Arrange
         string extension = string.Empty;
         // Act & Assert
-        Assert.ThrowsException<ArgumentException>(() => PathHelper.GetMimeType(extension));
+        Assert.Throws<ArgumentException>(() => PathHelper.GetMimeType(extension));
     }
 
     [TestMethod]

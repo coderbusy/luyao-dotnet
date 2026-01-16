@@ -63,26 +63,23 @@ public class EnumerableExtensionsTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void SplitToBatch_NullSource_ThrowsArgumentNullException()
     {
         List<int>? input = null;
-        _ = input.SplitToBatch(2).ToList();
+        Assert.Throws<ArgumentNullException>(() => _ = input.SplitToBatch(2).ToList());
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void SplitToBatch_BatchSizeZero_ThrowsArgumentOutOfRangeException()
     {
         var input = Enumerable.Range(1, 3);
-        _ = input.SplitToBatch(0).ToList();
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = input.SplitToBatch(0).ToList());
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void SplitToBatch_BatchSizeNegative_ThrowsArgumentOutOfRangeException()
     {
         var input = Enumerable.Range(1, 3);
-        _ = input.SplitToBatch(-1).ToList();
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = input.SplitToBatch(-1).ToList());
     }
 }
