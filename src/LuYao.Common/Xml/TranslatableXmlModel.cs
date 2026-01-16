@@ -16,7 +16,6 @@ namespace LuYao.Xml;
 /// 2. 自动反序列化 XML
 /// 3. 支持转换后的回调处理
 /// </remarks>
-[Serializable]
 public abstract class TranslatableXmlModel<T> where T : TranslatableXmlModel<T>
 {
     private static readonly XmlSerializer XmlSerializer;
