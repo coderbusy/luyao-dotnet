@@ -503,4 +503,299 @@ public class SizeHelperTests
         Assert.AreEqual(1m, arr[4]); // 10 mm = 1 cm
         Assert.AreEqual(1.5m, arr[5]); // 15 mm = 1.5 cm
     }
+
+    #region Extract Method Tests
+
+    /// <summary>
+    /// 测试无标记输入：1x2x3，期望 DimensionKind 为 Unspecified
+    /// </summary>
+    [TestMethod]
+    public void Extract_UnmarkedInput_ReturnsUnspecifiedKind()
+    {
+        var result = SizeHelper.Extract("1x2x3");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        Assert.AreEqual(DimensionKind.Unspecified, dimension.Items[0].Kind);
+        Assert.AreEqual(DimensionKind.Unspecified, dimension.Items[1].Kind);
+        Assert.AreEqual(DimensionKind.Unspecified, dimension.Items[2].Kind);
+        Assert.AreEqual(1m, dimension.Items[0].Value);
+        Assert.AreEqual(2m, dimension.Items[1].Value);
+        Assert.AreEqual(3m, dimension.Items[2].Value);
+    }
+
+    /// <summary>
+    /// 测试英寸标记和维度标签：10''W X 36''H
+    /// </summary>
+    [TestMethod]
+    public void Extract_InchWithDimensionLabels_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("10''W X 36''H");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Inch, dimension.Unit);
+        Assert.AreEqual(2, dimension.Items.Count);
+        
+        Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
+        Assert.AreEqual(10m, dimension.Items[0].Value);
+        
+        Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
+        Assert.AreEqual(36m, dimension.Items[1].Value);
+    }
+
+    /// <summary>
+    /// 测试双组解析：10cmx10cmx10cm(3.94x3.94x3.94in)，期望返回两个Dimension对象
+    /// </summary>
+    [TestMethod]
+    public void Extract_TwoGroups_ReturnsTwoDimensions()
+    {
+        var result = SizeHelper.Extract("10cmx10cmx10cm(3.94x3.94x3.94in)");
+        
+        Assert.AreEqual(2, result.Count);
+        
+        // 第一组：厘米
+        var dim1 = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dim1.Unit);
+        Assert.AreEqual(3, dim1.Items.Count);
+        Assert.AreEqual(10m, dim1.Items[0].Value);
+        Assert.AreEqual(10m, dim1.Items[1].Value);
+        Assert.AreEqual(10m, dim1.Items[2].Value);
+        
+        // 第二组：英寸
+        var dim2 = result[1];
+        Assert.AreEqual(DimensionUnit.Inch, dim2.Unit);
+        Assert.AreEqual(3, dim2.Items.Count);
+        Assert.AreEqual(3.94m, dim2.Items[0].Value);
+        Assert.AreEqual(3.94m, dim2.Items[1].Value);
+        Assert.AreEqual(3.94m, dim2.Items[2].Value);
+    }
+
+    /// <summary>
+    /// 测试厘米输入保持原单位
+    /// </summary>
+    [TestMethod]
+    public void Extract_CentimeterInput_PreservesUnit()
+    {
+        var result = SizeHelper.Extract("10x20x30cm");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        Assert.AreEqual(10m, dimension.Items[0].Value);
+        Assert.AreEqual(20m, dimension.Items[1].Value);
+        Assert.AreEqual(30m, dimension.Items[2].Value);
+    }
+
+    /// <summary>
+    /// 测试英寸输入保持原单位
+    /// </summary>
+    [TestMethod]
+    public void Extract_InchInput_PreservesUnit()
+    {
+        var result = SizeHelper.Extract("10x20x30in");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Inch, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        Assert.AreEqual(10m, dimension.Items[0].Value);
+        Assert.AreEqual(20m, dimension.Items[1].Value);
+        Assert.AreEqual(30m, dimension.Items[2].Value);
+    }
+
+    /// <summary>
+    /// 测试毫米转换为厘米
+    /// </summary>
+    [TestMethod]
+    public void Extract_MillimeterInput_ConvertsTocentimeter()
+    {
+        var result = SizeHelper.Extract("100x200x300mm");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        Assert.AreEqual(10m, dimension.Items[0].Value);  // 100mm = 10cm
+        Assert.AreEqual(20m, dimension.Items[1].Value);  // 200mm = 20cm
+        Assert.AreEqual(30m, dimension.Items[2].Value);  // 300mm = 30cm
+    }
+
+    /// <summary>
+    /// 测试米转换为厘米
+    /// </summary>
+    [TestMethod]
+    public void Extract_MeterInput_ConvertsToCentimeter()
+    {
+        var result = SizeHelper.Extract("1x2x3m");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        Assert.AreEqual(100m, dimension.Items[0].Value);  // 1m = 100cm
+        Assert.AreEqual(200m, dimension.Items[1].Value);  // 2m = 200cm
+        Assert.AreEqual(300m, dimension.Items[2].Value);  // 3m = 300cm
+    }
+
+    /// <summary>
+    /// 测试双引号标记的英寸
+    /// </summary>
+    [TestMethod]
+    public void Extract_DoubleQuoteInch_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("10\"x20\"x30\"");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Inch, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        Assert.AreEqual(10m, dimension.Items[0].Value);
+        Assert.AreEqual(20m, dimension.Items[1].Value);
+        Assert.AreEqual(30m, dimension.Items[2].Value);
+    }
+
+    /// <summary>
+    /// 测试空字符串输入
+    /// </summary>
+    [TestMethod]
+    public void Extract_EmptyString_ReturnsEmptyList()
+    {
+        var result = SizeHelper.Extract("");
+        
+        Assert.IsNotNull(result);
+        Assert.AreEqual(0, result.Count);
+    }
+
+    /// <summary>
+    /// 测试null输入
+    /// </summary>
+    [TestMethod]
+    public void Extract_NullString_ReturnsEmptyList()
+    {
+        var result = SizeHelper.Extract(null);
+        
+        Assert.IsNotNull(result);
+        Assert.AreEqual(0, result.Count);
+    }
+
+    /// <summary>
+    /// 测试维度标签：Width, Height, Length
+    /// </summary>
+    [TestMethod]
+    public void Extract_DimensionLabels_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("10cmW x 20cmH x 30cmL");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        
+        Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
+        Assert.AreEqual(10m, dimension.Items[0].Value);
+        
+        Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
+        Assert.AreEqual(20m, dimension.Items[1].Value);
+        
+        Assert.AreEqual(DimensionKind.Length, dimension.Items[2].Kind);
+        Assert.AreEqual(30m, dimension.Items[2].Value);
+    }
+
+    /// <summary>
+    /// 测试完整维度标签词：Width, Height, Length
+    /// </summary>
+    [TestMethod]
+    public void Extract_FullDimensionLabels_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("10Width x 20Height x 30Length cm");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        
+        Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
+        Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
+        Assert.AreEqual(DimensionKind.Length, dimension.Items[2].Kind);
+    }
+
+    /// <summary>
+    /// 测试混合单位和维度标签
+    /// </summary>
+    [TestMethod]
+    public void Extract_MixedUnitsWithLabels_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("10cmW x 20''H");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        // 当有多种单位时，优先检测到的单位作为主单位
+        Assert.AreEqual(2, dimension.Items.Count);
+        
+        Assert.AreEqual(DimensionKind.Width, dimension.Items[0].Kind);
+        Assert.AreEqual(DimensionKind.Height, dimension.Items[1].Kind);
+    }
+
+    /// <summary>
+    /// 测试小数值
+    /// </summary>
+    [TestMethod]
+    public void Extract_DecimalValues_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("10.5x20.3x30.7cm");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        Assert.AreEqual(10.5m, dimension.Items[0].Value);
+        Assert.AreEqual(20.3m, dimension.Items[1].Value);
+        Assert.AreEqual(30.7m, dimension.Items[2].Value);
+    }
+
+    /// <summary>
+    /// 测试分米转换为厘米
+    /// </summary>
+    [TestMethod]
+    public void Extract_DecimeterInput_ConvertsToCentimeter()
+    {
+        var result = SizeHelper.Extract("1x2x3dm");
+        
+        Assert.AreEqual(1, result.Count);
+        var dimension = result[0];
+        Assert.AreEqual(DimensionUnit.Centimeter, dimension.Unit);
+        Assert.AreEqual(3, dimension.Items.Count);
+        Assert.AreEqual(10m, dimension.Items[0].Value);  // 1dm = 10cm
+        Assert.AreEqual(20m, dimension.Items[1].Value);  // 2dm = 20cm
+        Assert.AreEqual(30m, dimension.Items[2].Value);  // 3dm = 30cm
+    }
+
+    /// <summary>
+    /// 测试多括号组
+    /// </summary>
+    [TestMethod]
+    public void Extract_MultipleParenthesesGroups_ParsesCorrectly()
+    {
+        var result = SizeHelper.Extract("10x20cm(5x6in)(7x8mm)");
+        
+        Assert.AreEqual(3, result.Count);
+        
+        // 第一组：厘米
+        Assert.AreEqual(DimensionUnit.Centimeter, result[0].Unit);
+        Assert.AreEqual(2, result[0].Items.Count);
+        
+        // 第二组：英寸
+        Assert.AreEqual(DimensionUnit.Inch, result[1].Unit);
+        Assert.AreEqual(2, result[1].Items.Count);
+        
+        // 第三组：毫米转厘米
+        Assert.AreEqual(DimensionUnit.Centimeter, result[2].Unit);
+        Assert.AreEqual(2, result[2].Items.Count);
+    }
+
+    #endregion
 }
