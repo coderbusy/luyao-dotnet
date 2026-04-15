@@ -1,5 +1,5 @@
-﻿using LuYao.Text.Json;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LuYao.Data;
 
@@ -7,7 +7,7 @@ namespace LuYao.Data;
 /// 代表一行数据，提供对列存储数据集合中特定行数据的访问。
 /// 实现了 <see cref="IRecordCursor"/> 接口，支持类型安全的数据读取操作。
 /// </summary>
-public struct RecordRow : IRecordCursor, IDataModel
+public struct RecordRow : IRecordCursor
 {
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
@@ -68,9 +68,14 @@ public struct RecordRow : IRecordCursor, IDataModel
 
     #endregion
 
-    #region IDataModel
+    #region Indexer
 
-    ///<inheritdoc/>
+    /// <summary>
+    /// 根据列名获取或设置当前行指定列的值。
+    /// </summary>
+    /// <param name="key">列的名称。</param>
+    /// <returns>指定列的值。</returns>
+    /// <exception cref="KeyNotFoundException">当列名不存在时抛出。</exception>
     public object? this[string key]
     {
         get => this.Record.Columns.Get(key).GetValue(this);

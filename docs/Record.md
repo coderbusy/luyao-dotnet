@@ -56,9 +56,9 @@
 
 `RecordColumn` 是列的抽象基类，`RecordColumn<T>` 是泛型实现。
 
-- 每个列持有所属 `Record` 引用、列名（`Name`）和数据类型（`Type`）。
+- 每个列持有所属 `Record` 引用、列名（`Name`）和数据类型（`Type`）。列名可通过 `Record.RenameColumn` 修改。
 - 数据以数组 `T[]` 形式列存储，支持自动扩容。
-- 提供按行索引或游标位置读写值：`GetValue(int row)` / `SetValue(object? value, int row)`。
+- 提供按行索引读写值：`GetValue(int row)` / `SetValue(object? value, int row)`。
 - 泛型列额外提供强类型读写：`Get(int row)` / `Set(T value, int row)`。
 
 ### 3.3 `RecordColumnCollection`
@@ -250,7 +250,7 @@
 要求：
 
 - 以表名映射 `Record` 名称。
-- 对表名冲突提供明确策略（抛异常 / 覆盖 / 重命名）。
+- 当前 `FromDataSet` 采用“抛异常”策略：若名称冲突则抛出 `ArgumentException`。后续可扩展支持覆盖或重命名策略。
 
 ### 8.4 行为约束
 

@@ -87,16 +87,10 @@ public class RecordColumn<T> : RecordColumn
     }
 
     ///<inheritdoc/>
-    public T Get() => Get(Record.Cursor);
-
-    ///<inheritdoc/>
     public virtual void Set(T value, int row)
     {
         OnSet(row);
         _data[row] = value;
     }
-
-    ///<inheritdoc/>
-    public void Set(T value) => Set(value, Record.Cursor);
     #endregion
 }

@@ -401,7 +401,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 1);
         var byteColumn = record.Columns.Add<byte>("ByteColumn");
         var row = record.AddRow();
-        byteColumn.Set(255);
+        byteColumn.Set(255, row.Row);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -421,7 +421,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 1);
         var doubleColumn = record.Columns.Add<double>("DoubleColumn");
         var row = record.AddRow();
-        doubleColumn.Set(3.14159);
+        doubleColumn.Set(3.14159, row.Row);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -442,7 +442,7 @@ public class RecordRowTests
         var dateTimeColumn = record.Columns.Add<DateTime>("DateTimeColumn");
         var testDate = new DateTime(2023, 8, 15, 14, 30, 0);
         var row = record.AddRow();
-        dateTimeColumn.Set(testDate);
+        dateTimeColumn.Set(testDate, row.Row);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -483,9 +483,9 @@ public class RecordRowTests
 
         // 添加更多测试数据
         var row3 = record.AddRow();
-        intColumn.Set(300);
-        stringColumn.Set("Test3");
-        boolColumn.Set(true);
+        intColumn.Set(300, row3.Row);
+        stringColumn.Set("Test3", row3.Row);
+        boolColumn.Set(true, row3.Row);
 
         var recordRow0 = new RecordRow(record, 0);
         var recordRow1 = new RecordRow(record, 1);

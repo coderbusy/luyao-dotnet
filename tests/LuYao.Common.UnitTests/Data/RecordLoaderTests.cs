@@ -58,14 +58,14 @@ public class RecordLoaderTests
         var row = record.AddRow();
 
         // 设置数据
-        idColumn.Set(123);
-        nameColumn.Set("测试名称");
-        createTimeColumn.Set(new DateTime(2023, 7, 28, 10, 30, 0));
-        isActiveColumn.Set(true);
-        scoreColumn.Set(95.5);
-        customColumn.Set("自定义值");
-        nullableIntColumn.Set(456);
-        nullableDateTimeColumn.Set(new DateTime(2023, 8, 1));
+        idColumn.Set(123, row.Row);
+        nameColumn.Set("测试名称", row.Row);
+        createTimeColumn.Set(new DateTime(2023, 7, 28, 10, 30, 0), row.Row);
+        isActiveColumn.Set(true, row.Row);
+        scoreColumn.Set(95.5, row.Row);
+        customColumn.Set("自定义值", row.Row);
+        nullableIntColumn.Set(456, row.Row);
+        nullableDateTimeColumn.Set(new DateTime(2023, 8, 1), row.Row);
 
         return (record, row);
     }
@@ -104,7 +104,7 @@ public class RecordLoaderTests
         var record = new Record("TestTable", 1);
         var idColumn = record.Columns.Add<Int32>("Id");
         var row = record.AddRow();
-        idColumn.Set(100);
+        idColumn.Set(100, row.Row);
 
         var entity = new TestEntity
         {
@@ -200,7 +200,7 @@ public class RecordLoaderTests
         var record = new Record("TestTable", 1);
         var customColumn = record.Columns.Add<String>("custom_column"); // 使用特性指定的名称
         var row = record.AddRow();
-        customColumn.Set("特性测试值");
+        customColumn.Set("特性测试值", row.Row);
 
         var entity = new TestEntity();
 
@@ -295,8 +295,8 @@ public class RecordLoaderTests
         var textColumn = record.Columns.Add<String>("Text");
         var row = record.AddRow();
 
-        valueColumn.Set(42);
-        textColumn.Set("简单测试");
+        valueColumn.Set(42, row.Row);
+        textColumn.Set("简单测试", row.Row);
 
         var entity = new SimpleEntity();
 
@@ -318,7 +318,7 @@ public class RecordLoaderTests
         var record = new Record("TestTable", 1);
         var idColumn = record.Columns.Add<Int32>("Value"); // 修正列名
         var row = record.AddRow();
-        idColumn.Set(1);
+        idColumn.Set(1, row.Row);
 
         var entity1 = new SimpleEntity();
         var entity2 = new SimpleEntity();

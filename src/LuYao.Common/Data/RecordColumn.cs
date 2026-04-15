@@ -49,24 +49,12 @@ public abstract class RecordColumn
     public abstract void SetValue(object? value, int row);
 
     /// <summary>
-    /// 在当前游标位置设置列的值。
-    /// </summary>
-    /// <param name="value">要设置的值，可以为 null。</param>
-    public void SetValue(object? value) => this.SetValue(value, this.Record.Cursor);
-
-    /// <summary>
     /// 获取指定行的列值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>指定行的列值，可能为 null。</returns>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
     public abstract object? GetValue(int row);
-
-    /// <summary>
-    /// 获取当前游标位置的列值。
-    /// </summary>
-    /// <returns>当前游标位置的列值，可能为 null。</returns>
-    public object? GetValue() => this.GetValue(this.Record.Cursor);
 
     /// <summary>
     /// 删除指定行的列值。
@@ -94,17 +82,13 @@ public abstract class RecordColumn
 
     internal void OnSet(int row)
     {
-        if (row == 0 && this.Record.Count == 0)
-        {
-            this.Record.AddRow();
-            return;
-        }
         if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
     }
     internal void OnGet(int row)
     {
         if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
     }
+
     #region Get 
     /// <summary>
     /// 获取指定行的值并转换为指定的泛型类型。
@@ -123,12 +107,5 @@ public abstract class RecordColumn
         return (T)Valid.To(value, typeof(T));
     }
 
-    /// <summary>
-    /// 获取当前游标位置的值并转换为指定的泛型类型。
-    /// </summary>
-    /// <typeparam name="T">要转换到的目标类型。</typeparam>
-    /// <returns>转换后的值，如果原值为 null 则返回类型 T 的默认值。</returns>
-    /// <exception cref="InvalidCastException">当值无法转换为目标类型时抛出。</exception>
-    public T? Get<T>() => this.Get<T>(this.Record.Cursor);
     #endregion
 }
