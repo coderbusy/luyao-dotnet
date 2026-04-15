@@ -133,7 +133,8 @@
 
 - 统一边界行为（空表、越界、空列、类型不匹配）。
 - 明确异常类型（`ArgumentException`、`ArgumentOutOfRangeException`、`InvalidOperationException` 等）。
-- 尽量减少隐式状态副作用（例如游标状态影响操作结果）。
+- 所有数据访问基于行索引（`int row`）或 `RecordRow`，无隐式状态依赖。
+- `SetValue` / `GetValue` 的边界检查一致：行索引超出 `[0, Count)` 时抛出 `ArgumentOutOfRangeException`。
 
 ### 4.6 Schema 操作
 
@@ -193,17 +194,22 @@
 
 ---
 
-## 6. 游标模型
+## 6. 数据访问模型
 
-### 6.1 游标定位
+`Record` 采用基于行索引的无状态访问模型，不维护游标。
 
-`Record` 保留游标（`Cursor`）属性，用于兼容基于游标的旧 API（如 `Read()`、`MoveFirst()`、`MoveLast()` 等）。
+### 6.1 访问方式
 
-### 6.2 使用边界
+- **行索引**：`record[int row]` 返回 `RecordRow`。
+- **遍历**：`foreach (var row in record)` 按行索引顺序产生 `RecordRow`。
+- **列级别**：`column.GetValue(int row)` / `column.SetValue(value, int row)` / `column.Get<T>(int row)` / `column.Set(T value, int row)`。
+- **行级别**：`row.Get<T>(column)` / `row.Get<T>(name)` / `row[name]`。
 
-- 游标仅在用户主动遍历（`Read()` 循环）或显式操作游标位置时生效。
-- 内部实现（查询引擎、集合操作等）不依赖游标状态，全部基于行索引操作。
-- 新增操作应基于行索引或 `RecordRow`，不引入对游标的隐式依赖。
+### 6.2 设计约束
+
+- 所有读写操作必须显式指定行索引，不存在依赖隐式位置的 API。
+- `AddRow()` 返回新行的 `RecordRow`，不产生任何全局状态副作用。
+- `RecordRow` 是轻量 `struct`，持有 `Record` 引用和行索引，本身不可变。
 
 ---
 
@@ -295,3 +301,166 @@
 - 空表操作返回空 `Record`（零行保留 Schema），不返回 `null`。
 - 异常信息清晰，便于排查问题。
 - 多目标框架编译通过，并有覆盖关键行为的单元测试。
+
+---
+
+## 12. 最佳实践
+
+### 12.1 创建与填充
+
+```csharp
+// 推荐：先定义列结构，再逐行添加数据
+var record = new Record("Orders", expectedRows);
+var idCol = record.Columns.Add<int>("Id");
+var nameCol = record.Columns.Add<string>("Name");
+var amountCol = record.Columns.Add<decimal>("Amount");
+
+for (int i = 0; i < count; i++)
+{
+    var row = record.AddRow();
+    idCol.Set(i + 1, row.Row);
+    nameCol.Set($"Order-{i + 1}", row.Row);
+    amountCol.Set(amounts[i], row.Row);
+}
+```
+
+**要点**：
+
+- 构造时传入预估行数 `expectedRows` 可减少列数组扩容次数。
+- 优先使用泛型 `Add<T>()` 添加列，返回 `RecordColumn<T>` 以获得强类型 `Set` / `Get`。
+- 使用 `AddRow()` 返回的 `RecordRow` 获取行索引，避免手动维护索引变量。
+
+### 12.2 读取数据
+
+```csharp
+// 推荐：通过 foreach 遍历 + 列引用读取
+var idCol = record.Columns.Find<int>("Id")!;
+var nameCol = record.Columns.Find<string>("Name")!;
+
+foreach (var row in record)
+{
+    int id = row.Get<int>(idCol);
+    string name = row.Get<string>(nameCol);
+}
+```
+
+**要点**：
+
+- 在循环外缓存列引用（`RecordColumn` / `RecordColumn<T>`），避免每行按名称查找。
+- 使用 `row.Get<T>(RecordColumn)` 比 `row.Get<T>(string)` 更快（跳过名称查找）。
+- 需要随机访问时使用 `record[index]` 索引器获取 `RecordRow`。
+
+### 12.3 列引用的生命周期
+
+```csharp
+// 列引用在 Record 生命周期内有效
+var col = record.Columns.Find<int>("Id")!;
+
+// ✅ 正确：同一 Record 内使用列引用
+int val = col.Get(0);
+
+// ⚠️ 注意：Clone / CloneSchema 产生的新 Record 有独立的列实例
+var clone = record.Clone();
+// col 仍指向原 Record，不能用于 clone
+var cloneCol = clone.Columns.Find<int>("Id")!;
+```
+
+**要点**：
+
+- `RecordColumn` 绑定到创建它的 `Record` 实例，不可跨 `Record` 使用。
+- `Clone()` / `CloneSchema()` 返回全新 `Record`，列引用不互通。
+- `RecordRow.Get<T>(RecordColumn)` 在检测到列不属于当前 `Record` 时，会自动回退到按名称查找。
+
+### 12.4 Schema 操作
+
+```csharp
+// 重命名列
+record.RenameColumn("OldName", "NewName");
+
+// 类型转换（逐行转换）
+record.CastColumn("Price", typeof(decimal));
+
+// 复制结构用于构建新表
+var template = record.CloneSchema();
+```
+
+**要点**：
+
+- `RenameColumn` 会使已持有的列引用名称同步更新（同一对象）。
+- `CastColumn` 会替换底层列实例。此前缓存的列引用将失效，需重新获取。
+- `ReorderColumns` 要求传入全部列名，不支持部分排序。
+
+### 12.5 与 ADO.NET 互操作
+
+```csharp
+// 从 IDataReader 填充
+var record = new Record();
+record.Read(dataReader);
+
+// 从 DataTable 创建
+var record = Record.Read(dataTable);
+
+// 导出为 DataTable
+var dt = record.ToDataTable();
+
+// RecordSet <-> DataSet
+var set = RecordSet.FromDataSet(dataSet);
+var ds = set.ToDataSet();
+```
+
+**要点**：
+
+- `Record.Read(IDataReader)` 会清空现有列和数据，完全用 Reader 的内容替换。
+- `Record.Read(DataTable)` 是静态方法，返回新实例；`record.Read(IDataReader)` 是实例方法，就地填充。
+- `DBNull.Value` 和 `null` 均映射为列类型的默认值（值类型为 `default(T)`，引用类型为 `null`）。
+
+### 12.6 RecordSet 管理
+
+```csharp
+var set = new RecordSet();
+set.Add("Orders", ordersRecord);
+set.Add("Customers", customersRecord);
+
+// 安全获取
+if (set.TryGet("Orders", out var orders))
+{
+    // 使用 orders
+}
+
+// 遍历（按添加顺序）
+foreach (var record in set)
+{
+    Console.WriteLine($"{record.Name}: {record.Count} rows");
+}
+```
+
+**要点**：
+
+- `RecordSet` 默认区分大小写（`StringComparer.Ordinal`）。如需不区分大小写，构造时传入 `StringComparer.OrdinalIgnoreCase`。
+- `Add` 名称重复时抛异常；`Set` 名称重复时覆盖。根据场景选择合适的方法。
+- `Rename` 会同步更新 `Record.Name` 属性。
+- 枚举顺序与添加顺序一致。
+
+### 12.7 异常处理
+
+| 场景 | 异常类型 |
+|------|----------|
+| 行索引越界 | `ArgumentOutOfRangeException` |
+| 列名不存在（`Columns.Get`） | `KeyNotFoundException` |
+| 重复列名 | `DuplicateNameException` |
+| 类型不匹配 | `InvalidCastException` |
+| 空参数 | `ArgumentNullException` |
+| 空/空白名称 | `ArgumentException` |
+
+**要点**：
+
+- `Columns.Find(name)` 不存在时返回 `null`（适合可选查找）。
+- `Columns.Get(name)` 不存在时抛 `KeyNotFoundException`（适合必须存在的场景）。
+- `record[row]` 索引越界时抛 `ArgumentOutOfRangeException`。
+
+### 12.8 性能提示
+
+- **预分配容量**：`new Record(name, expectedRows)` 减少列数组扩容。
+- **缓存列引用**：循环内避免反复调用 `Columns.Find` 或 `Columns["name"]`。
+- **优先泛型 API**：`RecordColumn<T>.Get(row)` / `Set(value, row)` 避免装箱拆箱，比 `GetValue` / `SetValue` 更高效。
+- **批量构建**：先添加所有列，再逐行填充。不要在行循环中动态添加列。
