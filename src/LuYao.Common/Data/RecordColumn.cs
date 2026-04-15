@@ -32,7 +32,7 @@ public abstract class RecordColumn
     /// 获取列的名称。
     /// </summary>
     /// <value>列的名称字符串。</value>
-    public string Name { get; }
+    public string Name { get; internal set; }
 
     /// <summary>
     /// 获取列的实际数据类型。

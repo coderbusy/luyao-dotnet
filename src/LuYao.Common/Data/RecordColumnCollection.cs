@@ -211,4 +211,55 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
             return this.Find(name);
         }
     }
+
+    /// <summary>
+    /// 重命名指定列。
+    /// </summary>
+    /// <param name="oldName">原列名。</param>
+    /// <param name="newName">新列名。</param>
+    /// <exception cref="ArgumentException">当 <paramref name="newName"/> 为空或空白时抛出。</exception>
+    /// <exception cref="KeyNotFoundException">当 <paramref name="oldName"/> 不存在时抛出。</exception>
+    /// <exception cref="DuplicateNameException">当 <paramref name="newName"/> 已被其他列使用时抛出。</exception>
+    public void Rename(string oldName, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName)) throw new ArgumentException("列名不能为空", nameof(newName));
+        var col = Find(oldName) ?? throw new KeyNotFoundException($"列 '{oldName}' 不存在");
+        if (oldName != newName && this.Contains(newName))
+            throw new DuplicateNameException($"列名 '{newName}' 已经存在");
+        col.Name = newName;
+        _list.InvalidateCache();
+    }
+
+    /// <summary>
+    /// 替换指定索引处的列实例。
+    /// </summary>
+    /// <param name="index">要替换的列索引。</param>
+    /// <param name="column">新的列实例。</param>
+    internal void ReplaceAt(int index, RecordColumn column)
+    {
+        _list[index] = column;
+    }
+
+    /// <summary>
+    /// 按指定顺序重新排列列。
+    /// </summary>
+    /// <param name="names">按期望顺序排列的列名数组。必须包含所有现有列名。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="names"/> 为 null 时抛出。</exception>
+    /// <exception cref="ArgumentException">当列名数量不匹配或包含不存在的列名时抛出。</exception>
+    public void Reorder(params string[] names)
+    {
+        if (names == null) throw new ArgumentNullException(nameof(names));
+        if (names.Length != _list.Count)
+            throw new ArgumentException($"列名数量 ({names.Length}) 与现有列数量 ({_list.Count}) 不匹配", nameof(names));
+
+        var reordered = new RecordColumn[names.Length];
+        for (int i = 0; i < names.Length; i++)
+        {
+            var col = Find(names[i]) ?? throw new ArgumentException($"列 '{names[i]}' 不存在", nameof(names));
+            reordered[i] = col;
+        }
+
+        _list.Clear();
+        _list.AddRange(reordered);
+    }
 }

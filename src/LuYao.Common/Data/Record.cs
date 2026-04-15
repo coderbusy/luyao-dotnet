@@ -537,13 +537,13 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
         {
             dt.Columns.Add(col.Name, col.Type);
         }
-        this.MoveFirst();
-        while (this.Read())
+        for (int r = 0; r < this.Count; r++)
         {
             DataRow row = dt.Rows.Add();
             for (int i = 0; i < this.Columns.Count; i++)
             {
-                row[i] = this.Columns[i].GetValue(this.Cursor);
+                var val = this.Columns[i].GetValue(r);
+                if (val is not null) row[i] = val;
             }
         }
     }
@@ -585,6 +585,111 @@ public partial class Record : IEnumerable<RecordRow>, IRecordCursor
         var dt = new DataTable(this.Name);
         this.Write(dt);
         return dt;
+    }
+
+    #endregion
+
+    #region Schema Operations
+
+    /// <summary>
+    /// 重命名指定列。
+    /// </summary>
+    /// <param name="oldName">原列名。</param>
+    /// <param name="newName">新列名。</param>
+    public void RenameColumn(string oldName, string newName)
+    {
+        this.Columns.Rename(oldName, newName);
+    }
+
+    /// <summary>
+    /// 转换指定列的数据类型，逐行转换数据值。
+    /// </summary>
+    /// <param name="name">要转换的列名。</param>
+    /// <param name="newType">目标数据类型。</param>
+    /// <exception cref="KeyNotFoundException">当列名不存在时抛出。</exception>
+    /// <exception cref="ArgumentNullException">当 <paramref name="newType"/> 为 null 时抛出。</exception>
+    public void CastColumn(string name, Type newType)
+    {
+        if (newType == null) throw new ArgumentNullException(nameof(newType));
+        var oldCol = this.Columns.Find(name) ?? throw new KeyNotFoundException($"列 '{name}' 不存在");
+        if (oldCol.Type == newType) return;
+
+        int idx = this.Columns.IndexOf(name);
+        var newCol = Helpers.MakeRecordColumn(this, name, newType);
+
+        for (int r = 0; r < this.Count; r++)
+        {
+            var val = oldCol.GetValue(r);
+            if (val is not null)
+            {
+                newCol.SetValue(Valid.To(val, newType), r);
+            }
+        }
+
+        this.Columns.ReplaceAt(idx, newCol);
+    }
+
+    /// <summary>
+    /// 按指定顺序重新排列列。
+    /// </summary>
+    /// <param name="names">按期望顺序排列的列名数组。</param>
+    public void ReorderColumns(params string[] names)
+    {
+        this.Columns.Reorder(names);
+    }
+
+    /// <summary>
+    /// 仅复制列结构（零行），返回新 <see cref="Record"/>。
+    /// </summary>
+    /// <returns>具有相同列结构但零行的新 <see cref="Record"/> 实例。</returns>
+    public Record CloneSchema()
+    {
+        var clone = new Record(this.Name, 0);
+        foreach (RecordColumn col in this.Columns)
+        {
+            clone.Columns.Add(col.Name, col.Type);
+        }
+        return clone;
+    }
+
+    /// <summary>
+    /// 复制列结构与全部行数据，返回新 <see cref="Record"/>。
+    /// </summary>
+    /// <returns>包含相同列结构和全部数据的新 <see cref="Record"/> 实例。</returns>
+    public Record Clone()
+    {
+        var clone = new Record(this.Name, this.Count);
+        foreach (RecordColumn col in this.Columns)
+        {
+            clone.Columns.Add(col.Name, col.Type);
+        }
+        for (int r = 0; r < this.Count; r++)
+        {
+            clone.AddRow();
+            for (int c = 0; c < this.Columns.Count; c++)
+            {
+                var val = this.Columns[c].GetValue(r);
+                if (val is not null)
+                {
+                    clone.Columns[c].SetValue(val, r);
+                }
+            }
+        }
+        return clone;
+    }
+
+    /// <summary>
+    /// 导出列定义信息（列名 + 类型）。
+    /// </summary>
+    /// <returns>表示当前列结构的 <see cref="RecordSchema"/> 实例。</returns>
+    public RecordSchema GetSchema()
+    {
+        var columns = new List<RecordSchema.ColumnDef>(this.Columns.Count);
+        foreach (RecordColumn col in this.Columns)
+        {
+            columns.Add(new RecordSchema.ColumnDef(col.Name, col.Type));
+        }
+        return new RecordSchema(columns);
     }
 
     #endregion
