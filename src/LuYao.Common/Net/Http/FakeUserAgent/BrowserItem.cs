@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Resources;
 
 namespace LuYao.Net.Http.FakeUserAgent;
 
@@ -9,6 +11,9 @@ namespace LuYao.Net.Http.FakeUserAgent;
 /// </summary>
 public class BrowserItem
 {
+    private const string BrowsersResourceName = "Browsers";
+    private static readonly ResourceManager ResourceManager = new ResourceManager(typeof(BrowserItem).Namespace + ".FakeUserAgentResources", typeof(BrowserItem).Assembly);
+
     /// <summary>
     /// 用户代理字符串。
     /// </summary>
@@ -73,8 +78,13 @@ public class BrowserItem
     /// <returns>返回一个包含所有浏览器项的枚举。</returns>
     public static IEnumerable<BrowserItem> List()
     {
-        var res = typeof(BrowserItem).Namespace + ".Browsers.dat";
-        using (var ms = typeof(BrowserItem).Assembly.GetManifestResourceStream(res))
+        var bytes = ResourceManager.GetObject(BrowsersResourceName) as byte[];
+        if (bytes == null)
+        {
+            throw new InvalidOperationException("无法加载 FakeUserAgent 浏览器数据资源。", new MissingManifestResourceException(BrowsersResourceName));
+        }
+
+        using (var ms = new MemoryStream(bytes, false))
         using (var gz = new GZipStream(ms, CompressionMode.Decompress))
         using (var reader = new BinaryReader(gz))
         {

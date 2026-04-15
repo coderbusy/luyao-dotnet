@@ -17,15 +17,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Remove="Net\Http\FakeUserAgent\Browsers.dat" />
+		<None Remove="Net\Http\FakeUserAgent\Resources\Browsers.dat" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Include="..\Assembly.cs" Link="Assembly.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Net\Http\FakeUserAgent\Browsers.dat" />
 	</ItemGroup>
 
 	<ItemGroup>
