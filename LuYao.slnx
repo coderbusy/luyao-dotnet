@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LuYao.Common/LuYao.Common.csproj" />
+    <Project Path="src/LuYao.Net.Http.FakeUserAgent/LuYao.Net.Http.FakeUserAgent.csproj" />
+    <Project Path="src/LuYao.Text.Json.Jint/LuYao.Text.Json.Jint.csproj" />
+    <Project Path="src/LuYao.Text.Json/LuYao.Text.Json.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LuYao.Common.UnitTests/LuYao.Common.UnitTests.csproj" />
+    <Project Path="tests/LuYao.Text.Json.UnitTests/LuYao.Text.Json.UnitTests.csproj" />
+  </Folder>
+  <Project Path="build/_build.csproj">
+    <Build Project="false" />
+  </Project>
+</Solution>
