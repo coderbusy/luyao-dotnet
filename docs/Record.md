@@ -20,7 +20,8 @@
 - 负责内存中的表结构与数据处理。
 - 保留与 `IDataReader`、`DataTable` 的互操作。
 - 提供集合操作能力（筛选、连接、聚合、集合代数）。
-- 支持二进制序列化（`ISerializable`）和 XML 序列化（`IXmlSerializable`）。
+- 支持对象映射（`AddRow<T>`、`AddRows<T>`、`ToList<T>`、`To<T>`）。
+- 支持二进制序列化（`WriteTo` / `ReadFrom`）。
 - 支持服务端翻页元数据（`Page`、`PageSize`、`MaxCount`、`MaxPage`）。
 
 ### 2.2 `RecordSet` 核心职责
@@ -30,7 +31,6 @@
 
 ### 2.3 非核心职责
 
-- 对象映射能力（`From<T>`、`FromList<T>`、`To<T>`、`ToList<T>`）不属于核心数据处理职责，后续下沉到扩展层。对象映射的详细设计见独立文档 `RecordMapping.md`。
 - JSON、文本等协议能力通过扩展模块提供（如扩展方法或独立包）。
 
 ### 2.4 线程安全
@@ -185,44 +185,19 @@
 
 ### 4.8 序列化
 
-`Record` 和 `RecordSet` 实现 `ISerializable` 和 `IXmlSerializable` 接口，支持二进制序列化和 XML 序列化。
+`Record` 和 `RecordSet` 支持通过 `WriteTo` / `ReadFrom` 方法进行二进制序列化。
 
-#### 二进制序列化（`ISerializable`）
+#### 二进制序列化
 
-序列化内容包括：
-- `n`：表名。
-- 翻页元数据：`p`、`sz`、`m`。
-- `ns`：列名数组（`string[]`，单个键）。
-- `ts`：列类型码数组（`sbyte[]`，单个键，负值表示 Nullable）。
-- `0`, `1`, ...：每列的底层数据数组（截断到实际行数），一列一个键。
+通过 `BinaryWriter` / `BinaryReader` 实现，按固定顺序写入：
+
+1. 格式版本号（`byte`）。
+2. 表名（`string`）。
+3. 翻页元数据：`Page`、`PageSize`、`MaxCount`（各 `int`）。
+4. 列数量（`int`），随后每列写入：列名（`string`）、类型码（`RecordColumnType`，`byte`）、是否可空（`bool`）。
+5. 行数量（`int`），随后按列顺序写入每列的数据。
 
 `RecordSet` 序列化其包含的所有 `Record`。
-
-#### XML 序列化（`IXmlSerializable`）
-
-XML 格式：
-
-```xml
-<!-- Record: schema 在属性 S 中，行值作为属性 -->
-<Record N="Orders" PS="20" MC="100" S="Id:i4,Name:s">
-  <r Id="1" Name="Order-1"/>
-  <r Id="2" Name="Order-2"/>
-</Record>
-
-<!-- RecordSet -->
-<RecordSet>
-  <R N="Orders" S="Id:i4,Name:s"><r Id="1" Name="Order-1"/></R>
-  <R N="Customers" S="Name:s"><r Name="Alice"/></R>
-</RecordSet>
-```
-
-- 列定义压缩为单个属性 `S`（Schema），格式为 `列名:类型别名,...`（如 `Id:i4,Name:s`）。
-- 行数据使用 `<r/>` 元素，列值作为 XML 属性存储。`null` 值省略对应属性。
-- 元素/属性名使用紧凑缩写：`N`=Name, `P`=Page, `PS`=PageSize, `MC`=MaxCount, `S`=Schema。
-- 列类型使用紧凑别名（封闭白名单映射）：`i4`=Int32, `s`=String, `b`=Boolean, `r8`=Double, `dt`=DateTime, `g`=Guid, `bin`=byte[] 等。Nullable 类型后缀 `?`（如 `i4?`）。
-- 翻页属性仅在非默认值时输出（`P` 默认 1，`PS`/`MC` 默认 0）。
-- `byte[]` 值使用 Base64 编码。
-- 列类型使用 `Type.FullName` 序列化，使用 `Type.GetType` 反序列化。
 
 ---
 
@@ -360,7 +335,7 @@ XML 格式：
 2. `RecordSet` 与 `DataSet` 双向互操作
 3. Schema 操作（`RenameColumn`、`CastColumn`、`CloneSchema`、`Clone`、`GetSchema`）
 4. 服务端翻页属性
-5. `ISerializable` / `IXmlSerializable` 序列化
+5. 二进制序列化（`WriteTo` / `ReadFrom`）
 6. `RecordQuery` 基础框架（`AsQuery` + `ToRecord` + `QueryOptions`）
 7. `Where/Select/OrderBy/Distinct/Take/Skip`
 8. `Join/InnerJoin/LeftJoin/RightJoin` + 索引优化
@@ -380,7 +355,7 @@ XML 格式：
 - 空表操作返回空 `Record`（零行保留 Schema），不返回 `null`。
 - 异常信息清晰，便于排查问题。
 - 多目标框架编译通过，并有覆盖关键行为的单元测试。
-- `Record` / `RecordSet` 可通过 `ISerializable` 和 `IXmlSerializable` 正确往返序列化。
+- `Record` / `RecordSet` 可通过 `WriteTo` / `ReadFrom` 正确往返二进制序列化。
 - 翻页属性在序列化、`Clone` 中得到保留。
 
 ---
@@ -548,6 +523,6 @@ foreach (var record in set)
 
 ---
 
-## 13. 对象映射（已移至独立文档）
+## 13. 对象映射
 
-对象映射能力不属于 `Record` 核心职责（见 §2.3），详细设计见独立文档 `RecordMapping.md`。
+对象映射能力属于 `Record` 核心职责（见 §2.1），提供 `AddRow<T>`、`AddRows<T>`、`ToList<T>`、`To<T>` 等扩展方法。
