@@ -96,8 +96,8 @@
 - `InnerJoin`
 - `LeftJoin`
 - `RightJoin`
-- `FullOuterJoin`（可在第二阶段实现）
-- `CrossJoin`（可在第二阶段实现）
+- `FullOuterJoin`
+- `CrossJoin`
 
 连接需支持：
 
@@ -287,7 +287,7 @@
 6. `Join/InnerJoin/LeftJoin/RightJoin` + 索引优化
 7. `Union/Intersect/Except/Concat`
 8. `GroupBy + Aggregate`
-9. 评估并补充 `FullOuterJoin/CrossJoin`
+9. `FullOuterJoin/CrossJoin`
 
 ---
 

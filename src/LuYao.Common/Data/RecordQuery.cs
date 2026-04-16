@@ -215,6 +215,58 @@ public class RecordQuery
         return this;
     }
 
+    /// <summary>
+    /// 全外连接：保留左右两表的所有行，无匹配一侧填 null。
+    /// </summary>
+    /// <param name="right">右表。</param>
+    /// <param name="leftKey">左表键列名。</param>
+    /// <param name="rightKey">右表键列名。</param>
+    /// <param name="rightPrefix">右表重名列前缀，为 null 时重名抛异常。</param>
+    /// <returns>当前查询对象，支持链式调用。</returns>
+    public RecordQuery FullOuterJoin(Record right, string leftKey, string rightKey, string? rightPrefix = null)
+    {
+        if (right == null) throw new ArgumentNullException(nameof(right));
+        if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
+        if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
+        _steps.Add((record, opts) => ExecuteJoin(record, right.Clone(), leftKey, rightKey, rightPrefix, JoinType.FullOuter, opts));
+        return this;
+    }
+
+    /// <summary>
+    /// 全外连接，右表为查询对象。
+    /// </summary>
+    public RecordQuery FullOuterJoin(RecordQuery right, string leftKey, string rightKey, string? rightPrefix = null)
+    {
+        if (right == null) throw new ArgumentNullException(nameof(right));
+        if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
+        if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
+        _steps.Add((record, opts) => ExecuteJoin(record, right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.FullOuter, opts));
+        return this;
+    }
+
+    /// <summary>
+    /// 交叉连接（笛卡尔积）：左表每行与右表每行两两组合，结果行数 = 左表行数 × 右表行数。
+    /// </summary>
+    /// <param name="right">右表。</param>
+    /// <param name="rightPrefix">右表重名列前缀，为 null 时重名抛异常。</param>
+    /// <returns>当前查询对象，支持链式调用。</returns>
+    public RecordQuery CrossJoin(Record right, string? rightPrefix = null)
+    {
+        if (right == null) throw new ArgumentNullException(nameof(right));
+        _steps.Add((record, opts) => ExecuteCrossJoin(record, right.Clone(), rightPrefix));
+        return this;
+    }
+
+    /// <summary>
+    /// 交叉连接（笛卡尔积），右表为查询对象。
+    /// </summary>
+    public RecordQuery CrossJoin(RecordQuery right, string? rightPrefix = null)
+    {
+        if (right == null) throw new ArgumentNullException(nameof(right));
+        _steps.Add((record, opts) => ExecuteCrossJoin(record, right.ToRecord(), rightPrefix));
+        return this;
+    }
+
     #endregion
 
     #region Set Algebra
@@ -369,7 +421,7 @@ public class RecordQuery
 
     #region Execution
 
-    private enum JoinType { Inner, Left, Right }
+    private enum JoinType { Inner, Left, Right, FullOuter }
 
     private static Record ExecuteWhere(Record source, Func<RecordRow, bool> predicate)
     {
@@ -544,7 +596,9 @@ public class RecordQuery
             list.Add(r);
         }
 
-        var matchedRight = joinType == JoinType.Right ? new HashSet<int>() : null;
+        var matchedRight = (joinType == JoinType.Right || joinType == JoinType.FullOuter)
+            ? new HashSet<int>()
+            : null;
 
         // 遍历左表
         for (int lr = 0; lr < left.Count; lr++)
@@ -567,38 +621,73 @@ public class RecordQuery
                     }
                 }
             }
-            else if (joinType == JoinType.Left)
+            else if (joinType == JoinType.Left || joinType == JoinType.FullOuter)
             {
-                // Left join: 左行保留，右侧填 null
+                // Left / FullOuter: 左行保留，右侧填 null
                 var newRow = result.AddRow();
                 CopyRow(left, lr, result, newRow.Row, 0, left.Columns.Count);
             }
-            // Inner join: 不匹配的行丢弃
+            // Inner / Right: 不匹配的左行丢弃
         }
 
-        // Right join: 未匹配的右表行
-        if (joinType == JoinType.Right)
+        // Right / FullOuter: 追加未匹配的右表行（左侧列填 null）
+        if (joinType == JoinType.Right || joinType == JoinType.FullOuter)
         {
             for (int rr = 0; rr < right.Count; rr++)
             {
-                var rightKeyVal = ConvertToKeyString(rightCol.GetValue(rr));
-                var hasMatch = rightIndex.TryGetValue(rightKeyVal, out _)
-                    && matchedRight != null && matchedRight.Contains(rr);
+                if (matchedRight != null && matchedRight.Contains(rr)) continue;
 
-                if (!hasMatch)
+                var newRow = result.AddRow();
+                for (int ci = 0; ci < rightColSources.Count; ci++)
                 {
-                    // 右表行无匹配左表行：左侧列填 null
-                    var newRow = result.AddRow();
-                    for (int ci = 0; ci < rightColSources.Count; ci++)
-                    {
-                        var val = rightColSources[ci].GetValue(rr);
-                        if (val is not null)
-                            result.Columns[rightColDestIndices[ci]].SetValue(val, newRow.Row);
-                    }
+                    var val = rightColSources[ci].GetValue(rr);
+                    if (val is not null)
+                        result.Columns[rightColDestIndices[ci]].SetValue(val, newRow.Row);
                 }
             }
+        }
 
-            // 同时需要处理有匹配的部分 — 上面的 Inner 循环已处理
+        return result;
+    }
+
+    private static Record ExecuteCrossJoin(Record left, Record right, string? rightPrefix)
+    {
+        var result = new Record(left.Name, 0);
+        foreach (RecordColumn col in left.Columns)
+        {
+            result.Columns.Add(col.Name, col.Type);
+        }
+
+        var crossRightSources = new List<RecordColumn>();
+        var crossRightDestIdx = new List<int>();
+        foreach (RecordColumn col in right.Columns)
+        {
+            var destName = col.Name;
+            if (left.Columns.Find(destName) != null)
+            {
+                if (rightPrefix == null)
+                    throw new InvalidOperationException($"右表列 '{destName}' 与左表列重名，请指定 rightPrefix 参数");
+                destName = rightPrefix + destName;
+            }
+            result.Columns.Add(destName, col.Type);
+            crossRightSources.Add(col);
+            crossRightDestIdx.Add(result.Columns.IndexOf(destName));
+        }
+
+        // 笛卡尔积：左表每行 × 右表每行
+        for (int lr = 0; lr < left.Count; lr++)
+        {
+            for (int rr = 0; rr < right.Count; rr++)
+            {
+                var newRow = result.AddRow();
+                CopyRow(left, lr, result, newRow.Row, 0, left.Columns.Count);
+                for (int ci = 0; ci < crossRightSources.Count; ci++)
+                {
+                    var val = crossRightSources[ci].GetValue(rr);
+                    if (val is not null)
+                        result.Columns[crossRightDestIdx[ci]].SetValue(val, newRow.Row);
+                }
+            }
         }
 
         return result;
