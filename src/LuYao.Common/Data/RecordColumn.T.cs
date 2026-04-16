@@ -72,9 +72,26 @@ public class RecordColumn<T> : RecordColumn
     internal override void Extend(int length)
     {
         if (_data.Length >= length) return;
-        T[] tmp = new T[length];
+        int newLen = Math.Max(length, _data.Length * 2);
+        T[] tmp = new T[newLen];
         _data.CopyTo(tmp, 0);
         _data = tmp;
+    }
+
+    internal override Array GetDataArray(int count)
+    {
+        if (count == _data.Length) return _data;
+        var arr = new T[count];
+        Array.Copy(_data, arr, count);
+        return arr;
+    }
+
+    internal override void SetDataArray(Array data, int count)
+    {
+        var src = (T[])data;
+        var len = Math.Min(src.Length, count);
+        if (_data.Length < count) _data = new T[count];
+        Array.Copy(src, _data, len);
     }
 
     #region Get / Set
@@ -87,16 +104,10 @@ public class RecordColumn<T> : RecordColumn
     }
 
     ///<inheritdoc/>
-    public T Get() => Get(Record.Cursor);
-
-    ///<inheritdoc/>
     public virtual void Set(T value, int row)
     {
         OnSet(row);
         _data[row] = value;
     }
-
-    ///<inheritdoc/>
-    public void Set(T value) => Set(value, Record.Cursor);
     #endregion
 }

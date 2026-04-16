@@ -58,9 +58,9 @@ public class GenericMethodTests
         var row = record.AddRow();
 
         // Act
-        intColumn.Set(123);
-        stringColumn.Set("Test String");
-        boolColumn.Set(false);
+        intColumn.Set(123, row.Row);
+        stringColumn.Set("Test String", row.Row);
+        boolColumn.Set(false, row.Row);
 
         // Assert
         Assert.AreEqual(123, row.Get<Int32>(intColumn));
@@ -82,8 +82,8 @@ public class GenericMethodTests
         var row = record.AddRow();
 
         // 设置一些测试数据
-        intColumn.Set(42);
-        stringColumn.Set("Hello");
+        intColumn.Set(42, 0);
+        stringColumn.Set("Hello", 0);
 
         // Act & Assert
         int intValue = intColumn.Get<int>(0);

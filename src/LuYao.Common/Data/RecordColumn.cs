@@ -26,19 +26,31 @@ public abstract class RecordColumn
         this.Record = record ?? throw new ArgumentNullException(nameof(record));
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
         this._type = type ?? throw new ArgumentNullException(nameof(type));
+        this.ColumnType = Helpers.GetColumnType(type);
+        this.IsNullable = Helpers.IsNullableType(type);
     }
     private Type _type;
     /// <summary>
     /// 获取列的名称。
     /// </summary>
     /// <value>列的名称字符串。</value>
-    public string Name { get; }
+    public string Name { get; internal set; }
 
     /// <summary>
     /// 获取列的实际数据类型。
     /// </summary>
     /// <value>表示列实际数据类型的 <see cref="Type"/> 对象。</value>
     public Type Type => this._type;
+
+    /// <summary>
+    /// 获取列的基础枚举类型标识（不含可空信息）。
+    /// </summary>
+    public RecordColumnType ColumnType { get; }
+
+    /// <summary>
+    /// 获取列是否为可空类型。
+    /// </summary>
+    public bool IsNullable { get; }
 
     /// <summary>
     /// 在指定行设置列的值。
@@ -49,24 +61,12 @@ public abstract class RecordColumn
     public abstract void SetValue(object? value, int row);
 
     /// <summary>
-    /// 在当前游标位置设置列的值。
-    /// </summary>
-    /// <param name="value">要设置的值，可以为 null。</param>
-    public void SetValue(object? value) => this.SetValue(value, this.Record.Cursor);
-
-    /// <summary>
     /// 获取指定行的列值。
     /// </summary>
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>指定行的列值，可能为 null。</returns>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
     public abstract object? GetValue(int row);
-
-    /// <summary>
-    /// 获取当前游标位置的列值。
-    /// </summary>
-    /// <returns>当前游标位置的列值，可能为 null。</returns>
-    public object? GetValue() => this.GetValue(this.Record.Cursor);
 
     /// <summary>
     /// 删除指定行的列值。
@@ -86,6 +86,16 @@ public abstract class RecordColumn
     public abstract int Capacity { get; }
     internal abstract void Extend(int length);
 
+    /// <summary>
+    /// 获取底层数据数组（截断到实际行数），用于序列化。
+    /// </summary>
+    internal abstract Array GetDataArray(int count);
+
+    /// <summary>
+    /// 从序列化数据数组还原列数据。
+    /// </summary>
+    internal abstract void SetDataArray(Array data, int count);
+
     ///  <inheritdoc/>
     public override string ToString()
     {
@@ -94,17 +104,13 @@ public abstract class RecordColumn
 
     internal void OnSet(int row)
     {
-        if (row == 0 && this.Record.Count == 0)
-        {
-            this.Record.AddRow();
-            return;
-        }
         if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
     }
     internal void OnGet(int row)
     {
         if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
     }
+
     #region Get 
     /// <summary>
     /// 获取指定行的值并转换为指定的泛型类型。
@@ -123,12 +129,5 @@ public abstract class RecordColumn
         return (T)Valid.To(value, typeof(T));
     }
 
-    /// <summary>
-    /// 获取当前游标位置的值并转换为指定的泛型类型。
-    /// </summary>
-    /// <typeparam name="T">要转换到的目标类型。</typeparam>
-    /// <returns>转换后的值，如果原值为 null 则返回类型 T 的默认值。</returns>
-    /// <exception cref="InvalidCastException">当值无法转换为目标类型时抛出。</exception>
-    public T? Get<T>() => this.Get<T>(this.Record.Cursor);
     #endregion
 }

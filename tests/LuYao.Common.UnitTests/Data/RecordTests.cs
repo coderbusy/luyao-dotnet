@@ -1038,17 +1038,15 @@ public class RecordTests
     public void Columns_SetObject_WorksCorrectly()
     {
         var re = new Record();
-        var raw = re.Columns.Add<Student>("Raw");
+        var name = re.Columns.Add<string>("Name");
         var id = re.Columns.Add<Int32>("Id");
 
         var row = re.AddRow();
-        raw.SetValue(new Student { Id = 1, Name = "John Doe" }, row.Row);
+        name.SetValue("John Doe", row.Row);
         id.Set(1, row.Row);
 
         // Assert
-        var stu = raw.Get<Student>(row.Row);
-        Assert.AreEqual(1, stu!.Id);
-        Assert.AreEqual("John Doe", stu.Name);
+        Assert.AreEqual("John Doe", name.Get(row.Row));
         Assert.AreEqual(1, id.Get<Int32>(row.Row));
     }
 
@@ -1057,10 +1055,9 @@ public class RecordTests
     {
         // Arrange
         var re = new Record();
-        var raw = re.Columns.Add<Student>("Raw");
         var id = re.Columns.Add<Int32>("Id");
         var row = re.AddRow();
-        // Act & Assert
-        Assert.Throws<InvalidCastException>(() => raw.SetValue(1, row.Row));
+        // Act & Assert - DateTime cannot be converted to int via SetValue
+        Assert.Throws<InvalidCastException>(() => id.SetValue(DateTime.Now, row.Row));
     }
 }

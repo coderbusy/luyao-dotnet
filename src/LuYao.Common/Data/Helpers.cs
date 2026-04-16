@@ -1,11 +1,101 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace LuYao.Data;
 
 static class Helpers
 {
+    #region RecordColumnType <-> Type 双向映射
+
+    private static readonly Dictionary<Type, RecordColumnType> TypeToColumnType = new()
+    {
+        [typeof(bool)] = RecordColumnType.Boolean,
+        [typeof(sbyte)] = RecordColumnType.SByte,
+        [typeof(short)] = RecordColumnType.Int16,
+        [typeof(int)] = RecordColumnType.Int32,
+        [typeof(long)] = RecordColumnType.Int64,
+        [typeof(byte)] = RecordColumnType.Byte,
+        [typeof(ushort)] = RecordColumnType.UInt16,
+        [typeof(uint)] = RecordColumnType.UInt32,
+        [typeof(ulong)] = RecordColumnType.UInt64,
+        [typeof(float)] = RecordColumnType.Single,
+        [typeof(double)] = RecordColumnType.Double,
+        [typeof(decimal)] = RecordColumnType.Decimal,
+        [typeof(char)] = RecordColumnType.Char,
+        [typeof(string)] = RecordColumnType.String,
+        [typeof(DateTime)] = RecordColumnType.DateTime,
+        [typeof(DateTimeOffset)] = RecordColumnType.DateTimeOffset,
+        [typeof(TimeSpan)] = RecordColumnType.TimeSpan,
+        [typeof(Guid)] = RecordColumnType.Guid,
+        [typeof(byte[])] = RecordColumnType.ByteArray,
+    };
+
+    private static readonly Dictionary<RecordColumnType, Type> ColumnTypeToType;
+
+    static Helpers()
+    {
+        ColumnTypeToType = new Dictionary<RecordColumnType, Type>(TypeToColumnType.Count);
+        foreach (var kv in TypeToColumnType)
+        {
+            ColumnTypeToType[kv.Value] = kv.Key;
+        }
+    }
+
+    /// <summary>
+    /// 从 CLR <see cref="Type"/> 获取基础 <see cref="RecordColumnType"/>（不含 Nullable 信息）。
+    /// </summary>
+    internal static RecordColumnType GetColumnType(Type type)
+    {
+        var underlying = Nullable.GetUnderlyingType(type);
+        var lookup = underlying ?? type;
+        if (TypeToColumnType.TryGetValue(lookup, out var ct))
+            return ct;
+        throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型");
+    }
+
+    /// <summary>
+    /// 判断 CLR <see cref="Type"/> 是否为 Nullable 值类型。
+    /// </summary>
+    internal static bool IsNullableType(Type type)
+    {
+        return Nullable.GetUnderlyingType(type) != null;
+    }
+
+    /// <summary>
+    /// 从基础 <see cref="RecordColumnType"/> 和 <paramref name="isNullable"/> 还原 CLR <see cref="Type"/>。
+    /// </summary>
+    internal static Type GetClrType(RecordColumnType columnType, bool isNullable)
+    {
+        if (!ColumnTypeToType.TryGetValue(columnType, out var baseType))
+            throw new NotSupportedException($"未知列类型枚举值: {columnType}");
+        if (isNullable && baseType.IsValueType)
+            return typeof(Nullable<>).MakeGenericType(baseType);
+        return baseType;
+    }
+
+    #endregion
+
+    internal static bool IsSupportedColumnType(Type type)
+    {
+        if (type == null) return false;
+        if (TypeToColumnType.ContainsKey(type)) return true;
+        var underlying = Nullable.GetUnderlyingType(type);
+        return underlying != null && TypeToColumnType.ContainsKey(underlying);
+    }
+
+    /// <summary>
+    /// 验证列类型是否在白名单内，不在则抛出异常。
+    /// </summary>
+    internal static void ValidateColumnType(Type type)
+    {
+        if (!IsSupportedColumnType(type))
+        {
+            throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型。支持的类型包括：bool, 整数类型, 浮点类型, char, string, DateTime, DateTimeOffset, TimeSpan, Guid, byte[] 及其 Nullable 形式。");
+        }
+    }
+
     private static readonly ConcurrentDictionary<Type, Func<Record, string, Type, RecordColumn>> _cache = new();
 
     private static Func<Record, string, Type, RecordColumn> GetConstructor(Type type)
@@ -48,6 +138,8 @@ static class Helpers
         if (record == null) throw new ArgumentNullException(nameof(record));
         if (name == null) throw new ArgumentNullException(nameof(name));
         if (type == null) throw new ArgumentNullException(nameof(type));
+
+        ValidateColumnType(type);
 
         var ctor = GetConstructor(type);
         return ctor.Invoke(record, name, type);
