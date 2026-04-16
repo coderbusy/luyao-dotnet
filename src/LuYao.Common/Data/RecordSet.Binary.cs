@@ -27,10 +27,12 @@ public partial class RecordSet
     {
         if (writer == null) throw new ArgumentNullException(nameof(writer));
         writer.Write(BinaryFormatVersion);
-        writer.Write(_names.Count);
-        foreach (var name in _names)
+        writer.Write(_records.Count);
+        foreach (var kvp in _records)
         {
-            _records[name].WriteTo(writer);
+            // 以字典键作为权威名称，防止 Record.Name 被外部修改后产生漂移
+            kvp.Value.Name = kvp.Key;
+            kvp.Value.WriteTo(writer);
         }
     }
 

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace LuYao.Data;
 
@@ -12,7 +13,6 @@ namespace LuYao.Data;
 public partial class RecordSet : IEnumerable<Record>
 {
     private readonly Dictionary<string, Record> _records;
-    private readonly List<string> _names;
     private readonly StringComparer _comparer;
 
     /// <summary>
@@ -31,7 +31,6 @@ public partial class RecordSet : IEnumerable<Record>
     {
         _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
         _records = new Dictionary<string, Record>(_comparer);
-        _names = new List<string>();
     }
 
     /// <summary>
@@ -42,7 +41,7 @@ public partial class RecordSet : IEnumerable<Record>
     /// <summary>
     /// 获取集合中所有 Record 的名称。
     /// </summary>
-    public IReadOnlyList<string> Names => _names;
+    public IEnumerable<string> Names => _records.Keys;
 
     /// <summary>
     /// 按名称获取 Record。
@@ -67,7 +66,6 @@ public partial class RecordSet : IEnumerable<Record>
         if (_records.ContainsKey(name)) throw new ArgumentException($"名称 '{name}' 已经存在", nameof(name));
         record.Name = name;
         _records.Add(name, record);
-        _names.Add(name);
     }
 
     /// <summary>
@@ -82,15 +80,7 @@ public partial class RecordSet : IEnumerable<Record>
         ValidateName(name);
         if (record == null) throw new ArgumentNullException(nameof(record));
         record.Name = name;
-        if (_records.ContainsKey(name))
-        {
-            _records[name] = record;
-        }
-        else
-        {
-            _records.Add(name, record);
-            _names.Add(name);
-        }
+        _records[name] = record;
     }
 
     /// <summary>
@@ -124,16 +114,7 @@ public partial class RecordSet : IEnumerable<Record>
     /// <returns>如果成功删除则返回 true，否则返回 false。</returns>
     public bool Remove(string name)
     {
-        if (!_records.Remove(name)) return false;
-        for (int i = _names.Count - 1; i >= 0; i--)
-        {
-            if (_comparer.Equals(_names[i], name))
-            {
-                _names.RemoveAt(i);
-                break;
-            }
-        }
-        return true;
+        return _records.Remove(name);
     }
 
     /// <summary>
@@ -165,15 +146,6 @@ public partial class RecordSet : IEnumerable<Record>
         _records.Remove(oldName);
         record.Name = newName;
         _records.Add(newName, record);
-
-        for (int i = 0; i < _names.Count; i++)
-        {
-            if (_comparer.Equals(_names[i], oldName))
-            {
-                _names[i] = newName;
-                break;
-            }
-        }
     }
 
     /// <summary>
@@ -182,7 +154,6 @@ public partial class RecordSet : IEnumerable<Record>
     public void Clear()
     {
         _records.Clear();
-        _names.Clear();
     }
 
     /// <summary>
@@ -222,23 +193,16 @@ public partial class RecordSet : IEnumerable<Record>
     public void WriteTo(DataSet ds)
     {
         if (ds == null) throw new ArgumentNullException(nameof(ds));
-        foreach (var name in _names)
+        foreach (var kvp in _records)
         {
-            var record = _records[name];
-            var dt = new DataTable(name);
-            record.Write(dt);
+            var dt = new DataTable(kvp.Key);
+            kvp.Value.Write(dt);
             ds.Tables.Add(dt);
         }
     }
 
     /// <inheritdoc/>
-    public IEnumerator<Record> GetEnumerator()
-    {
-        foreach (var name in _names)
-        {
-            yield return _records[name];
-        }
-    }
+    public IEnumerator<Record> GetEnumerator() => _records.Values.GetEnumerator();
 
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -248,5 +212,4 @@ public partial class RecordSet : IEnumerable<Record>
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("名称不能为空或空白", nameof(name));
     }
-
-    }
+}

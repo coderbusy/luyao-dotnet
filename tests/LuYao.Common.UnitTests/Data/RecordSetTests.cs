@@ -29,7 +29,7 @@ public class RecordSetTests
         var set = new RecordSet();
 
         Assert.AreEqual(0, set.Count);
-        Assert.AreEqual(0, set.Names.Count);
+        Assert.AreEqual(0, set.Names.Count());
     }
 
     [TestMethod]
@@ -272,7 +272,7 @@ public class RecordSetTests
 
         set.Remove("B");
 
-        Assert.AreEqual(2, set.Names.Count);
+        Assert.AreEqual(2, set.Names.Count());
         CollectionAssert.AreEqual(new[] { "A", "C" }, set.Names.ToArray());
     }
 
@@ -383,7 +383,7 @@ public class RecordSetTests
         set.Clear();
 
         Assert.AreEqual(0, set.Count);
-        Assert.AreEqual(0, set.Names.Count);
+        Assert.AreEqual(0, set.Names.Count());
     }
 
     #endregion
