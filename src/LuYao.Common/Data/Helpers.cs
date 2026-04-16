@@ -36,40 +36,43 @@ static class Helpers
 
     static Helpers()
     {
-        ColumnTypeToType = new Dictionary<RecordColumnType, Type>(TypeToColumnType.Count * 2);
+        ColumnTypeToType = new Dictionary<RecordColumnType, Type>(TypeToColumnType.Count);
         foreach (var kv in TypeToColumnType)
         {
             ColumnTypeToType[kv.Value] = kv.Key;
-            // 同时注册 Nullable 映射（负值）
-            if (kv.Key.IsValueType)
-            {
-                var nullableEnum = (RecordColumnType)(-(sbyte)kv.Value);
-                ColumnTypeToType[nullableEnum] = typeof(Nullable<>).MakeGenericType(kv.Key);
-            }
         }
     }
 
     /// <summary>
-    /// 从 CLR <see cref="Type"/> 获取 <see cref="RecordColumnType"/>。
+    /// 从 CLR <see cref="Type"/> 获取基础 <see cref="RecordColumnType"/>（不含 Nullable 信息）。
     /// </summary>
     internal static RecordColumnType GetColumnType(Type type)
     {
         var underlying = Nullable.GetUnderlyingType(type);
-        if (underlying != null && TypeToColumnType.TryGetValue(underlying, out var ct))
-            return (RecordColumnType)(-(sbyte)ct);
-        if (TypeToColumnType.TryGetValue(type, out ct))
+        var lookup = underlying ?? type;
+        if (TypeToColumnType.TryGetValue(lookup, out var ct))
             return ct;
         throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型");
     }
 
     /// <summary>
-    /// 从 <see cref="RecordColumnType"/> 获取 CLR <see cref="Type"/>。
+    /// 判断 CLR <see cref="Type"/> 是否为 Nullable 值类型。
     /// </summary>
-    internal static Type GetClrType(RecordColumnType columnType)
+    internal static bool IsNullableType(Type type)
     {
-        if (ColumnTypeToType.TryGetValue(columnType, out var type))
-            return type;
-        throw new NotSupportedException($"未知列类型枚举值: {columnType}");
+        return Nullable.GetUnderlyingType(type) != null;
+    }
+
+    /// <summary>
+    /// 从基础 <see cref="RecordColumnType"/> 和 <paramref name="isNullable"/> 还原 CLR <see cref="Type"/>。
+    /// </summary>
+    internal static Type GetClrType(RecordColumnType columnType, bool isNullable)
+    {
+        if (!ColumnTypeToType.TryGetValue(columnType, out var baseType))
+            throw new NotSupportedException($"未知列类型枚举值: {columnType}");
+        if (isNullable && baseType.IsValueType)
+            return typeof(Nullable<>).MakeGenericType(baseType);
+        return baseType;
     }
 
     #endregion

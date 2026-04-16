@@ -36,13 +36,14 @@ public partial class Record
         writer.Write(this._pageSize);
         writer.Write(this._maxCount);
 
-        // Schema: column count + (name, type code) per column
+        // Schema: column count + (name, type, isNullable) per column
         writer.Write(this.Columns.Count);
         for (int c = 0; c < this.Columns.Count; c++)
         {
             var col = this.Columns[c];
             writer.Write(col.Name);
-            writer.Write((sbyte)col.ColumnType);
+            writer.Write((byte)col.ColumnType);
+            writer.Write(col.IsNullable);
         }
 
         // Row count
@@ -92,8 +93,9 @@ public partial class Record
         for (int c = 0; c < colCount; c++)
         {
             string name = reader.ReadString();
-            var columnType = (RecordColumnType)reader.ReadSByte();
-            Type clrType = Helpers.GetClrType(columnType);
+            var columnType = (RecordColumnType)reader.ReadByte();
+            bool isNullable = reader.ReadBoolean();
+            Type clrType = Helpers.GetClrType(columnType, isNullable);
             this.Columns.Add(name, clrType);
         }
 
@@ -152,15 +154,13 @@ public partial class Record
 
     private static void WriteColumnData(BinaryWriter writer, RecordColumn col, int rowCount)
     {
-        var columnType = col.ColumnType;
-        bool isNullable = (sbyte)columnType < 0;
+        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray;
 
         for (int r = 0; r < rowCount; r++)
         {
             var val = col.GetValue(r);
-            if (isNullable || columnType == RecordColumnType.String || columnType == RecordColumnType.ByteArray)
+            if (needsNullCheck)
             {
-                // 引用类型和 Nullable 需要写 null 标记
                 if (val is null)
                 {
                     writer.Write(false);
@@ -168,33 +168,29 @@ public partial class Record
                 }
                 writer.Write(true);
             }
-            WritePrimitiveValue(writer, val!, columnType);
+            WritePrimitiveValue(writer, val!, col.ColumnType);
         }
     }
 
     private static void ReadColumnData(BinaryReader reader, RecordColumn col, int rowCount)
     {
-        var columnType = col.ColumnType;
-        bool isNullable = (sbyte)columnType < 0;
+        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray;
 
         for (int r = 0; r < rowCount; r++)
         {
-            if (isNullable || columnType == RecordColumnType.String || columnType == RecordColumnType.ByteArray)
+            if (needsNullCheck)
             {
                 bool hasValue = reader.ReadBoolean();
                 if (!hasValue) continue;
             }
-            var val = ReadPrimitiveValue(reader, columnType);
+            var val = ReadPrimitiveValue(reader, col.ColumnType);
             col.SetValue(val, r);
         }
     }
 
     private static void WritePrimitiveValue(BinaryWriter writer, object value, RecordColumnType columnType)
     {
-        // 对 Nullable 类型，取其基类型进行写入
-        var baseType = (sbyte)columnType < 0 ? (RecordColumnType)(-(sbyte)columnType) : columnType;
-
-        switch (baseType)
+        switch (columnType)
         {
             case RecordColumnType.Boolean: writer.Write((bool)value); break;
             case RecordColumnType.SByte: writer.Write((sbyte)value); break;
@@ -230,9 +226,7 @@ public partial class Record
 
     private static object ReadPrimitiveValue(BinaryReader reader, RecordColumnType columnType)
     {
-        var baseType = (sbyte)columnType < 0 ? (RecordColumnType)(-(sbyte)columnType) : columnType;
-
-        switch (baseType)
+        switch (columnType)
         {
             case RecordColumnType.Boolean: return reader.ReadBoolean();
             case RecordColumnType.SByte: return reader.ReadSByte();

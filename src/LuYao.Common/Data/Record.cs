@@ -495,7 +495,7 @@ public partial class Record : IEnumerable<RecordRow>
         var columns = new List<RecordSchema.ColumnDef>(this.Columns.Count);
         foreach (RecordColumn col in this.Columns)
         {
-            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType));
+            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType, col.IsNullable));
         }
         return new RecordSchema(columns);
     }

@@ -27,6 +27,7 @@ public abstract class RecordColumn
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
         this._type = type ?? throw new ArgumentNullException(nameof(type));
         this.ColumnType = Helpers.GetColumnType(type);
+        this.IsNullable = Helpers.IsNullableType(type);
     }
     private Type _type;
     /// <summary>
@@ -42,9 +43,14 @@ public abstract class RecordColumn
     public Type Type => this._type;
 
     /// <summary>
-    /// 获取列的枚举类型标识。
+    /// 获取列的基础枚举类型标识（不含可空信息）。
     /// </summary>
     public RecordColumnType ColumnType { get; }
+
+    /// <summary>
+    /// 获取列是否为可空类型。
+    /// </summary>
+    public bool IsNullable { get; }
 
     /// <summary>
     /// 在指定行设置列的值。
