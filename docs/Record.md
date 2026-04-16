@@ -570,7 +570,7 @@ var list = record.ToList<Order>(options); // 列 "order_id" → order.OrderId
 | 列类型与属性类型不一致 | `Convert.ChangeType` + checked | `DeserializeValue` 钩子优先 |
 | 列为 `string`/整数 → 属性为枚举 | 内置转换：`Enum.Parse` 或直接强转 | — |
 | 列值为 `null` → 可空属性 | 赋 `null` | — |
-| 列值为 `null` → 不可空值类型属性 | **待定**（见下方讨论） | `NullToDefault` 选项 |
+| 列值为 `null` → 不可空值类型属性 | 赋 `default`（如 `int` → `0`） | — |
 | 转换失败 | 抛异常（含列名、目标属性名、行号） | — |
 
 ### 13.6 构造函数选择策略
@@ -632,9 +632,6 @@ public class RecordMappingOptions
     /// ToList/To 时是否要求 T 的所有属性都有对应列（默认 false）
     public bool RequireAllProperties { get; set; }
 
-    /// null 映射到不可空值类型时的行为（待定，见 §13.12）
-    public bool NullToDefault { get; set; }
-
     /// 自定义写入转换：(列名, 列类型, 属性值) → 列值
     public Func<string, Type, object?, object?>? SerializeValue { get; set; }
 
@@ -676,8 +673,7 @@ public class RecordMappingOptions
 |------|----------|
 | 类型转换失败 | `InvalidCastException`（含列名、源类型、目标类型、行号） |
 | 窄化溢出 | `OverflowException` |
-| `null` → 不可空值类型 | 待定（见 §13.12） |
-| `RequireAllProperties` 且属性缺失列 | `InvalidOperationException`（含缺失属性名） |
+| `RequireAllProperties` 且属性缺失列
 | `[RecordConstructor]` 标记了多个构造函数 | `AmbiguousMatchException` |
 | 无可用构造函数（无标记、无无参、无 RecordRow 参数） | `MissingMethodException` |
 
@@ -753,18 +749,15 @@ var list = record.ToList<Order>(options);
 
 - `Mapper` 与 `SerializeValue` / `DeserializeValue` 互斥：设置 `Mapper` 后，钩子被忽略。
 - `Mapper` 被设置时跳过内置缓存（Mapper 自行管理性能）。
-- `NameTransform`、`NullToDefault`、`RequireAllProperties` 等选项在 Mapper 模式下不生效（Mapper 完全接管）。
+- `NameTransform`、`RequireAllProperties` 等选项在 Mapper 模式下不生效（Mapper 完全接管）。
 
-### 13.12 待定：null → 不可空值类型的默认行为
+### 13.12 null → 不可空值类型的行为
 
-当列值为 `null` 映射到不可空值类型属性（如 `int`、`DateTime`）时，默认行为尚未确定。
+当可空列（如 `int?`）的值为 `null`，映射到不可空值类型属性（如 `int`）时，**赋 `default` 值**（如 `int` → `0`，`DateTime` → `0001-01-01`）。不抛异常，不提供开关。
 
-候选方案：
+理由：
 
-| 方案 | 行为 | 优点 | 缺点 |
-|------|------|------|------|
-| A. 默认抛异常 | 抛 `InvalidOperationException` | 安全，不会静默丢失 null 信息 | 从 DB 导入含 NULL 的数据时频繁报错 |
-| B. 默认赋 `default` | `int` → `0`，`DateTime` → `0001-01-01` | 与 `DataTable` / `IDataReader` 行为一致；与 Record 自身 `Read(IDataReader)` 的 null 处理一致 | 静默丢失 null 语义，`0` 和 null 不可区分 |
-| C. 按属性类型区分 | 数值类型赋 `default`，其他抛异常 | 折中 | 规则不一致，增加学习成本 |
-
-通过 `NullToDefault` 选项可覆盖默认行为，但默认行为需要确定。
+- 不可空列（如 `int`）底层为 `int[]`，初始值即为 `0`，不存在 null 问题。
+- 可空列（如 `int?`）映射到不可空属性时，用户已通过属性类型声明表达了"不关心 null 语义"的意图。
+- 若用户需要区分 `null` 与 `0`，应使用 `int?` 属性接收。
+- 与 `Record.Read(IDataReader)` 中 `DBNull` → `default` 的行为一致。
