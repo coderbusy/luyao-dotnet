@@ -74,6 +74,16 @@ public abstract class RecordColumn
     public abstract int Capacity { get; }
     internal abstract void Extend(int length);
 
+    /// <summary>
+    /// 获取底层数据数组（截断到实际行数），用于序列化。
+    /// </summary>
+    internal abstract Array GetDataArray(int count);
+
+    /// <summary>
+    /// 从序列化数据数组还原列数据。
+    /// </summary>
+    internal abstract void SetDataArray(Array data, int count);
+
     ///  <inheritdoc/>
     public override string ToString()
     {

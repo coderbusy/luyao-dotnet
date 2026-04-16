@@ -190,39 +190,37 @@
 #### 二进制序列化（`ISerializable`）
 
 序列化内容包括：
-- `Name`：表名。
-- 翻页元数据：`Page`、`PageSize`、`MaxCount`。
-- 列定义：每列的名称和类型。
-- 行数据：逐行逐列的值。
+- `n`：表名。
+- 翻页元数据：`p`、`sz`、`m`。
+- `ns`：列名数组（`string[]`，单个键）。
+- `ts`：列类型码数组（`sbyte[]`，单个键，负值表示 Nullable）。
+- `0`, `1`, ...：每列的底层数据数组（截断到实际行数），一列一个键。
 
-`RecordSet` 序列化其包含的所有 `Record` 及名称比较策略。
+`RecordSet` 序列化其包含的所有 `Record`。
 
 #### XML 序列化（`IXmlSerializable`）
 
 XML 格式：
 
 ```xml
-<!-- Record -->
-<Record Name="Orders" Page="1" PageSize="20" MaxCount="100">
-  <Columns>
-    <Column Name="Id" Type="System.Int32" />
-    <Column Name="Name" Type="System.String" />
-  </Columns>
-  <Rows>
-    <Row><V>1</V><V>Order-1</V></Row>
-    <Row><V>2</V><V>Order-2</V></Row>
-  </Rows>
+<!-- Record: schema 在属性 S 中，行值作为属性 -->
+<Record N="Orders" PS="20" MC="100" S="Id:i4,Name:s">
+  <r Id="1" Name="Order-1"/>
+  <r Id="2" Name="Order-2"/>
 </Record>
 
 <!-- RecordSet -->
 <RecordSet>
-  <Record Name="Orders" ...>...</Record>
-  <Record Name="Customers" ...>...</Record>
+  <R N="Orders" S="Id:i4,Name:s"><r Id="1" Name="Order-1"/></R>
+  <R N="Customers" S="Name:s"><r Name="Alice"/></R>
 </RecordSet>
 ```
 
-- 列值使用 `Convert.ToString` / `Convert.ChangeType` 进行文本序列化/反序列化。
-- `null` 值使用空元素或 `xsi:nil="true"` 表示。
+- 列定义压缩为单个属性 `S`（Schema），格式为 `列名:类型别名,...`（如 `Id:i4,Name:s`）。
+- 行数据使用 `<r/>` 元素，列值作为 XML 属性存储。`null` 值省略对应属性。
+- 元素/属性名使用紧凑缩写：`N`=Name, `P`=Page, `PS`=PageSize, `MC`=MaxCount, `S`=Schema。
+- 列类型使用紧凑别名（封闭白名单映射）：`i4`=Int32, `s`=String, `b`=Boolean, `r8`=Double, `dt`=DateTime, `g`=Guid, `bin`=byte[] 等。Nullable 类型后缀 `?`（如 `i4?`）。
+- 翻页属性仅在非默认值时输出（`P` 默认 1，`PS`/`MC` 默认 0）。
 - `byte[]` 值使用 Base64 编码。
 - 列类型使用 `Type.FullName` 序列化，使用 `Type.GetType` 反序列化。
 

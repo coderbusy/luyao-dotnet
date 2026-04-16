@@ -262,10 +262,10 @@ public class RecordSet : IEnumerable<Record>, ISerializable, IXmlSerializable
     protected RecordSet(SerializationInfo info, StreamingContext context)
         : this(StringComparer.Ordinal)
     {
-        int count = info.GetInt32("Count");
+        int count = info.GetInt32("C");
         for (int i = 0; i < count; i++)
         {
-            var record = (Record)info.GetValue($"Record_{i}", typeof(Record))!;
+            var record = (Record)info.GetValue($"R{i}", typeof(Record))!;
             this.Add(record.Name, record);
         }
     }
@@ -273,10 +273,10 @@ public class RecordSet : IEnumerable<Record>, ISerializable, IXmlSerializable
     /// <inheritdoc/>
     public void GetObjectData(SerializationInfo info, StreamingContext context)
     {
-        info.AddValue("Count", _names.Count);
+        info.AddValue("C", _names.Count);
         for (int i = 0; i < _names.Count; i++)
         {
-            info.AddValue($"Record_{i}", _records[_names[i]]);
+            info.AddValue($"R{i}", _records[_names[i]]);
         }
     }
 
@@ -293,7 +293,7 @@ public class RecordSet : IEnumerable<Record>, ISerializable, IXmlSerializable
         if (reader.IsEmptyElement) { reader.Read(); return; }
         reader.ReadStartElement(); // <RecordSet>
 
-        while (reader.IsStartElement("Record"))
+        while (reader.NodeType == XmlNodeType.Element)
         {
             var record = new Record();
             ((IXmlSerializable)record).ReadXml(reader);
@@ -308,7 +308,7 @@ public class RecordSet : IEnumerable<Record>, ISerializable, IXmlSerializable
         foreach (var name in _names)
         {
             var record = _records[name];
-            writer.WriteStartElement("Record");
+            writer.WriteStartElement("R");
             ((IXmlSerializable)record).WriteXml(writer);
             writer.WriteEndElement();
         }

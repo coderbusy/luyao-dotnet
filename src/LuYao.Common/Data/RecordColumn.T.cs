@@ -77,6 +77,22 @@ public class RecordColumn<T> : RecordColumn
         _data = tmp;
     }
 
+    internal override Array GetDataArray(int count)
+    {
+        if (count == _data.Length) return _data;
+        var arr = new T[count];
+        Array.Copy(_data, arr, count);
+        return arr;
+    }
+
+    internal override void SetDataArray(Array data, int count)
+    {
+        var src = (T[])data;
+        var len = Math.Min(src.Length, count);
+        if (_data.Length < count) _data = new T[count];
+        Array.Copy(src, _data, len);
+    }
+
     #region Get / Set
 
     ///<inheritdoc/>

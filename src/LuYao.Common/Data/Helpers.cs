@@ -22,9 +22,116 @@ static class Helpers
         typeof(byte[]),
     };
 
+    #region Type Alias (compact serialization)
+
+    private static readonly Dictionary<Type, string> TypeToAlias = new()
+    {
+        [typeof(bool)] = "b",
+        [typeof(sbyte)] = "i1", [typeof(short)] = "i2", [typeof(int)] = "i4", [typeof(long)] = "i8",
+        [typeof(byte)] = "u1", [typeof(ushort)] = "u2", [typeof(uint)] = "u4", [typeof(ulong)] = "u8",
+        [typeof(float)] = "r4", [typeof(double)] = "r8", [typeof(decimal)] = "dc",
+        [typeof(char)] = "c", [typeof(string)] = "s",
+        [typeof(DateTime)] = "dt", [typeof(DateTimeOffset)] = "dto", [typeof(TimeSpan)] = "ts",
+        [typeof(Guid)] = "g",
+        [typeof(byte[])] = "bin",
+    };
+
+    private static readonly Dictionary<string, Type> AliasToType;
+
     /// <summary>
-    /// 判断指定类型是否为支持的列类型（包括其 Nullable 形式）。
+    /// 获取类型的紧凑别名。支持 Nullable 类型（别名后加 '?'）。
     /// </summary>
+    internal static string GetTypeAlias(Type type)
+    {
+        var underlying = Nullable.GetUnderlyingType(type);
+        if (underlying != null && TypeToAlias.TryGetValue(underlying, out var alias))
+            return alias + "?";
+        if (TypeToAlias.TryGetValue(type, out alias))
+            return alias;
+        return type.FullName!;
+    }
+
+    /// <summary>
+    /// 从紧凑别名还原类型。支持 '?' 后缀表示 Nullable。
+    /// 兼容完整类型名（用于向后兼容旧格式）。
+    /// </summary>
+    internal static Type GetTypeFromAlias(string alias)
+    {
+        if (alias.EndsWith("?"))
+        {
+            var baseAlias = alias.Substring(0, alias.Length - 1);
+            if (AliasToType.TryGetValue(baseAlias, out var baseType))
+                return typeof(Nullable<>).MakeGenericType(baseType);
+        }
+        if (AliasToType.TryGetValue(alias, out var type))
+            return type;
+        // fallback: full type name (backward compat)
+        return Type.GetType(alias, throwOnError: true)!;
+    }
+
+    #endregion
+
+    #region Type Code (compact binary serialization)
+
+    private static readonly Dictionary<Type, sbyte> TypeToCode = new()
+    {
+        [typeof(bool)] = 1,
+        [typeof(sbyte)] = 2, [typeof(short)] = 3, [typeof(int)] = 4, [typeof(long)] = 5,
+        [typeof(byte)] = 6, [typeof(ushort)] = 7, [typeof(uint)] = 8, [typeof(ulong)] = 9,
+        [typeof(float)] = 10, [typeof(double)] = 11, [typeof(decimal)] = 12,
+        [typeof(char)] = 13, [typeof(string)] = 14,
+        [typeof(DateTime)] = 15, [typeof(DateTimeOffset)] = 16, [typeof(TimeSpan)] = 17,
+        [typeof(Guid)] = 18,
+        [typeof(byte[])] = 19,
+    };
+
+    private static readonly Dictionary<sbyte, Type> CodeToType;
+
+    static Helpers()
+    {
+        AliasToType = new Dictionary<string, Type>(TypeToAlias.Count * 2, StringComparer.Ordinal);
+        foreach (var kv in TypeToAlias)
+        {
+            AliasToType[kv.Value] = kv.Key;
+        }
+
+        CodeToType = new Dictionary<sbyte, Type>(TypeToCode.Count);
+        foreach (var kv in TypeToCode)
+        {
+            CodeToType[kv.Value] = kv.Key;
+        }
+    }
+
+    /// <summary>
+    /// 获取类型的紧凑 sbyte 编码。Nullable 类型使用负值。
+    /// </summary>
+    internal static sbyte GetTypeCode(Type type)
+    {
+        var underlying = Nullable.GetUnderlyingType(type);
+        if (underlying != null && TypeToCode.TryGetValue(underlying, out var code))
+            return (sbyte)(-code);
+        if (TypeToCode.TryGetValue(type, out code))
+            return code;
+        throw new NotSupportedException($"类型 '{type.FullName}' 无对应类型编码");
+    }
+
+    /// <summary>
+    /// 从 sbyte 编码还原类型。负值表示 Nullable。
+    /// </summary>
+    internal static Type GetTypeFromCode(sbyte code)
+    {
+        if (code < 0)
+        {
+            var baseCode = (sbyte)(-code);
+            if (CodeToType.TryGetValue(baseCode, out var baseType))
+                return typeof(Nullable<>).MakeGenericType(baseType);
+        }
+        if (CodeToType.TryGetValue(code, out var type))
+            return type;
+        throw new NotSupportedException($"未知类型编码: {code}");
+    }
+
+    #endregion
     internal static bool IsSupportedColumnType(Type type)
     {
         if (type == null) return false;
