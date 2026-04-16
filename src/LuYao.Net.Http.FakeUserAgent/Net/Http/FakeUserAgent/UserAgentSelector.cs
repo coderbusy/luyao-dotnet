@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Linq;
+using System.Threading;
 
 namespace LuYao.Net.Http.FakeUserAgent;
 
@@ -8,6 +9,9 @@ namespace LuYao.Net.Http.FakeUserAgent;
 /// </summary>
 public partial class UserAgentSelector : IUserAgentSelector
 {
+    private static readonly Random _globalRandom = new Random();
+    private static readonly ThreadLocal<Random> _random = new ThreadLocal<Random>(CreateRandom);
+
     private readonly BrowserItem[] _browsers;
 
     /// <summary>
@@ -23,7 +27,7 @@ public partial class UserAgentSelector : IUserAgentSelector
     public BrowserItem? Random()
     {
         if (_browsers.Length == 0) return null;
-        var idx = RandomHelper.Next(_browsers.Length);
+        var idx = Next(_browsers.Length);
         return _browsers[idx];
     }
 
@@ -60,5 +64,19 @@ public partial class UserAgentSelector : IUserAgentSelector
         if (predicate == null) throw new ArgumentNullException(nameof(predicate));
         var filteredBrowsers = BrowserItem.List().Where(predicate).ToArray();
         return new UserAgentSelector(filteredBrowsers);
+    }
+
+    private static int Next(int maxValue)
+    {
+        var random = _random.Value ?? CreateRandom();
+        return random.Next(maxValue);
+    }
+
+    private static Random CreateRandom()
+    {
+        lock (_globalRandom)
+        {
+            return new Random(_globalRandom.Next());
+        }
     }
 }

@@ -4,7 +4,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>net45;net461;netstandard2.0;netstandard2.1;net6.0;net8.0;net10.0</TargetFrameworks>
 		<RootNamespace>LuYao</RootNamespace>
-		<Title>LuYao.Common</Title>
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Nullable>enable</Nullable>
@@ -12,8 +11,8 @@
 		<AssemblyOriginatorKeyFile>..\..\docs\luyao.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net461'">
-		<Reference Include="System.Net.Http" />
+	<ItemGroup>
+		<None Remove="Net\Http\FakeUserAgent\Resources\Browsers.dat" />
 	</ItemGroup>
 
 	<ItemGroup>
