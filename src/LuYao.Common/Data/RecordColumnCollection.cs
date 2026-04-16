@@ -190,6 +190,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     public RecordColumn<T> Add<T>(string name)
     {
         this.OnAdd(name);
+        Helpers.ValidateColumnType(typeof(T));
         var col = new RecordColumn<T>(this.Record, name, typeof(T));
         this._list.Add(col);
         return col;

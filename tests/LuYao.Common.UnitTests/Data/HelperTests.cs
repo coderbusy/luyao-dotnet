@@ -20,13 +20,20 @@ public class HelperTests
         // Arrange
         var record = new Record();
         string name = "TestColumn";
-        Type type = typeof(Foo);
+        Type type = typeof(int);
         // Act
         var column = Helpers.MakeRecordColumn(record, name, type);
         // Assert
         Assert.IsNotNull(column);
         Assert.AreEqual(name, column.Name);
         Assert.AreEqual(type, column.Type);
-        Assert.IsInstanceOfType(column, typeof(RecordColumn<Foo>));
+        Assert.IsInstanceOfType(column, typeof(RecordColumn<int>));
+    }
+
+    [TestMethod]
+    public void MakeRecordColumn_UnsupportedType_ShouldThrow()
+    {
+        var record = new Record();
+        Assert.Throws<NotSupportedException>(() => Helpers.MakeRecordColumn(record, "Test", typeof(Foo)));
     }
 }

@@ -148,12 +148,12 @@ public class RecordSchemaOperationsTests
     {
         var record = CreateTestRecord();
 
-        record.CastColumn("Name", typeof(object));
+        record.CastColumn("Age", typeof(long));
 
         Assert.AreEqual("Id", record.Columns[0].Name);
         Assert.AreEqual("Name", record.Columns[1].Name);
         Assert.AreEqual("Age", record.Columns[2].Name);
-        Assert.AreEqual(typeof(object), record.Columns[1].Type);
+        Assert.AreEqual(typeof(long), record.Columns[2].Type);
     }
 
     #endregion

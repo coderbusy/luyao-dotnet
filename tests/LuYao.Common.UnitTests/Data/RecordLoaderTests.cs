@@ -534,11 +534,11 @@ public class RecordLoaderTests
         RecordLoader<ComplexTypeEntity>.WriteHeader(record);
 
         // Assert
-        Assert.AreEqual(4, record.Columns.Count);
+        Assert.AreEqual(3, record.Columns.Count); // ComplexObject (type object) is skipped by whitelist
         Assert.IsTrue(record.Columns.Contains("Id"));
         Assert.IsTrue(record.Columns.Contains("Duration"));
         Assert.IsTrue(record.Columns.Contains("Data"));
-        Assert.IsTrue(record.Columns.Contains("ComplexObject"));
+        Assert.IsFalse(record.Columns.Contains("ComplexObject")); // object type not in whitelist
 
         var idColumn = record.Columns.Find("Id");
         Assert.IsNotNull(idColumn);
@@ -551,10 +551,6 @@ public class RecordLoaderTests
         var dataColumn = record.Columns.Find("Data");
         Assert.IsNotNull(dataColumn);
         Assert.AreEqual(typeof(byte[]), dataColumn.Type);
-
-        var complexColumn = record.Columns.Find("ComplexObject");
-        Assert.IsNotNull(complexColumn);
-        Assert.AreEqual(typeof(object), complexColumn.Type);
     }
 
     /// <summary>

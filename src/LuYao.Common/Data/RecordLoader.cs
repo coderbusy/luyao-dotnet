@@ -147,7 +147,7 @@ static class RecordLoader<T> where T : class
     {
         foreach (var field in _fields)
         {
-            if (field.WriteToRow != null)
+            if (field.WriteToRow != null && Helpers.IsSupportedColumnType(field.Property.PropertyType))
             {
                 re.Columns.Add(field.Column, field.Property.PropertyType);
             }
