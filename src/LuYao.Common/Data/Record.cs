@@ -455,4 +455,18 @@ public partial class Record : IEnumerable<RecordRow>
 
     #endregion
 
+    #region Query
+
+    /// <summary>
+    /// 创建延迟执行的查询对象，支持链式调用。
+    /// </summary>
+    /// <param name="options">查询选项，可声明索引列等优化参数。</param>
+    /// <returns>可链式组合的 <see cref="RecordQuery"/> 实例。</returns>
+    public RecordQuery AsQuery(QueryOptions? options = null)
+    {
+        return new RecordQuery(this, options ?? new QueryOptions());
+    }
+
+    #endregion
+
 }
