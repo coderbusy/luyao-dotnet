@@ -544,4 +544,64 @@ public class RecordQueryTests
     }
 
     #endregion
+
+    #region OrderBy + ThenBy Composite Sort
+
+    [TestMethod]
+    public void WhenOrderByAgeThenByNameThenSortedByBothKeys()
+    {
+        var record = CreateTestRecord();
+        // Data: Alice(30), Bob(25), Charlie(35), Diana(25), Eve(30)
+
+        var result = record.AsQuery()
+            .OrderBy("Age")
+            .ThenBy("Name")
+            .ToRecord();
+
+        // Age=25: Bob, Diana; Age=30: Alice, Eve; Age=35: Charlie
+        Assert.AreEqual(5, result.Count);
+        Assert.AreEqual("Bob", result.Columns.Get("Name").GetValue(0));
+        Assert.AreEqual("Diana", result.Columns.Get("Name").GetValue(1));
+        Assert.AreEqual("Alice", result.Columns.Get("Name").GetValue(2));
+        Assert.AreEqual("Eve", result.Columns.Get("Name").GetValue(3));
+        Assert.AreEqual("Charlie", result.Columns.Get("Name").GetValue(4));
+    }
+
+    [TestMethod]
+    public void WhenOrderByAgeDescThenByNameAscThenCorrectOrder()
+    {
+        var record = CreateTestRecord();
+
+        var result = record.AsQuery()
+            .OrderBy("Age", descending: true)
+            .ThenBy("Name")
+            .ToRecord();
+
+        // Age=35: Charlie; Age=30: Alice, Eve; Age=25: Bob, Diana
+        Assert.AreEqual("Charlie", result.Columns.Get("Name").GetValue(0));
+        Assert.AreEqual("Alice", result.Columns.Get("Name").GetValue(1));
+        Assert.AreEqual("Eve", result.Columns.Get("Name").GetValue(2));
+        Assert.AreEqual("Bob", result.Columns.Get("Name").GetValue(3));
+        Assert.AreEqual("Diana", result.Columns.Get("Name").GetValue(4));
+    }
+
+    [TestMethod]
+    public void WhenThenByWithoutOrderByThenThrowsInvalidOperationException()
+    {
+        var record = CreateTestRecord();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            record.AsQuery().ThenBy("Name"));
+    }
+
+    [TestMethod]
+    public void WhenThenByAfterNonSortStepThenThrowsInvalidOperationException()
+    {
+        var record = CreateTestRecord();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            record.AsQuery().Where(r => true).ThenBy("Name"));
+    }
+
+    #endregion
 }

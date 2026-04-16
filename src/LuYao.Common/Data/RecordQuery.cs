@@ -54,7 +54,10 @@ public class RecordQuery
     public RecordQuery OrderBy(string columnName, bool descending = false)
     {
         if (columnName == null) throw new ArgumentNullException(nameof(columnName));
-        _steps.Add((record, opts) => ExecuteOrderBy(record, columnName, descending, isThenBy: false));
+        var sortKeys = new List<SortKey> { new SortKey(columnName, descending) };
+        int stepIndex = _steps.Count;
+        _steps.Add((record, opts) => ExecuteCompositeSort(record, sortKeys));
+        _sortKeysMap[stepIndex] = sortKeys;
         return this;
     }
 
@@ -64,10 +67,15 @@ public class RecordQuery
     /// <param name="columnName">排序列名。</param>
     /// <param name="descending">是否降序。</param>
     /// <returns>当前查询对象，支持链式调用。</returns>
+    /// <exception cref="InvalidOperationException">当没有前置 OrderBy 调用时抛出。</exception>
     public RecordQuery ThenBy(string columnName, bool descending = false)
     {
         if (columnName == null) throw new ArgumentNullException(nameof(columnName));
-        _steps.Add((record, opts) => ExecuteOrderBy(record, columnName, descending, isThenBy: true));
+        // 查找最后一个排序 step 并追加键
+        var lastSortKeys = FindLastSortKeys();
+        if (lastSortKeys == null)
+            throw new InvalidOperationException("ThenBy 必须在 OrderBy 之后调用");
+        lastSortKeys.Add(new SortKey(columnName, descending));
         return this;
     }
 
@@ -478,26 +486,58 @@ public class RecordQuery
         return result;
     }
 
-    private static Record ExecuteOrderBy(Record source, string columnName, bool descending, bool isThenBy)
+    private sealed class SortKey
     {
-        var col = source.Columns.Find(columnName)
-            ?? throw new InvalidOperationException($"列 '{columnName}' 不存在");
+        public string ColumnName { get; }
+        public bool Descending { get; }
+        public SortKey(string columnName, bool descending) { ColumnName = columnName; Descending = descending; }
+    }
 
-        // 构建行索引数组并排序
+    /// <summary>
+    /// 查找最后一个排序 step 关联的 SortKey 列表，用于 ThenBy 追加。
+    /// </summary>
+    private List<SortKey>? FindLastSortKeys()
+    {
+        // 从后往前找包含 SortKey 列表的排序 step
+        for (int i = _steps.Count - 1; i >= 0; i--)
+        {
+            if (_sortKeysMap.TryGetValue(i, out var keys)) return keys;
+            break; // 只允许紧跟在最后一个 step 后追加
+        }
+        return null;
+    }
+
+    private readonly Dictionary<int, List<SortKey>> _sortKeysMap = new();
+
+    private static Record ExecuteCompositeSort(Record source, List<SortKey> sortKeys)
+    {
+        // 解析所有排序列
+        var cols = new RecordColumn[sortKeys.Count];
+        var descs = new bool[sortKeys.Count];
+        for (int i = 0; i < sortKeys.Count; i++)
+        {
+            cols[i] = source.Columns.Find(sortKeys[i].ColumnName)
+                ?? throw new InvalidOperationException($"列 '{sortKeys[i].ColumnName}' 不存在");
+            descs[i] = sortKeys[i].Descending;
+        }
+
         var indices = Enumerable.Range(0, source.Count).ToArray();
-        var comparer = Comparer<object>.Default;
-
         Array.Sort(indices, (a, b) =>
         {
-            var va = col.GetValue(a);
-            var vb = col.GetValue(b);
-            int cmp;
-            if (va == null && vb == null) cmp = 0;
-            else if (va == null) cmp = -1;
-            else if (vb == null) cmp = 1;
-            else if (va is IComparable ca) cmp = ca.CompareTo(vb);
-            else cmp = 0;
-            return descending ? -cmp : cmp;
+            for (int k = 0; k < cols.Length; k++)
+            {
+                var va = cols[k].GetValue(a);
+                var vb = cols[k].GetValue(b);
+                int cmp;
+                if (va == null && vb == null) cmp = 0;
+                else if (va == null) cmp = -1;
+                else if (vb == null) cmp = 1;
+                else if (va is IComparable ca) cmp = ca.CompareTo(vb);
+                else cmp = 0;
+                if (descs[k]) cmp = -cmp;
+                if (cmp != 0) return cmp;
+            }
+            return 0;
         });
 
         return BuildFromIndices(source, indices);
@@ -1003,14 +1043,28 @@ public class RecordQuery
     {
         if (columns.Length == 1)
         {
-            return Convert.ToString(columns[0].GetValue(row)) ?? string.Empty;
+            var v = columns[0].GetValue(row);
+            if (v is null) return "\0N";
+            var s = Convert.ToString(v) ?? string.Empty;
+            return "\0V" + s;
         }
-        var parts = new string[columns.Length];
+        // 使用长度前缀编码避免分隔符碰撞：每个值编码为 "len:value"
+        var sb = new System.Text.StringBuilder();
         for (int i = 0; i < columns.Length; i++)
         {
-            parts[i] = Convert.ToString(columns[i].GetValue(row)) ?? string.Empty;
+            if (i > 0) sb.Append('\0');
+            var val = columns[i].GetValue(row);
+            if (val is null)
+            {
+                sb.Append("-1:");
+            }
+            else
+            {
+                var s = Convert.ToString(val) ?? string.Empty;
+                sb.Append(s.Length).Append(':').Append(s);
+            }
         }
-        return string.Join("\0", parts);
+        return sb.ToString();
     }
 
     #endregion

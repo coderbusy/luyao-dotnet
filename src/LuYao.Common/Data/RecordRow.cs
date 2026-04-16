@@ -82,4 +82,25 @@ public struct RecordRow : IRecordCursor
         set => this.Record.Columns.Get(key).SetValue(value, this);
     }
     #endregion
+
+    /// <summary>
+    /// 根据列名设置当前行指定列的泛型类型值，避免值类型 boxing。
+    /// </summary>
+    /// <typeparam name="T">要设置的值的类型。</typeparam>
+    /// <param name="name">列的名称。</param>
+    /// <param name="value">要设置的值。</param>
+    /// <exception cref="KeyNotFoundException">当列名不存在时抛出。</exception>
+    /// <exception cref="InvalidCastException">当列类型与 <typeparamref name="T"/> 不匹配时抛出。</exception>
+    public void Set<T>(string name, T value)
+    {
+        var col = this.Record.Columns.Get(name);
+        if (col is RecordColumn<T> typed)
+        {
+            typed.Set(value, this.Row);
+        }
+        else
+        {
+            col.SetValue(value, this.Row);
+        }
+    }
 }

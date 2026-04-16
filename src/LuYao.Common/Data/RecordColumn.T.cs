@@ -72,7 +72,8 @@ public class RecordColumn<T> : RecordColumn
     internal override void Extend(int length)
     {
         if (_data.Length >= length) return;
-        T[] tmp = new T[length];
+        int newLen = Math.Max(length, _data.Length * 2);
+        T[] tmp = new T[newLen];
         _data.CopyTo(tmp, 0);
         _data = tmp;
     }

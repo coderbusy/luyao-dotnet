@@ -128,6 +128,46 @@ public partial class Record : IEnumerable<RecordRow>
     }
 
     /// <summary>
+    /// 批量删除满足条件的所有行。从后向前删除以避免索引偏移问题。
+    /// </summary>
+    /// <param name="predicate">行筛选谓词，返回 true 的行将被删除。</param>
+    /// <returns>实际删除的行数。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="predicate"/> 为 null 时抛出。</exception>
+    public int DeleteWhere(Func<RecordRow, bool> predicate)
+    {
+        if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+        int deleted = 0;
+        for (int i = this.Count - 1; i >= 0; i--)
+        {
+            if (predicate(new RecordRow(this, i)))
+            {
+                Delete(i);
+                deleted++;
+            }
+        }
+        return deleted;
+    }
+
+    /// <summary>
+    /// 批量删除指定索引集合的行。索引将自动去重并从大到小排序后删除。
+    /// </summary>
+    /// <param name="rows">要删除的行索引集合。</param>
+    /// <returns>实际删除的行数。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="rows"/> 为 null 时抛出。</exception>
+    public int DeleteRows(IEnumerable<int> rows)
+    {
+        if (rows == null) throw new ArgumentNullException(nameof(rows));
+        // 去重并降序排列，从后向前删除
+        var sorted = new SortedSet<int>(rows);
+        int deleted = 0;
+        foreach (int row in sorted.Reverse())
+        {
+            if (Delete(row)) deleted++;
+        }
+        return deleted;
+    }
+
+    /// <summary>
     /// 清除所有数据。
     /// </summary>
     public void ClearRows()
