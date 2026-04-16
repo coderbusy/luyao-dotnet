@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Linq;
+using System.Threading;
 
 namespace LuYao.Net.Http.FakeUserAgent;
 
@@ -8,9 +9,8 @@ namespace LuYao.Net.Http.FakeUserAgent;
 /// </summary>
 public partial class UserAgentSelector : IUserAgentSelector
 {
-    [ThreadStatic]
-    private static Random? _localRandom;
     private static readonly Random _globalRandom = new Random();
+    private static readonly ThreadLocal<Random> _random = new ThreadLocal<Random>(CreateRandom);
 
     private readonly BrowserItem[] _browsers;
 
@@ -68,17 +68,15 @@ public partial class UserAgentSelector : IUserAgentSelector
 
     private static int Next(int maxValue)
     {
-        if (_localRandom == null)
+        var random = _random.Value ?? CreateRandom();
+        return random.Next(maxValue);
+    }
+
+    private static Random CreateRandom()
+    {
+        lock (_globalRandom)
         {
-            int seed;
-            lock (_globalRandom)
-            {
-                seed = _globalRandom.Next();
-            }
-
-            _localRandom = new Random(seed);
+            return new Random(_globalRandom.Next());
         }
-
-        return _localRandom.Next(maxValue);
     }
 }
