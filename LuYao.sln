@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuYao.Text.Json.UnitTests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuYao.Text.Json.Jint", "src\LuYao.Text.Json.Jint\LuYao.Text.Json.Jint.csproj", "{3C6752BD-CA1C-4F75-8141-07D52D737F8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuYao.Net.Http.FakeUserAgent", "src\LuYao.Net.Http.FakeUserAgent\LuYao.Net.Http.FakeUserAgent.csproj", "{61A34130-D38D-4B0B-8179-3EEDFE20E770}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{3C6752BD-CA1C-4F75-8141-07D52D737F8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C6752BD-CA1C-4F75-8141-07D52D737F8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C6752BD-CA1C-4F75-8141-07D52D737F8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61A34130-D38D-4B0B-8179-3EEDFE20E770}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61A34130-D38D-4B0B-8179-3EEDFE20E770}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61A34130-D38D-4B0B-8179-3EEDFE20E770}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61A34130-D38D-4B0B-8179-3EEDFE20E770}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{AD51FB01-BC36-4550-BA18-0D470A2C43D2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{76A7985A-DD5B-4DFC-9C30-77216E33F88E} = {90F2FC95-0AFD-4FF3-9AFB-15B8F15C6FB4}
 		{3C6752BD-CA1C-4F75-8141-07D52D737F8F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{61A34130-D38D-4B0B-8179-3EEDFE20E770} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD60AA5F-19E7-4C90-A883-5E19C085BAF3}

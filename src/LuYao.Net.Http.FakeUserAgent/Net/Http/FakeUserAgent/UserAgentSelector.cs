@@ -8,6 +8,10 @@ namespace LuYao.Net.Http.FakeUserAgent;
 /// </summary>
 public partial class UserAgentSelector : IUserAgentSelector
 {
+    [ThreadStatic]
+    private static Random? _localRandom;
+    private static readonly Random _globalRandom = new Random();
+
     private readonly BrowserItem[] _browsers;
 
     /// <summary>
@@ -23,7 +27,7 @@ public partial class UserAgentSelector : IUserAgentSelector
     public BrowserItem? Random()
     {
         if (_browsers.Length == 0) return null;
-        var idx = RandomHelper.Next(_browsers.Length);
+        var idx = Next(_browsers.Length);
         return _browsers[idx];
     }
 
@@ -60,5 +64,21 @@ public partial class UserAgentSelector : IUserAgentSelector
         if (predicate == null) throw new ArgumentNullException(nameof(predicate));
         var filteredBrowsers = BrowserItem.List().Where(predicate).ToArray();
         return new UserAgentSelector(filteredBrowsers);
+    }
+
+    private static int Next(int maxValue)
+    {
+        if (_localRandom == null)
+        {
+            int seed;
+            lock (_globalRandom)
+            {
+                seed = _globalRandom.Next();
+            }
+
+            _localRandom = new Random(seed);
+        }
+
+        return _localRandom.Next(maxValue);
     }
 }

@@ -27,6 +27,7 @@
 	
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\LuYao.Common\LuYao.Common.csproj" />
+		<ProjectReference Include="..\..\src\LuYao.Net.Http.FakeUserAgent\LuYao.Net.Http.FakeUserAgent.csproj" />
 	</ItemGroup>
 
 </Project>
