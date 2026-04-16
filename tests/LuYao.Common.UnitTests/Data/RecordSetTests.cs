@@ -357,16 +357,16 @@ public class RecordSetTests
     }
 
     [TestMethod]
-    public void WhenRenameThenNamesListPreservesOrder()
+    public void WhenRenameThenNamesListHasDeterministicOrder()
     {
         var set = new RecordSet();
         set.Add("A", CreateTestRecord("A", 1));
         set.Add("B", CreateTestRecord("B", 1));
         set.Add("C", CreateTestRecord("C", 1));
 
-        set.Rename("B", "BB");
+        set.Rename("B", "D");
 
-        CollectionAssert.AreEqual(new[] { "A", "BB", "C" }, set.Names.ToArray());
+        CollectionAssert.AreEqual(new[] { "A", "C", "D" }, set.Names.ToArray());
     }
 
     #endregion

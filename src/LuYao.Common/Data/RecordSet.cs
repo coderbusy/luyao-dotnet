@@ -12,7 +12,7 @@ namespace LuYao.Data;
 /// </summary>
 public partial class RecordSet : IEnumerable<Record>
 {
-    private readonly Dictionary<string, Record> _records;
+    private readonly SortedDictionary<string, Record> _records;
     private readonly StringComparer _comparer;
 
     /// <summary>
@@ -30,7 +30,7 @@ public partial class RecordSet : IEnumerable<Record>
     public RecordSet(StringComparer comparer)
     {
         _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
-        _records = new Dictionary<string, Record>(_comparer);
+        _records = new SortedDictionary<string, Record>(_comparer);
     }
 
     /// <summary>
