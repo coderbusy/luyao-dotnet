@@ -44,9 +44,17 @@
 **现象**: `Where().Select().OrderBy()` 链式调用会产生 N 个中间 Record，每个都含完整数组拷贝。  
 **建议**: 可合并操作（如 Where+Select 一次遍历）；或采用索引传递方案（只传 `int[]` 行索引到最后一步物化）。
 
-**标注**:先评估，我想知道方案细节。
+**标注**: ✅ 已修复（采用索引传递方案 A）
 
-**评估详情**:
+**实施详情**:
+
+已采用索引传递（Index-Passing Pipeline）方案重构 `RecordQuery`：
+
+- 引入 `IQueryStep` 接口，分为 `IndexStep`（纯索引变换）和 `MaterializeStep`（必须物化）两类
+- **IndexStep**（Where / OrderBy / ThenBy / Skip / Take / Distinct）：仅操作 `int[]` 行索引数组，不产生新 Record
+- **MaterializeStep**（Select / Join / GroupBy / Set ops / CrossJoin / Concat）：接收源 Record + 索引，物化为新 Record
+- `ToRecord()` 管道执行时，连续的 IndexStep 合并为一趟索引变换；仅在遇到 MaterializeStep 或管道末尾时才执行一次物化
+- 效果：`Where().OrderBy().Take()` 链只做 **1 次**物化（原来 3 次），内存峰值大幅降低
 
 当前每个 `Execute*` 方法都产生一个完整的 `Record` 中间结果。例如 `.Where().Select().OrderBy()` 链会依次产生 3 个独立的 Record，每个都包含完整的列数组拷贝。
 

@@ -6,18 +6,50 @@ namespace LuYao.Data;
 
 /// <summary>
 /// 延迟执行的查询对象，通过链式调用记录执行计划，最终通过 <see cref="ToRecord"/> 物化结果。
+/// 内部采用索引传递管道：可纯索引变换的操作（Where/OrderBy/Skip/Take/Distinct）仅传递 <c>int[]</c> 行索引，
+/// 遇到必须物化的操作（Select/Join/GroupBy/Set 等）时才产生新 <see cref="Record"/>，从而大幅减少中间拷贝。
 /// </summary>
 public class RecordQuery
 {
     private readonly Record _source;
     private readonly QueryOptions _options;
-    private readonly List<Func<Record, QueryOptions, Record>> _steps = new();
+    private readonly List<IQueryStep> _steps = new();
 
     internal RecordQuery(Record source, QueryOptions options)
     {
         _source = source ?? throw new ArgumentNullException(nameof(source));
         _options = options ?? new QueryOptions();
     }
+
+    #region Step abstractions
+
+    /// <summary>查询管道步骤标记接口。</summary>
+    private interface IQueryStep { }
+
+    /// <summary>
+    /// 仅变换行索引数组，不产生新 Record 的步骤。
+    /// </summary>
+    private sealed class IndexStep : IQueryStep
+    {
+        private readonly Func<Record, int[], QueryOptions, int[]> _transform;
+        public IndexStep(Func<Record, int[], QueryOptions, int[]> transform) => _transform = transform;
+        public int[] Execute(Record source, int[] indices, QueryOptions opts) => _transform(source, indices, opts);
+    }
+
+    /// <summary>
+    /// 必须物化为新 Record 的步骤（Select / Join / GroupBy / Set ops 等）。
+    /// 接收上游 Record + 当前行索引，返回全新 Record。
+    /// </summary>
+    private sealed class MaterializeStep : IQueryStep
+    {
+        private readonly Func<Record, int[], QueryOptions, Record> _execute;
+        public MaterializeStep(Func<Record, int[], QueryOptions, Record> execute) => _execute = execute;
+        public Record Execute(Record source, int[] indices, QueryOptions opts) => _execute(source, indices, opts);
+    }
+
+    #endregion
+
+    #region Public chain API
 
     /// <summary>
     /// 按条件过滤行。
@@ -27,7 +59,16 @@ public class RecordQuery
     public RecordQuery Where(Func<RecordRow, bool> predicate)
     {
         if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-        _steps.Add((record, opts) => ExecuteWhere(record, predicate));
+        _steps.Add(new IndexStep((source, indices, _) =>
+        {
+            var result = new List<int>(indices.Length);
+            foreach (var i in indices)
+            {
+                if (predicate(new RecordRow(source, i)))
+                    result.Add(i);
+            }
+            return result.ToArray();
+        }));
         return this;
     }
 
@@ -39,9 +80,8 @@ public class RecordQuery
     public RecordQuery Select(params string[] columnNames)
     {
         if (columnNames == null) throw new ArgumentNullException(nameof(columnNames));
-        // 捕获副本防止外部修改
         var names = (string[])columnNames.Clone();
-        _steps.Add((record, opts) => ExecuteSelect(record, names));
+        _steps.Add(new MaterializeStep((source, indices, _) => ExecuteSelect(source, indices, names)));
         return this;
     }
 
@@ -56,7 +96,7 @@ public class RecordQuery
         if (columnName == null) throw new ArgumentNullException(nameof(columnName));
         var sortKeys = new List<SortKey> { new SortKey(columnName, descending) };
         int stepIndex = _steps.Count;
-        _steps.Add((record, opts) => ExecuteCompositeSort(record, sortKeys));
+        _steps.Add(new IndexStep((source, indices, _) => ExecuteCompositeSort(source, indices, sortKeys)));
         _sortKeysMap[stepIndex] = sortKeys;
         return this;
     }
@@ -71,7 +111,6 @@ public class RecordQuery
     public RecordQuery ThenBy(string columnName, bool descending = false)
     {
         if (columnName == null) throw new ArgumentNullException(nameof(columnName));
-        // 查找最后一个排序 step 并追加键
         var lastSortKeys = FindLastSortKeys();
         if (lastSortKeys == null)
             throw new InvalidOperationException("ThenBy 必须在 OrderBy 之后调用");
@@ -87,7 +126,7 @@ public class RecordQuery
     public RecordQuery Distinct(params string[] columnNames)
     {
         var names = columnNames?.Length > 0 ? (string[])columnNames.Clone() : null;
-        _steps.Add((record, opts) => ExecuteDistinct(record, names));
+        _steps.Add(new IndexStep((source, indices, _) => ExecuteDistinct(source, indices, names)));
         return this;
     }
 
@@ -98,7 +137,14 @@ public class RecordQuery
     /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery Take(int count)
     {
-        _steps.Add((record, opts) => ExecuteTake(record, count));
+        _steps.Add(new IndexStep((source, indices, _) =>
+        {
+            if (count <= 0) return new int[0];
+            if (count >= indices.Length) return indices;
+            var result = new int[count];
+            Array.Copy(indices, result, count);
+            return result;
+        }));
         return this;
     }
 
@@ -109,7 +155,14 @@ public class RecordQuery
     /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery Skip(int count)
     {
-        _steps.Add((record, opts) => ExecuteSkip(record, count));
+        _steps.Add(new IndexStep((source, indices, _) =>
+        {
+            if (count <= 0) return indices;
+            if (count >= indices.Length) return new int[0];
+            var result = new int[indices.Length - count];
+            Array.Copy(indices, count, result, 0, result.Length);
+            return result;
+        }));
         return this;
     }
 
@@ -118,38 +171,25 @@ public class RecordQuery
     /// <summary>
     /// 等价内连接（<see cref="InnerJoin"/> 的别名）。
     /// </summary>
-    /// <param name="right">右表。</param>
-    /// <param name="leftKey">左表键列名。</param>
-    /// <param name="rightKey">右表键列名。</param>
-    /// <param name="rightPrefix">右表重名列前缀，为 null 时重名抛异常。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery Join(Record right, string leftKey, string rightKey, string? rightPrefix = null)
-    {
-        return InnerJoin(right, leftKey, rightKey, rightPrefix);
-    }
+        => InnerJoin(right, leftKey, rightKey, rightPrefix);
 
     /// <summary>
     /// 等价内连接（<see cref="InnerJoin"/> 的别名），右表为查询对象。
     /// </summary>
     public RecordQuery Join(RecordQuery right, string leftKey, string rightKey, string? rightPrefix = null)
-    {
-        return InnerJoin(right, leftKey, rightKey, rightPrefix);
-    }
+        => InnerJoin(right, leftKey, rightKey, rightPrefix);
 
     /// <summary>
     /// 内连接。
     /// </summary>
-    /// <param name="right">右表。</param>
-    /// <param name="leftKey">左表键列名。</param>
-    /// <param name="rightKey">右表键列名。</param>
-    /// <param name="rightPrefix">右表重名列前缀，为 null 时重名抛异常。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery InnerJoin(Record right, string leftKey, string rightKey, string? rightPrefix = null)
     {
         if (right == null) throw new ArgumentNullException(nameof(right));
         if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
         if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
-        _steps.Add((record, opts) => ExecuteJoin(record, right.Clone(), leftKey, rightKey, rightPrefix, JoinType.Inner, opts));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteJoin(Materialize(source, indices), right.Clone(), leftKey, rightKey, rightPrefix, JoinType.Inner, opts)));
         return this;
     }
 
@@ -161,24 +201,21 @@ public class RecordQuery
         if (right == null) throw new ArgumentNullException(nameof(right));
         if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
         if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
-        _steps.Add((record, opts) => ExecuteJoin(record, right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.Inner, opts));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteJoin(Materialize(source, indices), right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.Inner, opts)));
         return this;
     }
 
     /// <summary>
     /// 左连接。
     /// </summary>
-    /// <param name="right">右表。</param>
-    /// <param name="leftKey">左表键列名。</param>
-    /// <param name="rightKey">右表键列名。</param>
-    /// <param name="rightPrefix">右表重名列前缀，为 null 时重名抛异常。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery LeftJoin(Record right, string leftKey, string rightKey, string? rightPrefix = null)
     {
         if (right == null) throw new ArgumentNullException(nameof(right));
         if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
         if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
-        _steps.Add((record, opts) => ExecuteJoin(record, right.Clone(), leftKey, rightKey, rightPrefix, JoinType.Left, opts));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteJoin(Materialize(source, indices), right.Clone(), leftKey, rightKey, rightPrefix, JoinType.Left, opts)));
         return this;
     }
 
@@ -190,24 +227,21 @@ public class RecordQuery
         if (right == null) throw new ArgumentNullException(nameof(right));
         if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
         if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
-        _steps.Add((record, opts) => ExecuteJoin(record, right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.Left, opts));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteJoin(Materialize(source, indices), right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.Left, opts)));
         return this;
     }
 
     /// <summary>
     /// 右连接。
     /// </summary>
-    /// <param name="right">右表。</param>
-    /// <param name="leftKey">左表键列名。</param>
-    /// <param name="rightKey">右表键列名。</param>
-    /// <param name="rightPrefix">右表重名列前缀，为 null 时重名抛异常。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery RightJoin(Record right, string leftKey, string rightKey, string? rightPrefix = null)
     {
         if (right == null) throw new ArgumentNullException(nameof(right));
         if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
         if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
-        _steps.Add((record, opts) => ExecuteJoin(record, right.Clone(), leftKey, rightKey, rightPrefix, JoinType.Right, opts));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteJoin(Materialize(source, indices), right.Clone(), leftKey, rightKey, rightPrefix, JoinType.Right, opts)));
         return this;
     }
 
@@ -219,24 +253,21 @@ public class RecordQuery
         if (right == null) throw new ArgumentNullException(nameof(right));
         if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
         if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
-        _steps.Add((record, opts) => ExecuteJoin(record, right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.Right, opts));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteJoin(Materialize(source, indices), right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.Right, opts)));
         return this;
     }
 
     /// <summary>
     /// 全外连接：保留左右两表的所有行，无匹配一侧填 null。
     /// </summary>
-    /// <param name="right">右表。</param>
-    /// <param name="leftKey">左表键列名。</param>
-    /// <param name="rightKey">右表键列名。</param>
-    /// <param name="rightPrefix">右表重名列前缀，为 null 时重名抛异常。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery FullOuterJoin(Record right, string leftKey, string rightKey, string? rightPrefix = null)
     {
         if (right == null) throw new ArgumentNullException(nameof(right));
         if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
         if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
-        _steps.Add((record, opts) => ExecuteJoin(record, right.Clone(), leftKey, rightKey, rightPrefix, JoinType.FullOuter, opts));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteJoin(Materialize(source, indices), right.Clone(), leftKey, rightKey, rightPrefix, JoinType.FullOuter, opts)));
         return this;
     }
 
@@ -248,20 +279,19 @@ public class RecordQuery
         if (right == null) throw new ArgumentNullException(nameof(right));
         if (leftKey == null) throw new ArgumentNullException(nameof(leftKey));
         if (rightKey == null) throw new ArgumentNullException(nameof(rightKey));
-        _steps.Add((record, opts) => ExecuteJoin(record, right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.FullOuter, opts));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteJoin(Materialize(source, indices), right.ToRecord(), leftKey, rightKey, rightPrefix, JoinType.FullOuter, opts)));
         return this;
     }
 
     /// <summary>
     /// 交叉连接（笛卡尔积）：左表每行与右表每行两两组合，结果行数 = 左表行数 × 右表行数。
     /// </summary>
-    /// <param name="right">右表。</param>
-    /// <param name="rightPrefix">右表重名列前缀，为 null 时重名抛异常。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery CrossJoin(Record right, string? rightPrefix = null)
     {
         if (right == null) throw new ArgumentNullException(nameof(right));
-        _steps.Add((record, opts) => ExecuteCrossJoin(record, right.Clone(), rightPrefix));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteCrossJoin(Materialize(source, indices), right.Clone(), rightPrefix)));
         return this;
     }
 
@@ -271,7 +301,8 @@ public class RecordQuery
     public RecordQuery CrossJoin(RecordQuery right, string? rightPrefix = null)
     {
         if (right == null) throw new ArgumentNullException(nameof(right));
-        _steps.Add((record, opts) => ExecuteCrossJoin(record, right.ToRecord(), rightPrefix));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteCrossJoin(Materialize(source, indices), right.ToRecord(), rightPrefix)));
         return this;
     }
 
@@ -279,113 +310,93 @@ public class RecordQuery
 
     #region Set Algebra
 
-    /// <summary>
-    /// 合并两个结果集并去重。
-    /// </summary>
-    /// <param name="other">另一个 Record。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
+    /// <summary>合并两个结果集并去重。</summary>
     public RecordQuery Union(Record other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteConcat(record, other.Clone(), deduplicate: true));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteConcat(Materialize(source, indices), other.Clone(), deduplicate: true)));
         return this;
     }
 
-    /// <summary>
-    /// 合并两个结果集并去重，另一方为查询对象。
-    /// </summary>
+    /// <summary>合并两个结果集并去重，另一方为查询对象。</summary>
     public RecordQuery Union(RecordQuery other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteConcat(record, other.ToRecord(), deduplicate: true));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteConcat(Materialize(source, indices), other.ToRecord(), deduplicate: true)));
         return this;
     }
 
-    /// <summary>
-    /// 合并两个结果集，保留所有行（不去重）。
-    /// </summary>
-    /// <param name="other">另一个 Record。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
+    /// <summary>合并两个结果集，保留所有行（不去重）。</summary>
     public RecordQuery UnionAll(Record other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteConcat(record, other.Clone(), deduplicate: false));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteConcat(Materialize(source, indices), other.Clone(), deduplicate: false)));
         return this;
     }
 
-    /// <summary>
-    /// 合并两个结果集，保留所有行（不去重），另一方为查询对象。
-    /// </summary>
+    /// <summary>合并两个结果集，保留所有行（不去重），另一方为查询对象。</summary>
     public RecordQuery UnionAll(RecordQuery other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteConcat(record, other.ToRecord(), deduplicate: false));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteConcat(Materialize(source, indices), other.ToRecord(), deduplicate: false)));
         return this;
     }
 
-    /// <summary>
-    /// 返回两个结果集的交集（去重）。
-    /// </summary>
-    /// <param name="other">另一个 Record。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
+    /// <summary>返回两个结果集的交集（去重）。</summary>
     public RecordQuery Intersect(Record other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteIntersect(record, other.Clone()));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteIntersect(Materialize(source, indices), other.Clone())));
         return this;
     }
 
-    /// <summary>
-    /// 返回两个结果集的交集（去重），另一方为查询对象。
-    /// </summary>
+    /// <summary>返回两个结果集的交集（去重），另一方为查询对象。</summary>
     public RecordQuery Intersect(RecordQuery other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteIntersect(record, other.ToRecord()));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteIntersect(Materialize(source, indices), other.ToRecord())));
         return this;
     }
 
-    /// <summary>
-    /// 返回在当前结果集中但不在另一个结果集中的行（去重）。
-    /// </summary>
-    /// <param name="other">另一个 Record。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
+    /// <summary>返回在当前结果集中但不在另一个结果集中的行（去重）。</summary>
     public RecordQuery Except(Record other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteExcept(record, other.Clone()));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteExcept(Materialize(source, indices), other.Clone())));
         return this;
     }
 
-    /// <summary>
-    /// 返回在当前结果集中但不在另一个结果集中的行（去重），另一方为查询对象。
-    /// </summary>
+    /// <summary>返回在当前结果集中但不在另一个结果集中的行（去重），另一方为查询对象。</summary>
     public RecordQuery Except(RecordQuery other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteExcept(record, other.ToRecord()));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteExcept(Materialize(source, indices), other.ToRecord())));
         return this;
     }
 
-    /// <summary>
-    /// 将另一个结果集的行追加到当前结果集（不去重，等价于 SQL UNION ALL 但不要求 Schema 完全一致时的别名）。
-    /// </summary>
-    /// <param name="other">另一个 Record。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
+    /// <summary>将另一个结果集的行追加到当前结果集（不去重）。</summary>
     public RecordQuery Concat(Record other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteConcat(record, other.Clone(), deduplicate: false));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteConcat(Materialize(source, indices), other.Clone(), deduplicate: false)));
         return this;
     }
 
-    /// <summary>
-    /// 将另一个结果集的行追加到当前结果集（不去重），另一方为查询对象。
-    /// </summary>
+    /// <summary>将另一个结果集的行追加到当前结果集（不去重），另一方为查询对象。</summary>
     public RecordQuery Concat(RecordQuery other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        _steps.Add((record, opts) => ExecuteConcat(record, other.ToRecord(), deduplicate: false));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteConcat(Materialize(source, indices), other.ToRecord(), deduplicate: false)));
         return this;
     }
 
@@ -396,9 +407,6 @@ public class RecordQuery
     /// <summary>
     /// 按指定列分组并应用聚合函数。
     /// </summary>
-    /// <param name="keyColumns">分组键列名。</param>
-    /// <param name="aggregates">聚合定义数组。</param>
-    /// <returns>当前查询对象，支持链式调用。</returns>
     public RecordQuery GroupBy(string[] keyColumns, params AggregateDefinition[] aggregates)
     {
         if (keyColumns == null) throw new ArgumentNullException(nameof(keyColumns));
@@ -406,9 +414,12 @@ public class RecordQuery
         if (keyColumns.Length == 0) throw new ArgumentException("分组键列不能为空", nameof(keyColumns));
         var keys = (string[])keyColumns.Clone();
         var aggs = (AggregateDefinition[])aggregates.Clone();
-        _steps.Add((record, opts) => ExecuteGroupBy(record, keys, aggs));
+        _steps.Add(new MaterializeStep((source, indices, opts) =>
+            ExecuteGroupBy(Materialize(source, indices), keys, aggs)));
         return this;
     }
+
+    #endregion
 
     #endregion
 
@@ -419,11 +430,35 @@ public class RecordQuery
     /// <returns>物化后的 <see cref="Record"/> 实例。</returns>
     public Record ToRecord()
     {
-        var current = _source.Clone();
+        // 管道起点：source Record + 全行索引
+        Record current = _source;
+        int[] indices = Enumerable.Range(0, _source.Count).ToArray();
+        bool ownsRecord = false; // 是否已经 clone/物化过 source
+
         foreach (var step in _steps)
         {
-            current = step(current, _options);
+            if (step is IndexStep indexStep)
+            {
+                // 纯索引变换，不产生新 Record
+                indices = indexStep.Execute(current, indices, _options);
+            }
+            else if (step is MaterializeStep materializeStep)
+            {
+                // 物化步骤：先将累积的索引应用到 current 得到实际 Record，
+                // 然后执行物化操作（该步骤内部可能再次调用 Materialize 来处理 join 参数等）
+                var materialized = materializeStep.Execute(current, indices, _options);
+                current = materialized;
+                indices = Enumerable.Range(0, current.Count).ToArray();
+                ownsRecord = true;
+            }
         }
+
+        // 管道结束：如果最后仍有未物化的索引变换，执行最终物化
+        if (!ownsRecord || !IsIdentityIndices(current, indices))
+        {
+            current = Materialize(current, indices);
+        }
+
         return current;
     }
 
@@ -431,17 +466,53 @@ public class RecordQuery
 
     private enum JoinType { Inner, Left, Right, FullOuter }
 
-    private static Record ExecuteWhere(Record source, Func<RecordRow, bool> predicate)
+    private sealed class SortKey
     {
-        var result = source.CloneSchema();
-        for (int i = 0; i < source.Count; i++)
+        public string ColumnName { get; }
+        public bool Descending { get; }
+        public SortKey(string columnName, bool descending) { ColumnName = columnName; Descending = descending; }
+    }
+
+    private readonly Dictionary<int, List<SortKey>> _sortKeysMap = new();
+
+    private List<SortKey>? FindLastSortKeys()
+    {
+        for (int i = _steps.Count - 1; i >= 0; i--)
         {
-            var row = new RecordRow(source, i);
-            if (!predicate(row)) continue;
+            if (_sortKeysMap.TryGetValue(i, out var keys)) return keys;
+            break;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 判断索引数组是否为 [0, 1, 2, ..., count-1] 恒等映射。
+    /// </summary>
+    private static bool IsIdentityIndices(Record record, int[] indices)
+    {
+        if (indices.Length != record.Count) return false;
+        for (int i = 0; i < indices.Length; i++)
+        {
+            if (indices[i] != i) return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 将 source 按 indices 物化为新的 Record。
+    /// </summary>
+    private static Record Materialize(Record source, int[] indices)
+    {
+        if (IsIdentityIndices(source, indices)) return source.Clone();
+
+        var result = source.CloneSchema();
+        for (int i = 0; i < indices.Length; i++)
+        {
+            var srcRow = indices[i];
             var newRow = result.AddRow();
             for (int c = 0; c < source.Columns.Count; c++)
             {
-                var val = source.Columns[c].GetValue(i);
+                var val = source.Columns[c].GetValue(srcRow);
                 if (val is not null)
                 {
                     result.Columns[c].SetValue(val, newRow.Row);
@@ -451,18 +522,17 @@ public class RecordQuery
         return result;
     }
 
-    private static Record ExecuteSelect(Record source, string[] columnNames)
+    private static Record ExecuteSelect(Record source, int[] indices, string[] columnNames)
     {
         if (columnNames.Length == 0) throw new ArgumentException("投影列名不能为空");
 
-        // 校验列名
         foreach (var name in columnNames)
         {
             if (source.Columns.Find(name) == null)
                 throw new InvalidOperationException($"列 '{name}' 不存在");
         }
 
-        var result = new Record(source.Name, source.Count);
+        var result = new Record(source.Name, indices.Length);
         var sourceColumns = new RecordColumn[columnNames.Length];
         for (int i = 0; i < columnNames.Length; i++)
         {
@@ -471,47 +541,24 @@ public class RecordQuery
             result.Columns.Add(srcCol.Name, srcCol.Type);
         }
 
-        for (int r = 0; r < source.Count; r++)
+        for (int i = 0; i < indices.Length; i++)
         {
+            var srcRow = indices[i];
             result.AddRow();
             for (int c = 0; c < columnNames.Length; c++)
             {
-                var val = sourceColumns[c].GetValue(r);
+                var val = sourceColumns[c].GetValue(srcRow);
                 if (val is not null)
                 {
-                    result.Columns[c].SetValue(val, r);
+                    result.Columns[c].SetValue(val, i);
                 }
             }
         }
         return result;
     }
 
-    private sealed class SortKey
+    private static int[] ExecuteCompositeSort(Record source, int[] indices, List<SortKey> sortKeys)
     {
-        public string ColumnName { get; }
-        public bool Descending { get; }
-        public SortKey(string columnName, bool descending) { ColumnName = columnName; Descending = descending; }
-    }
-
-    /// <summary>
-    /// 查找最后一个排序 step 关联的 SortKey 列表，用于 ThenBy 追加。
-    /// </summary>
-    private List<SortKey>? FindLastSortKeys()
-    {
-        // 从后往前找包含 SortKey 列表的排序 step
-        for (int i = _steps.Count - 1; i >= 0; i--)
-        {
-            if (_sortKeysMap.TryGetValue(i, out var keys)) return keys;
-            break; // 只允许紧跟在最后一个 step 后追加
-        }
-        return null;
-    }
-
-    private readonly Dictionary<int, List<SortKey>> _sortKeysMap = new();
-
-    private static Record ExecuteCompositeSort(Record source, List<SortKey> sortKeys)
-    {
-        // 解析所有排序列
         var cols = new RecordColumn[sortKeys.Count];
         var descs = new bool[sortKeys.Count];
         for (int i = 0; i < sortKeys.Count; i++)
@@ -521,8 +568,8 @@ public class RecordQuery
             descs[i] = sortKeys[i].Descending;
         }
 
-        var indices = Enumerable.Range(0, source.Count).ToArray();
-        Array.Sort(indices, (a, b) =>
+        var result = (int[])indices.Clone();
+        Array.Sort(result, (a, b) =>
         {
             for (int k = 0; k < cols.Length; k++)
             {
@@ -540,14 +587,13 @@ public class RecordQuery
             return 0;
         });
 
-        return BuildFromIndices(source, indices);
+        return result;
     }
 
-    private static Record ExecuteDistinct(Record source, string[]? columnNames)
+    private static int[] ExecuteDistinct(Record source, int[] indices, string[]? columnNames)
     {
         var targetNames = columnNames ?? source.Columns.Cast<RecordColumn>().Select(c => c.Name).ToArray();
 
-        // 校验列名
         foreach (var name in targetNames)
         {
             if (source.Columns.Find(name) == null)
@@ -562,7 +608,7 @@ public class RecordQuery
 
         var seen = new HashSet<string>();
         var keepIndices = new List<int>();
-        for (int r = 0; r < source.Count; r++)
+        foreach (var r in indices)
         {
             var key = BuildRowKey(targetCols, r);
             if (seen.Add(key))
@@ -571,25 +617,7 @@ public class RecordQuery
             }
         }
 
-        return BuildFromIndices(source, keepIndices);
-    }
-
-    private static Record ExecuteTake(Record source, int count)
-    {
-        if (count <= 0) return source.CloneSchema();
-        if (count >= source.Count) return source.Clone();
-
-        var indices = Enumerable.Range(0, Math.Min(count, source.Count)).ToList();
-        return BuildFromIndices(source, indices);
-    }
-
-    private static Record ExecuteSkip(Record source, int count)
-    {
-        if (count <= 0) return source.Clone();
-        if (count >= source.Count) return source.CloneSchema();
-
-        var indices = Enumerable.Range(count, source.Count - count).ToList();
-        return BuildFromIndices(source, indices);
+        return keepIndices.ToArray();
     }
 
     private static Record ExecuteJoin(Record left, Record right, string leftKey, string rightKey, string? rightPrefix, JoinType joinType, QueryOptions opts)
@@ -599,7 +627,6 @@ public class RecordQuery
         var rightCol = right.Columns.Find(rightKey)
             ?? throw new InvalidOperationException($"右表列 '{rightKey}' 不存在");
 
-        // 构建结果 schema: 左表全部列 + 右表非键列（或全部列）
         var result = new Record(left.Name, 0);
         foreach (RecordColumn col in left.Columns)
         {
@@ -617,14 +644,12 @@ public class RecordQuery
                     throw new InvalidOperationException($"右表列 '{destName}' 与左表列重名，请指定 rightPrefix 参数");
                 destName = rightPrefix + destName;
             }
-            var destCol = result.Columns.Add(destName, col.Type);
+            result.Columns.Add(destName, col.Type);
             rightColSources.Add(col);
             rightColDestIndices.Add(result.Columns.IndexOf(destName));
         }
 
-        // 构建右表键索引: key -> list of row indices
         var rightIndex = new Dictionary<string, List<int>>();
-        var comparison = opts.StringComparison;
         for (int r = 0; r < right.Count; r++)
         {
             var key = ConvertToKeyString(rightCol.GetValue(r));
@@ -640,7 +665,6 @@ public class RecordQuery
             ? new HashSet<int>()
             : null;
 
-        // 遍历左表
         for (int lr = 0; lr < left.Count; lr++)
         {
             var leftKeyVal = ConvertToKeyString(leftCol.GetValue(lr));
@@ -663,14 +687,11 @@ public class RecordQuery
             }
             else if (joinType == JoinType.Left || joinType == JoinType.FullOuter)
             {
-                // Left / FullOuter: 左行保留，右侧填 null
                 var newRow = result.AddRow();
                 CopyRow(left, lr, result, newRow.Row, 0, left.Columns.Count);
             }
-            // Inner / Right: 不匹配的左行丢弃
         }
 
-        // Right / FullOuter: 追加未匹配的右表行（左侧列填 null）
         if (joinType == JoinType.Right || joinType == JoinType.FullOuter)
         {
             for (int rr = 0; rr < right.Count; rr++)
@@ -714,7 +735,6 @@ public class RecordQuery
             crossRightDestIdx.Add(result.Columns.IndexOf(destName));
         }
 
-        // 笛卡尔积：左表每行 × 右表每行
         for (int lr = 0; lr < left.Count; lr++)
         {
             for (int rr = 0; rr < right.Count; rr++)
@@ -767,7 +787,6 @@ public class RecordQuery
         var result = left.CloneSchema();
         var allCols = result.Columns;
 
-        // 复制左表行
         for (int r = 0; r < left.Count; r++)
         {
             var newRow = result.AddRow();
@@ -778,7 +797,6 @@ public class RecordQuery
             }
         }
 
-        // 复制右表行
         for (int r = 0; r < right.Count; r++)
         {
             var newRow = result.AddRow();
@@ -791,9 +809,10 @@ public class RecordQuery
 
         if (deduplicate)
         {
-            var targetCols = new RecordColumn[allCols.Count];
-            for (int i = 0; i < allCols.Count; i++) targetCols[i] = allCols[i];
-            return ExecuteDistinct(result, null);
+            // 对合并结果做 Distinct
+            var indices = Enumerable.Range(0, result.Count).ToArray();
+            var distinctIndices = ExecuteDistinct(result, indices, null);
+            return Materialize(result, distinctIndices);
         }
 
         return result;
@@ -803,7 +822,6 @@ public class RecordQuery
     {
         ValidateSchemaCompatibility(left, right);
 
-        // 构建右表行键集合
         var rightCols = new RecordColumn[right.Columns.Count];
         for (int i = 0; i < rightCols.Length; i++) rightCols[i] = right.Columns[i];
         var rightKeys = new HashSet<string>();
@@ -826,7 +844,7 @@ public class RecordQuery
             }
         }
 
-        return BuildFromIndices(left, keepIndices);
+        return Materialize(left, keepIndices.ToArray());
     }
 
     private static Record ExecuteExcept(Record left, Record right)
@@ -855,12 +873,11 @@ public class RecordQuery
             }
         }
 
-        return BuildFromIndices(left, keepIndices);
+        return Materialize(left, keepIndices.ToArray());
     }
 
     private static Record ExecuteGroupBy(Record source, string[] keyColumns, AggregateDefinition[] aggregates)
     {
-        // 校验键列
         var keyCols = new RecordColumn[keyColumns.Length];
         for (int i = 0; i < keyColumns.Length; i++)
         {
@@ -868,14 +885,12 @@ public class RecordQuery
                 ?? throw new InvalidOperationException($"分组键列 '{keyColumns[i]}' 不存在");
         }
 
-        // 校验聚合源列
         foreach (var agg in aggregates)
         {
             if (agg.SourceColumn != null && source.Columns.Find(agg.SourceColumn) == null)
                 throw new InvalidOperationException($"聚合源列 '{agg.SourceColumn}' 不存在");
         }
 
-        // 分组: key -> list of row indices
         var groups = new Dictionary<string, List<int>>();
         var groupOrder = new List<string>();
         for (int r = 0; r < source.Count; r++)
@@ -890,7 +905,6 @@ public class RecordQuery
             list.Add(r);
         }
 
-        // 构建结果 schema
         var result = new Record(source.Name, groups.Count);
         foreach (var keyCol in keyCols)
         {
@@ -902,14 +916,12 @@ public class RecordQuery
             result.Columns.Add(agg.OutputColumn, outputType);
         }
 
-        // 填充结果
         foreach (var groupKey in groupOrder)
         {
             var rows = groups[groupKey];
             var firstRow = rows[0];
             var newRow = result.AddRow();
 
-            // 填充键列
             for (int k = 0; k < keyCols.Length; k++)
             {
                 var val = keyCols[k].GetValue(firstRow);
@@ -917,7 +929,6 @@ public class RecordQuery
                     result.Columns[k].SetValue(val, newRow.Row);
             }
 
-            // 填充聚合列
             for (int a = 0; a < aggregates.Length; a++)
             {
                 var agg = aggregates[a];
@@ -1020,25 +1031,6 @@ public class RecordQuery
 
     #region Helpers
 
-    private static Record BuildFromIndices(Record source, IList<int> indices)
-    {
-        var result = source.CloneSchema();
-        for (int i = 0; i < indices.Count; i++)
-        {
-            var srcRow = indices[i];
-            var newRow = result.AddRow();
-            for (int c = 0; c < source.Columns.Count; c++)
-            {
-                var val = source.Columns[c].GetValue(srcRow);
-                if (val is not null)
-                {
-                    result.Columns[c].SetValue(val, newRow.Row);
-                }
-            }
-        }
-        return result;
-    }
-
     private static string BuildRowKey(RecordColumn[] columns, int row)
     {
         if (columns.Length == 1)
@@ -1048,7 +1040,6 @@ public class RecordQuery
             var s = Convert.ToString(v) ?? string.Empty;
             return "\0V" + s;
         }
-        // 使用长度前缀编码避免分隔符碰撞：每个值编码为 "len:value"
         var sb = new System.Text.StringBuilder();
         for (int i = 0; i < columns.Length; i++)
         {
