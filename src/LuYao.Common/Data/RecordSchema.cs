@@ -31,14 +31,19 @@ public sealed class RecordSchema
         public string Name { get; }
 
         /// <summary>
-        /// 列的数据类型。
+        /// 列的枚举类型标识。
         /// </summary>
-        public Type Type { get; }
+        public RecordColumnType ColumnType { get; }
 
-        internal ColumnDef(string name, Type type)
+        /// <summary>
+        /// 列的 CLR 数据类型。
+        /// </summary>
+        public Type Type => Helpers.GetClrType(ColumnType);
+
+        internal ColumnDef(string name, RecordColumnType columnType)
         {
             Name = name;
-            Type = type;
+            ColumnType = columnType;
         }
     }
 }

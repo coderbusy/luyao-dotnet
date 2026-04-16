@@ -1,8 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace LuYao.Data;
 
@@ -29,20 +26,15 @@ public class RecordSerializationTests
         return record;
     }
 
-    #region XML Serialization
+    #region Binary Serialization
 
     [TestMethod]
-    public void WhenXmlRoundTripThenDataPreserved()
+    public void WhenBinaryRoundTripThenDataPreserved()
     {
         var original = CreateTestRecord();
 
-        var serializer = new XmlSerializer(typeof(Record));
-        using var sw = new StringWriter();
-        serializer.Serialize(sw, original);
-        var xml = sw.ToString();
-
-        using var sr = new StringReader(xml);
-        var deserialized = (Record)serializer.Deserialize(sr)!;
+        var bytes = original.ToBytes();
+        var deserialized = Record.FromBytes(bytes);
 
         Assert.AreEqual("Orders", deserialized.Name);
         Assert.AreEqual(2, deserialized.Count);
@@ -58,18 +50,14 @@ public class RecordSerializationTests
     }
 
     [TestMethod]
-    public void WhenXmlRoundTripEmptyRecordThenSchemaPreserved()
+    public void WhenBinaryRoundTripEmptyRecordThenSchemaPreserved()
     {
         var original = new Record("Empty", 0);
         original.Columns.Add<int>("Id");
         original.Columns.Add<string>("Name");
 
-        var serializer = new XmlSerializer(typeof(Record));
-        using var sw = new StringWriter();
-        serializer.Serialize(sw, original);
-
-        using var sr = new StringReader(sw.ToString());
-        var deserialized = (Record)serializer.Deserialize(sr)!;
+        var bytes = original.ToBytes();
+        var deserialized = Record.FromBytes(bytes);
 
         Assert.AreEqual("Empty", deserialized.Name);
         Assert.AreEqual(0, deserialized.Count);
@@ -79,20 +67,15 @@ public class RecordSerializationTests
     }
 
     [TestMethod]
-    public void WhenXmlRoundTripWithNullValuesThenPreserved()
+    public void WhenBinaryRoundTripWithNullValuesThenPreserved()
     {
         var record = new Record("Test", 1);
         record.Columns.Add<string>("Name");
         record.Columns.Add<int?>("Value");
         record.AddRow();
-        // leave values as null/default
 
-        var serializer = new XmlSerializer(typeof(Record));
-        using var sw = new StringWriter();
-        serializer.Serialize(sw, record);
-
-        using var sr = new StringReader(sw.ToString());
-        var deserialized = (Record)serializer.Deserialize(sr)!;
+        var bytes = record.ToBytes();
+        var deserialized = Record.FromBytes(bytes);
 
         Assert.AreEqual(1, deserialized.Count);
         Assert.IsNull(deserialized.Columns[0].GetValue(0));
@@ -100,22 +83,87 @@ public class RecordSerializationTests
     }
 
     [TestMethod]
-    public void WhenXmlRoundTripWithByteArrayThenPreserved()
+    public void WhenBinaryRoundTripWithByteArrayThenPreserved()
     {
         var record = new Record("Binary", 1);
         var col = record.Columns.Add<byte[]>("Data");
         var row = record.AddRow();
         col.Set(new byte[] { 1, 2, 3, 4, 5 }, row.Row);
 
-        var serializer = new XmlSerializer(typeof(Record));
-        using var sw = new StringWriter();
-        serializer.Serialize(sw, record);
-
-        using var sr = new StringReader(sw.ToString());
-        var deserialized = (Record)serializer.Deserialize(sr)!;
+        var bytes = record.ToBytes();
+        var deserialized = Record.FromBytes(bytes);
 
         var data = deserialized.Columns.Find<byte[]>("Data")!.Get(0);
         CollectionAssert.AreEqual(new byte[] { 1, 2, 3, 4, 5 }, data);
+    }
+
+    [TestMethod]
+    public void WhenBinaryRoundTripWithAllTypesThenPreserved()
+    {
+        var record = new Record("AllTypes", 1);
+        record.Columns.Add<bool>("Bool");
+        record.Columns.Add<sbyte>("SByte");
+        record.Columns.Add<short>("Short");
+        record.Columns.Add<int>("Int");
+        record.Columns.Add<long>("Long");
+        record.Columns.Add<byte>("Byte");
+        record.Columns.Add<ushort>("UShort");
+        record.Columns.Add<uint>("UInt");
+        record.Columns.Add<ulong>("ULong");
+        record.Columns.Add<float>("Float");
+        record.Columns.Add<double>("Double");
+        record.Columns.Add<decimal>("Decimal");
+        record.Columns.Add<char>("Char");
+        record.Columns.Add<string>("String");
+        record.Columns.Add<DateTime>("DateTime");
+        record.Columns.Add<DateTimeOffset>("DateTimeOffset");
+        record.Columns.Add<TimeSpan>("TimeSpan");
+        record.Columns.Add<Guid>("Guid");
+
+        var r = record.AddRow();
+        record.Columns.Find<bool>("Bool")!.Set(true, r.Row);
+        record.Columns.Find<sbyte>("SByte")!.Set(-1, r.Row);
+        record.Columns.Find<short>("Short")!.Set(short.MaxValue, r.Row);
+        record.Columns.Find<int>("Int")!.Set(42, r.Row);
+        record.Columns.Find<long>("Long")!.Set(long.MaxValue, r.Row);
+        record.Columns.Find<byte>("Byte")!.Set(255, r.Row);
+        record.Columns.Find<ushort>("UShort")!.Set(ushort.MaxValue, r.Row);
+        record.Columns.Find<uint>("UInt")!.Set(uint.MaxValue, r.Row);
+        record.Columns.Find<ulong>("ULong")!.Set(ulong.MaxValue, r.Row);
+        record.Columns.Find<float>("Float")!.Set(3.14f, r.Row);
+        record.Columns.Find<double>("Double")!.Set(3.14159265, r.Row);
+        record.Columns.Find<decimal>("Decimal")!.Set(99.99m, r.Row);
+        record.Columns.Find<char>("Char")!.Set('A', r.Row);
+        record.Columns.Find<string>("String")!.Set("Hello", r.Row);
+        var dt = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc);
+        record.Columns.Find<DateTime>("DateTime")!.Set(dt, r.Row);
+        var dto = new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.FromHours(8));
+        record.Columns.Find<DateTimeOffset>("DateTimeOffset")!.Set(dto, r.Row);
+        record.Columns.Find<TimeSpan>("TimeSpan")!.Set(TimeSpan.FromHours(2.5), r.Row);
+        var guid = Guid.NewGuid();
+        record.Columns.Find<Guid>("Guid")!.Set(guid, r.Row);
+
+        var bytes = record.ToBytes();
+        var d = Record.FromBytes(bytes);
+
+        Assert.AreEqual(true, d.Columns.Find<bool>("Bool")!.Get(0));
+        Assert.AreEqual((sbyte)-1, d.Columns.Find<sbyte>("SByte")!.Get(0));
+        Assert.AreEqual(short.MaxValue, d.Columns.Find<short>("Short")!.Get(0));
+        Assert.AreEqual(42, d.Columns.Find<int>("Int")!.Get(0));
+        Assert.AreEqual(long.MaxValue, d.Columns.Find<long>("Long")!.Get(0));
+        Assert.AreEqual((byte)255, d.Columns.Find<byte>("Byte")!.Get(0));
+        Assert.AreEqual(ushort.MaxValue, d.Columns.Find<ushort>("UShort")!.Get(0));
+        Assert.AreEqual(uint.MaxValue, d.Columns.Find<uint>("UInt")!.Get(0));
+        Assert.AreEqual(ulong.MaxValue, d.Columns.Find<ulong>("ULong")!.Get(0));
+        Assert.AreEqual(3.14f, d.Columns.Find<float>("Float")!.Get(0));
+        Assert.AreEqual(3.14159265, d.Columns.Find<double>("Double")!.Get(0));
+        Assert.AreEqual(99.99m, d.Columns.Find<decimal>("Decimal")!.Get(0));
+        Assert.AreEqual('A', d.Columns.Find<char>("Char")!.Get(0));
+        Assert.AreEqual("Hello", d.Columns.Find<string>("String")!.Get(0));
+        Assert.AreEqual(dt, d.Columns.Find<DateTime>("DateTime")!.Get(0));
+        Assert.AreEqual(dto, d.Columns.Find<DateTimeOffset>("DateTimeOffset")!.Get(0));
+        Assert.AreEqual(TimeSpan.FromHours(2.5), d.Columns.Find<TimeSpan>("TimeSpan")!.Get(0));
+        Assert.AreEqual(guid, d.Columns.Find<Guid>("Guid")!.Get(0));
     }
 
     #endregion
@@ -124,10 +172,10 @@ public class RecordSerializationTests
 [TestClass]
 public class RecordSetSerializationTests
 {
-    #region XML Serialization
+    #region Binary Serialization
 
     [TestMethod]
-    public void WhenXmlRoundTripThenAllRecordsPreserved()
+    public void WhenBinaryRoundTripThenAllRecordsPreserved()
     {
         var set = new RecordSet();
 
@@ -143,12 +191,8 @@ public class RecordSetSerializationTests
         customers.Columns[0].SetValue("Alice", row2.Row);
         set.Add("Customers", customers);
 
-        var serializer = new XmlSerializer(typeof(RecordSet));
-        using var sw = new StringWriter();
-        serializer.Serialize(sw, set);
-
-        using var sr = new StringReader(sw.ToString());
-        var deserialized = (RecordSet)serializer.Deserialize(sr)!;
+        var bytes = set.ToBytes();
+        var deserialized = RecordSet.FromBytes(bytes);
 
         Assert.AreEqual(2, deserialized.Count);
         Assert.IsTrue(deserialized.Contains("Orders"));
@@ -158,16 +202,12 @@ public class RecordSetSerializationTests
     }
 
     [TestMethod]
-    public void WhenXmlRoundTripEmptySetThenEmpty()
+    public void WhenBinaryRoundTripEmptySetThenEmpty()
     {
         var set = new RecordSet();
 
-        var serializer = new XmlSerializer(typeof(RecordSet));
-        using var sw = new StringWriter();
-        serializer.Serialize(sw, set);
-
-        using var sr = new StringReader(sw.ToString());
-        var deserialized = (RecordSet)serializer.Deserialize(sr)!;
+        var bytes = set.ToBytes();
+        var deserialized = RecordSet.FromBytes(bytes);
 
         Assert.AreEqual(0, deserialized.Count);
     }

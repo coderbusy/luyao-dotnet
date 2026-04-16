@@ -476,7 +476,7 @@ public class RecordSetTests
     {
         var set = new RecordSet();
 
-        Assert.Throws<ArgumentNullException>(() => set.WriteTo(null!));
+        Assert.Throws<ArgumentNullException>(() => set.WriteTo((System.Data.DataSet)null!));
     }
 
     [TestMethod]

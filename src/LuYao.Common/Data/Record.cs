@@ -4,11 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace LuYao.Data;
 
@@ -16,8 +12,7 @@ namespace LuYao.Data;
 /// 列存储数据集合
 /// </summary>
 [DebuggerTypeProxy(typeof(RecordDebuggerTypeProxy))]
-[Serializable]
-public partial class Record : IEnumerable<RecordRow>, ISerializable, IXmlSerializable
+public partial class Record : IEnumerable<RecordRow>
 {
     /// <summary>
     /// 初始化 <see cref="Record"/> 类的新实例。
@@ -500,7 +495,7 @@ public partial class Record : IEnumerable<RecordRow>, ISerializable, IXmlSeriali
         var columns = new List<RecordSchema.ColumnDef>(this.Columns.Count);
         foreach (RecordColumn col in this.Columns)
         {
-            columns.Add(new RecordSchema.ColumnDef(col.Name, col.Type));
+            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType));
         }
         return new RecordSchema(columns);
     }
@@ -521,172 +516,4 @@ public partial class Record : IEnumerable<RecordRow>, ISerializable, IXmlSeriali
 
     #endregion
 
-    #region ISerializable
-
-    /// <summary>
-    /// 从序列化数据重建 <see cref="Record"/> 实例。
-    /// </summary>
-    protected Record(SerializationInfo info, StreamingContext context)
-        : this(info.GetString("n"), info.GetInt32("k"))
-    {
-        Page = info.GetInt32("p");
-        _maxCount = info.GetInt32("m");
-        _pageSize = info.GetInt32("sz");
-
-        int rowCount = info.GetInt32("k");
-        var names = (string[])info.GetValue("ns", typeof(string[]))!;
-        var codes = (sbyte[])info.GetValue("ts", typeof(sbyte[]))!;
-
-        for (int c = 0; c < names.Length; c++)
-        {
-            Type type = Helpers.GetTypeFromCode(codes[c]);
-            var col = this.Columns.Add(names[c], type);
-            var data = (Array)info.GetValue(c.ToString(), typeof(object))!;
-            col.SetDataArray(data, rowCount);
-        }
-
-        this.Count = rowCount;
     }
-
-    /// <inheritdoc/>
-    public void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        info.AddValue("n", this.Name);
-        info.AddValue("k", this.Count);
-        info.AddValue("p", this.Page);
-        info.AddValue("m", _maxCount);
-        info.AddValue("sz", _pageSize);
-
-        var names = new string[this.Columns.Count];
-        var codes = new sbyte[this.Columns.Count];
-
-        for (int c = 0; c < this.Columns.Count; c++)
-        {
-            var col = this.Columns[c];
-            names[c] = col.Name;
-            codes[c] = Helpers.GetTypeCode(col.Type);
-            info.AddValue(c.ToString(), col.GetDataArray(this.Count));
-        }
-
-        info.AddValue("ns", names);
-        info.AddValue("ts", codes);
-    }
-
-    #endregion
-
-    #region IXmlSerializable
-
-    XmlSchema? IXmlSerializable.GetSchema() => null;
-
-    void IXmlSerializable.ReadXml(XmlReader reader)
-    {
-        this.Name = reader.GetAttribute("N") ?? reader.LocalName;
-        this.Page = int.TryParse(reader.GetAttribute("P"), out var p) ? p : 1;
-        this._pageSize = int.TryParse(reader.GetAttribute("PS"), out var ps) ? ps : 0;
-        this._maxCount = int.TryParse(reader.GetAttribute("MC"), out var mc) ? mc : 0;
-
-        this.Columns.Clear();
-
-        // 读取 schema 属性: "Id:i4,Name:s"
-        string? schema = reader.GetAttribute("S");
-        if (schema != null && schema.Length > 0)
-        {
-            foreach (var part in schema.Split(','))
-            {
-                int sep = part.LastIndexOf(':');
-                if (sep < 0) continue;
-                string colName = part.Substring(0, sep);
-                string typeAlias = part.Substring(sep + 1);
-                this.Columns.Add(colName, Helpers.GetTypeFromAlias(typeAlias));
-            }
-        }
-
-        if (reader.IsEmptyElement) { reader.Read(); return; }
-        reader.ReadStartElement();
-
-        // 行数据：<r Col1="val1" Col2="val2" />
-        while (reader.IsStartElement("r"))
-        {
-            var row = this.AddRow();
-            if (reader.HasAttributes)
-            {
-                for (int c = 0; c < this.Columns.Count; c++)
-                {
-                    var col = this.Columns[c];
-                    string? val = reader.GetAttribute(col.Name);
-                    if (val != null)
-                    {
-                        var obj = DeserializeColumnValue(val, col.Type);
-                        if (obj is not null) col.SetValue(obj, row.Row);
-                    }
-                }
-            }
-            reader.Read(); // self-closing <r />
-        }
-
-        reader.ReadEndElement();
-    }
-
-    void IXmlSerializable.WriteXml(XmlWriter writer)
-    {
-        if (!string.IsNullOrEmpty(this.Name))
-            writer.WriteAttributeString("N", this.Name);
-        if (this.Page != 1)
-            writer.WriteAttributeString("P", this.Page.ToString());
-        if (_pageSize != 0)
-            writer.WriteAttributeString("PS", _pageSize.ToString());
-        if (_maxCount != 0)
-            writer.WriteAttributeString("MC", _maxCount.ToString());
-
-        // schema: "Id:i4,Name:s"
-        if (this.Columns.Count > 0)
-        {
-            var sb = new StringBuilder();
-            for (int c = 0; c < this.Columns.Count; c++)
-            {
-                if (c > 0) sb.Append(',');
-                var col = this.Columns[c];
-                sb.Append(col.Name).Append(':').Append(Helpers.GetTypeAlias(col.Type));
-            }
-            writer.WriteAttributeString("S", sb.ToString());
-        }
-
-        // 行数据
-        for (int r = 0; r < this.Count; r++)
-        {
-            writer.WriteStartElement("r");
-            for (int c = 0; c < this.Columns.Count; c++)
-            {
-                var val = this.Columns[c].GetValue(r);
-                if (val is not null)
-                {
-                    writer.WriteAttributeString(
-                        this.Columns[c].Name,
-                        SerializeColumnValue(val, this.Columns[c].Type));
-                }
-            }
-            writer.WriteEndElement();
-        }
-    }
-
-    private static string SerializeColumnValue(object value, Type type)
-    {
-        if (type == typeof(byte[]))
-            return Convert.ToBase64String((byte[])value);
-        return Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
-    }
-
-    private static object? DeserializeColumnValue(string text, Type type)
-    {
-        if (string.IsNullOrEmpty(text)) return null;
-        if (type == typeof(byte[]))
-            return Convert.FromBase64String(text);
-
-        var underlying = Nullable.GetUnderlyingType(type);
-        var targetType = underlying ?? type;
-        return Convert.ChangeType(text, targetType, System.Globalization.CultureInfo.InvariantCulture);
-    }
-
-    #endregion
-
-}

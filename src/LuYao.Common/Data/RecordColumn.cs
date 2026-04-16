@@ -26,6 +26,7 @@ public abstract class RecordColumn
         this.Record = record ?? throw new ArgumentNullException(nameof(record));
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
         this._type = type ?? throw new ArgumentNullException(nameof(type));
+        this.ColumnType = Helpers.GetColumnType(type);
     }
     private Type _type;
     /// <summary>
@@ -39,6 +40,11 @@ public abstract class RecordColumn
     /// </summary>
     /// <value>表示列实际数据类型的 <see cref="Type"/> 对象。</value>
     public Type Type => this._type;
+
+    /// <summary>
+    /// 获取列的枚举类型标识。
+    /// </summary>
+    public RecordColumnType ColumnType { get; }
 
     /// <summary>
     /// 在指定行设置列的值。

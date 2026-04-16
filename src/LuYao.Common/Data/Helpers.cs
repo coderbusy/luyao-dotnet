@@ -7,137 +7,79 @@ namespace LuYao.Data;
 
 static class Helpers
 {
-    /// <summary>
-    /// 列类型白名单（封闭，不可外部扩展）。
-    /// </summary>
-    private static readonly HashSet<Type> SupportedColumnTypes = new()
+    #region RecordColumnType <-> Type 双向映射
+
+    private static readonly Dictionary<Type, RecordColumnType> TypeToColumnType = new()
     {
-        typeof(bool),
-        typeof(sbyte), typeof(short), typeof(int), typeof(long),
-        typeof(byte), typeof(ushort), typeof(uint), typeof(ulong),
-        typeof(float), typeof(double), typeof(decimal),
-        typeof(char), typeof(string),
-        typeof(DateTime), typeof(DateTimeOffset), typeof(TimeSpan),
-        typeof(Guid),
-        typeof(byte[]),
+        [typeof(bool)] = RecordColumnType.Boolean,
+        [typeof(sbyte)] = RecordColumnType.SByte,
+        [typeof(short)] = RecordColumnType.Int16,
+        [typeof(int)] = RecordColumnType.Int32,
+        [typeof(long)] = RecordColumnType.Int64,
+        [typeof(byte)] = RecordColumnType.Byte,
+        [typeof(ushort)] = RecordColumnType.UInt16,
+        [typeof(uint)] = RecordColumnType.UInt32,
+        [typeof(ulong)] = RecordColumnType.UInt64,
+        [typeof(float)] = RecordColumnType.Single,
+        [typeof(double)] = RecordColumnType.Double,
+        [typeof(decimal)] = RecordColumnType.Decimal,
+        [typeof(char)] = RecordColumnType.Char,
+        [typeof(string)] = RecordColumnType.String,
+        [typeof(DateTime)] = RecordColumnType.DateTime,
+        [typeof(DateTimeOffset)] = RecordColumnType.DateTimeOffset,
+        [typeof(TimeSpan)] = RecordColumnType.TimeSpan,
+        [typeof(Guid)] = RecordColumnType.Guid,
+        [typeof(byte[])] = RecordColumnType.ByteArray,
     };
 
-    #region Type Alias (compact serialization)
-
-    private static readonly Dictionary<Type, string> TypeToAlias = new()
-    {
-        [typeof(bool)] = "b",
-        [typeof(sbyte)] = "i1", [typeof(short)] = "i2", [typeof(int)] = "i4", [typeof(long)] = "i8",
-        [typeof(byte)] = "u1", [typeof(ushort)] = "u2", [typeof(uint)] = "u4", [typeof(ulong)] = "u8",
-        [typeof(float)] = "r4", [typeof(double)] = "r8", [typeof(decimal)] = "dc",
-        [typeof(char)] = "c", [typeof(string)] = "s",
-        [typeof(DateTime)] = "dt", [typeof(DateTimeOffset)] = "dto", [typeof(TimeSpan)] = "ts",
-        [typeof(Guid)] = "g",
-        [typeof(byte[])] = "bin",
-    };
-
-    private static readonly Dictionary<string, Type> AliasToType;
-
-    /// <summary>
-    /// 获取类型的紧凑别名。支持 Nullable 类型（别名后加 '?'）。
-    /// </summary>
-    internal static string GetTypeAlias(Type type)
-    {
-        var underlying = Nullable.GetUnderlyingType(type);
-        if (underlying != null && TypeToAlias.TryGetValue(underlying, out var alias))
-            return alias + "?";
-        if (TypeToAlias.TryGetValue(type, out alias))
-            return alias;
-        return type.FullName!;
-    }
-
-    /// <summary>
-    /// 从紧凑别名还原类型。支持 '?' 后缀表示 Nullable。
-    /// 兼容完整类型名（用于向后兼容旧格式）。
-    /// </summary>
-    internal static Type GetTypeFromAlias(string alias)
-    {
-        if (alias.EndsWith("?"))
-        {
-            var baseAlias = alias.Substring(0, alias.Length - 1);
-            if (AliasToType.TryGetValue(baseAlias, out var baseType))
-                return typeof(Nullable<>).MakeGenericType(baseType);
-        }
-        if (AliasToType.TryGetValue(alias, out var type))
-            return type;
-        // fallback: full type name (backward compat)
-        return Type.GetType(alias, throwOnError: true)!;
-    }
-
-    #endregion
-
-    #region Type Code (compact binary serialization)
-
-    private static readonly Dictionary<Type, sbyte> TypeToCode = new()
-    {
-        [typeof(bool)] = 1,
-        [typeof(sbyte)] = 2, [typeof(short)] = 3, [typeof(int)] = 4, [typeof(long)] = 5,
-        [typeof(byte)] = 6, [typeof(ushort)] = 7, [typeof(uint)] = 8, [typeof(ulong)] = 9,
-        [typeof(float)] = 10, [typeof(double)] = 11, [typeof(decimal)] = 12,
-        [typeof(char)] = 13, [typeof(string)] = 14,
-        [typeof(DateTime)] = 15, [typeof(DateTimeOffset)] = 16, [typeof(TimeSpan)] = 17,
-        [typeof(Guid)] = 18,
-        [typeof(byte[])] = 19,
-    };
-
-    private static readonly Dictionary<sbyte, Type> CodeToType;
+    private static readonly Dictionary<RecordColumnType, Type> ColumnTypeToType;
 
     static Helpers()
     {
-        AliasToType = new Dictionary<string, Type>(TypeToAlias.Count * 2, StringComparer.Ordinal);
-        foreach (var kv in TypeToAlias)
+        ColumnTypeToType = new Dictionary<RecordColumnType, Type>(TypeToColumnType.Count * 2);
+        foreach (var kv in TypeToColumnType)
         {
-            AliasToType[kv.Value] = kv.Key;
-        }
-
-        CodeToType = new Dictionary<sbyte, Type>(TypeToCode.Count);
-        foreach (var kv in TypeToCode)
-        {
-            CodeToType[kv.Value] = kv.Key;
+            ColumnTypeToType[kv.Value] = kv.Key;
+            // 同时注册 Nullable 映射（负值）
+            if (kv.Key.IsValueType)
+            {
+                var nullableEnum = (RecordColumnType)(-(sbyte)kv.Value);
+                ColumnTypeToType[nullableEnum] = typeof(Nullable<>).MakeGenericType(kv.Key);
+            }
         }
     }
 
     /// <summary>
-    /// 获取类型的紧凑 sbyte 编码。Nullable 类型使用负值。
+    /// 从 CLR <see cref="Type"/> 获取 <see cref="RecordColumnType"/>。
     /// </summary>
-    internal static sbyte GetTypeCode(Type type)
+    internal static RecordColumnType GetColumnType(Type type)
     {
         var underlying = Nullable.GetUnderlyingType(type);
-        if (underlying != null && TypeToCode.TryGetValue(underlying, out var code))
-            return (sbyte)(-code);
-        if (TypeToCode.TryGetValue(type, out code))
-            return code;
-        throw new NotSupportedException($"类型 '{type.FullName}' 无对应类型编码");
+        if (underlying != null && TypeToColumnType.TryGetValue(underlying, out var ct))
+            return (RecordColumnType)(-(sbyte)ct);
+        if (TypeToColumnType.TryGetValue(type, out ct))
+            return ct;
+        throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型");
     }
 
     /// <summary>
-    /// 从 sbyte 编码还原类型。负值表示 Nullable。
+    /// 从 <see cref="RecordColumnType"/> 获取 CLR <see cref="Type"/>。
     /// </summary>
-    internal static Type GetTypeFromCode(sbyte code)
+    internal static Type GetClrType(RecordColumnType columnType)
     {
-        if (code < 0)
-        {
-            var baseCode = (sbyte)(-code);
-            if (CodeToType.TryGetValue(baseCode, out var baseType))
-                return typeof(Nullable<>).MakeGenericType(baseType);
-        }
-        if (CodeToType.TryGetValue(code, out var type))
+        if (ColumnTypeToType.TryGetValue(columnType, out var type))
             return type;
-        throw new NotSupportedException($"未知类型编码: {code}");
+        throw new NotSupportedException($"未知列类型枚举值: {columnType}");
     }
 
     #endregion
+
     internal static bool IsSupportedColumnType(Type type)
     {
         if (type == null) return false;
-        if (SupportedColumnTypes.Contains(type)) return true;
+        if (TypeToColumnType.ContainsKey(type)) return true;
         var underlying = Nullable.GetUnderlyingType(type);
-        return underlying != null && SupportedColumnTypes.Contains(underlying);
+        return underlying != null && TypeToColumnType.ContainsKey(underlying);
     }
 
     /// <summary>

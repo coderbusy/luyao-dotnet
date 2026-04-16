@@ -2,10 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Runtime.Serialization;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace LuYao.Data;
 
@@ -13,8 +9,7 @@ namespace LuYao.Data;
 /// 命名 Record 集合，用于组织和管理多个 <see cref="Record"/>。
 /// 以 <see cref="Record.Name"/> 作为管理键，支持按名称增删改查。
 /// </summary>
-[Serializable]
-public class RecordSet : IEnumerable<Record>, ISerializable, IXmlSerializable
+public partial class RecordSet : IEnumerable<Record>
 {
     private readonly Dictionary<string, Record> _records;
     private readonly List<string> _names;
@@ -254,65 +249,4 @@ public class RecordSet : IEnumerable<Record>, ISerializable, IXmlSerializable
             throw new ArgumentException("名称不能为空或空白", nameof(name));
     }
 
-    #region ISerializable
-
-    /// <summary>
-    /// 从序列化数据重建 <see cref="RecordSet"/> 实例。
-    /// </summary>
-    protected RecordSet(SerializationInfo info, StreamingContext context)
-        : this(StringComparer.Ordinal)
-    {
-        int count = info.GetInt32("C");
-        for (int i = 0; i < count; i++)
-        {
-            var record = (Record)info.GetValue($"R{i}", typeof(Record))!;
-            this.Add(record.Name, record);
-        }
     }
-
-    /// <inheritdoc/>
-    public void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        info.AddValue("C", _names.Count);
-        for (int i = 0; i < _names.Count; i++)
-        {
-            info.AddValue($"R{i}", _records[_names[i]]);
-        }
-    }
-
-    #endregion
-
-    #region IXmlSerializable
-
-    XmlSchema? IXmlSerializable.GetSchema() => null;
-
-    void IXmlSerializable.ReadXml(XmlReader reader)
-    {
-        this.Clear();
-
-        if (reader.IsEmptyElement) { reader.Read(); return; }
-        reader.ReadStartElement(); // <RecordSet>
-
-        while (reader.NodeType == XmlNodeType.Element)
-        {
-            var record = new Record();
-            ((IXmlSerializable)record).ReadXml(reader);
-            this.Add(record.Name, record);
-        }
-
-        reader.ReadEndElement(); // </RecordSet>
-    }
-
-    void IXmlSerializable.WriteXml(XmlWriter writer)
-    {
-        foreach (var name in _names)
-        {
-            var record = _records[name];
-            writer.WriteStartElement("R");
-            ((IXmlSerializable)record).WriteXml(writer);
-            writer.WriteEndElement();
-        }
-    }
-
-    #endregion
-}
