@@ -20,6 +20,8 @@
 - 负责内存中的表结构与数据处理。
 - 保留与 `IDataReader`、`DataTable` 的互操作。
 - 提供集合操作能力（筛选、连接、聚合、集合代数）。
+- 支持二进制序列化（`ISerializable`）和 XML 序列化（`IXmlSerializable`）。
+- 支持服务端翻页元数据（`Page`、`PageSize`、`MaxCount`、`MaxPage`）。
 
 ### 2.2 `RecordSet` 核心职责
 
@@ -28,8 +30,7 @@
 
 ### 2.3 非核心职责
 
-- 对象映射能力（`From<T>`、`FromList<T>`、`To<T>`、`ToList<T>`）不属于核心数据处理职责，后续下沉到扩展层。
-- 通用序列化/反序列化（尤其是列类型不确定场景）不放在核心类型内。
+- 对象映射能力（`From<T>`、`FromList<T>`、`To<T>`、`ToList<T>`）不属于核心数据处理职责，后续下沉到扩展层。对象映射的详细设计见独立文档 `RecordMapping.md`。
 - JSON、文本等协议能力通过扩展模块提供（如扩展方法或独立包）。
 
 ### 2.4 线程安全
@@ -171,6 +172,60 @@
 - `Clone()`：复制列结构与全部行数据，返回新 `Record`。
 - `GetSchema()`：导出列定义信息（列名 + 类型），用于序列化、传输或 Schema 比较等场景。
 
+### 4.7 服务端翻页
+
+`Record` 支持携带服务端翻页元数据，用于分页查询结果的传输。
+
+- `Page`：当前页码（从 1 开始，默认值 1）。
+- `PageSize`：每页数据条数。
+- `MaxCount`：总数据条数。当值大于 0 时返回设置值，否则返回 `Count`。
+- `MaxPage`：总页数（只读，由 `MaxCount` 和 `PageSize` 计算得出）。当 `MaxCount` 为 0 时返回 0；`PageSize` 为 0 时按默认值 20 计算。
+
+翻页属性仅作为元数据，不影响 `Record` 的数据操作行为。`Clone()` 和序列化会保留翻页属性。
+
+### 4.8 序列化
+
+`Record` 和 `RecordSet` 实现 `ISerializable` 和 `IXmlSerializable` 接口，支持二进制序列化和 XML 序列化。
+
+#### 二进制序列化（`ISerializable`）
+
+序列化内容包括：
+- `Name`：表名。
+- 翻页元数据：`Page`、`PageSize`、`MaxCount`。
+- 列定义：每列的名称和类型。
+- 行数据：逐行逐列的值。
+
+`RecordSet` 序列化其包含的所有 `Record` 及名称比较策略。
+
+#### XML 序列化（`IXmlSerializable`）
+
+XML 格式：
+
+```xml
+<!-- Record -->
+<Record Name="Orders" Page="1" PageSize="20" MaxCount="100">
+  <Columns>
+    <Column Name="Id" Type="System.Int32" />
+    <Column Name="Name" Type="System.String" />
+  </Columns>
+  <Rows>
+    <Row><V>1</V><V>Order-1</V></Row>
+    <Row><V>2</V><V>Order-2</V></Row>
+  </Rows>
+</Record>
+
+<!-- RecordSet -->
+<RecordSet>
+  <Record Name="Orders" ...>...</Record>
+  <Record Name="Customers" ...>...</Record>
+</RecordSet>
+```
+
+- 列值使用 `Convert.ToString` / `Convert.ChangeType` 进行文本序列化/反序列化。
+- `null` 值使用空元素或 `xsi:nil="true"` 表示。
+- `byte[]` 值使用 Base64 编码。
+- 列类型使用 `Type.FullName` 序列化，使用 `Type.GetType` 反序列化。
+
 ---
 
 ## 5. 查询执行模型
@@ -306,12 +361,14 @@
 1. `RecordSet` 基础容器能力（命名管理 + 索引器 + 枚举 + 校验）
 2. `RecordSet` 与 `DataSet` 双向互操作
 3. Schema 操作（`RenameColumn`、`CastColumn`、`CloneSchema`、`Clone`、`GetSchema`）
-4. `RecordQuery` 基础框架（`AsQuery` + `ToRecord` + `QueryOptions`）
-5. `Where/Select/OrderBy/Distinct/Take/Skip`
-6. `Join/InnerJoin/LeftJoin/RightJoin` + 索引优化
-7. `Union/Intersect/Except/Concat`
-8. `GroupBy + Aggregate`
-9. `FullOuterJoin/CrossJoin`
+4. 服务端翻页属性
+5. `ISerializable` / `IXmlSerializable` 序列化
+6. `RecordQuery` 基础框架（`AsQuery` + `ToRecord` + `QueryOptions`）
+7. `Where/Select/OrderBy/Distinct/Take/Skip`
+8. `Join/InnerJoin/LeftJoin/RightJoin` + 索引优化
+9. `Union/Intersect/Except/Concat`
+10. `GroupBy + Aggregate`
+11. `FullOuterJoin/CrossJoin`
 
 ---
 
@@ -325,6 +382,8 @@
 - 空表操作返回空 `Record`（零行保留 Schema），不返回 `null`。
 - 异常信息清晰，便于排查问题。
 - 多目标框架编译通过，并有覆盖关键行为的单元测试。
+- `Record` / `RecordSet` 可通过 `ISerializable` 和 `IXmlSerializable` 正确往返序列化。
+- 翻页属性在序列化、`Clone` 中得到保留。
 
 ---
 
@@ -491,273 +550,6 @@ foreach (var record in set)
 
 ---
 
-## 13. 对象映射
+## 13. 对象映射（已移至独立文档）
 
-对象映射能力位于扩展层，提供 `Record` / `RecordQuery` 与 CLR 对象之间的双向转换。
-
-### 13.1 设计定位
-
-- 对象映射不属于 `Record` 核心职责（见 §2.3），以扩展方法形式提供。
-- 映射层负责 CLR 属性与列之间的名称匹配、类型转换、构造函数选择。
-- 列类型系统保持封闭白名单（见 §3.4），自定义类型的转换仅在映射边界发生。
-
-### 13.2 API
-
-#### 写入（对象 → Record）
-
-- `Record.AddRow<T>(T item)`：将对象的属性按名称匹配写入已有列。
-- `Record.AddRow<T>(T item, RecordMappingOptions options)`：带选项写入。
-- `Record.AddRows<T>(IEnumerable<T> items)`：批量写入。
-- `Record.AddRows<T>(IEnumerable<T> items, RecordMappingOptions options)`：批量带选项写入。
-
-#### 读取（Record / RecordQuery → 对象）
-
-- `Record.ToList<T>()`
-- `Record.ToList<T>(RecordMappingOptions options)`
-- `RecordRow.To<T>()`
-- `RecordRow.To<T>(RecordMappingOptions options)`
-- `RecordQuery.ToList<T>()`：直接从查询物化为对象列表，不产生中间 `Record`。
-- `RecordQuery.ToList<T>(RecordMappingOptions options)`
-
-### 13.3 名称匹配
-
-- 匹配方式为鸭子类型：不绑定具体 CLR 类型，只关心属性名称。
-- 不同类型只要属性名重叠就能写入同一张表。
-- 默认按 `OrdinalIgnoreCase` 比较属性名与列名。
-
-#### 名称转换（属性名 → 列名，单向）
-
-名称转换仅支持**属性名 → 列名**的单向映射，通过 `RecordMappingOptions.NameTransform` 配置：
-
-- **AddRow\<T\>**：对每个属性名调用 `NameTransform` 得到列名，再按列名在 `Record` 中查找匹配列。
-- **ToList\<T\> / To\<T\>**：对 `T` 的每个属性名调用 `NameTransform` 得到列名，再按列名在 `Record` 中查找匹配列。
-- 即：映射始终以「属性名经转换后的列名」为桥梁，`Record` 侧的列名不做反向转换。
-
-```csharp
-// 示例：属性名 PascalCase → 列名 snake_case
-var options = new RecordMappingOptions
-{
-    NameTransform = name => ToSnakeCase(name) // "OrderId" → "order_id"
-};
-record.AddRow(order, options);           // order.OrderId → 列 "order_id"
-var list = record.ToList<Order>(options); // 列 "order_id" → order.OrderId
-```
-
-- 若 `NameTransform` 为 `null`（默认），直接使用属性名按 `NameComparison` 匹配。
-- `NameTransform` 的结果再按 `NameComparison` 与列名比较（转换后仍可不区分大小写）。
-
-### 13.4 AddRow\<T\> 行为
-
-| 场景 | 默认行为 | 可选覆盖 |
-|------|----------|----------|
-| 属性名匹配到列 | 写入值 | — |
-| 属性名未匹配到列 | 忽略 | `AutoAddColumns = true` 时自动添加列（已有行填默认值） |
-| 属性类型与列类型一致 | 直接写入 | — |
-| 属性类型与列类型不一致 | `Convert.ChangeType` + checked 上下文 | `SerializeValue` 钩子优先 |
-| 属性为枚举类型 | 内置转换：列为整数类型时取底层值，列为 `string` 时取名称 | — |
-| 窄化转换溢出 | 抛 `OverflowException` | — |
-| 不兼容转换 | 抛 `InvalidCastException`（含列名、源类型、目标类型、行号） | — |
-| 自动拓宽列类型 | 不拓宽（列类型一旦确定即为契约） | `AutoWidenColumns`（预留，默认关闭） |
-
-### 13.5 ToList\<T\> / To\<T\> 行为
-
-| 场景 | 默认行为 | 可选覆盖 |
-|------|----------|----------|
-| 列匹配到属性 | 赋值 | — |
-| 列未匹配到属性（多余列） | 忽略 | — |
-| 属性未匹配到列（缺失列） | 属性保持 `default` | `RequireAllProperties = true` 时抛异常 |
-| 列类型与属性类型一致 | 直接赋值 | — |
-| 列类型与属性类型不一致 | `Convert.ChangeType` + checked | `DeserializeValue` 钩子优先 |
-| 列为 `string`/整数 → 属性为枚举 | 内置转换：`Enum.Parse` 或直接强转 | — |
-| 列值为 `null` → 可空属性 | 赋 `null` | — |
-| 列值为 `null` → 不可空值类型属性 | 赋 `default`（如 `int` → `0`） | — |
-| 转换失败 | 抛异常（含列名、目标属性名、行号） | — |
-
-### 13.6 构造函数选择策略
-
-按以下优先级依次查找，命中即停止：
-
-1. **`[RecordConstructor]` 标记的构造函数**：若存在，直接使用。若标记了多个，抛 `AmbiguousMatchException`。标记的构造函数按参数名（`OrdinalIgnoreCase`）匹配列名，未匹配到列的参数使用参数类型的 `default` 值。
-2. **无参构造函数**：若存在公开无参构造函数，使用它创建实例，然后逐属性赋值。
-3. **单参数 `RecordRow` 构造函数**：若存在接受单个 `RecordRow` 参数的公开构造函数，使用它。此模式将完整的行数据交给类型自行处理，映射层不再进行属性赋值。适用于需要自定义映射逻辑的复杂类型。
-4. **以上均未命中**：抛 `MissingMethodException`，提示无可用构造函数。
-
-```csharp
-// 模式 1：显式标记
-public class Order
-{
-    [RecordConstructor]
-    public Order(int id, string name) { ... }
-    public Order() { ... } // 被忽略，因为有标记的构造函数
-}
-
-// 模式 2：无参构造 + 属性赋值（最常见）
-public class Order
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-}
-
-// 模式 3：RecordRow 构造（完全自定义）
-public class Order
-{
-    public Order(RecordRow row)
-    {
-        Id = row.Get<int>("Id");
-        Name = row.Get<string>("Name");
-    }
-}
-```
-
-### 13.7 嵌套与复杂类型
-
-- 第一版仅映射扁平属性（只处理公开可读/可写的简单属性）。
-- 遇到嵌套/复杂类型属性直接跳过，不报错。
-- 与 Dapper 行为一致。
-
-### 13.8 RecordMappingOptions
-
-```csharp
-public class RecordMappingOptions
-{
-    /// 名称比较策略（默认 OrdinalIgnoreCase）
-    public StringComparison NameComparison { get; set; } = StringComparison.OrdinalIgnoreCase;
-
-    /// 属性名 → 列名 单向转换函数（默认 null，不转换）
-    public Func<string, string>? NameTransform { get; set; }
-
-    /// AddRow 时是否自动添加不存在的列（默认 false）
-    public bool AutoAddColumns { get; set; }
-
-    /// ToList/To 时是否要求 T 的所有属性都有对应列（默认 false）
-    public bool RequireAllProperties { get; set; }
-
-    /// 自定义写入转换：(列名, 列类型, 属性值) → 列值
-    public Func<string, Type, object?, object?>? SerializeValue { get; set; }
-
-    /// 自定义读取转换：(列名, 属性类型, 列值) → 属性值
-    public Func<string, Type, object?, object?>? DeserializeValue { get; set; }
-
-    /// 自定义映射器，优先级最高（见 §13.11）
-    public IRecordMapper? Mapper { get; set; }
-}
-```
-
-### 13.9 性能
-
-映射层需要在高频场景（万行级遍历）下保持高效。核心策略：
-
-#### 编译委托
-
-- 首次映射时通过表达式树（`Expression<T>`）编译生成强类型委托，后续调用零反射。
-- **AddRow\<T\>**：编译为 `Action<T, RecordColumn[], int>`，直接按列索引写入，无装箱。
-- **ToList\<T\> / To\<T\>**：编译为 `Func<RecordColumn[], int, T>`，直接按列索引读取并构造对象。
-
-#### 缓存策略
-
-- 映射计划按 `(typeof(T), Schema 签名, RecordMappingOptions 关键字段)` 缓存。
-- Schema 签名 = 列名 + 列类型的有序组合哈希（列顺序变化 = 不同签名）。
-- 缓存使用 `ConcurrentDictionary`，线程安全，生命周期为进程级。
-- `IRecordMapper` 被设置时跳过缓存（用户完全接管）。
-
-#### 热路径优化
-
-- 编译后的委托直接操作 `RecordColumn<T>._data` 数组（通过 `internal` 访问），跳过边界检查和虚方法调用。
-- 避免 `object` 装箱：值类型列使用泛型 `RecordColumn<T>.Get/Set` 路径。
-- 批量写入（`AddRows<T>`）一次编译、循环调用，避免重复查找列。
-- 名称转换结果在编译阶段求值并固化到委托中，运行时不再调用 `NameTransform`。
-
-### 13.10 异常汇总
-
-| 场景 | 异常类型 |
-|------|----------|
-| 类型转换失败 | `InvalidCastException`（含列名、源类型、目标类型、行号） |
-| 窄化溢出 | `OverflowException` |
-| `RequireAllProperties` 且属性缺失列
-| `[RecordConstructor]` 标记了多个构造函数 | `AmbiguousMatchException` |
-| 无可用构造函数（无标记、无无参、无 RecordRow 参数） | `MissingMethodException` |
-
-### 13.11 IRecordMapper
-
-`IRecordMapper` 提供完全自定义的映射能力，优先级高于所有内置映射逻辑。当 `RecordMappingOptions.Mapper` 被设置时，映射层将所有工作委托给它，不再进行反射、名称匹配或类型转换。
-
-```csharp
-/// 非泛型基接口
-public interface IRecordMapper
-{
-    /// 将对象的值写入 Record 的指定行
-    void Write(object item, Record record, int row);
-
-    /// 从 Record 的指定行创建对象
-    object Read(Record record, int row);
-}
-
-/// 泛型接口，提供强类型支持
-public interface IRecordMapper<T> : IRecordMapper
-{
-    /// 将对象的值写入 Record 的指定行
-    void Write(T item, Record record, int row);
-
-    /// 从 Record 的指定行创建对象
-    new T Read(Record record, int row);
-}
-```
-
-#### 职责边界
-
-- **由 Mapper 负责**：属性-列绑定、类型转换、对象构造——全部由实现者控制。
-- **由映射层负责**：调用 `AddRow` 时分配行（`record.AddRow()`），将行索引传给 Mapper；调用 `ToList<T>` 时遍历行并收集结果。
-- Mapper 不负责 `Record` 的 Schema 管理（不添加/删除列）。
-
-#### 使用场景
-
-- 需要极致性能，避免内置映射的开销（虽然内置已使用编译委托，但 Mapper 可以做到零抽象）。
-- 映射逻辑非常规（如一个属性映射到多列、条件映射等）。
-- 需要复用已有的映射逻辑（如项目中已有 ORM 映射基础设施）。
-
-```csharp
-// 示例
-public class OrderMapper : IRecordMapper<Order>
-{
-    public void Write(Order item, Record record, int row)
-    {
-        record.Columns.Get("Id").SetValue(item.Id, row);
-        record.Columns.Get("Name").SetValue(item.Name, row);
-    }
-
-    public Order Read(Record record, int row)
-    {
-        return new Order
-        {
-            Id = record.Columns.Find<int>("Id")!.Get(row),
-            Name = record.Columns.Find<string>("Name")!.Get(row),
-        };
-    }
-
-    // 显式接口实现
-    void IRecordMapper.Write(object item, Record record, int row) => Write((Order)item, record, row);
-    object IRecordMapper.Read(Record record, int row) => Read(record, row);
-}
-
-// 使用
-var options = new RecordMappingOptions { Mapper = new OrderMapper() };
-record.AddRow(order, options);
-var list = record.ToList<Order>(options);
-```
-
-#### 约束
-
-- `Mapper` 与 `SerializeValue` / `DeserializeValue` 互斥：设置 `Mapper` 后，钩子被忽略。
-- `Mapper` 被设置时跳过内置缓存（Mapper 自行管理性能）。
-- `NameTransform`、`RequireAllProperties` 等选项在 Mapper 模式下不生效（Mapper 完全接管）。
-
-### 13.12 null → 不可空值类型的行为
-
-当可空列（如 `int?`）的值为 `null`，映射到不可空值类型属性（如 `int`）时，**赋 `default` 值**（如 `int` → `0`，`DateTime` → `0001-01-01`）。不抛异常，不提供开关。
-
-理由：
-
-- 不可空列（如 `int`）底层为 `int[]`，初始值即为 `0`，不存在 null 问题。
-- 可空列（如 `int?`）映射到不可空属性时，用户已通过属性类型声明表达了"不关心 null 语义"的意图。
-- 若用户需要区分 `null` 与 `0`，应使用 `int?` 属性接收。
-- 与 `Record.Read(IDataReader)` 中 `DBNull` → `default` 的行为一致。
+对象映射能力不属于 `Record` 核心职责（见 §2.3），详细设计见独立文档 `RecordMapping.md`。
