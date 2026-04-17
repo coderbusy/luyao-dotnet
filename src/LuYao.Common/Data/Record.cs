@@ -23,6 +23,15 @@ public partial class Record : IEnumerable<RecordRow>
     }
 
     /// <summary>
+    /// 初始化 <see cref="Record"/> 类的新实例。
+    /// </summary>
+    /// <param name="name">表名称。</param>
+    public Record(string name) : this(name, 0)
+    {
+
+    }
+
+    /// <summary>
     /// 使用指定的表名和行数初始化 <see cref="Record"/> 类的新实例。
     /// </summary>
     /// <param name="name">表名称。</param>
@@ -556,4 +565,4 @@ public partial class Record : IEnumerable<RecordRow>
 
     #endregion
 
-    }
+}
