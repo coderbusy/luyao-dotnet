@@ -30,6 +30,7 @@ public partial class Record
         if (writer == null) throw new ArgumentNullException(nameof(writer));
 
         // Header
+        BinaryPayloadHeader.Write(writer, BinaryPayloadType.Record);
         writer.Write(BinaryFormatVersion);
         writer.Write(this.Name ?? string.Empty);
         writer.Write(this.Page);
@@ -78,7 +79,7 @@ public partial class Record
         if (reader == null) throw new ArgumentNullException(nameof(reader));
 
         // Header
-        byte version = reader.ReadByte();
+        byte version = BinaryPayloadHeader.ReadVersion(reader, BinaryPayloadType.Record);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 

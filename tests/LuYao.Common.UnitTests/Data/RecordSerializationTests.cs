@@ -166,6 +166,33 @@ public class RecordSerializationTests
         Assert.AreEqual(guid, d.Columns.Find<Guid>("Guid")!.Get(0));
     }
 
+    [TestMethod]
+    public void WhenSerializeToBytesThenRecordHeaderContainsRecordType()
+    {
+        var record = new Record("Orders", 1);
+        record.Columns.Add<int>("Id");
+        record.AddRow();
+
+        var bytes = record.ToBytes();
+
+        Assert.IsTrue(bytes.Length >= 5);
+        Assert.AreEqual((byte)0xFF, bytes[0]);
+        Assert.AreEqual((byte)'L', bytes[1]);
+        Assert.AreEqual((byte)'Y', bytes[2]);
+        Assert.AreEqual((byte)1, bytes[3]);
+    }
+
+    [TestMethod]
+    public void WhenReadRecordFromRecordSetPayloadThenThrowTypeMismatch()
+    {
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
+
+        var bytes = set.ToBytes();
+
+        Assert.Throws<InvalidOperationException>(() => Record.FromBytes(bytes));
+    }
+
     #endregion
 }
 
@@ -210,6 +237,30 @@ public class RecordSetSerializationTests
         var deserialized = RecordSet.FromBytes(bytes);
 
         Assert.AreEqual(0, deserialized.Count);
+    }
+
+    [TestMethod]
+    public void WhenSerializeToBytesThenRecordSetHeaderContainsRecordSetType()
+    {
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
+
+        var bytes = set.ToBytes();
+
+        Assert.IsTrue(bytes.Length >= 5);
+        Assert.AreEqual((byte)0xFF, bytes[0]);
+        Assert.AreEqual((byte)'L', bytes[1]);
+        Assert.AreEqual((byte)'Y', bytes[2]);
+        Assert.AreEqual((byte)2, bytes[3]);
+    }
+
+    [TestMethod]
+    public void WhenReadRecordSetFromRecordPayloadThenThrowTypeMismatch()
+    {
+        var record = new Record("Orders", 0);
+        var bytes = record.ToBytes();
+
+        Assert.Throws<InvalidOperationException>(() => RecordSet.FromBytes(bytes));
     }
 
     #endregion

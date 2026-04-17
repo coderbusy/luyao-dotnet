@@ -26,6 +26,7 @@ public partial class RecordSet
     public void WriteTo(BinaryWriter writer)
     {
         if (writer == null) throw new ArgumentNullException(nameof(writer));
+        BinaryPayloadHeader.Write(writer, BinaryPayloadType.RecordSet);
         writer.Write(BinaryFormatVersion);
         writer.Write(_records.Count);
         foreach (var kvp in _records)
@@ -54,7 +55,7 @@ public partial class RecordSet
     public void ReadFrom(BinaryReader reader)
     {
         if (reader == null) throw new ArgumentNullException(nameof(reader));
-        byte version = reader.ReadByte();
+        byte version = BinaryPayloadHeader.ReadVersion(reader, BinaryPayloadType.RecordSet);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 
