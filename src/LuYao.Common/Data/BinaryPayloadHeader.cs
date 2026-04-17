@@ -43,11 +43,16 @@ internal static class BinaryPayloadHeader
         return reader.ReadByte();
     }
 
+    /// <summary>
+    /// 尝试从二进制数据读取类型头中的 payload 类型。
+    /// </summary>
+    /// <param name="data">二进制数据。</param>
+    /// <param name="payloadType">成功时返回读取到的 payload 类型。</param>
+    /// <returns>当数据包含有效类型头时返回 true；否则返回 false。</returns>
     public static bool TryGetPayloadType(byte[] data, out BinaryPayloadType payloadType)
     {
-        if (data == null) throw new ArgumentNullException(nameof(data));
-
         payloadType = default;
+        if (data == null) return false;
         if (data.Length < 4) return false;
         if (data[0] != Marker || data[1] != Signature1 || data[2] != Signature2) return false;
 

@@ -158,7 +158,7 @@ public partial class Record
     /// <returns>当数据包含 <see cref="Record"/> 类型头时返回 true；否则返回 false。</returns>
     public static bool IsBinaryPayload(byte[] data)
     {
-        if (data == null) throw new ArgumentNullException(nameof(data));
+        if (data == null) return false;
         return BinaryPayloadHeader.TryGetPayloadType(data, out var payloadType)
             && payloadType == BinaryPayloadType.Record;
     }

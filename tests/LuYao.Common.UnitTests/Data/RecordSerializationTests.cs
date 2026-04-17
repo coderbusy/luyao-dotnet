@@ -194,7 +194,7 @@ public class RecordSerializationTests
     }
 
     [TestMethod]
-    public void WhenDetectPayloadTypeForRecordThenReturnExpectedResult()
+    public void IsBinaryPayload_DetectsRecordAndRecordSetCorrectly()
     {
         var record = new Record("Orders", 0);
         var set = new RecordSet();
@@ -206,6 +206,7 @@ public class RecordSerializationTests
         Assert.IsTrue(Record.IsBinaryPayload(recordBytes));
         Assert.IsFalse(Record.IsBinaryPayload(setBytes));
         Assert.IsFalse(Record.IsBinaryPayload(new byte[] { 1, 2, 3, 4 }));
+        Assert.IsFalse(Record.IsBinaryPayload((byte[])null));
     }
 
     #endregion
@@ -279,7 +280,7 @@ public class RecordSetSerializationTests
     }
 
     [TestMethod]
-    public void WhenDetectPayloadTypeForRecordSetThenReturnExpectedResult()
+    public void IsBinaryPayload_DetectsRecordSetAndRecordCorrectly()
     {
         var record = new Record("Orders", 0);
         var set = new RecordSet();
@@ -291,6 +292,7 @@ public class RecordSetSerializationTests
         Assert.IsTrue(RecordSet.IsBinaryPayload(setBytes));
         Assert.IsFalse(RecordSet.IsBinaryPayload(recordBytes));
         Assert.IsFalse(RecordSet.IsBinaryPayload(new byte[] { 0xFF, (byte)'L', (byte)'Y', 9 }));
+        Assert.IsFalse(RecordSet.IsBinaryPayload((byte[])null));
     }
 
     #endregion
