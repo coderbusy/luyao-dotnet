@@ -55,7 +55,7 @@ public partial class RecordSet
     public void ReadFrom(BinaryReader reader)
     {
         if (reader == null) throw new ArgumentNullException(nameof(reader));
-        byte version = BinaryPayloadHeader.ReadVersion(reader, BinaryPayloadType.RecordSet);
+        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.RecordSet);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 

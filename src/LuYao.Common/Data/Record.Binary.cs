@@ -79,7 +79,7 @@ public partial class Record
         if (reader == null) throw new ArgumentNullException(nameof(reader));
 
         // Header
-        byte version = BinaryPayloadHeader.ReadVersion(reader, BinaryPayloadType.Record);
+        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.Record);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 

@@ -23,7 +23,7 @@ internal static class BinaryPayloadHeader
         writer.Write((byte)payloadType);
     }
 
-    public static byte ReadVersion(BinaryReader reader, BinaryPayloadType expectedType)
+    public static byte ReadHeaderAndVersion(BinaryReader reader, BinaryPayloadType expectedType)
     {
         byte first = reader.ReadByte();
         if (first != Marker)
@@ -34,7 +34,7 @@ internal static class BinaryPayloadHeader
         byte sig1 = reader.ReadByte();
         byte sig2 = reader.ReadByte();
         if (sig1 != Signature1 || sig2 != Signature2)
-            throw new InvalidOperationException("无效的二进制文件头。");
+            throw new InvalidOperationException($"无效的二进制文件头签名，期望 'LY'，实际 0x{sig1:X2}{sig2:X2}。");
 
         var actualType = (BinaryPayloadType)reader.ReadByte();
         if (actualType != expectedType)
