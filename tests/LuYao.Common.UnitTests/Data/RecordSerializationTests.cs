@@ -166,6 +166,49 @@ public class RecordSerializationTests
         Assert.AreEqual(guid, d.Columns.Find<Guid>("Guid")!.Get(0));
     }
 
+    [TestMethod]
+    public void WhenSerializeToBytesThenRecordHeaderContainsRecordType()
+    {
+        var record = new Record("Orders", 1);
+        record.Columns.Add<int>("Id");
+        record.AddRow();
+
+        var bytes = record.ToBytes();
+
+        Assert.IsTrue(bytes.Length >= 5);
+        Assert.AreEqual((byte)0xFF, bytes[0]);
+        Assert.AreEqual((byte)'L', bytes[1]);
+        Assert.AreEqual((byte)'Y', bytes[2]);
+        Assert.AreEqual((byte)1, bytes[3]);
+    }
+
+    [TestMethod]
+    public void WhenReadRecordFromRecordSetPayloadThenThrowTypeMismatch()
+    {
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
+
+        var bytes = set.ToBytes();
+
+        Assert.Throws<InvalidOperationException>(() => Record.FromBytes(bytes));
+    }
+
+    [TestMethod]
+    public void IsBinaryPayload_DetectsRecordAndRecordSetCorrectly()
+    {
+        var record = new Record("Orders", 0);
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
+
+        var recordBytes = record.ToBytes();
+        var setBytes = set.ToBytes();
+
+        Assert.IsTrue(Record.IsBinaryPayload(recordBytes));
+        Assert.IsFalse(Record.IsBinaryPayload(setBytes));
+        Assert.IsFalse(Record.IsBinaryPayload(new byte[] { 1, 2, 3, 4 }));
+        Assert.IsFalse(Record.IsBinaryPayload((byte[])null));
+    }
+
     #endregion
 }
 
@@ -210,6 +253,46 @@ public class RecordSetSerializationTests
         var deserialized = RecordSet.FromBytes(bytes);
 
         Assert.AreEqual(0, deserialized.Count);
+    }
+
+    [TestMethod]
+    public void WhenSerializeToBytesThenRecordSetHeaderContainsRecordSetType()
+    {
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
+
+        var bytes = set.ToBytes();
+
+        Assert.IsTrue(bytes.Length >= 5);
+        Assert.AreEqual((byte)0xFF, bytes[0]);
+        Assert.AreEqual((byte)'L', bytes[1]);
+        Assert.AreEqual((byte)'Y', bytes[2]);
+        Assert.AreEqual((byte)2, bytes[3]);
+    }
+
+    [TestMethod]
+    public void WhenReadRecordSetFromRecordPayloadThenThrowTypeMismatch()
+    {
+        var record = new Record("Orders", 0);
+        var bytes = record.ToBytes();
+
+        Assert.Throws<InvalidOperationException>(() => RecordSet.FromBytes(bytes));
+    }
+
+    [TestMethod]
+    public void IsBinaryPayload_DetectsRecordSetAndRecordCorrectly()
+    {
+        var record = new Record("Orders", 0);
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
+
+        var recordBytes = record.ToBytes();
+        var setBytes = set.ToBytes();
+
+        Assert.IsTrue(RecordSet.IsBinaryPayload(setBytes));
+        Assert.IsFalse(RecordSet.IsBinaryPayload(recordBytes));
+        Assert.IsFalse(RecordSet.IsBinaryPayload(new byte[] { 0xFF, (byte)'L', (byte)'Y', 9 }));
+        Assert.IsFalse(RecordSet.IsBinaryPayload((byte[])null));
     }
 
     #endregion

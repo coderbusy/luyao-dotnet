@@ -26,6 +26,7 @@ public partial class RecordSet
     public void WriteTo(BinaryWriter writer)
     {
         if (writer == null) throw new ArgumentNullException(nameof(writer));
+        BinaryPayloadHeader.Write(writer, BinaryPayloadType.RecordSet);
         writer.Write(BinaryFormatVersion);
         writer.Write(_records.Count);
         foreach (var kvp in _records)
@@ -54,7 +55,7 @@ public partial class RecordSet
     public void ReadFrom(BinaryReader reader)
     {
         if (reader == null) throw new ArgumentNullException(nameof(reader));
-        byte version = reader.ReadByte();
+        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.RecordSet);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 
@@ -100,5 +101,17 @@ public partial class RecordSet
         if (data == null) throw new ArgumentNullException(nameof(data));
         using var ms = new MemoryStream(data, writable: false);
         return FromStream(ms);
+    }
+
+    /// <summary>
+    /// 检测二进制数据是否为带类型头的 <see cref="RecordSet"/>。
+    /// </summary>
+    /// <param name="data">二进制数据。</param>
+    /// <returns>当数据包含 <see cref="RecordSet"/> 类型头时返回 true；否则返回 false。</returns>
+    public static bool IsBinaryPayload(byte[] data)
+    {
+        if (data == null) return false;
+        return BinaryPayloadHeader.TryGetPayloadType(data, out var payloadType)
+            && payloadType == BinaryPayloadType.RecordSet;
     }
 }

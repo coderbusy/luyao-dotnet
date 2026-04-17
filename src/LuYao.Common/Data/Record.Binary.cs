@@ -30,6 +30,7 @@ public partial class Record
         if (writer == null) throw new ArgumentNullException(nameof(writer));
 
         // Header
+        BinaryPayloadHeader.Write(writer, BinaryPayloadType.Record);
         writer.Write(BinaryFormatVersion);
         writer.Write(this.Name ?? string.Empty);
         writer.Write(this.Page);
@@ -78,7 +79,7 @@ public partial class Record
         if (reader == null) throw new ArgumentNullException(nameof(reader));
 
         // Header
-        byte version = reader.ReadByte();
+        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.Record);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 
@@ -148,6 +149,18 @@ public partial class Record
         if (data == null) throw new ArgumentNullException(nameof(data));
         using var ms = new MemoryStream(data, writable: false);
         return FromStream(ms);
+    }
+
+    /// <summary>
+    /// 检测二进制数据是否为带类型头的 <see cref="Record"/>。
+    /// </summary>
+    /// <param name="data">二进制数据。</param>
+    /// <returns>当数据包含 <see cref="Record"/> 类型头时返回 true；否则返回 false。</returns>
+    public static bool IsBinaryPayload(byte[] data)
+    {
+        if (data == null) return false;
+        return BinaryPayloadHeader.TryGetPayloadType(data, out var payloadType)
+            && payloadType == BinaryPayloadType.Record;
     }
 
     #region 列数据序列化
