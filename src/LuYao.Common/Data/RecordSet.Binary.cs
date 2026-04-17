@@ -102,4 +102,16 @@ public partial class RecordSet
         using var ms = new MemoryStream(data, writable: false);
         return FromStream(ms);
     }
+
+    /// <summary>
+    /// 检测二进制数据是否为带类型头的 <see cref="RecordSet"/>。
+    /// </summary>
+    /// <param name="data">二进制数据。</param>
+    /// <returns>当数据包含 <see cref="RecordSet"/> 类型头时返回 true；否则返回 false。</returns>
+    public static bool IsBinaryPayload(byte[] data)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        return BinaryPayloadHeader.TryGetPayloadType(data, out var payloadType)
+            && payloadType == BinaryPayloadType.RecordSet;
+    }
 }

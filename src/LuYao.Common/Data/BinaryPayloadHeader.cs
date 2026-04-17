@@ -42,4 +42,20 @@ internal static class BinaryPayloadHeader
 
         return reader.ReadByte();
     }
+
+    public static bool TryGetPayloadType(byte[] data, out BinaryPayloadType payloadType)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+
+        payloadType = default;
+        if (data.Length < 4) return false;
+        if (data[0] != Marker || data[1] != Signature1 || data[2] != Signature2) return false;
+
+        byte rawType = data[3];
+        if (rawType != (byte)BinaryPayloadType.Record && rawType != (byte)BinaryPayloadType.RecordSet)
+            return false;
+
+        payloadType = (BinaryPayloadType)rawType;
+        return true;
+    }
 }
