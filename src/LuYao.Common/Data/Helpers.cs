@@ -93,6 +93,9 @@ static class Helpers
         }
     }
 
+    /// <summary>
+    /// 规范化列类型查找目标：先展开 Nullable，再将枚举转换为其基础数值类型。
+    /// </summary>
     private static Type NormalizeColumnLookupType(Type type)
     {
         var effective = Nullable.GetUnderlyingType(type) ?? type;

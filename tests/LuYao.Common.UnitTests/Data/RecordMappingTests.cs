@@ -44,8 +44,15 @@ public class ColumnTypeWhitelistTests
         var record = new Record("Test", 1);
         record.Columns.Add("Enum", typeof(RecordMappingTests.Color));
         record.Columns.Add("NullableEnum", typeof(RecordMappingTests.Color?));
+        var row = record.AddRow();
+        record.Columns.Find<RecordMappingTests.Color>("Enum")!.Set(RecordMappingTests.Color.Green, row.Row);
+        record.Columns.Find<RecordMappingTests.Color?>("NullableEnum")!.Set(RecordMappingTests.Color.Blue, row.Row);
 
         Assert.AreEqual(2, record.Columns.Count);
+        Assert.AreEqual(RecordColumnType.Int32, record.Columns[0].ColumnType);
+        Assert.AreEqual(RecordColumnType.Int32, record.Columns[1].ColumnType);
+        Assert.AreEqual(RecordMappingTests.Color.Green, record.Columns.Find<RecordMappingTests.Color>("Enum")!.Get(0));
+        Assert.AreEqual(RecordMappingTests.Color.Blue, record.Columns.Find<RecordMappingTests.Color?>("NullableEnum")!.Get(0));
     }
 
     [TestMethod]
@@ -87,7 +94,7 @@ public class RecordMappingTests
         public double Extra { get; set; }
     }
 
-    public enum Color { Red, Green, Blue }
+    public enum Color : int { Red, Green, Blue }
 
     public class EntityWithEnum
     {
