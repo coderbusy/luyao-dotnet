@@ -32,8 +32,20 @@ public class ColumnTypeWhitelistTests
         record.Columns.Add<ushort>("UShort");
         record.Columns.Add<uint>("UInt");
         record.Columns.Add<ulong>("ULong");
+        record.Columns.Add<RecordMappingTests.Color>("Enum");
+        record.Columns.Add<RecordMappingTests.Color?>("NullableEnum");
 
-        Assert.AreEqual(21, record.Columns.Count);
+        Assert.AreEqual(23, record.Columns.Count);
+    }
+
+    [TestMethod]
+    public void WhenAddEnumTypeByTypeThenSucceeds()
+    {
+        var record = new Record("Test", 1);
+        record.Columns.Add("Enum", typeof(RecordMappingTests.Color));
+        record.Columns.Add("NullableEnum", typeof(RecordMappingTests.Color?));
+
+        Assert.AreEqual(2, record.Columns.Count);
     }
 
     [TestMethod]

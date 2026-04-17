@@ -203,6 +203,11 @@ public partial class Record
 
     private static void WritePrimitiveValue(BinaryWriter writer, object value, RecordColumnType columnType)
     {
+        if (value.GetType().IsEnum)
+        {
+            value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
+        }
+
         switch (columnType)
         {
             case RecordColumnType.Boolean: writer.Write((bool)value); break;

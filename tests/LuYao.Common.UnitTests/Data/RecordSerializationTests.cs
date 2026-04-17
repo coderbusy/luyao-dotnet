@@ -6,6 +6,12 @@ namespace LuYao.Data;
 [TestClass]
 public class RecordSerializationTests
 {
+    private enum FavoriteType
+    {
+        Common = 100,
+        Chat = 200,
+    }
+
     private static Record CreateTestRecord()
     {
         var record = new Record("Orders", 2);
@@ -164,6 +170,23 @@ public class RecordSerializationTests
         Assert.AreEqual(dto, d.Columns.Find<DateTimeOffset>("DateTimeOffset")!.Get(0));
         Assert.AreEqual(TimeSpan.FromHours(2.5), d.Columns.Find<TimeSpan>("TimeSpan")!.Get(0));
         Assert.AreEqual(guid, d.Columns.Find<Guid>("Guid")!.Get(0));
+    }
+
+    [TestMethod]
+    public void WhenBinaryRoundTripWithEnumColumnThenPreserved()
+    {
+        var record = new Record("EnumRecord", 1);
+        var favoriteCol = record.Columns.Add<FavoriteType>("Favorite");
+        var nullableFavoriteCol = record.Columns.Add<FavoriteType?>("NullableFavorite");
+        var row = record.AddRow();
+        favoriteCol.Set(FavoriteType.Chat, row.Row);
+        nullableFavoriteCol.Set(FavoriteType.Common, row.Row);
+
+        var bytes = record.ToBytes();
+        var deserialized = Record.FromBytes(bytes);
+
+        Assert.AreEqual(200, deserialized.Columns.Find<int>("Favorite")!.Get(0));
+        Assert.AreEqual(100, deserialized.Columns.Find<int?>("NullableFavorite")!.Get(0));
     }
 
     [TestMethod]
