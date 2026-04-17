@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace LuYao.Data;
@@ -102,10 +103,18 @@ public partial class RecordSet : IEnumerable<Record>
     /// <param name="name">Record 的名称。</param>
     /// <param name="record">如果找到则返回对应的 <see cref="Record"/> 实例，否则为 null。</param>
     /// <returns>如果找到则返回 true，否则返回 false。</returns>
+
+#if NETCOREAPP2_0_OR_GREATER
+    public bool TryGet(string name, [MaybeNullWhen(false)] out Record? record)
+    {
+        return _records.TryGetValue(name, out record);
+    }
+#else
     public bool TryGet(string name, out Record? record)
     {
         return _records.TryGetValue(name, out record);
     }
+#endif
 
     /// <summary>
     /// 按名称删除 Record。
