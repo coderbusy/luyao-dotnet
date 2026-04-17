@@ -48,8 +48,7 @@ static class Helpers
     /// </summary>
     internal static RecordColumnType GetColumnType(Type type)
     {
-        var underlying = Nullable.GetUnderlyingType(type);
-        var lookup = underlying ?? type;
+        var lookup = NormalizeColumnLookupType(type);
         if (TypeToColumnType.TryGetValue(lookup, out var ct))
             return ct;
         throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型");
@@ -80,9 +79,7 @@ static class Helpers
     internal static bool IsSupportedColumnType(Type type)
     {
         if (type == null) return false;
-        if (TypeToColumnType.ContainsKey(type)) return true;
-        var underlying = Nullable.GetUnderlyingType(type);
-        return underlying != null && TypeToColumnType.ContainsKey(underlying);
+        return TypeToColumnType.ContainsKey(NormalizeColumnLookupType(type));
     }
 
     /// <summary>
@@ -92,8 +89,17 @@ static class Helpers
     {
         if (!IsSupportedColumnType(type))
         {
-            throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型。支持的类型包括：bool, 整数类型, 浮点类型, char, string, DateTime, DateTimeOffset, TimeSpan, Guid, byte[] 及其 Nullable 形式。");
+            throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型。支持的类型包括：bool, 整数类型, 浮点类型, char, string, DateTime, DateTimeOffset, TimeSpan, Guid, byte[]、枚举及其 Nullable 形式。");
         }
+    }
+
+    /// <summary>
+    /// 规范化列类型查找目标：先展开 Nullable，再将枚举转换为其基础数值类型。
+    /// </summary>
+    private static Type NormalizeColumnLookupType(Type type)
+    {
+        var effective = Nullable.GetUnderlyingType(type) ?? type;
+        return effective.IsEnum ? Enum.GetUnderlyingType(effective) : effective;
     }
 
     private static readonly ConcurrentDictionary<Type, Func<Record, string, Type, RecordColumn>> _cache = new();
