@@ -259,39 +259,42 @@ public partial class Record : IEnumerable<RecordRow>
         sb.Append(string.IsNullOrWhiteSpace(this.Name) ? "None" : this.Name);
         sb.AppendFormat(" count {0} column {1}", this.Count, this._cols.Count);
         sb.AppendLine();
+        if (this._cols.Count == 0) return sb.ToString();
         if (this.Count == 1)
         {
             //只有一行数据时，输出每列的值
-            int max = this._cols.Max(f => f.Name.Length);
+            int max = this._cols.Max(f => DisplayWidth(f.Name));
             foreach (RecordColumn col in this._cols)
             {
-                sb.AppendFormat("{0} | {1}", col.Name.PadRight(max), col.GetValue(0));
+                sb.Append(PadRightByWidth(col.Name, max));
+                sb.Append(" | ");
+                sb.Append(col.GetValue(0));
                 sb.AppendLine();
             }
         }
         else
         {
             //多行时，输出表格
-            const int MAX_LENGTH = 40;
+            const int MAX_WIDTH = 40;
             int[] heads = new int[this._cols.Count];
             string[,] arr = new string[Count, this._cols.Count];
             for (int k = 0; k < this._cols.Count; k++)
             {
                 RecordColumn col = this._cols[k];
-                int max = col.Name.Length;
+                int max = DisplayWidth(col.Name);
 
                 for (int i = 0; i < Count; i++)
                 {
                     string s = Convert.ToString(col.GetValue(i)) ?? string.Empty;
-                    int len = bLength(s);
-                    if (len > MAX_LENGTH)
+                    int w = DisplayWidth(s);
+                    if (w > MAX_WIDTH)
                     {
-                        s = bSubstring(s, MAX_LENGTH + 2) + "..";
-                        len = MAX_LENGTH;
+                        s = SubstringByWidth(s, MAX_WIDTH - 2) + "..";
+                        w = DisplayWidth(s);
                     }
                     arr[i, k] = s;
 
-                    if (len > max) max = len;
+                    if (w > max) max = w;
                 }
 
                 heads[k] = max;
@@ -301,7 +304,15 @@ public partial class Record : IEnumerable<RecordRow>
             for (int k = 0; k < this._cols.Count; k++)
             {
                 if (k > 0) sb.Append(" | ");
-                sb.Append(this._cols[k].Name.PadRight(heads[k]));
+                sb.Append(PadRightByWidth(this._cols[k].Name, heads[k]));
+            }
+            sb.AppendLine();
+
+            //写分隔线
+            for (int k = 0; k < this._cols.Count; k++)
+            {
+                if (k > 0) sb.Append("-+-");
+                sb.Append(new string('-', heads[k]));
             }
 
             //写数据行
@@ -313,41 +324,75 @@ public partial class Record : IEnumerable<RecordRow>
                     if (k > 0) sb.Append(" | ");
 
                     string s = arr[i, k];
-                    int len = bLength(s);
-                    int max = heads[k];
-                    sb.Append(s);
-                    if (max > len) sb.Append(new string(' ', max - len));
+                    sb.Append(PadRightByWidth(s, heads[k]));
                 }
             }
         }
         return sb.ToString();
     }
 
-    static string bSubstring(string s, int len)
+    /// <summary>
+    /// 按显示宽度截取字符串，保证不超过指定的列宽。
+    /// </summary>
+    static string SubstringByWidth(string s, int maxWidth)
     {
-        string ret = string.Empty;
-        char[] chars = s.ToCharArray();
-        for (int i = 0, idx = 0; i < s.Length; ++i, ++idx)
-        {
-            if (Encoding.UTF8.GetByteCount(chars, i, 1) > 1) ++idx;
-            if (idx >= len) break;
-            ret += s[i];
-        }
-
-        return ret;
-    }
-
-    static int bLength(string s) // 单字节长度
-    {
-        if (s == null) return 0;
-        int len = 0;
-        char[] chars = s.ToCharArray();
+        var buf = new StringBuilder();
+        int width = 0;
         for (int i = 0; i < s.Length; i++)
         {
-            if (Encoding.UTF8.GetByteCount(chars, i, 1) > 1) len += 2;
-            else len++;
+            int cw = IsWide(s[i]) ? 2 : 1;
+            if (width + cw > maxWidth) break;
+            buf.Append(s[i]);
+            width += cw;
         }
-        return len;
+        return buf.ToString();
+    }
+
+    /// <summary>
+    /// 将字符串用空格填充到指定的显示宽度。
+    /// </summary>
+    static string PadRightByWidth(string s, int totalWidth)
+    {
+        int w = DisplayWidth(s);
+        if (w >= totalWidth) return s;
+        return s + new string(' ', totalWidth - w);
+    }
+
+    /// <summary>
+    /// 计算字符串在等宽字体终端中的显示列宽。
+    /// 东亚宽字符（CJK、全角标点等）占 2 列，其余占 1 列。
+    /// </summary>
+    static int DisplayWidth(string s)
+    {
+        if (s == null) return 0;
+        int width = 0;
+        for (int i = 0; i < s.Length; i++)
+        {
+            width += IsWide(s[i]) ? 2 : 1;
+        }
+        return width;
+    }
+
+    /// <summary>
+    /// 判断字符是否为东亚宽字符（在等宽终端中占 2 列）。
+    /// 覆盖 CJK 统一汉字、全角 ASCII/标点、片假名、韩文音节等常见范围。
+    /// </summary>
+    static bool IsWide(char c)
+    {
+        // CJK Unified Ideographs, CJK Extension A, Compatibility Ideographs
+        if (c >= 0x4E00 && c <= 0x9FFF) return true;
+        if (c >= 0x3400 && c <= 0x4DBF) return true;
+        if (c >= 0xF900 && c <= 0xFAFF) return true;
+        // Fullwidth Forms (全角 ASCII、全角标点)
+        if (c >= 0xFF01 && c <= 0xFF60) return true;
+        if (c >= 0xFFE0 && c <= 0xFFE6) return true;
+        // CJK Symbols and Punctuation, Hiragana, Katakana, Bopomofo
+        if (c >= 0x3000 && c <= 0x33FF) return true;
+        // Hangul Syllables
+        if (c >= 0xAC00 && c <= 0xD7AF) return true;
+        // CJK Unified Ideographs Extension B+ (surrogates, treat high surrogate range)
+        if (c >= 0xD800 && c <= 0xDFFF) return true;
+        return false;
     }
     #endregion
 
