@@ -84,11 +84,11 @@ public static class RecordMappingExtensions
     /// 将类型 <typeparamref name="T"/> 的公共可读写属性批量添加为列。
     /// 如果存在任意不支持的属性类型，会立即抛出异常，不会进行部分添加。
     /// </summary>
-    /// <typeparam name="T">实体类型，必须为引用类型。</typeparam>
+    /// <typeparam name="T">实体类型。</typeparam>
     /// <param name="record">目标 Record。</param>
     /// <exception cref="InvalidOperationException">类型不包含公共可读写属性。</exception>
     /// <exception cref="NotSupportedException">属性类型不在 Record 支持的列类型白名单中。</exception>
-    public static void AddColumns<T>(this Record record) where T : class
+    public static void AddColumns<T>(this Record record)
     {
         if (record == null) throw new ArgumentNullException(nameof(record));
         var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -110,21 +110,21 @@ public static class RecordMappingExtensions
     /// <summary>
     /// 按属性表达式将类型 <typeparamref name="T"/> 的指定属性添加为列（仅支持直接属性，不支持嵌套属性）。
     /// </summary>
-    /// <typeparam name="T">实体类型，必须为引用类型。</typeparam>
+    /// <typeparam name="T">实体类型。</typeparam>
     /// <param name="record">目标 Record。</param>
     /// <param name="column">第一个属性表达式。</param>
     /// <param name="otherColumns">其他属性表达式。</param>
     public static void AddColumns<T>(
         this Record record,
         Expression<Func<T, object?>> column,
-        params Expression<Func<T, object?>>[] otherColumns) where T : class
+        params Expression<Func<T, object?>>[] otherColumns)
     {
         if (record == null) throw new ArgumentNullException(nameof(record));
         if (column == null) throw new ArgumentNullException(nameof(column));
         if (otherColumns == null) throw new ArgumentNullException(nameof(otherColumns));
 
-        var properties = new List<PropertyInfo> { GetDirectProperty(column) };
-        properties.AddRange(otherColumns.Select(GetDirectProperty));
+        var properties = new List<PropertyInfo> { GetDirectProperty(column, nameof(column)) };
+        properties.AddRange(otherColumns.Select(static selector => GetDirectProperty(selector, nameof(otherColumns))));
         foreach (var property in properties)
         {
             Helpers.ValidateColumnType(property.PropertyType);
@@ -132,9 +132,9 @@ public static class RecordMappingExtensions
         AddColumns(record, properties);
     }
 
-    private static PropertyInfo GetDirectProperty<T>(Expression<Func<T, object?>> selector)
+    private static PropertyInfo GetDirectProperty<T>(Expression<Func<T, object?>> selector, string paramName)
     {
-        if (selector == null) throw new ArgumentNullException(nameof(selector));
+        if (selector == null) throw new ArgumentNullException(paramName);
 
         Expression body = selector.Body;
         if (body is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } unary)
@@ -145,7 +145,7 @@ public static class RecordMappingExtensions
             || memberExpression.Member is not PropertyInfo property
             || !property.CanRead)
         {
-            throw new ArgumentException("属性表达式必须是直接属性访问（例如 x => x.Name），且不支持嵌套属性。", nameof(selector));
+            throw new ArgumentException("属性表达式必须是直接属性访问（例如 x => x.Name），且不支持嵌套属性。", paramName);
         }
 
         return property;
@@ -153,15 +153,38 @@ public static class RecordMappingExtensions
 
     private static void AddColumns(Record record, IEnumerable<PropertyInfo> properties)
     {
-        foreach (var property in properties)
+        var propertyList = properties.ToArray();
+        ValidateColumnsCanBeAdded(record, propertyList);
+
+        foreach (var property in propertyList)
         {
             record.Columns.Add(property.Name, property.PropertyType);
         }
     }
 
+    private static void ValidateColumnsCanBeAdded(Record record, IReadOnlyList<PropertyInfo> properties)
+    {
+        var duplicateName = properties
+            .GroupBy(static property => property.Name)
+            .FirstOrDefault(static group => group.Count() > 1)?.Key;
+        if (duplicateName != null)
+        {
+            throw new InvalidOperationException($"存在重复的列名：{duplicateName}。");
+        }
+
+        var conflictingName = properties
+            .Select(static property => property.Name)
+            .FirstOrDefault(record.Columns.Contains);
+        if (conflictingName != null)
+        {
+            throw new InvalidOperationException($"列“{conflictingName}”已存在，无法重复添加。");
+        }
+    }
+
     private static void EnsureCanAddMappedRows(Record record, RecordMappingOptions? options)
     {
-        if (record.Columns.Count == 0 && (options == null || !options.AutoAddColumns))
+        if (record.Columns.Count == 0
+            && (options == null || (!options.AutoAddColumns && options.Mapper == null)))
         {
             throw new InvalidOperationException("Record 没有任何列。请先添加列或设置 RecordMappingOptions.AutoAddColumns = true。");
         }

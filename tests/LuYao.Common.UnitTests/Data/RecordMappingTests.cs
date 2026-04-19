@@ -94,6 +94,12 @@ public class RecordMappingTests
         public double Extra { get; set; }
     }
 
+    public struct SimpleStructEntity
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+    }
+
     public enum Color : int { Red, Green, Blue }
 
     public class EntityWithEnum
@@ -329,6 +335,18 @@ public class RecordMappingTests
     }
 
     [TestMethod]
+    public void WhenAddColumnsFromStructTypeThenAddsSupportedProperties()
+    {
+        var record = new Record("Test", 5);
+
+        record.AddColumns<SimpleStructEntity>();
+
+        Assert.AreEqual(2, record.Columns.Count);
+        Assert.IsNotNull(record.Columns.Find("Id"));
+        Assert.IsNotNull(record.Columns.Find("Name"));
+    }
+
+    [TestMethod]
     public void WhenAddColumnsFromTypeWithNoPropertiesThenThrows()
     {
         var record = new Record("Test", 5);
@@ -374,7 +392,17 @@ public class RecordMappingTests
     {
         var record = new Record("Test", 5);
 
-        Assert.Throws<ArgumentException>(() => record.AddColumns<NestedEntity>(x => x.Child.Name));
+        var ex = Assert.Throws<ArgumentException>(() => record.AddColumns<NestedEntity>(x => x.Child.Name));
+        Assert.AreEqual("column", ex.ParamName);
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsByExpressionsWithNestedOtherPropertyThenThrowsWithOtherColumnsParamName()
+    {
+        var record = new Record("Test", 5);
+
+        var ex = Assert.Throws<ArgumentException>(() => record.AddColumns<SimpleEntity>(x => x.Id, x => x.Name.Length));
+        Assert.AreEqual("otherColumns", ex.ParamName);
     }
 
     [TestMethod]
@@ -384,6 +412,28 @@ public class RecordMappingTests
 
         Assert.Throws<NotSupportedException>(() => record.AddColumns<EntityWithComplexProp>(x => x.Id, x => x.Items));
         Assert.AreEqual(0, record.Columns.Count);
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsByExpressionsContainsDuplicateThenThrowsWithoutPartialColumns()
+    {
+        var record = new Record("Test", 5);
+
+        Assert.Throws<InvalidOperationException>(() => record.AddColumns<SimpleEntity>(x => x.Id, x => x.Id));
+        Assert.AreEqual(0, record.Columns.Count);
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsFromTypeHasExistingColumnThenThrowsWithoutPartialColumns()
+    {
+        var record = new Record("Test", 5);
+        record.Columns.Add<int>("Id");
+
+        Assert.Throws<InvalidOperationException>(() => record.AddColumns<SimpleEntity>());
+        Assert.AreEqual(1, record.Columns.Count);
+        Assert.IsNotNull(record.Columns.Find("Id"));
+        Assert.IsNull(record.Columns.Find("Name"));
+        Assert.IsNull(record.Columns.Find("Amount"));
     }
 
     #endregion
@@ -682,6 +732,71 @@ public class RecordMappingTests
 
         Assert.AreEqual(5, list[0].Id);
         Assert.AreEqual("Test", list[0].Name);
+    }
+
+    public class TestSchemaCreatingMapper : IRecordMapper<SimpleEntity>
+    {
+        public void Write(SimpleEntity item, Record record, int row)
+        {
+            if (!record.Columns.Contains("Id"))
+            {
+                record.Columns.Add<int>("Id");
+            }
+
+            if (!record.Columns.Contains("Name"))
+            {
+                record.Columns.Add<string>("Name");
+            }
+
+            record.Columns.Get("Id").SetValue(item.Id, row);
+            record.Columns.Get("Name").SetValue(item.Name, row);
+        }
+
+        public SimpleEntity Read(Record record, int row)
+        {
+            return new SimpleEntity
+            {
+                Id = (int)record.Columns.Get("Id").GetValue(row)!,
+                Name = (string)record.Columns.Get("Name").GetValue(row)!,
+            };
+        }
+
+        void IRecordMapper.Write(object item, Record record, int row) => Write((SimpleEntity)item, record, row);
+        object IRecordMapper.Read(Record record, int row) => Read(record, row);
+    }
+
+    [TestMethod]
+    public void WhenCustomMapperAddRowWithoutColumnsThenAllowsSchemaCreation()
+    {
+        var record = new Record("Test", 5);
+        var options = new RecordMappingOptions { Mapper = new TestSchemaCreatingMapper() };
+
+        record.AddRow(new SimpleEntity { Id = 7, Name = "Mapper" }, options);
+
+        Assert.AreEqual(1, record.Count);
+        Assert.AreEqual(2, record.Columns.Count);
+        Assert.AreEqual(7, record.Columns.Find<int>("Id")!.Get(0));
+        Assert.AreEqual("Mapper", record.Columns.Find<string>("Name")!.Get(0));
+    }
+
+    [TestMethod]
+    public void WhenCustomMapperAddRowsWithoutColumnsThenAllowsSchemaCreation()
+    {
+        var record = new Record("Test", 5);
+        var options = new RecordMappingOptions { Mapper = new TestSchemaCreatingMapper() };
+
+        record.AddRows(new[]
+        {
+            new SimpleEntity { Id = 1, Name = "A" },
+            new SimpleEntity { Id = 2, Name = "B" },
+        }, options);
+
+        Assert.AreEqual(2, record.Count);
+        Assert.AreEqual(2, record.Columns.Count);
+        Assert.AreEqual(1, record.Columns.Find<int>("Id")!.Get(0));
+        Assert.AreEqual(2, record.Columns.Find<int>("Id")!.Get(1));
+        Assert.AreEqual("A", record.Columns.Find<string>("Name")!.Get(0));
+        Assert.AreEqual("B", record.Columns.Find<string>("Name")!.Get(1));
     }
 
     #endregion
