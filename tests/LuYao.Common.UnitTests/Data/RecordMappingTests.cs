@@ -114,6 +114,15 @@ public class RecordMappingTests
         public List<int> Items { get; set; } = new List<int>();
     }
 
+    public class EntityWithoutProperties
+    {
+    }
+
+    public class NestedEntity
+    {
+        public SimpleEntity Child { get; set; } = new SimpleEntity();
+    }
+
     public class RecordRowCtorEntity
     {
         public int Id { get; }
@@ -257,6 +266,74 @@ public class RecordMappingTests
         record.AddRow(new EntityWithEnum { Id = 1, Color = Color.Blue });
 
         Assert.AreEqual("Blue", record.Columns.Find<string>("Color")!.Get(0));
+    }
+
+    [TestMethod]
+    public void WhenAddRowWithoutColumnsAndAutoAddDisabledThenThrows()
+    {
+        var record = new Record("Test", 5);
+
+        Assert.Throws<InvalidOperationException>(() => record.AddRow(new SimpleEntity { Id = 1, Name = "Alice" }));
+        Assert.AreEqual(0, record.Count);
+    }
+
+    [TestMethod]
+    public void WhenAddRowsWithoutColumnsAndAutoAddDisabledThenThrows()
+    {
+        var record = new Record("Test", 5);
+        var items = new[]
+        {
+            new SimpleEntity { Id = 1, Name = "A" },
+            new SimpleEntity { Id = 2, Name = "B" },
+        };
+
+        Assert.Throws<InvalidOperationException>(() => record.AddRows(items));
+        Assert.AreEqual(0, record.Count);
+    }
+
+    #endregion
+
+    #region AddColumns<T>
+
+    [TestMethod]
+    public void WhenAddColumnsFromTypeThenAddsSupportedProperties()
+    {
+        var record = new Record("Test", 5);
+
+        record.AddColumns<SimpleEntity>();
+
+        Assert.AreEqual(3, record.Columns.Count);
+        Assert.IsNotNull(record.Columns.Find("Id"));
+        Assert.IsNotNull(record.Columns.Find("Name"));
+        Assert.IsNotNull(record.Columns.Find("Amount"));
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsFromTypeWithNoPropertiesThenThrows()
+    {
+        var record = new Record("Test", 5);
+
+        Assert.Throws<InvalidOperationException>(() => record.AddColumns<EntityWithoutProperties>());
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsByExpressionsThenAddsSpecifiedColumns()
+    {
+        var record = new Record("Test", 5);
+
+        record.AddColumns<SimpleEntity>(x => x.Id, x => x.Name);
+
+        Assert.AreEqual(2, record.Columns.Count);
+        Assert.IsNotNull(record.Columns.Find("Id"));
+        Assert.IsNotNull(record.Columns.Find("Name"));
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsByExpressionWithNestedPropertyThenThrows()
+    {
+        var record = new Record("Test", 5);
+
+        Assert.Throws<ArgumentException>(() => record.AddColumns<NestedEntity>(x => x.Child.Name));
     }
 
     #endregion

@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace LuYao.Data;
 
@@ -34,6 +37,7 @@ public static class RecordMappingExtensions
     {
         if (record == null) throw new ArgumentNullException(nameof(record));
         if (item == null) throw new ArgumentNullException(nameof(item));
+        EnsureCanAddMappedRows(record, options);
 
         var row = record.AddRow();
         RecordMappingEngine.WriteRow(item, record, row.Row, options);
@@ -66,8 +70,88 @@ public static class RecordMappingExtensions
         foreach (var item in items)
         {
             if (item == null) throw new ArgumentNullException(nameof(items), "集合中包含 null 元素。");
+            EnsureCanAddMappedRows(record, options);
             var row = record.AddRow();
             RecordMappingEngine.WriteRow(item, record, row.Row, options);
+        }
+    }
+
+    #endregion
+
+    #region AddColumns<T>
+
+    /// <summary>
+    /// 将类型 <typeparamref name="T"/> 的可映射属性批量添加为列。
+    /// </summary>
+    /// <typeparam name="T">实体类型，必须为引用类型。</typeparam>
+    /// <param name="record">目标 Record。</param>
+    public static void AddColumns<T>(this Record record) where T : class
+    {
+        if (record == null) throw new ArgumentNullException(nameof(record));
+        var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(static p => p.CanRead && Helpers.IsSupportedColumnType(p.PropertyType))
+            .ToArray();
+        if (properties.Length == 0)
+        {
+            throw new InvalidOperationException($"类型 '{typeof(T).FullName}' 不包含可映射的公共属性。");
+        }
+
+        AddColumns(record, properties);
+    }
+
+    /// <summary>
+    /// 按属性表达式将类型 <typeparamref name="T"/> 的指定属性添加为列（仅支持直接属性，不支持嵌套属性）。
+    /// </summary>
+    /// <typeparam name="T">实体类型，必须为引用类型。</typeparam>
+    /// <param name="record">目标 Record。</param>
+    /// <param name="column">第一个属性表达式。</param>
+    /// <param name="otherColumns">其他属性表达式。</param>
+    public static void AddColumns<T>(
+        this Record record,
+        Expression<Func<T, object?>> column,
+        params Expression<Func<T, object?>>[] otherColumns) where T : class
+    {
+        if (record == null) throw new ArgumentNullException(nameof(record));
+        if (column == null) throw new ArgumentNullException(nameof(column));
+        if (otherColumns == null) throw new ArgumentNullException(nameof(otherColumns));
+
+        var properties = new List<PropertyInfo> { GetDirectProperty(column) };
+        properties.AddRange(otherColumns.Select(GetDirectProperty));
+        AddColumns(record, properties);
+    }
+
+    private static PropertyInfo GetDirectProperty<T>(Expression<Func<T, object?>> selector)
+    {
+        if (selector == null) throw new ArgumentNullException(nameof(selector));
+
+        Expression body = selector.Body;
+        if (body is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } unary)
+            body = unary.Operand;
+
+        if (body is not MemberExpression memberExpression
+            || memberExpression.Expression is not ParameterExpression
+            || memberExpression.Member is not PropertyInfo property
+            || !property.CanRead)
+        {
+            throw new ArgumentException("属性表达式必须是直接属性访问（例如 x => x.Name），且不支持嵌套属性。", nameof(selector));
+        }
+
+        return property;
+    }
+
+    private static void AddColumns(Record record, IEnumerable<PropertyInfo> properties)
+    {
+        foreach (var property in properties)
+        {
+            record.Columns.Add(property.Name, property.PropertyType);
+        }
+    }
+
+    private static void EnsureCanAddMappedRows(Record record, RecordMappingOptions? options)
+    {
+        if (record.Columns.Count == 0 && (options == null || !options.AutoAddColumns))
+        {
+            throw new InvalidOperationException("Record 没有任何列。请先添加列或设置 RecordMappingOptions.AutoAddColumns = true。");
         }
     }
 
