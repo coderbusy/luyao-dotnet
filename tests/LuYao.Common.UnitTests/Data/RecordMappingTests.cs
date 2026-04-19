@@ -134,6 +134,12 @@ public class RecordMappingTests
         }
     }
 
+    public class EntityWithCaseVariantProperties
+    {
+        public int Id { get; set; }
+        public int ID { get; set; }
+    }
+
     public class NestedEntity
     {
         public SimpleEntity Child { get; set; } = new SimpleEntity();
@@ -427,13 +433,34 @@ public class RecordMappingTests
     public void WhenAddColumnsFromTypeHasExistingColumnThenThrowsWithoutPartialColumns()
     {
         var record = new Record("Test", 5);
-        record.Columns.Add<int>("Id");
+        record.Columns.Add<int>("id");
 
         Assert.Throws<InvalidOperationException>(() => record.AddColumns<SimpleEntity>());
         Assert.AreEqual(1, record.Columns.Count);
-        Assert.IsNotNull(record.Columns.Find("Id"));
+        Assert.IsNotNull(record.Columns.Find("id"));
         Assert.IsNull(record.Columns.Find("Name"));
         Assert.IsNull(record.Columns.Find("Amount"));
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsFromTypeHasCaseInsensitiveDuplicateThenThrowsWithoutPartialColumns()
+    {
+        var record = new Record("Test", 5);
+
+        Assert.Throws<InvalidOperationException>(() => record.AddColumns<EntityWithCaseVariantProperties>());
+        Assert.AreEqual(0, record.Columns.Count);
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsByExpressionsHasExistingColumnWithDifferentCaseThenThrowsWithoutPartialColumns()
+    {
+        var record = new Record("Test", 5);
+        record.Columns.Add<int>("id");
+
+        Assert.Throws<InvalidOperationException>(() => record.AddColumns<SimpleEntity>(x => x.Id, x => x.Name));
+        Assert.AreEqual(1, record.Columns.Count);
+        Assert.IsNotNull(record.Columns.Find("id"));
+        Assert.IsNull(record.Columns.Find("Name"));
     }
 
     #endregion

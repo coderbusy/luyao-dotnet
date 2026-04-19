@@ -164,17 +164,22 @@ public static class RecordMappingExtensions
 
     private static void ValidateColumnsCanBeAdded(Record record, IReadOnlyList<PropertyInfo> properties)
     {
+        var comparer = StringComparer.OrdinalIgnoreCase;
+
         var duplicateName = properties
-            .GroupBy(static property => property.Name)
+            .GroupBy(static property => property.Name, comparer)
             .FirstOrDefault(static group => group.Count() > 1)?.Key;
         if (duplicateName != null)
         {
             throw new InvalidOperationException($"存在重复的列名：{duplicateName}。");
         }
 
+        var existingColumnNames = record.Columns
+            .Select(static column => column.Name)
+            .ToHashSet(comparer);
         var conflictingName = properties
             .Select(static property => property.Name)
-            .FirstOrDefault(record.Columns.Contains);
+            .FirstOrDefault(existingColumnNames.Contains);
         if (conflictingName != null)
         {
             throw new InvalidOperationException($"列“{conflictingName}”已存在，无法重复添加。");
