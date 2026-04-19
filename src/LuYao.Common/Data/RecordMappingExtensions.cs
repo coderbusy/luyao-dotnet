@@ -66,17 +66,7 @@ public static class RecordMappingExtensions
     {
         if (record == null) throw new ArgumentNullException(nameof(record));
         if (items == null) throw new ArgumentNullException(nameof(items));
-
-        var shouldValidateSchema = record.Columns.Count == 0 && (options == null || !options.AutoAddColumns);
-        if (shouldValidateSchema)
-        {
-            foreach (var item in items)
-            {
-                if (item == null) throw new ArgumentNullException(nameof(items), "集合中包含 null 元素。");
-                throw new InvalidOperationException("Record 没有任何列。请先添加列或设置 RecordMappingOptions.AutoAddColumns = true。");
-            }
-            return;
-        }
+        EnsureCanAddMappedRows(record, options);
 
         foreach (var item in items)
         {
@@ -102,7 +92,7 @@ public static class RecordMappingExtensions
     {
         if (record == null) throw new ArgumentNullException(nameof(record));
         var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(static p => p.CanRead && p.CanWrite)
+            .Where(static p => p.CanRead && p.CanWrite && p.GetIndexParameters().Length == 0)
             .ToArray();
         if (properties.Length == 0)
         {
@@ -135,6 +125,10 @@ public static class RecordMappingExtensions
 
         var properties = new List<PropertyInfo> { GetDirectProperty(column) };
         properties.AddRange(otherColumns.Select(GetDirectProperty));
+        foreach (var property in properties)
+        {
+            Helpers.ValidateColumnType(property.PropertyType);
+        }
         AddColumns(record, properties);
     }
 

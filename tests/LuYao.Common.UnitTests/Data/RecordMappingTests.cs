@@ -118,6 +118,16 @@ public class RecordMappingTests
     {
     }
 
+    public class EntityWithIndexer
+    {
+        public int Id { get; set; }
+        public string this[int index]
+        {
+            get => index.ToString();
+            set { }
+        }
+    }
+
     public class NestedEntity
     {
         public SimpleEntity Child { get; set; } = new SimpleEntity();
@@ -291,6 +301,16 @@ public class RecordMappingTests
         Assert.AreEqual(0, record.Count);
     }
 
+    [TestMethod]
+    public void WhenAddRowsWithoutColumnsAndAutoAddDisabledWithEmptyItemsThenThrows()
+    {
+        var record = new Record("Test", 5);
+        var items = Array.Empty<SimpleEntity>();
+
+        Assert.Throws<InvalidOperationException>(() => record.AddRows(items));
+        Assert.AreEqual(0, record.Count);
+    }
+
     #endregion
 
     #region AddColumns<T>
@@ -326,6 +346,18 @@ public class RecordMappingTests
     }
 
     [TestMethod]
+    public void WhenAddColumnsFromTypeWithIndexerThenSkipsIndexer()
+    {
+        var record = new Record("Test", 5);
+
+        record.AddColumns<EntityWithIndexer>();
+
+        Assert.AreEqual(1, record.Columns.Count);
+        Assert.IsNotNull(record.Columns.Find("Id"));
+        Assert.IsNull(record.Columns.Find("Item"));
+    }
+
+    [TestMethod]
     public void WhenAddColumnsByExpressionsThenAddsSpecifiedColumns()
     {
         var record = new Record("Test", 5);
@@ -343,6 +375,15 @@ public class RecordMappingTests
         var record = new Record("Test", 5);
 
         Assert.Throws<ArgumentException>(() => record.AddColumns<NestedEntity>(x => x.Child.Name));
+    }
+
+    [TestMethod]
+    public void WhenAddColumnsByExpressionsWithUnsupportedPropertyThenThrowsWithoutPartialColumns()
+    {
+        var record = new Record("Test", 5);
+
+        Assert.Throws<NotSupportedException>(() => record.AddColumns<EntityWithComplexProp>(x => x.Id, x => x.Items));
+        Assert.AreEqual(0, record.Columns.Count);
     }
 
     #endregion
