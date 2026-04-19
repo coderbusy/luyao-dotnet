@@ -67,10 +67,20 @@ public static class RecordMappingExtensions
         if (record == null) throw new ArgumentNullException(nameof(record));
         if (items == null) throw new ArgumentNullException(nameof(items));
 
+        var shouldValidateSchema = record.Columns.Count == 0 && (options == null || !options.AutoAddColumns);
+        if (shouldValidateSchema)
+        {
+            foreach (var item in items)
+            {
+                if (item == null) throw new ArgumentNullException(nameof(items), "集合中包含 null 元素。");
+                throw new InvalidOperationException("Record 没有任何列。请先添加列或设置 RecordMappingOptions.AutoAddColumns = true。");
+            }
+            return;
+        }
+
         foreach (var item in items)
         {
             if (item == null) throw new ArgumentNullException(nameof(items), "集合中包含 null 元素。");
-            EnsureCanAddMappedRows(record, options);
             var row = record.AddRow();
             RecordMappingEngine.WriteRow(item, record, row.Row, options);
         }
