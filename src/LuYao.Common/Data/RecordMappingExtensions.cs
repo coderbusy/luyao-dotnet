@@ -91,7 +91,7 @@ public static class RecordMappingExtensions
     #region AddColumns<T>
 
     /// <summary>
-    /// 将类型 <typeparamref name="T"/> 的可映射属性批量添加为列。
+    /// 将类型 <typeparamref name="T"/> 的公共可读写属性批量添加为列。
     /// </summary>
     /// <typeparam name="T">实体类型，必须为引用类型。</typeparam>
     /// <param name="record">目标 Record。</param>
@@ -99,11 +99,16 @@ public static class RecordMappingExtensions
     {
         if (record == null) throw new ArgumentNullException(nameof(record));
         var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(static p => p.CanRead && Helpers.IsSupportedColumnType(p.PropertyType))
+            .Where(static p => p.CanRead && p.CanWrite)
             .ToArray();
         if (properties.Length == 0)
         {
-            throw new InvalidOperationException($"类型 '{typeof(T).FullName}' 不包含可映射的公共属性。");
+            throw new InvalidOperationException($"类型 '{typeof(T).FullName}' 不包含公共可读写属性。");
+        }
+
+        foreach (var property in properties)
+        {
+            Helpers.ValidateColumnType(property.PropertyType);
         }
 
         AddColumns(record, properties);

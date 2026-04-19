@@ -317,6 +317,15 @@ public class RecordMappingTests
     }
 
     [TestMethod]
+    public void WhenAddColumnsFromTypeWithUnsupportedPropertyThenThrows()
+    {
+        var record = new Record("Test", 5);
+
+        Assert.Throws<NotSupportedException>(() => record.AddColumns<EntityWithComplexProp>());
+        Assert.AreEqual(0, record.Columns.Count);
+    }
+
+    [TestMethod]
     public void WhenAddColumnsByExpressionsThenAddsSpecifiedColumns()
     {
         var record = new Record("Test", 5);
