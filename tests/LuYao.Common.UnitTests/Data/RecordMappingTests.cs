@@ -136,8 +136,8 @@ public class RecordMappingTests
 
     public class EntityWithCaseVariantProperties
     {
-        public int Id { get; set; }
-        public int ID { get; set; }
+        public int UserId { get; set; }
+        public int UserID { get; set; }
     }
 
     public class NestedEntity
