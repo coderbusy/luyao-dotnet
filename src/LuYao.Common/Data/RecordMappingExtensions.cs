@@ -92,9 +92,12 @@ public static class RecordMappingExtensions
 
     /// <summary>
     /// 将类型 <typeparamref name="T"/> 的公共可读写属性批量添加为列。
+    /// 如果存在任意不支持的属性类型，会立即抛出异常，不会进行部分添加。
     /// </summary>
     /// <typeparam name="T">实体类型，必须为引用类型。</typeparam>
     /// <param name="record">目标 Record。</param>
+    /// <exception cref="InvalidOperationException">类型不包含公共可读写属性。</exception>
+    /// <exception cref="NotSupportedException">属性类型不在 Record 支持的列类型白名单中。</exception>
     public static void AddColumns<T>(this Record record) where T : class
     {
         if (record == null) throw new ArgumentNullException(nameof(record));
