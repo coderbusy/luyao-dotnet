@@ -174,9 +174,9 @@ public static class RecordMappingExtensions
             throw new InvalidOperationException($"存在重复的列名：{duplicateName}。");
         }
 
-        var existingColumnNames = record.Columns
-            .Select(static column => column.Name)
-            .ToHashSet(comparer);
+        var existingColumnNames = new HashSet<string>(
+            record.Columns.Select(static column => column.Name),
+            comparer);
         var conflictingName = properties
             .Select(static property => property.Name)
             .FirstOrDefault(existingColumnNames.Contains);
