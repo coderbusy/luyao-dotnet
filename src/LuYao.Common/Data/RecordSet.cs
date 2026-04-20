@@ -105,12 +105,12 @@ public partial class RecordSet : IEnumerable<Record>
     /// <returns>如果找到则返回 true，否则返回 false。</returns>
 
 #if NETCOREAPP2_0_OR_GREATER
-    public bool TryGet(string name, [MaybeNullWhen(false)] out Record? record)
+    public bool TryGet(string name, [MaybeNullWhen(false)] out Record record)
     {
         return _records.TryGetValue(name, out record);
     }
 #else
-    public bool TryGet(string name, out Record? record)
+    public bool TryGet(string name, out Record record)
     {
         return _records.TryGetValue(name, out record);
     }
