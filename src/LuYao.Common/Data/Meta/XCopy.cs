@@ -9,6 +9,32 @@ namespace LuYao.Data.Meta;
 /// <typeparam name="T">要映射的对象类型，必须为引用类型。</typeparam>
 public static class XCopy<T> where T : class
 {
+    // 预先过滤，避免每次调用重复遍历和判断
+    private static readonly IReadOnlyList<XProp> _readableProps = BuildReadableProps();
+    private static readonly IReadOnlyList<XProp> _writableProps = BuildWritableProps();
+
+    private static IReadOnlyList<XProp> BuildReadableProps()
+    {
+        var all = XProp.GetAll(typeof(T));
+        var list = new List<XProp>(all.Count);
+        foreach (var p in all)
+        {
+            if (Helpers.IsSupportedForReading(p)) list.Add(p);
+        }
+        return list.AsReadOnly();
+    }
+
+    private static IReadOnlyList<XProp> BuildWritableProps()
+    {
+        var all = XProp.GetAll(typeof(T));
+        var list = new List<XProp>(all.Count);
+        foreach (var p in all)
+        {
+            if (Helpers.IsSupportedForWriting(p)) list.Add(p);
+        }
+        return list.AsReadOnly();
+    }
+
     #region RecordRow
     /// <summary>
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="row"/> 对应的列。
@@ -17,12 +43,8 @@ public static class XCopy<T> where T : class
     /// <param name="row">目标行；仅写入类型受支持的可读属性。</param>
     public static void CopyTo(T data, RecordRow row)
     {
-        var props = XProp.GetAll(typeof(T));
-        var re = row.Record;
-
-        foreach (var prop in props)
+        foreach (var prop in _readableProps)
         {
-            if (!Helpers.IsSupportedForReading(prop)) continue;
             row[prop.Name] = prop.GetValue(data);
         }
     }
@@ -34,12 +56,10 @@ public static class XCopy<T> where T : class
     /// <param name="row">数据来源行。</param>
     public static void CopyFrom(T data, RecordRow row)
     {
-        var props = XProp.GetAll(typeof(T));
-        var re = row.Record;
-        foreach (var prop in props)
+        var columns = row.Record.Columns;
+        foreach (var prop in _writableProps)
         {
-            if (!Helpers.IsSupportedForWriting(prop)) continue;
-            if (!re.Columns.Contains(prop.Name)) continue;
+            if (!columns.Contains(prop.Name)) continue;
             prop.SetValue(data, row[prop.Name]);
         }
     }
@@ -57,7 +77,7 @@ public static class XCopy<TSource, TTarget> where TSource : class where TTarget 
     // 预先构建源→目标属性映射对，避免每次调用重复查找。
     private static readonly IReadOnlyList<PropPair> _map = BuildMap();
 
-    private sealed class PropPair
+    private readonly struct PropPair
     {
         internal readonly IXProp Source;
         internal readonly IXProp Target;
