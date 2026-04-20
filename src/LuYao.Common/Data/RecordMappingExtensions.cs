@@ -128,32 +128,4 @@ public static class RecordMappingExtensions
 
     #endregion
 
-    #region ToList<T> on RecordQuery
-
-    /// <summary>
-    /// 直接从查询物化为对象列表，不产生中间 Record。
-    /// </summary>
-    /// <typeparam name="T">目标类型。</typeparam>
-    /// <param name="query">源查询。</param>
-    /// <returns>映射后的对象列表。</returns>
-    public static List<T> ToList<T>(this RecordQuery query)
-    {
-        return ToList<T>(query, null);
     }
-
-    /// <summary>
-    /// 直接从查询物化为对象列表（带映射选项），不产生中间 Record。
-    /// </summary>
-    /// <typeparam name="T">目标类型。</typeparam>
-    /// <param name="query">源查询。</param>
-    /// <param name="options">映射选项。</param>
-    /// <returns>映射后的对象列表。</returns>
-    public static List<T> ToList<T>(this RecordQuery query, RecordMappingOptions? options)
-    {
-        if (query == null) throw new ArgumentNullException(nameof(query));
-        var record = query.ToRecord();
-        return RecordMappingEngine.ReadAll<T>(record, options);
-    }
-
-    #endregion
-}

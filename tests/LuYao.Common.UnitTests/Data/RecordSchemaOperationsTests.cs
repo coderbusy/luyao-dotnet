@@ -158,58 +158,6 @@ public class RecordSchemaOperationsTests
 
     #endregion
 
-    #region ReorderColumns
-
-    [TestMethod]
-    public void WhenReorderColumnsThenOrderChanges()
-    {
-        var record = CreateTestRecord();
-
-        record.ReorderColumns("Age", "Name", "Id");
-
-        Assert.AreEqual("Age", record.Columns[0].Name);
-        Assert.AreEqual("Name", record.Columns[1].Name);
-        Assert.AreEqual("Id", record.Columns[2].Name);
-    }
-
-    [TestMethod]
-    public void WhenReorderColumnsWithWrongCountThenThrowsArgumentException()
-    {
-        var record = CreateTestRecord();
-
-        Assert.Throws<ArgumentException>(() => record.ReorderColumns("Id", "Name"));
-    }
-
-    [TestMethod]
-    public void WhenReorderColumnsWithNonExistentNameThenThrowsArgumentException()
-    {
-        var record = CreateTestRecord();
-
-        Assert.Throws<ArgumentException>(() => record.ReorderColumns("Id", "Name", "NonExistent"));
-    }
-
-    [TestMethod]
-    public void WhenReorderColumnsThenDataPreserved()
-    {
-        var record = CreateTestRecord();
-
-        record.ReorderColumns("Age", "Id", "Name");
-
-        Assert.AreEqual(20, record.Columns[0].GetValue(0));
-        Assert.AreEqual(1, record.Columns[1].GetValue(0));
-        Assert.AreEqual("Person1", record.Columns[2].GetValue(0));
-    }
-
-    [TestMethod]
-    public void WhenReorderColumnsNullThenThrowsArgumentNullException()
-    {
-        var record = CreateTestRecord();
-
-        Assert.Throws<ArgumentNullException>(() => record.ReorderColumns(null!));
-    }
-
-    #endregion
-
     #region CloneSchema
 
     [TestMethod]

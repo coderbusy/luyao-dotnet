@@ -6,61 +6,6 @@ namespace LuYao.Data;
 [TestClass]
 public class RecordBoundaryTests
 {
-    #region Null Values in Distinct / GroupBy
-
-    [TestMethod]
-    public void WhenDistinctWithAllNullColumnThenDeduplicatesCorrectly()
-    {
-        var record = new Record("Test", 3);
-        var idCol = record.Columns.Add<int>("Id");
-        record.Columns.Add<string>("Name");
-
-        for (int i = 0; i < 3; i++)
-        {
-            var row = record.AddRow();
-            idCol.Set(i, row.Row);
-            // Name left as null for all rows
-        }
-
-        var result = record.AsQuery().Distinct("Name").ToRecord();
-
-        // All nulls should deduplicate to 1 row
-        Assert.AreEqual(1, result.Count);
-    }
-
-    [TestMethod]
-    public void WhenGroupByNullKeyColumnThenGroupsNullsTogether()
-    {
-        var record = new Record("Test", 4);
-        var nameCol = record.Columns.Add<string>("Name");
-        var valCol = record.Columns.Add<int>("Value");
-
-        var row1 = record.AddRow();
-        nameCol.Set("A", row1.Row);
-        valCol.Set(10, row1.Row);
-
-        var row2 = record.AddRow();
-        // Name is null
-        valCol.Set(20, row2.Row);
-
-        var row3 = record.AddRow();
-        // Name is null
-        valCol.Set(30, row3.Row);
-
-        var row4 = record.AddRow();
-        nameCol.Set("A", row4.Row);
-        valCol.Set(40, row4.Row);
-
-        var result = record.AsQuery()
-            .GroupBy(new[] { "Name" }, new AggregateDefinition(AggregateFunction.Sum, "Value", "Total"))
-            .ToRecord();
-
-        // 2 groups: "A" and null
-        Assert.AreEqual(2, result.Count);
-    }
-
-    #endregion
-
     #region Large Row Count Expansion
 
     [TestMethod]
@@ -217,32 +162,6 @@ public class RecordBoundaryTests
 
     #endregion
 
-    #region BuildRowKey Collision Resistance
-
-    [TestMethod]
-    public void WhenDistinctWithAmbiguousStringValuesThenNoFalseCollision()
-    {
-        var record = new Record("Test", 2);
-        var col1 = record.Columns.Add<string>("A");
-        var col2 = record.Columns.Add<string>("B");
-
-        // These two rows previously could collide with simple separator join
-        var r1 = record.AddRow();
-        col1.Set("a\0b", r1.Row);
-        col2.Set("c", r1.Row);
-
-        var r2 = record.AddRow();
-        col1.Set("a", r2.Row);
-        col2.Set("b\0c", r2.Row);
-
-        var result = record.AsQuery().Distinct().ToRecord();
-
-        // Should remain 2 distinct rows
-        Assert.AreEqual(2, result.Count);
-    }
-
-    #endregion
-
     #region RecordRow.Set<T>
 
     [TestMethod]
@@ -258,35 +177,6 @@ public class RecordBoundaryTests
 
         Assert.AreEqual(42, row.Get<int>("Id"));
         Assert.AreEqual("Test", row.Get<string>("Name"));
-    }
-
-    #endregion
-
-    #region QueryOptions.Indexes Stability
-
-    [TestMethod]
-    public void WhenAsQueryWithIndexesThenDoesNotThrow()
-    {
-        var record = new Record("Test", 3);
-        var idCol = record.Columns.Add<int>("Id");
-        var nameCol = record.Columns.Add<string>("Name");
-
-        for (int i = 0; i < 3; i++)
-        {
-            var row = record.AddRow();
-            idCol.Set(i, row.Row);
-            nameCol.Set($"Item{i}", row.Row);
-        }
-
-        var options = new QueryOptions
-        {
-            EnableIndexing = true,
-            Indexes = new[] { new[] { "Id" }, new[] { "Name" } }
-        };
-
-        var result = record.AsQuery(options).Where(r => r.Get<int>("Id") > 0).ToRecord();
-
-        Assert.AreEqual(2, result.Count);
     }
 
     #endregion

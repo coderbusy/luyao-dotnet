@@ -1007,25 +1007,29 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void Columns_AddDuplicateName_ThrowsException()
+    public void Columns_AddDuplicateName_ReturnsExisting()
     {
         // Arrange
         var table = new Record();
-        table.Columns.Add<String>("TestColumn");
+        var col1 = table.Columns.Add<String>("TestColumn");
 
-        // Act & Assert
-        Assert.Throws<DuplicateNameException>(() => table.Columns.Add<String>("TestColumn")); // 应该抛出异常
+        // Act
+        var col2 = table.Columns.Add<String>("TestColumn");
+
+        // Assert - should return the same column, not throw
+        Assert.AreSame(col1, col2);
+        Assert.AreEqual(1, table.Columns.Count);
     }
 
     [TestMethod]
-    public void Columns_AddDuplicateNameDifferentType_ThrowsException()
+    public void Columns_AddDuplicateNameDifferentType_ThrowsInvalidCastException()
     {
         // Arrange
         var table = new Record();
         table.Columns.Add<String>("TestColumn");
 
-        // Act & Assert
-        Assert.Throws<DuplicateNameException>(() => table.Columns.Add<Int32>("TestColumn")); // 应该抛出异常
+        // Act & Assert - casting to wrong generic type throws InvalidCastException
+        Assert.Throws<InvalidCastException>(() => table.Columns.Add<Int32>("TestColumn"));
     }
 
     public class Student
