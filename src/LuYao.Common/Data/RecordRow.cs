@@ -74,7 +74,7 @@ public struct RecordRow : IPropertyAccessor
     /// <summary>
     /// 获取当前行所在 Record 列集合对应的属性元数据列表。
     /// </summary>
-    public IReadOnlyList<IXProp> Props => (IReadOnlyList<IXProp>)this.Record.Columns;
+    public IReadOnlyList<IXProp> Props => Record.Columns;
 
     #endregion
 
@@ -82,14 +82,18 @@ public struct RecordRow : IPropertyAccessor
 
     /// <summary>
     /// 根据列名获取或设置当前行指定列的值。
+    /// 读取时，若列不存在则返回 <see langword="null"/>；
+    /// 写入时，若列不存在则静默跳过。
     /// </summary>
     /// <param name="key">列的名称。</param>
-    /// <returns>指定列的值。</returns>
-    /// <exception cref="KeyNotFoundException">当列名不存在时抛出。</exception>
     public object? this[string key]
     {
-        get => this.Record.Columns.Get(key).GetValue(this);
-        set => this.Record.Columns.Get(key).SetValue(value, this);
+        get => this.Record.Columns.Find(key)?.GetValue(this);
+        set
+        {
+            var col = this.Record.Columns.Find(key);
+            if (col != null) col.SetValue(value, this);
+        }
     }
     #endregion
 
