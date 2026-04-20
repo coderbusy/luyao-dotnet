@@ -33,7 +33,7 @@ public static class XMeta
     private static Func<object, IIndexer> BuildFactory(Type type)
     {
         var indexerType = typeof(XData<>).MakeGenericType(type);
-        var method = indexerType.GetMethod("CreateIndexer", new[] { type });
+        var method = indexerType.GetMethod("CreateIndexer", [type]);
         if (method == null)
             throw new InvalidOperationException($"未找到 {indexerType.FullName} 上的 CreateIndexer 方法。");
 
