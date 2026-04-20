@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LuYao.Data.Meta;
 
@@ -8,14 +7,19 @@ namespace LuYao.Data.Meta;
 /// 提供对强类型对象属性的按名称读写操作，底层使用 <see cref="XProp"/> 加速反射访问。
 /// </summary>
 /// <typeparam name="T">目标类型，必须具有无参构造函数。</typeparam>
-public static class XData<T> where T : new()
+public static class XData<T> where T : class
 {
     private static readonly IReadOnlyList<XProp> _props = XProp.GetAll(typeof(T));
 
     private static XProp Get(string name)
     {
         foreach (var p in _props)
-            if (string.Equals(p.Name, name, StringComparison.Ordinal)) return p;
+        {
+            if (string.Equals(p.Name, name, StringComparison.Ordinal))
+            {
+                return p;
+            }
+        }
         throw new ArgumentException($"类型 {typeof(T).FullName} 上未找到属性 '{name}'。", nameof(name));
     }
 
@@ -47,5 +51,49 @@ public static class XData<T> where T : new()
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         return Get(name).GetValue(data);
+    }
+
+    /// <summary>
+    /// 为指定对象实例创建一个 <see cref="IIndexer"/>，支持按属性名读写。
+    /// </summary>
+    /// <param name="data">目标对象实例。</param>
+    /// <returns>绑定到 <paramref name="data"/> 的 <see cref="IIndexer"/> 实例。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
+    public static IIndexer CreateIndexer(T data)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        return new Indexer(data);
+    }
+
+    private sealed class Indexer : IIndexer
+    {
+        private readonly T _data;
+
+        public Indexer(T data) => _data = data;
+
+        public object? this[string name]
+        {
+            get
+            {
+                foreach (var p in _props)
+                {
+                    if (string.Equals(p.Name, name, StringComparison.Ordinal))
+                    {
+                        return p.GetValue(_data);
+                    }
+                }
+                return null;
+            }
+            set
+            {
+                foreach (var p in _props)
+                {
+                    if (string.Equals(p.Name, name, StringComparison.Ordinal))
+                    {
+                        p.SetValue(_data, value); return;
+                    }
+                }
+            }
+        }
     }
 }
