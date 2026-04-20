@@ -1,11 +1,12 @@
 ﻿using System;
+using LuYao.Data.Meta;
 
 namespace LuYao.Data;
 
 /// <summary>
 /// 表示一个数据列。
 /// </summary>
-public abstract class RecordColumn
+public abstract class RecordColumn : IXProp
 {
     /// <summary>
     /// 获取关联的记录实例。
@@ -128,6 +129,16 @@ public abstract class RecordColumn
         if (value is T direct) return direct;
         return (T)Valid.To(value, typeof(T));
     }
+
+    #endregion
+
+    #region IXProp 实现
+
+    bool IXProp.CanRead => true;
+    bool IXProp.CanWrite => true;
+
+    object? IXProp.GetValue(object instance) => GetValue(((RecordRow)instance).Row);
+    void IXProp.SetValue(object instance, object? value) => SetValue(value, ((RecordRow)instance).Row);
 
     #endregion
 }

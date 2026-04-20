@@ -14,7 +14,7 @@ public interface IPropertyAccessor
     /// <summary>
     /// 获取当前对象所有可访问的属性元数据列表。
     /// </summary>
-    IReadOnlyList<XProp> Props { get; }
+    IReadOnlyList<IXProp> Props { get; }
 
     /// <summary>
     /// 按属性名读写属性值。

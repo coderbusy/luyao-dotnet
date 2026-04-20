@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using LuYao.Data.Meta;
 
 namespace LuYao.Data;
 
 /// <summary>
 /// 代表一行数据，提供对列存储数据集合中特定行数据的访问。
-/// 实现了 <see cref="IRecordCursor"/> 接口，支持类型安全的数据读取操作。
+/// 实现了 <see cref="IPropertyAccessor"/> 接口，支持按属性名读写数据。
 /// </summary>
-public struct RecordRow : IRecordCursor
+public struct RecordRow : IPropertyAccessor
 {
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
@@ -44,7 +45,7 @@ public struct RecordRow : IRecordCursor
     /// <returns>该行在数据集合中的索引位置。</returns>
     public static implicit operator int(RecordRow rowRef) => rowRef.Row;
 
-    #region IRecordCursor 实现
+    #region 数据读取
 
     /// <summary>
     /// 根据列对象获取当前行指定列的泛型类型值。
@@ -65,6 +66,15 @@ public struct RecordRow : IRecordCursor
         var col = this.Record.Columns.Find(name);
         return col != null ? col.Get<T>(this.Row) : default;
     }
+
+    #endregion
+
+    #region IPropertyAccessor 实现
+
+    /// <summary>
+    /// 获取当前行所在 Record 列集合对应的属性元数据列表。
+    /// </summary>
+    public IReadOnlyList<IXProp> Props => (IReadOnlyList<IXProp>)this.Record.Columns;
 
     #endregion
 

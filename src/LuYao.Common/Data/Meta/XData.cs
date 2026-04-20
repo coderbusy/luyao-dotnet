@@ -71,7 +71,7 @@ public static class XData<T> where T : class
 
         public Indexer(T data) => _data = data;
 
-        public IReadOnlyList<XProp> Props => _props;
+        public IReadOnlyList<IXProp> Props => _props;
 
         public object? this[string name]
         {

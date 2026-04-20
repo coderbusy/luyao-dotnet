@@ -5,10 +5,11 @@ using System.Reflection;
 
 namespace LuYao.Data.Meta;
 
+
 /// <summary>
 /// 封装某个类型的单个公共属性，提供快速的反射读写访问（通过编译的委托实现）。
 /// </summary>
-public class XProp
+public class XProp : IXProp
 {
     private static readonly ConcurrentDictionary<Type, IReadOnlyList<XProp>> _cache =
         new ConcurrentDictionary<Type, IReadOnlyList<XProp>>();
@@ -36,10 +37,14 @@ public class XProp
 
     private readonly Func<object, object?>? _getter;
     private readonly Action<object, object?>? _setter;
+    private readonly string _name;
+    private readonly Type _type;
 
     private XProp(PropertyInfo property)
     {
         _property = property;
+        _name = property.Name;
+        _type = property.PropertyType;
 
         if (property.CanRead && property.GetGetMethod(nonPublic: false) is { } getMethod)
         {
@@ -68,12 +73,12 @@ public class XProp
     /// <summary>
     /// 属性类型
     /// </summary>
-    public Type Type => _property.PropertyType;
+    public Type Type => _type;
 
     /// <summary>
     /// 属性名称
     /// </summary>
-    public string Name => _property.Name;
+    public string Name => _name;
 
     /// <summary>
     /// 可否读取
