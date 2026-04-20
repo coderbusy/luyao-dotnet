@@ -132,7 +132,7 @@ public class UnitConverter
     /// var converter = new UnitConverter();
     /// var request = new UnitConverter.UnitExchangeRequest
     /// {
-    ///     From = "grams",
+    ///     CopyFrom = "grams",
     ///     TargetUnits = new[] { "grams", "kilograms", "tons", "milligrams" },
     ///     Value = 1500m,
     ///     Min = 0m,

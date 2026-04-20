@@ -8,7 +8,7 @@ namespace LuYao.Data;
 /// 代表一行数据，提供对列存储数据集合中特定行数据的访问。
 /// 实现了 <see cref="IPropertyAccessor"/> 接口，支持按属性名读写数据。
 /// </summary>
-public struct RecordRow : IPropertyAccessor
+public partial struct RecordRow : IPropertyAccessor
 {
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
@@ -76,10 +76,6 @@ public struct RecordRow : IPropertyAccessor
     /// </summary>
     public IReadOnlyList<IXProp> Props => Record.Columns;
 
-    #endregion
-
-    #region Indexer
-
     /// <summary>
     /// 根据列名获取或设置当前行指定列的值。
     /// 读取时，若列不存在则返回 <see langword="null"/>；
@@ -95,6 +91,7 @@ public struct RecordRow : IPropertyAccessor
             if (col != null) col.SetValue(value, this);
         }
     }
+
     #endregion
 
     /// <summary>

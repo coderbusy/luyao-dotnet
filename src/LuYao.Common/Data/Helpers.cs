@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LuYao.Data.Meta;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -82,6 +83,17 @@ static class Helpers
         return TypeToColumnType.ContainsKey(NormalizeColumnLookupType(type));
     }
 
+    internal static bool IsSupportedForReading(IXProp p)
+    {
+        if (p != null && p.CanRead && IsSupportedColumnType(p.Type)) return true;
+        return false;
+    }
+    internal static bool IsSupportedForWriting(IXProp p)
+    {
+        if (p != null && p.CanWrite && IsSupportedColumnType(p.Type)) return true;
+        return false;
+    }
+
     /// <summary>
     /// 验证列类型是否在白名单内，不在则抛出异常。
     /// </summary>
@@ -150,4 +162,5 @@ static class Helpers
         var ctor = GetConstructor(type);
         return ctor.Invoke(record, name, type);
     }
+
 }

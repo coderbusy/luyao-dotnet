@@ -65,7 +65,7 @@ public static class XData<T> where T : class
         return new Indexer(data);
     }
 
-    private sealed class Indexer : IPropertyAccessor
+    private struct Indexer : IPropertyAccessor
     {
         private readonly T _data;
 
