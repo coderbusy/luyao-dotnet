@@ -14,12 +14,7 @@ partial class Record
     public static Record From<T>(T data) where T : class
     {
         var re = new Record();
-        var props = XProp.GetAll(typeof(T));
-        foreach (var p in props)
-        {
-            if (!Helpers.IsSupportedForReading(p)) continue;
-            re.Columns.Add(p.Name, p.Type);
-        }
+        re.FillColumns<T>();
 
         re.AddRow().CopyFrom(data);
 
@@ -36,11 +31,7 @@ partial class Record
     {
         var props = XProp.GetAll(typeof(T));
         var re = new Record();
-        foreach (var p in props)
-        {
-            if (!Helpers.IsSupportedForReading(p)) continue;
-            re.Columns.Add(p.Name, p.Type);
-        }
+        re.FillColumns<T>();
 
         foreach (var item in items)
         {
