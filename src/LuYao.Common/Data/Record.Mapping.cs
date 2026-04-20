@@ -60,7 +60,7 @@ partial class Record
     /// 根据对象实例（例如匿名类型实例）的可读属性向当前 <see cref="Record"/> 追加对应的列定义。
     /// </summary>
     /// <typeparam name="T">提供列定义的对象类型。</typeparam>
-    /// <param name="template">用于推断列结构的对象实例。</param>
+    /// <param name="template">用于推断列结构的对象实例；仅使用其编译时类型信息，不读取其属性值。</param>
     /// <exception cref="ArgumentNullException"><paramref name="template"/> 为 <see langword="null"/>。</exception>
     public void AppendColumns<T>(T template) where T : class
     {

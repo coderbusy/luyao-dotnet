@@ -134,7 +134,8 @@ public class NameFilterTests
         var record = new Record();
         SampleData template = null;
 
-        Assert.Throws<ArgumentNullException>(() => record.AppendColumns(template));
+        var ex = Assert.Throws<ArgumentNullException>(() => record.AppendColumns(template));
+        Assert.AreEqual("template", ex.ParamName);
     }
 
     [TestMethod]
