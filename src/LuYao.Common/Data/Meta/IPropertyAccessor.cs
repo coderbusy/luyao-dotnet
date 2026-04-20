@@ -1,4 +1,6 @@
-﻿namespace LuYao.Data.Meta;
+﻿using System.Collections.Generic;
+
+namespace LuYao.Data.Meta;
 
 /// <summary>
 /// 提供对对象属性的按名称读写操作。
@@ -7,8 +9,13 @@
 /// 写入时，若指定的属性名不存在，则静默跳过，不抛出异常。
 /// 读取时，若指定的属性名不存在，则返回 <see langword="null"/>。
 /// </remarks>
-public interface IIndexer
+public interface IPropertyAccessor
 {
+    /// <summary>
+    /// 获取当前对象所有可访问的属性元数据列表。
+    /// </summary>
+    IReadOnlyList<XProp> Props { get; }
+
     /// <summary>
     /// 按属性名读写属性值。
     /// </summary>

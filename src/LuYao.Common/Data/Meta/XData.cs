@@ -54,22 +54,24 @@ public static class XData<T> where T : class
     }
 
     /// <summary>
-    /// 为指定对象实例创建一个 <see cref="IIndexer"/>，支持按属性名读写。
+    /// 为指定对象实例创建一个 <see cref="IPropertyAccessor"/>，支持按属性名读写。
     /// </summary>
     /// <param name="data">目标对象实例。</param>
-    /// <returns>绑定到 <paramref name="data"/> 的 <see cref="IIndexer"/> 实例。</returns>
+    /// <returns>绑定到 <paramref name="data"/> 的 <see cref="IPropertyAccessor"/> 实例。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
-    public static IIndexer CreateIndexer(T data)
+    public static IPropertyAccessor CreatePropertyAccessor(T data)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         return new Indexer(data);
     }
 
-    private sealed class Indexer : IIndexer
+    private sealed class Indexer : IPropertyAccessor
     {
         private readonly T _data;
 
         public Indexer(T data) => _data = data;
+
+        public IReadOnlyList<XProp> Props => _props;
 
         public object? this[string name]
         {
