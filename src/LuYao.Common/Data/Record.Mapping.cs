@@ -57,6 +57,18 @@ partial class Record
     }
 
     /// <summary>
+    /// 根据对象实例（例如匿名类型实例）的可读属性向当前 <see cref="Record"/> 追加对应的列定义。
+    /// </summary>
+    /// <typeparam name="T">提供列定义的对象类型。</typeparam>
+    /// <param name="template">用于推断列结构的对象实例；仅使用其编译时类型信息，不读取其属性值。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="template"/> 为 <see langword="null"/>。</exception>
+    public void AppendColumns<T>(T template) where T : class
+    {
+        if (template == null) throw new ArgumentNullException(nameof(template));
+        this.AppendColumns<T>();
+    }
+
+    /// <summary>
     /// 按照指定的属性名列表向当前 <see cref="Record"/> 追加列定义，列的追加顺序与 <paramref name="names"/> 的顺序一致。
     /// 不在类型 <typeparamref name="T"/> 中或不受支持的属性名将被忽略。
     /// 若 <paramref name="names"/> 为 <see langword="null"/> 或空数组，则不追加任何列。
