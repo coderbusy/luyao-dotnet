@@ -59,17 +59,17 @@ public static class XData<T> where T : class
     /// <param name="data">目标对象实例。</param>
     /// <returns>绑定到 <paramref name="data"/> 的 <see cref="IPropertyAccessor"/> 实例。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
-    public static IPropertyAccessor CreatePropertyAccessor(T data)
+    public static IPropertyAccessor CreateAccessor(T data)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
-        return new Indexer(data);
+        return new Accessor(data);
     }
 
-    private struct Indexer : IPropertyAccessor
+    private struct Accessor : IPropertyAccessor
     {
         private readonly T _data;
 
-        public Indexer(T data) => _data = data;
+        public Accessor(T data) => _data = data;
 
         public IReadOnlyList<IXProp> Props => _props;
 

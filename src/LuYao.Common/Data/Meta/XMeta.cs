@@ -23,7 +23,7 @@ public static class XMeta
     /// 写入时，若指定的属性名不存在，则静默跳过，不抛出异常。
     /// 读取时，若指定的属性名不存在，则返回 <see langword="null"/>。
     /// </remarks>
-    public static IPropertyAccessor CreatePropertyAccessor(object data)
+    public static IPropertyAccessor CreateAccessor(object data)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         var factory = _cache.GetOrAdd(data.GetType(), BuildFactory);
@@ -40,10 +40,10 @@ public static class XMeta
     /// 写入时，若指定的属性名不存在，则静默跳过，不抛出异常。
     /// 读取时，若指定的属性名不存在，则返回 <see langword="null"/>。
     /// </remarks>
-    public static IPropertyAccessor CreatePropertyAccessor<T>(T data) where T : class
+    public static IPropertyAccessor CreateAccessor<T>(T data) where T : class
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
-        return XData<T>.CreatePropertyAccessor(data);
+        return XData<T>.CreateAccessor(data);
     }
 
     private static Func<object, IPropertyAccessor> BuildFactory(Type type)
@@ -53,7 +53,7 @@ public static class XMeta
         if (method == null)
             throw new InvalidOperationException($"未找到 {indexerType.FullName} 上的 CreatePropertyAccessor 方法。");
 
-        // 编译: (object obj) => XData<T>.CreatePropertyAccessor((T)obj)
+        // 编译: (object obj) => XData<T>.CreateAccessor((T)obj)
         var param = Expression.Parameter(typeof(object), "obj");
         var call = Expression.Call(method, Expression.Convert(param, type));
         return Expression.Lambda<Func<object, IPropertyAccessor>>(call, param).Compile();

@@ -13,12 +13,12 @@ public class XDataCreatePropertyAccessorTests
         public int ReadOnly { get; } = 99;
     }
 
-    // ── CreatePropertyAccessor 参数校验 ───────────────────────────────────────────────
+    // ── CreateAccessor 参数校验 ───────────────────────────────────────────────
 
     [TestMethod]
     public void CreatePropertyAccessor_NullData_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => XData<SampleModel>.CreatePropertyAccessor(null!));
+        Assert.Throws<ArgumentNullException>(() => XData<SampleModel>.CreateAccessor(null!));
     }
 
     // ── 写入（set�?──────────────────────────────────────────────────────────
@@ -27,7 +27,7 @@ public class XDataCreatePropertyAccessorTests
     public void Set_ExistingKey_WritesValue()
     {
         var model = new SampleModel();
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         indexer["Id"] = 42;
 
@@ -38,7 +38,7 @@ public class XDataCreatePropertyAccessorTests
     public void Set_ExistingStringKey_WritesValue()
     {
         var model = new SampleModel();
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         indexer["Name"] = "hello";
 
@@ -49,7 +49,7 @@ public class XDataCreatePropertyAccessorTests
     public void Set_NonExistingKey_DoesNotThrow()
     {
         var model = new SampleModel { Id = 1 };
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         // 不存在的 key 应静默跳过，不抛异常
         indexer["NotExist"] = 99;
@@ -61,7 +61,7 @@ public class XDataCreatePropertyAccessorTests
     public void Set_KeyIsCaseSensitive_DoesNotWriteWrongCase()
     {
         var model = new SampleModel { Id = 7 };
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         // "id" �?"Id" 大小写不同，应跳�?
         indexer["id"] = 100;
@@ -75,7 +75,7 @@ public class XDataCreatePropertyAccessorTests
     public void Get_ExistingKey_ReturnsValue()
     {
         var model = new SampleModel { Id = 5 };
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         var result = indexer["Id"];
 
@@ -86,7 +86,7 @@ public class XDataCreatePropertyAccessorTests
     public void Get_NonExistingKey_ReturnsNull()
     {
         var model = new SampleModel();
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         var result = indexer["NotExist"];
 
@@ -97,7 +97,7 @@ public class XDataCreatePropertyAccessorTests
     public void Get_KeyIsCaseSensitive_ReturnsNullForWrongCase()
     {
         var model = new SampleModel { Id = 3 };
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         var result = indexer["id"];
 
@@ -108,7 +108,7 @@ public class XDataCreatePropertyAccessorTests
     public void Get_ReadOnlyProperty_ReturnsValue()
     {
         var model = new SampleModel();
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         var result = indexer["ReadOnly"];
 
@@ -121,7 +121,7 @@ public class XDataCreatePropertyAccessorTests
     public void SetThenGet_SameKey_ReturnsWrittenValue()
     {
         var model = new SampleModel();
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         indexer["Name"] = "world";
 
@@ -132,7 +132,7 @@ public class XDataCreatePropertyAccessorTests
     public void Indexer_ReflectsUnderlyingModelChanges()
     {
         var model = new SampleModel { Id = 1 };
-        var indexer = XData<SampleModel>.CreatePropertyAccessor(model);
+        var indexer = XData<SampleModel>.CreateAccessor(model);
 
         model.Id = 99;
 
