@@ -87,7 +87,7 @@ public class XCopyGenericTests
         Assert.IsNull(target.Name);
     }
 
-    // ── CopyTo ───────────────────────────────────────────────────────────────
+    // ── Copy ───────────────────────────────────────────────────────────────
 
     [TestMethod]
     public void CopyTo_NullSource_ThrowsArgumentNullException()
