@@ -107,7 +107,7 @@ public class NameFilterTests
     {
         // 传入顺序与声明顺序故意相反，验证列顺序与传入顺序一致
         var record = new Record();
-        record.AppendColumns<SampleData>(nameof(SampleData.Email), nameof(SampleData.Id));
+        record.AppendColumns<SampleData>(new[] { nameof(SampleData.Email), nameof(SampleData.Id) });
         Assert.AreEqual(nameof(SampleData.Email), record.Columns[0].Name);
         Assert.AreEqual(nameof(SampleData.Id), record.Columns[1].Name);
     }
@@ -128,22 +128,22 @@ public class NameFilterTests
     public void AppendColumns_WithNames_OnlyAddsSpecifiedColumns()
     {
         var record = new Record();
-        record.AppendColumns<SampleData>(nameof(SampleData.Id), nameof(SampleData.Name));
+        record.AppendColumns<SampleData>(new[] { nameof(SampleData.Id), nameof(SampleData.Name) });
         Assert.AreEqual(2, record.Columns.Count);
         Assert.IsNotNull(record.Columns[nameof(SampleData.Id)]);
         Assert.IsNotNull(record.Columns[nameof(SampleData.Name)]);
     }
 
     [TestMethod]
-    public void AppendColumns_WithNullOrEmptyNames_AddsAllColumns()
+    public void AppendColumns_WithNullOrEmptyNames_AddsNoColumns()
     {
         var record1 = new Record();
         record1.AppendColumns<SampleData>(new string[0]);
-        Assert.AreEqual(4, record1.Columns.Count, "空数组应与无参重载一致，追加所有列。");
+        Assert.AreEqual(0, record1.Columns.Count, "空数组不应追加任何列。");
 
         var record2 = new Record();
         record2.AppendColumns<SampleData>((string[])null);
-        Assert.AreEqual(4, record2.Columns.Count, "null 应与无参重载一致，追加所有列。");
+        Assert.AreEqual(0, record2.Columns.Count, "null 不应追加任何列。");
     }
 
     [TestMethod]

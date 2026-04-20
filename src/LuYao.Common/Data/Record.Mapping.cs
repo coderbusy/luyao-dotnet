@@ -59,17 +59,13 @@ partial class Record
     /// <summary>
     /// 按照指定的属性名列表向当前 <see cref="Record"/> 追加列定义，列的追加顺序与 <paramref name="names"/> 的顺序一致。
     /// 不在类型 <typeparamref name="T"/> 中或不受支持的属性名将被忽略。
-    /// 若 <paramref name="names"/> 为 <see langword="null"/> 或空数组，则行为与无参重载一致，追加所有可读属性列。
+    /// 若 <paramref name="names"/> 为 <see langword="null"/> 或空数组，则不追加任何列。
     /// </summary>
     /// <typeparam name="T">提供列类型信息的对象类型。</typeparam>
     /// <param name="names">要追加的属性名数组，列将按此顺序添加。</param>
-    public void AppendColumns<T>(params string[] names) where T : class
+    public void AppendColumns<T>(string[] names) where T : class
     {
-        if (names == null || names.Length == 0)
-        {
-            this.AppendColumns<T>();
-            return;
-        }
+        if (names == null || names.Length == 0) return;
         // 构建属性元数据索引，以便按 names 顺序快速查找类型信息。
         var propMap = new Dictionary<string, XProp>(StringComparer.Ordinal);
         foreach (var p in XProp.GetAll(typeof(T)))
