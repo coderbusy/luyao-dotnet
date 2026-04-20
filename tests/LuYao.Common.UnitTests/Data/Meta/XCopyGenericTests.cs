@@ -142,4 +142,64 @@ public class XCopyGenericTests
         Assert.AreEqual(source.Name, copy.Name);
         Assert.AreEqual(source.Score, copy.Score);
     }
+
+    // ── record class ──────────────────────────────────────────────────────────
+
+    private record class RecordSource
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public double Score { get; set; }
+    }
+
+    private record class RecordTarget
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public double Score { get; set; }
+    }
+
+    [TestMethod]
+    public void Copy_RecordClassSource_MatchingPropertiesAreCopied()
+    {
+        var source = new RecordSource { Id = 10, Name = "Record", Score = 7.7 };
+        var target = XCopy<RecordSource, RecordTarget>.Copy(source);
+
+        Assert.AreEqual(10, target.Id);
+        Assert.AreEqual("Record", target.Name);
+        Assert.AreEqual(7.7, target.Score);
+    }
+
+    [TestMethod]
+    public void Copy_RecordClassSource_ReturnsNewInstance()
+    {
+        var source = new RecordSource { Id = 11 };
+        var t1 = XCopy<RecordSource, RecordTarget>.Copy(source);
+        var t2 = XCopy<RecordSource, RecordTarget>.Copy(source);
+
+        Assert.AreNotSame(t1, t2);
+    }
+
+    [TestMethod]
+    public void CopyTo_RecordClassTarget_OverwritesExistingValues()
+    {
+        var source = new RecordSource { Id = 12, Name = "New" };
+        var target = new RecordTarget { Id = 99, Name = "Old" };
+
+        XCopy<RecordSource, RecordTarget>.CopyTo(source, target);
+
+        Assert.AreEqual(12, target.Id);
+        Assert.AreEqual("New", target.Name);
+    }
+
+    [TestMethod]
+    public void Copy_ClassSourceToRecordClassTarget_MatchingPropertiesAreCopied()
+    {
+        var source = new Source { Id = 13, Name = "Mixed", Score = 3.3 };
+        var target = XCopy<Source, RecordTarget>.Copy(source);
+
+        Assert.AreEqual(13, target.Id);
+        Assert.AreEqual("Mixed", target.Name);
+        Assert.AreEqual(3.3, target.Score);
+    }
 }

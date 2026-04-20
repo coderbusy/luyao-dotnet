@@ -50,8 +50,8 @@ public static class XCopy<T> where T : class
 /// 提供在两种强类型对象之间按属性名称进行浅拷贝的静态工具类。
 /// 仅复制源类型与目标类型中同名、类型相同且均受支持的可读/可写属性。
 /// </summary>
-/// <typeparam name="TSource">数据来源对象类型，必须为引用类型。</typeparam>
-/// <typeparam name="TTarget">数据目标对象类型，必须为引用类型且具有无参构造函数。</typeparam>
+/// <typeparam name="TSource">数据来源对象类型。</typeparam>
+/// <typeparam name="TTarget">数据目标对象类型，必须具有无参构造函数。</typeparam>
 public static class XCopy<TSource, TTarget> where TSource : class where TTarget : class, new()
 {
     // 预先构建源→目标属性映射对，避免每次调用重复查找。
@@ -67,6 +67,11 @@ public static class XCopy<TSource, TTarget> where TSource : class where TTarget 
             Source = source;
             Target = target;
         }
+
+        public void Copy(TSource sourceInstance, TTarget targetInstance)
+        {
+            Target.SetValue(targetInstance, Source.GetValue(sourceInstance));
+        }
     }
 
     private static IReadOnlyList<PropPair> BuildMap()
@@ -78,14 +83,13 @@ public static class XCopy<TSource, TTarget> where TSource : class where TTarget 
         var targetIndex = new Dictionary<string, IXProp>(StringComparer.Ordinal);
         foreach (var tp in targetProps)
         {
-            if (Helpers.IsSupportedForWriting(tp))
-                targetIndex[tp.Name] = tp;
+            if (tp.CanWrite) targetIndex[tp.Name] = tp;
         }
 
         var map = new List<PropPair>();
         foreach (var sp in sourceProps)
         {
-            if (!Helpers.IsSupportedForReading(sp)) continue;
+            if (!sp.CanRead) continue;
             if (!targetIndex.TryGetValue(sp.Name, out var tp)) continue;
             // 仅当属性类型完全一致时才映射
             if (sp.Type != tp.Type) continue;
@@ -123,7 +127,7 @@ public static class XCopy<TSource, TTarget> where TSource : class where TTarget 
 
         foreach (var pair in _map)
         {
-            pair.Target.SetValue(target, pair.Source.GetValue(source));
+            pair.Copy(source, target);
         }
     }
 }
