@@ -113,6 +113,31 @@ public class NameFilterTests
     }
 
     [TestMethod]
+    public void AppendColumns_WithAnonymousTemplate_AddsColumnsFromTemplateType()
+    {
+        var record = new Record();
+
+        record.AppendColumns(new { Id = 1, Name = "Test", IsOk = true });
+
+        Assert.AreEqual(3, record.Columns.Count);
+        Assert.AreEqual("Id", record.Columns[0].Name);
+        Assert.AreEqual(typeof(int), record.Columns[0].Type);
+        Assert.AreEqual("Name", record.Columns[1].Name);
+        Assert.AreEqual(typeof(string), record.Columns[1].Type);
+        Assert.AreEqual("IsOk", record.Columns[2].Name);
+        Assert.AreEqual(typeof(bool), record.Columns[2].Type);
+    }
+
+    [TestMethod]
+    public void AppendColumns_WithNullTemplate_ThrowsArgumentNullException()
+    {
+        var record = new Record();
+        SampleData template = null;
+
+        Assert.Throws<ArgumentNullException>(() => record.AppendColumns(template));
+    }
+
+    [TestMethod]
     public void AppendColumns_WithFilter_RespectsManualIncludeOrder()
     {
         // 通过 NameFilter 手动 Include 的顺序应正确反映到 Record 列顺序
