@@ -529,15 +529,6 @@ public partial class Record : IEnumerable<RecordRow>
     }
 
     /// <summary>
-    /// 按指定顺序重新排列列。
-    /// </summary>
-    /// <param name="names">按期望顺序排列的列名数组。</param>
-    public void ReorderColumns(params string[] names)
-    {
-        this.Columns.Reorder(names);
-    }
-
-    /// <summary>
     /// 仅复制列结构（零行），返回新 <see cref="Record"/>。
     /// </summary>
     /// <returns>具有相同列结构但零行的新 <see cref="Record"/> 实例。</returns>
@@ -596,18 +587,4 @@ public partial class Record : IEnumerable<RecordRow>
 
     #endregion
 
-    #region Query
-
-    /// <summary>
-    /// 创建延迟执行的查询对象，支持链式调用。
-    /// </summary>
-    /// <param name="options">查询选项，可声明索引列等优化参数。</param>
-    /// <returns>可链式组合的 <see cref="RecordQuery"/> 实例。</returns>
-    public RecordQuery AsQuery(QueryOptions? options = null)
-    {
-        return new RecordQuery(this, options ?? new QueryOptions());
     }
-
-    #endregion
-
-}
