@@ -1,4 +1,5 @@
 ﻿using LuYao.Data.Meta;
+using System;
 using System.Collections.Generic;
 
 namespace LuYao.Data;
@@ -14,7 +15,7 @@ partial class Record
     public static Record From<T>(T data) where T : class
     {
         var re = new Record();
-        re.FillColumns<T>();
+        re.AppendColumns<T>();
 
         re.AddRow().CopyFrom(data);
 
@@ -31,7 +32,7 @@ partial class Record
     {
         var props = XProp.GetAll(typeof(T));
         var re = new Record();
-        re.FillColumns<T>();
+        re.AppendColumns<T>();
 
         foreach (var item in items)
         {
@@ -45,7 +46,7 @@ partial class Record
     /// 按照类型 <typeparamref name="T"/> 的可读属性向当前 <see cref="Record"/> 追加对应的列定义。
     /// </summary>
     /// <typeparam name="T">提供列定义的对象类型。</typeparam>
-    public void FillColumns<T>() where T : class
+    public void AppendColumns<T>() where T : class
     {
         var props = XProp.GetAll(typeof(T));
         foreach (var p in props)
@@ -53,6 +54,47 @@ partial class Record
             if (!Helpers.IsSupportedForReading(p)) continue;
             this.Columns.Add(p.Name, p.Type);
         }
+    }
+
+    /// <summary>
+    /// 按照指定的属性名列表向当前 <see cref="Record"/> 追加列定义，列的追加顺序与 <paramref name="names"/> 的顺序一致。
+    /// 不在类型 <typeparamref name="T"/> 中或不受支持的属性名将被忽略。
+    /// 若 <paramref name="names"/> 为 <see langword="null"/> 或空数组，则行为与无参重载一致，追加所有可读属性列。
+    /// </summary>
+    /// <typeparam name="T">提供列类型信息的对象类型。</typeparam>
+    /// <param name="names">要追加的属性名数组，列将按此顺序添加。</param>
+    public void AppendColumns<T>(params string[] names) where T : class
+    {
+        if (names == null || names.Length == 0)
+        {
+            this.AppendColumns<T>();
+            return;
+        }
+        // 构建属性元数据索引，以便按 names 顺序快速查找类型信息。
+        var propMap = new Dictionary<string, XProp>(StringComparer.Ordinal);
+        foreach (var p in XProp.GetAll(typeof(T)))
+        {
+            if (Helpers.IsSupportedForReading(p))
+                propMap[p.Name] = p;
+        }
+        foreach (var name in names)
+        {
+            if (propMap.TryGetValue(name, out var prop))
+                this.Columns.Add(prop.Name, prop.Type);
+        }
+    }
+
+    /// <summary>
+    /// 通过 <see cref="NameFilter{T}"/> 的链式配置向当前 <see cref="Record"/> 追加列定义。
+    /// 列的追加顺序与 <paramref name="filter"/> 中配置的属性选取顺序一致。
+    /// </summary>
+    /// <typeparam name="T">提供列定义的对象类型。</typeparam>
+    /// <param name="filter">用于配置属性过滤规则的委托，接收一个 <see cref="NameFilter{T}"/> 实例。</param>
+    public void AppendColumns<T>(Action<NameFilter<T>> filter) where T : class
+    {
+        var arg = new NameFilter<T>();
+        filter(arg);
+        this.AppendColumns<T>(arg.ToNames());
     }
 
     /// <summary>
