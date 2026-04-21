@@ -316,7 +316,7 @@ foreach (var row in record)
 
 **要点**：
 
-- `Field<T>` 在列不存在时返回 `default(T)`；如果你需要"列必须存在"的语义，请改用 `record.Columns.Get(name)` 取列后再读。
+- `Field<T>` 在列不存在时返回 `default(T)`；如果你需要"列必须存在"的语义，可先调用 `record.Columns.Get(name)` 显式校验列存在，再读取对应数据。
 
 ### 11.3 dynamic 与自动建列
 
