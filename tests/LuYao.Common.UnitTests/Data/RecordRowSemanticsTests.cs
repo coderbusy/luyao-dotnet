@@ -134,4 +134,12 @@ public class RecordRowSemanticsTests
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
     }
+
+    private void Test(Func<RecordRow, Boolean> filter) { }
+    private void Test(Func<dynamic, Boolean> filter) { }
+
+    private void XTest()
+    {
+        Test((RecordRow m) => m.Field<int>("Id") > 10);
+    }
 }

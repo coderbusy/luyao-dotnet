@@ -48,7 +48,6 @@
 - 提供类型安全的数据读取：`Field<T>(RecordColumn col)`、`Field<T>(string name)`（命名对齐 `System.Data.DataRowExtensions.Field<T>`，便于与 `DataTable` 互操作的用户迁移）。
 - 提供按列名写入：`Set<T>(string name, T value)`。**写入时若列不存在会按 `T` 自动建列**；同名列已存在但类型不一致时抛 `InvalidOperationException`。
 - 支持隐式转换为 `int`（返回行索引）。
-- 实现 `IPropertyAccessor`，但其字符串键索引器为**显式接口实现**——只能通过接口访问，外部无法直接 `row["Foo"]`。Mapping、序列化等反射场景预期通过该接口访问。
 - 实现 `IDynamicMetaObjectProvider`：`dynamic` 成员/索引读取在列不存在时返回 `null`；写入时按 `value.GetType()` **自动建列**，若 `value` 为 `null` 且列不存在则跳过该次写入（无法推断列类型）。
 - 作为 `Where` 谓词参数、`foreach` 遍历结果等场景的核心类型。
 
@@ -158,6 +157,14 @@
 
 `RecordSet` 序列化其包含的所有 `Record`。
 
+### 4.5 查询与过滤
+
+`Record` 提供了一组实用的查询方法，用于在内存中快速查找符合条件的数据行：
+
+- **泛型精确匹配**：`Find<T>(string name, T value)` 和 `FindAll<T>(string name, T value)` 可按指定列名与值进行快速精确匹配。如果指定列不存在或找不到匹配项，则返回 `null` 或空序列。
+- **Lambda 筛选**：`Find(Func<RecordRow, bool> filter)` 和 `FindAll(Func<RecordRow, bool> filter)` 允许通过自定义条件筛选 `RecordRow`。
+- **动态类型筛选**：`FindByDynamic(Func<dynamic, bool> filter)` 和 `FindAllByDynamic(Func<dynamic, bool> filter)` 配合 `dynamic` 提供更灵活的表达式查询。
+
 ---
 
 ## 5. 数据访问模型
@@ -170,7 +177,6 @@
 - **遍历**：`foreach (var row in record)` 按行索引顺序产生 `RecordRow`。
 - **列级别**：`column.GetValue(int row)` / `column.SetValue(value, int row)` / `column.Get<T>(int row)` / `column.Set(T value, int row)`。
 - **行级别（强类型）**：`row.Field<T>(column)` / `row.Field<T>(name)` 读取；`row.Set<T>(name, value)` 写入。
-- **行级别（弱类型 / Mapping）**：通过 `IPropertyAccessor` 接口访问 `((IPropertyAccessor)row)[name]`；该索引器为显式实现，不在公共 API 表面暴露。
 - **dynamic**：`dynamic d = row;` 之后 `d.Foo` / `d["Foo"]` 进行读写。
 
 ### 5.2 列与值访问语义约定（重要）
@@ -180,13 +186,11 @@
 | `row.Field<T>(name)` | 返回 `default(T)` | — |
 | `row.Set<T>(name, value)` | — | **自动按 `T` 建列** |
 | `dynamic`（成员或索引器） | 返回 `null` | **按 `value.GetType()` 自动建列**；`value == null` 时跳过 |
-| `IPropertyAccessor` 索引器（Mapping） | 返回 `null` | **静默跳过，不建列** |
 
 约定优于配置：
 
 - 自动建列只发生在显式的 `Set<T>` 与 dynamic 写入路径上。
-- Mapping（`Fill<T>` / `CopyFrom<T>` / `XCopy`）走 `IPropertyAccessor`，**不建列**。需要从 DTO 灌入数据前，请先 `Columns.AddFrom<T>()` 或手动 `Add` 声明 schema。
-- `RecordRow` 的字符串键索引器对外隐藏，避免使用者误以为索引器赋值会建列。
+- Mapping（`Fill<T>` / `CopyFrom<T>` / `XCopy`）**不建列**。需要从 DTO 灌入数据前，请先 `Columns.AddFrom<T>()` 或手动 `Add` 声明 schema。
 
 ### 5.3 设计约束
 
@@ -348,7 +352,7 @@ foreach (var dto in dtos)
 }
 ```
 
-**注意**：`Fill<T>` / `CopyFrom<T>` 走 `IPropertyAccessor`，**不会自动建列**。若 DTO 有 `Foo` 属性而 Record 未声明 `Foo` 列，该属性的值会被静默丢弃。这是预期行为——schema 应由调用方显式声明。
+**注意**：`Fill<T>` / `CopyFrom<T>` **不会自动建列**。若 DTO 有 `Foo` 属性而 Record 未声明 `Foo` 列，该属性的值会被静默丢弃。这是预期行为——schema 应由调用方显式声明。
 - 需要随机访问时使用 `record[index]` 索引器获取 `RecordRow`。
 
 ### 11.3 列引用的生命周期
@@ -463,6 +467,24 @@ foreach (var record in set)
 - **缓存列引用**：循环内避免反复调用 `Columns.Find` 或 `Columns["name"]`。
 - **优先泛型 API**：`RecordColumn<T>.Get(row)` / `Set(value, row)` 避免装箱拆箱，比 `GetValue` / `SetValue` 更高效。
 - **批量构建**：先添加所有列，再逐行填充。不要在行循环中动态添加列。
+
+### 11.9 数据查询
+
+```csharp
+// 按强类型列值查找单条
+var row = record.Find<string>("Name", "Alice");
+
+// 使用 Lambda 过滤多条记录
+var activeRows = record.FindAll(r => r.Field<bool>("IsActive"));
+
+// 使用 dynamic 动态查询
+var dynamicRow = record.FindByDynamic(d => d.Id == 100);
+```
+
+**要点**：
+
+- `Find` / `FindByDynamic` 若未找到匹配项或指定的列不存在，会直接返回 `null`。
+- `FindAll` 系列方法返回延迟执行的 `IEnumerable<RecordRow>`。
 
 ---
 
