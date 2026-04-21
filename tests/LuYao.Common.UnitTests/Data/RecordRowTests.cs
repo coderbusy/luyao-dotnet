@@ -181,43 +181,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 使用同一记录上的列对象读取布尔值时，应返回正确值。
-    /// </summary>
-    [TestMethod]
-    public void GetBoolean_ByColumn_SameRecord_ShouldReturnCorrectValue()
-    {
-        // Arrange
-        var (record, _, _, boolColumn) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
-
-        // Act
-        var result = recordRow.Field<Boolean>(boolColumn);
-
-        // Assert
-        Assert.AreEqual(false, result);
-    }
-
-    /// <summary>
-    /// 使用其他记录的同名列对象读取时，应回退到按列名查找。
-    /// </summary>
-    [TestMethod]
-    public void GetBoolean_ByColumn_DifferentRecord_ShouldFallbackToNameSearch()
-    {
-        // Arrange
-        var (record1, _, _, _) = CreateTestRecord();
-        var (record2, _, _, boolColumn2) = CreateTestRecord();
-        var recordRow = new RecordRow(record1, 0);
-
-        // Act
-        var result = recordRow.Field<Boolean>(boolColumn2);
-
-        // Assert
-        Assert.AreEqual(true, result);
-    }
-
-
-
-    /// <summary>
     /// 按列名读取已存在的字符串列时，应返回正确值。
     /// </summary>
     [TestMethod]
@@ -250,25 +213,6 @@ public class RecordRowTests
         // Assert
         Assert.AreEqual(default(string), result);
     }
-
-    /// <summary>
-    /// 使用同一记录上的列对象读取字符串值时，应返回正确值。
-    /// </summary>
-    [TestMethod]
-    public void GetString_ByColumn_SameRecord_ShouldReturnCorrectValue()
-    {
-        // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-
-        // Act
-        var result = recordRow.Field<String>(stringColumn);
-
-        // Assert
-        Assert.AreEqual("Test1", result);
-    }
-
-
 
     /// <summary>
     /// 按列名读取已存在的整型列时，应返回正确值。
@@ -305,25 +249,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 使用同一记录上的列对象读取整型值时，应返回正确值。
-    /// </summary>
-    [TestMethod]
-    public void GetInt32_ByColumn_SameRecord_ShouldReturnCorrectValue()
-    {
-        // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-
-        // Act
-        var result = recordRow.Field<Int32>(intColumn);
-
-        // Assert
-        Assert.AreEqual(100, result);
-    }
-
-
-
-    /// <summary>
     /// 泛型按列名读取已存在列时，应返回正确值。
     /// </summary>
     [TestMethod]
@@ -356,26 +281,6 @@ public class RecordRowTests
         // Assert
         Assert.AreEqual(default(int), result);
     }
-
-    /// <summary>
-    /// 泛型使用列对象读取值时，应返回正确值。
-    /// </summary>
-    [TestMethod]
-    public void GetGeneric_ByColumn_SameRecord_ShouldReturnCorrectValue()
-    {
-        // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
-
-        // Act
-        var result = recordRow.Field<int>(intColumn);
-
-        // Assert
-        Assert.AreEqual(200, result);
-    }
-
-
-
 
     /// <summary>
     /// 应支持按列名读取字节值。
@@ -497,34 +402,16 @@ public class RecordRowTests
     public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
+        var (record, _, _, _) = CreateTestRecord();
         var recordRow = new RecordRow(record, 0);
 
         // Act
         var result1 = recordRow.Field<Int32>("IntColumn");
         var result2 = recordRow.Field<Int32>("IntColumn");
-        var result3 = recordRow.Field<Int32>(intColumn);
 
         // Assert
         Assert.AreEqual(result1, result2);
-        Assert.AreEqual(result2, result3);
         Assert.AreEqual(100, result1);
-    }
-
-    /// <summary>
-    /// 按列名和按列对象读取时，应得到相同结果。
-    /// </summary>
-    [TestMethod]
-    public void GetMethods_ByNameVsByColumn_ShouldReturnSameResults()
-    {
-        // Arrange
-        var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
-
-        // Act & Assert
-        Assert.AreEqual(recordRow.Field<Int32>("IntColumn"), recordRow.Field<Int32>(intColumn));
-        Assert.AreEqual(recordRow.Field<String>("StringColumn"), recordRow.Field<String>(stringColumn));
-        Assert.AreEqual(recordRow.Field<Boolean>("BoolColumn"), recordRow.Field<Boolean>(boolColumn));
     }
 
 
@@ -755,40 +642,4 @@ public class RecordRowTests
         Assert.IsNull(result);
     }
 
-    /// <summary>
-    /// <see cref="RecordRow.Field(RecordColumn)"/> 使用同一记录上的列对象读取时，应返回对应对象值。
-    /// </summary>
-    [TestMethod]
-    public void FieldObject_ByColumn_SameRecord_ShouldReturnValue()
-    {
-        // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
-
-        // Act
-        var result = recordRow.Field(stringColumn);
-
-        // Assert
-        Assert.AreEqual("Test2", result);
-    }
-
-    /// <summary>
-    /// <see cref="RecordRow.Field(RecordColumn)"/> 使用其他记录的同名列对象读取时，应回退到按列名查找并返回值。
-    /// </summary>
-    [TestMethod]
-    public void FieldObject_ByColumn_DifferentRecord_ShouldFallbackToNameSearch()
-    {
-        // Arrange
-        var (record1, _, _, _) = CreateTestRecord();
-        var (record2, _, _, boolColumn2) = CreateTestRecord();
-        var recordRow = new RecordRow(record1, 0);
-
-        // Act
-        var result = recordRow.Field(boolColumn2);
-
-        // Assert
-        Assert.AreEqual(true, result);
-    }
-
 }
-

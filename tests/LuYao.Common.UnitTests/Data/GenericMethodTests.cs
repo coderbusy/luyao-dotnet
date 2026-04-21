@@ -63,9 +63,9 @@ public class GenericMethodTests
         boolColumn.Set(false, row.Row);
 
         // Assert
-        Assert.AreEqual(123, row.Field<Int32>(intColumn));
-        Assert.AreEqual("Test String", row.Field<String>(stringColumn));
-        Assert.AreEqual(false, row.Field<Boolean>(boolColumn));
+        Assert.AreEqual(123, row.Field<Int32>("IntColumn"));
+        Assert.AreEqual("Test String", row.Field<String>("StringColumn"));
+        Assert.AreEqual(false, row.Field<Boolean>("BoolColumn"));
     }
 
 
@@ -97,10 +97,10 @@ public class GenericMethodTests
         Assert.AreEqual("42", intAsString);
 
         // Verify access through RecordRow
-        int intFromRow = row.Field<int>(intColumn);
+        int intFromRow = row.Field<int>("IntColumn");
         Assert.AreEqual(42, intFromRow);
 
-        string stringFromRow = row.Field<string>(stringColumn);
+        string stringFromRow = row.Field<string>("StringColumn");
         Assert.AreEqual("Hello", stringFromRow);
     }
 
