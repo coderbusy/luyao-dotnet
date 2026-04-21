@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 
 namespace LuYao.Data;
@@ -48,7 +48,7 @@ public class RecordBoundaryTests
         record.Delete(2);
 
         Assert.AreEqual(4, record.Count);
-        var values = record.Select(r => r.Get<int>("Id")).ToArray();
+        var values = record.Select(r => r.Field<int>("Id")).ToArray();
         CollectionAssert.AreEqual(new[] { 0, 10, 30, 40 }, values);
     }
 
@@ -96,11 +96,11 @@ public class RecordBoundaryTests
             idCol.Set(i, row.Row);
         }
 
-        int deleted = record.DeleteWhere(r => r.Get<int>("Id") % 2 == 0);
+        int deleted = record.DeleteWhere(r => r.Field<int>("Id") % 2 == 0);
 
         Assert.AreEqual(3, deleted);
         Assert.AreEqual(2, record.Count);
-        var remaining = record.Select(r => r.Get<int>("Id")).ToArray();
+        var remaining = record.Select(r => r.Field<int>("Id")).ToArray();
         CollectionAssert.AreEqual(new[] { 1, 3 }, remaining);
     }
 
@@ -120,7 +120,7 @@ public class RecordBoundaryTests
 
         Assert.AreEqual(3, deleted);
         Assert.AreEqual(2, record.Count);
-        var remaining = record.Select(r => r.Get<int>("Id")).ToArray();
+        var remaining = record.Select(r => r.Field<int>("Id")).ToArray();
         CollectionAssert.AreEqual(new[] { 10, 30 }, remaining);
     }
 
@@ -154,7 +154,7 @@ public class RecordBoundaryTests
             idCol.Set(i, row.Row);
         }
 
-        int deleted = record.DeleteWhere(r => r.Get<int>("Id") > 100);
+        int deleted = record.DeleteWhere(r => r.Field<int>("Id") > 100);
 
         Assert.AreEqual(0, deleted);
         Assert.AreEqual(3, record.Count);
@@ -175,8 +175,8 @@ public class RecordBoundaryTests
         row.Set("Id", 42);
         row.Set("Name", "Test");
 
-        Assert.AreEqual(42, row.Get<int>("Id"));
-        Assert.AreEqual("Test", row.Get<string>("Name"));
+        Assert.AreEqual(42, row.Field<int>("Id"));
+        Assert.AreEqual("Test", row.Field<string>("Name"));
     }
 
     #endregion

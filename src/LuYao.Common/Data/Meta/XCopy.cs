@@ -40,12 +40,12 @@ public static class XCopy<T> where T : class
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="row"/> 对应的列。
     /// </summary>
     /// <param name="data">数据来源对象。</param>
-    /// <param name="row">目标行；仅写入类型受支持的可读属性。</param>
+    /// <param name="row">目标行；仅写入类型受支持的可读属性。Mapping 路径下若列不存在则静默跳过，<b>不会自动建列</b>。</param>
     public static void CopyTo(T data, RecordRow row)
     {
         foreach (var prop in _readableProps)
         {
-            row[prop.Name] = prop.GetValue(data);
+            row.TrySetValue(prop.Name, prop.GetValue(data));
         }
     }
 
@@ -60,7 +60,7 @@ public static class XCopy<T> where T : class
         foreach (var prop in _writableProps)
         {
             if (!columns.Contains(prop.Name)) continue;
-            prop.SetValue(data, row[prop.Name]);
+            prop.SetValue(data, row.GetValueOrDefault(prop.Name));
         }
     }
     #endregion

@@ -1,5 +1,7 @@
-﻿using LuYao.Data.Meta;
+﻿using LuYao.Collections.Generic;
+using LuYao.Data.Meta;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -7,78 +9,119 @@ using System.Linq;
 namespace LuYao.Data;
 
 /// <summary>
-/// 列集合
+/// 列集合。
 /// </summary>
-public class RecordColumnCollection : List<RecordColumn>
+/// <remarks>
+/// 内部以 <see cref="KeyedList{TKey, TValue}"/> 维护数据，对外提供 <see cref="IReadOnlyList{T}"/> 视图，
+/// 不再继承 <see cref="List{T}"/>，避免外部通过基类接口绕过列名/类型校验。
+///
+/// 语义约定：
+/// <list type="bullet">
+///   <item><description><see cref="Find(string)"/>：列不存在时返回 <see langword="null"/>。</description></item>
+///   <item><description><see cref="Get(string)"/>：列不存在时抛 <see cref="KeyNotFoundException"/>。</description></item>
+///   <item><description><see cref="Add(string, Type)"/> / <see cref="Add{T}(string)"/>：同名同类型返回已有列；
+///     同名不同类型抛 <see cref="InvalidOperationException"/>。</description></item>
+/// </list>
+/// </remarks>
+public class RecordColumnCollection : IReadOnlyList<RecordColumn>
 {
+    private readonly KeyedList<string, RecordColumn> _items
+        = new KeyedList<string, RecordColumn>(c => c.Name, StringComparer.Ordinal);
+
     /// <summary>
-    /// 关联的记录
+    /// 关联的记录。
     /// </summary>
     public Record Record { get; }
 
     /// <summary>
-    /// 初始化 <see cref="RecordColumnCollection"/> 类的新实例
+    /// 初始化 <see cref="RecordColumnCollection"/> 类的新实例。
     /// </summary>
-    /// <param name="record">关联的记录实例</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出</exception>
+    /// <param name="record">关联的记录实例。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出。</exception>
     internal RecordColumnCollection(Record record)
     {
         this.Record = record ?? throw new ArgumentNullException(nameof(record));
     }
 
     /// <summary>
-    /// 当添加行时调用，用于扩展列的容量以适应新行
+    /// 列数量。
+    /// </summary>
+    public int Count => _items.Count;
+
+    /// <summary>
+    /// 按索引访问列。
+    /// </summary>
+    /// <param name="index">从零开始的列索引。</param>
+    public RecordColumn this[int index] => _items[index];
+
+    /// <summary>
+    /// 按列名访问列。列不存在时返回 <see langword="null"/>。
+    /// </summary>
+    /// <param name="name">要查找的列名。</param>
+    public RecordColumn? this[string name]
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+            return this.Find(name);
+        }
+    }
+
+    /// <summary>
+    /// 当添加行时调用，用于扩展列的容量以适应新行。
     /// </summary>
     internal void OnAddRow()
     {
-        if (this.Count == 0) return;
+        if (_items.Count == 0) return;
         int num = this.Record.Count;
-        foreach (RecordColumn col in this)
+        foreach (RecordColumn col in _items)
         {
             if (col.Capacity >= num) continue;
             col.Extend(num);
         }
-        this.Record.Capacity = this.Min(f => f.Capacity);
+        this.Record.Capacity = _items.Min(f => f.Capacity);
     }
 
     /// <summary>
-    /// 查找指定列名的索引
+    /// 查找指定列名的索引。
     /// </summary>
-    /// <param name="name">要查找的列名</param>
-    /// <returns>如果找到列则返回索引，否则返回 -1</returns>
+    /// <param name="name">要查找的列名。</param>
+    /// <returns>如果找到列则返回索引，否则返回 -1。</returns>
     public int IndexOf(string name)
     {
-        for (int i = 0; i < this.Count; i++)
-        {
-            if (this[i].Name == name) return i;
-        }
-        return -1;
+        if (name == null) return -1;
+        return _items.IndexOfKey(name);
     }
 
     /// <summary>
-    /// 判断指定的列名是否存在
+    /// 判断指定的列名是否存在。
     /// </summary>
-    /// <param name="name">要检查的列名</param>
-    /// <returns>如果列名存在则返回 true，否则返回 false</returns>
-    public bool Contains(string name) { return this.IndexOf(name) > -1; }
+    /// <param name="name">要检查的列名。</param>
+    /// <returns>如果列名存在则返回 true，否则返回 false。</returns>
+    public bool Contains(string name)
+    {
+        if (name == null) return false;
+        return _items.ContainsKey(name);
+    }
 
     /// <summary>
-    /// 根据列名查找列
+    /// 根据列名查找列。
     /// </summary>
-    /// <param name="name">要查找的列名</param>
-    /// <returns>如果找到列则返回 <see cref="RecordColumn"/> 实例，否则返回 null</returns>
+    /// <param name="name">要查找的列名。</param>
+    /// <returns>如果找到列则返回 <see cref="RecordColumn"/> 实例，否则返回 <see langword="null"/>。</returns>
     public RecordColumn? Find(string name)
     {
-        int idx = this.IndexOf(name);
-        return idx > -1 ? this[idx] : null;
+        if (name == null) return null;
+        int idx = _items.IndexOfKey(name);
+        return idx > -1 ? _items[idx] : null;
     }
 
     /// <summary>
-    /// 根据列名获取 <see cref="RecordColumn"/> 实例，如果列不存在则抛出 <see cref="KeyNotFoundException"/>。
+    /// 根据列名获取 <see cref="RecordColumn"/> 实例。
     /// </summary>
-    /// <param name="name">要查找的列名</param>
-    /// <returns>对应的 <see cref="RecordColumn"/> 实例</returns>
-    /// <exception cref="KeyNotFoundException">当列名不存在时抛出</exception>
+    /// <param name="name">要查找的列名。</param>
+    /// <returns>对应的 <see cref="RecordColumn"/> 实例。</returns>
+    /// <exception cref="KeyNotFoundException">当列名不存在时抛出。</exception>
     public RecordColumn Get(string name)
     {
         var col = Find(name);
@@ -89,10 +132,10 @@ public class RecordColumnCollection : List<RecordColumn>
     /// <summary>
     /// 根据列名查找指定泛型类型的列。
     /// </summary>
-    /// <typeparam name="T">要查找的列的数据类型</typeparam>
-    /// <param name="name">要查找的列名</param>
-    /// <returns>如果找到且类型匹配则返回 <see cref="RecordColumn{T}"/> 实例，否则返回 null</returns>
-    /// <exception cref="InvalidCastException">当找到的列类型与 <typeparamref name="T"/> 不匹配时抛出</exception>
+    /// <typeparam name="T">要查找的列的数据类型。</typeparam>
+    /// <param name="name">要查找的列名。</param>
+    /// <returns>如果找到且类型匹配则返回 <see cref="RecordColumn{T}"/> 实例；列不存在时返回 <see langword="null"/>。</returns>
+    /// <exception cref="InvalidCastException">当找到的列类型与 <typeparamref name="T"/> 不匹配时抛出。</exception>
     public RecordColumn<T>? Find<T>(string name)
     {
         var col = this.Find(name);
@@ -102,61 +145,79 @@ public class RecordColumnCollection : List<RecordColumn>
     }
 
     /// <summary>
-    /// 删除一个列
+    /// 根据列名删除列。
     /// </summary>
-    /// <param name="name">要删除的列名</param>
+    /// <param name="name">要删除的列名。</param>
+    /// <returns>是否删除成功。</returns>
     public bool Remove(string name)
     {
         int idx = this.IndexOf(name);
         if (idx > -1)
         {
-            this.RemoveAt(idx);
+            _items.RemoveAt(idx);
             return true;
         }
         return false;
     }
 
     /// <summary>
-    /// 清理所有列并重置记录行数
+    /// 清空所有列并重置记录行数。
     /// </summary>
-    public new void Clear()
+    public void Clear()
     {
-        base.Clear();
+        _items.Clear();
         this.Record.OnClear();
     }
 
     #region Add
 
     /// <summary>
-    /// 根据列名和类型添加一个列。如果列名已存在，直接返回已有列。
+    /// 根据列名和类型添加一个列。
     /// </summary>
-    /// <param name="name">列名</param>
-    /// <param name="type">列的数据类型</param>
-    /// <returns>添加的或已有的 <see cref="RecordColumn"/> 实例</returns>
+    /// <param name="name">列名。</param>
+    /// <param name="type">列的数据类型。</param>
+    /// <returns>新建或已有的 <see cref="RecordColumn"/> 实例。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为空或空白时抛出。</exception>
+    /// <exception cref="InvalidOperationException">当列名已存在但类型与 <paramref name="type"/> 不一致时抛出。</exception>
     public RecordColumn Add(string name, Type type)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
+        if (type == null) throw new ArgumentNullException(nameof(type));
         var existing = Find(name);
-        if (existing != null) return existing;
+        if (existing != null)
+        {
+            if (existing.Type != type)
+                throw new InvalidOperationException(
+                    $"列 '{name}' 已存在且类型为 {existing.Type.Name}，无法以类型 {type.Name} 重新添加。");
+            return existing;
+        }
         RecordColumn col = Helpers.MakeRecordColumn(this.Record, name, type);
-        base.Add(col);
+        _items.Add(col);
         return col;
     }
 
     /// <summary>
-    /// 添加指定泛型类型的列。如果列名已存在，直接返回已有列。
+    /// 添加指定泛型类型的列。
     /// </summary>
-    /// <typeparam name="T">列的数据类型</typeparam>
-    /// <param name="name">列名</param>
-    /// <returns>添加的或已有的 <see cref="RecordColumn{T}"/> 实例</returns>
+    /// <typeparam name="T">列的数据类型。</typeparam>
+    /// <param name="name">列名。</param>
+    /// <returns>新建或已有的 <see cref="RecordColumn{T}"/> 实例。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为空或空白时抛出。</exception>
+    /// <exception cref="InvalidOperationException">当列名已存在但类型与 <typeparamref name="T"/> 不一致时抛出。</exception>
     public RecordColumn<T> Add<T>(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
         var existing = Find(name);
-        if (existing != null) return (RecordColumn<T>)existing;
+        if (existing != null)
+        {
+            if (existing.Type != typeof(T))
+                throw new InvalidOperationException(
+                    $"列 '{name}' 已存在且类型为 {existing.Type.Name}，无法以类型 {typeof(T).Name} 重新添加。");
+            return (RecordColumn<T>)existing;
+        }
         Helpers.ValidateColumnType(typeof(T));
         var col = new RecordColumn<T>(this.Record, name, typeof(T));
-        base.Add(col);
+        _items.Add(col);
         return col;
     }
 
@@ -229,20 +290,6 @@ public class RecordColumnCollection : List<RecordColumn>
     #endregion
 
     /// <summary>
-    /// 根据列名获取 <see cref="RecordColumn"/> 实例，如果列不存在则返回 null。
-    /// </summary>
-    /// <param name="name">要查找的列名</param>
-    /// <returns>对应的 <see cref="RecordColumn"/> 实例，如果不存在则为 null</returns>
-    public RecordColumn? this[string name]
-    {
-        get
-        {
-            if (string.IsNullOrWhiteSpace(name)) return null;
-            return this.Find(name);
-        }
-    }
-
-    /// <summary>
     /// 重命名指定列。
     /// </summary>
     /// <param name="oldName">原列名。</param>
@@ -257,6 +304,8 @@ public class RecordColumnCollection : List<RecordColumn>
         if (oldName != newName && this.Contains(newName))
             throw new DuplicateNameException($"列名 '{newName}' 已经存在");
         col.Name = newName;
+        // 列名变更后需让内部键缓存失效，否则按新名称的查找会失败。
+        _items.InvalidateCache();
     }
 
     /// <summary>
@@ -266,6 +315,11 @@ public class RecordColumnCollection : List<RecordColumn>
     /// <param name="column">新的列实例。</param>
     internal void ReplaceAt(int index, RecordColumn column)
     {
-        this[index] = column;
+        _items[index] = column;
     }
+
+    /// <inheritdoc/>
+    public IEnumerator<RecordColumn> GetEnumerator() => _items.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
 }

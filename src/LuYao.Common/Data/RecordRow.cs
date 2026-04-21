@@ -53,16 +53,15 @@ public partial struct RecordRow : IPropertyAccessor, IDynamicMetaObjectProvider
     /// </summary>
     /// <typeparam name="T">要获取的值的类型。</typeparam>
     /// <param name="col">要读取的列对象。</param>
-    /// <returns>如果列属于当前记录则直接返回转换后的泛型类型值，否则返回同名值。</returns>
-    public T? Get<T>(RecordColumn col) => col.Record == this.Record ? col.Get<T>(this.Row) : this.Get<T>(col.Name);
+    /// <returns>如果列属于当前记录则直接返回转换后的泛型类型值，否则按列名在当前记录中查找。</returns>
+    public T? Field<T>(RecordColumn col) => col.Record == this.Record ? col.Get<T>(this.Row) : this.Field<T>(col.Name);
 
     /// <summary>
-    /// 根据列名获取当前行指定列的泛型类型值。
+    /// 根据列名获取当前行指定列的泛型类型值。列不存在时返回 <typeparamref name="T"/> 的默认值。
     /// </summary>
     /// <typeparam name="T">要获取的值的类型。</typeparam>
     /// <param name="name">列的名称。</param>
-    /// <returns>如果找到指定列则返回转换后的泛型类型值，否则返回该类型的默认值。</returns>
-    public T? Get<T>(string name)
+    public T? Field<T>(string name)
     {
         var col = this.Record.Columns.Find(name);
         return col != null ? col.Get<T>(this.Row) : default;
@@ -78,19 +77,52 @@ public partial struct RecordRow : IPropertyAccessor, IDynamicMetaObjectProvider
     public IReadOnlyList<IXProp> Props => Record.Columns;
 
     /// <summary>
-    /// 根据列名获取或设置当前行指定列的值。
-    /// 读取时，若列不存在则返回 <see langword="null"/>；
-    /// 写入时，若列不存在则静默跳过。
+    /// IPropertyAccessor 显式实现：按列名读写当前行的值。
+    /// 读取时列不存在返回 <see langword="null"/>；写入时列不存在静默跳过，<b>不会自动建列</b>。
+    /// 该索引器仅供 Mapping/反射场景通过接口访问，不在公共 API 表面公开。
     /// </summary>
-    /// <param name="key">列的名称。</param>
-    public object? this[string key]
+    object? IPropertyAccessor.this[string key]
     {
-        get => this.Record.Columns.Find(key)?.GetValue(this);
-        set
+        get => GetValueOrDefault(key);
+        set => TrySetValue(key, value);
+    }
+
+    /// <summary>
+    /// 按列名读取值；列不存在时返回 <see langword="null"/>。
+    /// 供 Mapping、dynamic 读取等内部路径使用。
+    /// </summary>
+    internal object? GetValueOrDefault(string name)
+    {
+        var col = this.Record.Columns.Find(name);
+        return col?.GetValue(this);
+    }
+
+    /// <summary>
+    /// 按列名写入值；列不存在时静默跳过。
+    /// 供 Mapping 写入路径使用，<b>不会自动建列</b>。
+    /// </summary>
+    internal void TrySetValue(string name, object? value)
+    {
+        var col = this.Record.Columns.Find(name);
+        if (col != null) col.SetValue(value, this);
+    }
+
+    /// <summary>
+    /// 按列名写入值；列不存在时按 <paramref name="value"/> 的运行时类型自动建列。
+    /// 当 <paramref name="value"/> 为 <see langword="null"/> 且列不存在时跳过该次写入（无法推断列类型）。
+    /// 供 dynamic 写入路径（成员/索引器赋值）使用。
+    /// </summary>
+    internal void SetAndEnsureColumn(string name, object? value)
+    {
+        var existing = this.Record.Columns.Find(name);
+        if (existing != null)
         {
-            var col = this.Record.Columns.Find(key);
-            if (col != null) col.SetValue(value, this);
+            existing.SetValue(value, this);
+            return;
         }
+        if (value is null) return;
+        var col = this.Record.Columns.Add(name, value.GetType());
+        col.SetValue(value, this);
     }
 
     #endregion
@@ -102,23 +134,16 @@ public partial struct RecordRow : IPropertyAccessor, IDynamicMetaObjectProvider
         => new RecordRowMetaObject(parameter, this);
 
     /// <summary>
-    /// 根据列名设置当前行指定列的泛型类型值，避免值类型 boxing。
+    /// 根据列名设置当前行指定列的泛型类型值。
+    /// 列不存在时按 <typeparamref name="T"/> 自动建列；列已存在但类型不匹配时抛 <see cref="InvalidOperationException"/>。
     /// </summary>
     /// <typeparam name="T">要设置的值的类型。</typeparam>
     /// <param name="name">列的名称。</param>
     /// <param name="value">要设置的值。</param>
-    /// <exception cref="KeyNotFoundException">当列名不存在时抛出。</exception>
-    /// <exception cref="InvalidCastException">当列类型与 <typeparamref name="T"/> 不匹配时抛出。</exception>
+    /// <exception cref="InvalidOperationException">当同名列已存在且类型与 <typeparamref name="T"/> 不一致时抛出。</exception>
     public void Set<T>(string name, T value)
     {
-        var col = this.Record.Columns.Get(name);
-        if (col is RecordColumn<T> typed)
-        {
-            typed.Set(value, this.Row);
-        }
-        else
-        {
-            col.SetValue(value, this.Row);
-        }
+        var col = this.Record.Columns.Add<T>(name);
+        col.Set(value, this.Row);
     }
 }
