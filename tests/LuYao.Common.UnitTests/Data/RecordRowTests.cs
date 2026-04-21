@@ -720,5 +720,75 @@ public class RecordRowTests
         Assert.AreEqual(recordRow.Field<bool>("BoolColumn"), (bool)row.BoolColumn!);
     }
 
+    /// <summary>
+    /// <see cref="RecordRow.Field(string)"/> 按列名读取已存在列时，应返回对应对象值。
+    /// </summary>
+    [TestMethod]
+    public void FieldObject_ByName_ColumnExists_ShouldReturnValue()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.Field("IntColumn");
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(100, (int)result!);
+    }
+
+    /// <summary>
+    /// <see cref="RecordRow.Field(string)"/> 按列名读取不存在列时，应返回 null。
+    /// </summary>
+    [TestMethod]
+    public void FieldObject_ByName_ColumnNotExists_ShouldReturnNull()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.Field("NonExistentColumn");
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    /// <summary>
+    /// <see cref="RecordRow.Field(RecordColumn)"/> 使用同一记录上的列对象读取时，应返回对应对象值。
+    /// </summary>
+    [TestMethod]
+    public void FieldObject_ByColumn_SameRecord_ShouldReturnValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 1);
+
+        // Act
+        var result = recordRow.Field(stringColumn);
+
+        // Assert
+        Assert.AreEqual("Test2", result);
+    }
+
+    /// <summary>
+    /// <see cref="RecordRow.Field(RecordColumn)"/> 使用其他记录的同名列对象读取时，应回退到按列名查找并返回值。
+    /// </summary>
+    [TestMethod]
+    public void FieldObject_ByColumn_DifferentRecord_ShouldFallbackToNameSearch()
+    {
+        // Arrange
+        var (record1, _, _, _) = CreateTestRecord();
+        var (record2, _, _, boolColumn2) = CreateTestRecord();
+        var recordRow = new RecordRow(record1, 0);
+
+        // Act
+        var result = recordRow.Field(boolColumn2);
+
+        // Assert
+        Assert.AreEqual(true, result);
+    }
+
 }
 
