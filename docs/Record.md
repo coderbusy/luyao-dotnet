@@ -45,10 +45,11 @@
 `RecordRow` 是用户最常接触的类型之一，代表 `Record` 中的一行数据视图。
 
 - 定义为 `struct`，持有所属 `Record` 引用与行索引（`Row`）。
-- 提供类型安全的数据读取：`Get<T>(RecordColumn col)`、`Get<T>(string name)`。
-- 提供基于列名的索引器读写：`this[string key]` { get; set; }。
+- 提供类型安全的数据读取：`Field<T>(RecordColumn col)`、`Field<T>(string name)`（命名对齐 `System.Data.DataRowExtensions.Field<T>`，便于与 `DataTable` 互操作的用户迁移）。
+- 提供按列名写入：`Set<T>(string name, T value)`。**写入时若列不存在会按 `T` 自动建列**；同名列已存在但类型不一致时抛 `InvalidOperationException`。
 - 支持隐式转换为 `int`（返回行索引）。
-- 实现 `IRecordCursor` 接口。
+- 实现 `IPropertyAccessor`，但其字符串键索引器为**显式接口实现**——只能通过接口访问，外部无法直接 `row["Foo"]`。Mapping、序列化等反射场景预期通过该接口访问。
+- 实现 `IDynamicMetaObjectProvider`：`dynamic` 成员/索引读取在列不存在时返回 `null`；写入时按 `value.GetType()` **自动建列**，若 `value` 为 `null` 且列不存在则跳过该次写入（无法推断列类型）。
 - 作为 `Where` 谓词参数、`foreach` 遍历结果等场景的核心类型。
 
 ### 3.2 `RecordColumn` / `RecordColumn<T>`
@@ -86,16 +87,26 @@
 
 ### 3.3 `RecordColumnCollection`
 
-`RecordColumnCollection` 管理 `Record` 的列集合，继承自 `List<RecordColumn>`。
+`RecordColumnCollection` 管理 `Record` 的列集合。
 
-已有能力：
+- 实现 `IReadOnlyList<RecordColumn>`，**不再继承 `List<RecordColumn>`**：避免外部通过基类接口（`Add(RecordColumn)`、`Insert`、`Sort` 等）绕过列名/类型校验。
+- 内部以 `KeyedList<string, RecordColumn>`（`StringComparer.Ordinal`）维护数据，按列名查找为 O(log n)。
+
+方法语义遵循 “宽容 / 严格 / 补齐” 三档划分：
+
+| 操作 | 方法 | 列不存在时的行为 |
+|------|------|------------------|
+| 宽容查找 | `Find(name)` / `Find<T>(name)` | 返回 `null` |
+| 严格查找 | `Get(name)` | 抛 `KeyNotFoundException` |
+| 按需创建 | `Add(name, type)` / `Add<T>(name)` | 创建新列；同名同类型返回已有；同名不同类型抛 `InvalidOperationException` |
+
+其它能力：
 
 - 按索引访问：`this[int index]`
 - 按名称访问：`this[string name]`（返回 `null` 若不存在）
-- 查找：`Find(string name)` / `Find<T>(string name)` / `Get(string name)`（不存在时抛异常）
 - 判断：`Contains(string name)` / `IndexOf(string name)`
-- 添加：`Add(string name, Type type)` / `Add<T>(string name)`（名称已存在时直接返回已有列，不报错）
 - 删除：`Remove(string name)`
+- 重命名：`Rename(oldName, newName)`
 - 清空：`Clear()`
 - 计数：`Count`
 
@@ -158,9 +169,26 @@
 - **行索引**：`record[int row]` 返回 `RecordRow`。
 - **遍历**：`foreach (var row in record)` 按行索引顺序产生 `RecordRow`。
 - **列级别**：`column.GetValue(int row)` / `column.SetValue(value, int row)` / `column.Get<T>(int row)` / `column.Set(T value, int row)`。
-- **行级别**：`row.Get<T>(column)` / `row.Get<T>(name)` / `row[name]`。
+- **行级别（强类型）**：`row.Field<T>(column)` / `row.Field<T>(name)` 读取；`row.Set<T>(name, value)` 写入。
+- **行级别（弱类型 / Mapping）**：通过 `IPropertyAccessor` 接口访问 `((IPropertyAccessor)row)[name]`；该索引器为显式实现，不在公共 API 表面暴露。
+- **dynamic**：`dynamic d = row;` 之后 `d.Foo` / `d["Foo"]` 进行读写。
 
-### 5.2 设计约束
+### 5.2 列与值访问语义约定（重要）
+
+| 路径 | 读取（列不存在） | 写入（列不存在） |
+|------|------------------|------------------|
+| `row.Field<T>(name)` | 返回 `default(T)` | — |
+| `row.Set<T>(name, value)` | — | **自动按 `T` 建列** |
+| `dynamic`（成员或索引器） | 返回 `null` | **按 `value.GetType()` 自动建列**；`value == null` 时跳过 |
+| `IPropertyAccessor` 索引器（Mapping） | 返回 `null` | **静默跳过，不建列** |
+
+约定优于配置：
+
+- 自动建列只发生在显式的 `Set<T>` 与 dynamic 写入路径上。
+- Mapping（`Fill<T>` / `CopyFrom<T>` / `XCopy`）走 `IPropertyAccessor`，**不建列**。需要从 DTO 灌入数据前，请先 `Columns.AddFrom<T>()` 或手动 `Add` 声明 schema。
+- `RecordRow` 的字符串键索引器对外隐藏，避免使用者误以为索引器赋值会建列。
+
+### 5.3 设计约束
 
 - 所有读写操作必须显式指定行索引，不存在依赖隐式位置的 API。
 - `AddRow()` 返回新行的 `RecordRow`，不产生任何全局状态副作用。
@@ -281,15 +309,46 @@ var nameCol = record.Columns.Find<string>("Name")!;
 
 foreach (var row in record)
 {
-    int id = row.Get<int>(idCol);
-    string name = row.Get<string>(nameCol);
+    int id = row.Field<int>(idCol);
+    string name = row.Field<string>(nameCol);
 }
 ```
 
 **要点**：
 
 - 在循环外缓存列引用（`RecordColumn` / `RecordColumn<T>`），避免每行按名称查找。
-- 使用 `row.Get<T>(RecordColumn)` 比 `row.Get<T>(string)` 更快（跳过名称查找）。
+- 使用 `row.Field<T>(RecordColumn)` 比 `row.Field<T>(string)` 更快（跳过名称查找）。
+- `Field<T>` 在列不存在时返回 `default(T)`；如果你需要"列必须存在"的语义，请改用 `record.Columns.Get(name)` 取列后再读。
+
+### 11.3 dynamic 与自动建列
+
+```csharp
+var re = new Record();
+dynamic dto = re.AddRow();
+dto.Id = 100;        // 自动按 int 建列
+dto.Name = "abc";    // 自动按 string 建列
+dto.Tag = null;      // 列不存在 + 值为 null → 跳过，不建列
+```
+
+dynamic 写入是为快速原型/动态结构而生；如果你的 schema 在编译时已知，**优先**显式 `Columns.Add<T>()` + `row.Set<T>()`，可获得：
+
+- 更早暴露列名拼写错误（同名不同类型直接抛 `InvalidOperationException`）；
+- 强类型路径，避免装箱与运行时类型推断；
+- 更好的可读性与重构友好度。
+
+### 11.4 对象映射
+
+```csharp
+// 推荐：先按 DTO 结构声明 Schema，再批量灌入
+record.Columns.AddFrom<MyDto>();
+foreach (var dto in dtos)
+{
+    var row = record.AddRow();
+    row.CopyFrom(dto);
+}
+```
+
+**注意**：`Fill<T>` / `CopyFrom<T>` 走 `IPropertyAccessor`，**不会自动建列**。若 DTO 有 `Foo` 属性而 Record 未声明 `Foo` 列，该属性的值会被静默丢弃。这是预期行为——schema 应由调用方显式声明。
 - 需要随机访问时使用 `record[index]` 索引器获取 `RecordRow`。
 
 ### 11.3 列引用的生命周期

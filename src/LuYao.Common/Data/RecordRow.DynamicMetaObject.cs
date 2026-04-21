@@ -12,11 +12,17 @@ partial struct RecordRow
     /// </summary>
     private sealed class RecordRowMetaObject : DynamicMetaObject
     {
-        private static readonly MethodInfo GetValueMethod =
-            typeof(RecordRow).GetProperty("Item")!.GetGetMethod()!;
+        // dynamic 读取走 GetValueOrDefault：列不存在返回 null。
+        private static readonly MethodInfo GetMethod =
+            typeof(RecordRow).GetMethod(
+                nameof(RecordRow.GetValueOrDefault),
+                BindingFlags.Instance | BindingFlags.NonPublic)!;
 
-        private static readonly MethodInfo SetValueMethod =
-            typeof(RecordRow).GetProperty("Item")!.GetSetMethod()!;
+        // dynamic 写入走 SetAndEnsureColumn：列不存在时按运行时类型自动建列；null 值且列不存在则跳过。
+        private static readonly MethodInfo SetMethod =
+            typeof(RecordRow).GetMethod(
+                nameof(RecordRow.SetAndEnsureColumn),
+                BindingFlags.Instance | BindingFlags.NonPublic)!;
 
         public RecordRowMetaObject(Expression expression, RecordRow value)
             : base(expression, BindingRestrictions.Empty, value)
@@ -36,7 +42,7 @@ partial struct RecordRow
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
             var call = Expression.Call(
                 GetLimitedSelf(),
-                GetValueMethod,
+                GetMethod,
                 Expression.Constant(binder.Name));
             return new DynamicMetaObject(call, restrictions);
         }
@@ -47,7 +53,7 @@ partial struct RecordRow
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
             var param = Expression.Variable(typeof(object));
             var assign = Expression.Assign(param, Expression.Convert(value.Expression, typeof(object)));
-            var call = Expression.Call(GetLimitedSelf(), SetValueMethod, Expression.Constant(binder.Name), param);
+            var call = Expression.Call(GetLimitedSelf(), SetMethod, Expression.Constant(binder.Name), param);
             // DLR requires the expression to return object, not void
             var block = Expression.Block(new[] { param }, assign, call, param);
             return new DynamicMetaObject(block, restrictions);
@@ -60,7 +66,7 @@ partial struct RecordRow
                 return base.BindGetIndex(binder, indexes);
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
             var key = Expression.Convert(indexes[0].Expression, typeof(string));
-            var call = Expression.Call(GetLimitedSelf(), GetValueMethod, key);
+            var call = Expression.Call(GetLimitedSelf(), GetMethod, key);
             return new DynamicMetaObject(call, restrictions);
         }
 
@@ -73,7 +79,7 @@ partial struct RecordRow
             var key = Expression.Convert(indexes[0].Expression, typeof(string));
             var param = Expression.Variable(typeof(object));
             var assign = Expression.Assign(param, Expression.Convert(value.Expression, typeof(object)));
-            var call = Expression.Call(GetLimitedSelf(), SetValueMethod, key, param);
+            var call = Expression.Call(GetLimitedSelf(), SetMethod, key, param);
             // DLR requires the expression to return object, not void
             var block = Expression.Block(new[] { param }, assign, call, param);
             return new DynamicMetaObject(block, restrictions);

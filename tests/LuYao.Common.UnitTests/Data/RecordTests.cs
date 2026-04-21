@@ -459,7 +459,7 @@ public class RecordTests
         var col2 = table.Columns.Add<Int32>("Col2");
 
         // Act
-        var removed = table.Columns.Remove(col1);
+        var removed = table.Columns.Remove(col1.Name);
 
         // Assert
         Assert.IsTrue(removed);
@@ -1022,14 +1022,14 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void Columns_AddDuplicateNameDifferentType_ThrowsInvalidCastException()
+    public void Columns_AddDuplicateNameDifferentType_ThrowsInvalidOperationException()
     {
         // Arrange
         var table = new Record();
         table.Columns.Add<String>("TestColumn");
 
-        // Act & Assert - casting to wrong generic type throws InvalidCastException
-        Assert.Throws<InvalidCastException>(() => table.Columns.Add<Int32>("TestColumn"));
+        // Act & Assert - 同名不同类型应抛 InvalidOperationException（不再是 InvalidCastException）
+        Assert.Throws<InvalidOperationException>(() => table.Columns.Add<Int32>("TestColumn"));
     }
 
     public class Student

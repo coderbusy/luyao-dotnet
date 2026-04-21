@@ -1,16 +1,16 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+ï»¿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
 namespace LuYao.Data;
 
 /// <summary>
-/// ²âÊÔ·ºÐÍ Set ºÍ To ·½·¨µÄ¹¦ÄÜºÍÐÔÄÜ
+/// ï¿½ï¿½ï¿½Ô·ï¿½ï¿½ï¿½ Set ï¿½ï¿½ To ï¿½ï¿½ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½Üºï¿½ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 [TestClass]
 public class GenericMethodTests
 {
     /// <summary>
-    /// ²âÊÔ RecordColumn µÄ·ºÐÍ Set ·½·¨
+    /// ï¿½ï¿½ï¿½ï¿½ RecordColumn ï¿½Ä·ï¿½ï¿½ï¿½ Set ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [TestMethod]
     public void RecordColumn_GenericSet_ShouldWorkWithAllTypes()
@@ -26,7 +26,7 @@ public class GenericMethodTests
         var row = record.AddRow();
         var rowIndex = 0;
 
-        // Act & Assert - ²âÊÔËùÓÐ»ù´¡ÀàÐÍ
+        // Act & Assert - ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         intColumn.Set(42, rowIndex);
         Assert.AreEqual(42, intColumn.Get<Int32>(rowIndex));
 
@@ -45,7 +45,7 @@ public class GenericMethodTests
     }
 
     /// <summary>
-    /// ²âÊÔ RecordRow µÄ·ºÐÍ Set ·½·¨
+    /// ï¿½ï¿½ï¿½ï¿½ RecordRow ï¿½Ä·ï¿½ï¿½ï¿½ Set ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [TestMethod]
     public void RecordRow_GenericSet_ShouldWorkWithAllTypes()
@@ -63,14 +63,14 @@ public class GenericMethodTests
         boolColumn.Set(false, row.Row);
 
         // Assert
-        Assert.AreEqual(123, row.Get<Int32>(intColumn));
-        Assert.AreEqual("Test String", row.Get<String>(stringColumn));
-        Assert.AreEqual(false, row.Get<Boolean>(boolColumn));
+        Assert.AreEqual(123, row.Field<Int32>(intColumn));
+        Assert.AreEqual("Test String", row.Field<String>(stringColumn));
+        Assert.AreEqual(false, row.Field<Boolean>(boolColumn));
     }
 
 
     /// <summary>
-    /// ²âÊÔ To ·ºÐÍ·½·¨
+    /// ï¿½ï¿½ï¿½ï¿½ To ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½
     /// </summary>
     [TestMethod]
     public void GenericTo_ShouldReturnCorrectTypes()
@@ -81,7 +81,7 @@ public class GenericMethodTests
         var stringColumn = record.Columns.Add<String>("StringColumn");
         var row = record.AddRow();
 
-        // ÉèÖÃÒ»Ð©²âÊÔÊý¾Ý
+        // ï¿½ï¿½ï¿½ï¿½Ò»Ð©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         intColumn.Set(42, 0);
         stringColumn.Set("Hello", 0);
 
@@ -92,20 +92,20 @@ public class GenericMethodTests
         string stringValue = stringColumn.Get<string>(0);
         Assert.AreEqual("Hello", stringValue);
 
-        // ²âÊÔÀàÐÍ×ª»»
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
         string intAsString = intColumn.Get<string>(0);
         Assert.AreEqual("42", intAsString);
 
-        // Í¨¹ý RecordRow ²âÊÔ
-        int intFromRow = row.Get<int>(intColumn);
+        // Í¨ï¿½ï¿½ RecordRow ï¿½ï¿½ï¿½ï¿½
+        int intFromRow = row.Field<int>(intColumn);
         Assert.AreEqual(42, intFromRow);
 
-        string stringFromRow = row.Get<string>(stringColumn);
+        string stringFromRow = row.Field<string>(stringColumn);
         Assert.AreEqual("Hello", stringFromRow);
     }
 
     /// <summary>
-    /// ²âÊÔ¿É¿ÕÀàÐÍÖ§³Ö
+    /// ï¿½ï¿½ï¿½Ô¿É¿ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½
     /// </summary>
     [TestMethod]
     public void GenericMethods_NullableTypes_ShouldWork()
@@ -115,19 +115,19 @@ public class GenericMethodTests
         var intColumn = record.Columns.Add<Int32>("IntColumn");
         var row = record.AddRow();
 
-        // Act & Assert - ²âÊÔ¿É¿ÕÀàÐÍ
+        // Act & Assert - ï¿½ï¿½ï¿½Ô¿É¿ï¿½ï¿½ï¿½ï¿½ï¿½
         int? nullableValue = 42;
         intColumn.SetValue(nullableValue, 0);
         Assert.AreEqual(42, intColumn.Get<Int32>(0));
 
-        // ²âÊÔ null Öµ´¦Àí
+        // ï¿½ï¿½ï¿½ï¿½ null Öµï¿½ï¿½ï¿½ï¿½
         intColumn.SetValue(null, 0);
         int defaultValue = intColumn.Get<Int32>(0);
-        Assert.AreEqual(0, defaultValue); // Ä¬ÈÏÖµ
+        Assert.AreEqual(0, defaultValue); // Ä¬ï¿½ï¿½Öµ
     }
 
     /// <summary>
-    /// ²âÊÔ±ß½çÇé¿ö
+    /// ï¿½ï¿½ï¿½Ô±ß½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [TestMethod]
     public void GenericMethods_EdgeCases_ShouldHandleCorrectly()
@@ -137,18 +137,18 @@ public class GenericMethodTests
         var stringColumn = record.Columns.Add<String>("StringColumn");
         var row = record.AddRow();
 
-        // Act & Assert - ²âÊÔ¿Õ×Ö·û´®
+        // Act & Assert - ï¿½ï¿½ï¿½Ô¿ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
         stringColumn.Set("", 0);
         Assert.AreEqual("", stringColumn.Get<String>(0));
 
-        // ²âÊÔ null ×Ö·û´®
+        // ï¿½ï¿½ï¿½ï¿½ null ï¿½Ö·ï¿½ï¿½ï¿½
         stringColumn.Set(null, 0);
         string result = stringColumn.Get<String>(0);
-        Assert.IsNull(result); // Ó¦¸Ã·µ»Ø null
+        Assert.IsNull(result); // Ó¦ï¿½Ã·ï¿½ï¿½ï¿½ null
     }
 
     /// <summary>
-    /// ²âÊÔË÷ÒýÑéÖ¤
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤
     /// </summary>
     [TestMethod]
     public void GenericSet_InvalidIndex_ShouldThrowException()
@@ -156,18 +156,18 @@ public class GenericMethodTests
         // Arrange
         var record = new Record("TestTable", 1);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
-        record.AddRow(); // Ö»ÓÐÒ»ÐÐ£¬ÓÐÐ§Ë÷ÒýÊÇ 0
+        record.AddRow(); // Ö»ï¿½ï¿½Ò»ï¿½Ð£ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0
 
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            intColumn.Set(42, 1)); // ÎÞÐ§Ë÷Òý
+            intColumn.Set(42, 1)); // ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            intColumn.Set(42, -1)); // ¸ºË÷Òý
+            intColumn.Set(42, -1)); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     }
 
     /// <summary>
-    /// ÐÔÄÜ¶Ô±È²âÊÔ - Õ¹Ê¾·ºÐÍ·½·¨Ïà¶ÔÓÚÍ¨ÓÃ·½·¨µÄÓÅÊÆ
+    /// ï¿½ï¿½ï¿½Ü¶Ô±È²ï¿½ï¿½ï¿½ - Õ¹Ê¾ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [TestMethod]
     public void GenericMethods_PerformanceComparison()
@@ -176,19 +176,19 @@ public class GenericMethodTests
         var record = new Record("PerfTest", 1000);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
 
-        // Ìí¼Ó 1000 ÐÐ
+        // ï¿½ï¿½ï¿½ 1000 ï¿½ï¿½
         for (int i = 0; i < 1000; i++)
         {
             record.AddRow();
         }
 
-        //Ô¤ÈÈ
+        //Ô¤ï¿½ï¿½
         intColumn.Set(0, 0);
         intColumn.SetValue(1, 1);
 
         var sw = System.Diagnostics.Stopwatch.StartNew();
 
-        // ²âÊÔ·ºÐÍ·½·¨ÐÔÄÜ
+        // ï¿½ï¿½ï¿½Ô·ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         sw.Restart();
         for (int i = 0; i < 1000; i++)
         {
@@ -196,7 +196,7 @@ public class GenericMethodTests
         }
         var genericTime = sw.ElapsedTicks;
 
-        // ²âÊÔÍ¨ÓÃ·½·¨ÐÔÄÜ  
+        // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  
         sw.Restart();
         for (int i = 0; i < 1000; i++)
         {
@@ -206,24 +206,24 @@ public class GenericMethodTests
 
         sw.Stop();
 
-        // ÑéÖ¤½á¹ûÕýÈ·ÐÔ
+        // ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½
         for (int i = 0; i < 1000; i++)
         {
             Assert.AreEqual(i, intColumn.Get<Int32>(i));
         }
 
-        // Êä³öÐÔÄÜ¶Ô±È£¨µ÷ÊÔÐÅÏ¢£©
-        System.Diagnostics.Debug.WriteLine($"·ºÐÍ·½·¨ºÄÊ±: {genericTime} ticks");
-        System.Diagnostics.Debug.WriteLine($"Í¨ÓÃ·½·¨ºÄÊ±: {objectTime} ticks");
-        System.Diagnostics.Debug.WriteLine($"ÐÔÄÜÌáÉý: {(double)objectTime / genericTime:F2}x");
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü¶Ô±È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½
+        System.Diagnostics.Debug.WriteLine($"ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½Ê±: {genericTime} ticks");
+        System.Diagnostics.Debug.WriteLine($"Í¨ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½Ê±: {objectTime} ticks");
+        System.Diagnostics.Debug.WriteLine($"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: {(double)objectTime / genericTime:F2}x");
 
-        // ·ºÐÍ·½·¨Ó¦¸Ã¸ü¿ì£¨ÔÊÐíÒ»¶¨µÄ²âÁ¿Îó²î£©
+        // ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½Ó¦ï¿½Ã¸ï¿½ï¿½ì£¨ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½î£©
         Assert.IsTrue(genericTime <= objectTime * 1.5,
-            $"·ºÐÍ·½·¨ÐÔÄÜÓ¦¸ÃÓÅÓÚ»ò½Ó½üÍ¨ÓÃ·½·¨¡£·ºÐÍ: {genericTime}, Í¨ÓÃ: {objectTime}");
+            $"ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½Ú»ï¿½Ó½ï¿½Í¨ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: {genericTime}, Í¨ï¿½ï¿½: {objectTime}");
     }
 
     /// <summary>
-    /// ²âÊÔ²»Í¬Êý¾ÝÀàÐÍµÄ×ª»»¾ØÕó
+    /// ï¿½ï¿½ï¿½Ô²ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [TestMethod]
     public void GenericMethods_TypeConversionMatrix_ShouldWork()
@@ -237,25 +237,25 @@ public class GenericMethodTests
 
         var row = record.AddRow();
 
-        // Act & Assert - ²âÊÔ¸÷ÖÖÀàÐÍ×ª»»
+        // Act & Assert - ï¿½ï¿½ï¿½Ô¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
 
-        // int -> ÆäËûÀàÐÍ
+        // int -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         intColumn.Set(42, 0);
         Assert.AreEqual(42.0, intColumn.Get<double>(0), 0.001);
         Assert.AreEqual("42", intColumn.Get<string>(0));
-        Assert.AreEqual(true, intColumn.Get<bool>(0)); // ·ÇÁãÖµÎª true
+        Assert.AreEqual(true, intColumn.Get<bool>(0)); // ï¿½ï¿½ï¿½ï¿½ÖµÎª true
 
-        // double -> ÆäËûÀàÐÍ
+        // double -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         doubleColumn.Set(3.14, 0);
-        Assert.AreEqual(3, doubleColumn.Get<int>(0)); // ½Ø¶Ï
+        Assert.AreEqual(3, doubleColumn.Get<int>(0)); // ï¿½Ø¶ï¿½
         Assert.AreEqual("3.14", doubleColumn.Get<string>(0));
 
-        // string -> ÆäËûÀàÐÍ
+        // string -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         stringColumn.Set("123", 0);
         Assert.AreEqual(123, stringColumn.Get<int>(0));
         Assert.AreEqual(123.0, stringColumn.Get<double>(0), 0.001);
 
-        // bool -> ÆäËûÀàÐÍ
+        // bool -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         boolColumn.Set(true, 0);
         Assert.AreEqual(1, boolColumn.Get<int>(0));
         Assert.AreEqual("True", boolColumn.Get<string>(0));
