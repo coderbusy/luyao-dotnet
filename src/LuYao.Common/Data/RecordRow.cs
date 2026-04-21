@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Text;
 using LuYao.Data.Meta;
 
 namespace LuYao.Data;
@@ -64,6 +65,39 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// <param name="name">列的名称。</param>
     /// <returns>列存在时返回当前行对应值；列不存在时返回 <see langword="null"/>。</returns>
     public object? Field(string name) => this.GetValueOrDefault(name);
+
+    /// <summary>
+    /// 将当前行的所有列值转换为字典。
+    /// </summary>
+    /// <returns>键为列名、值为当前行对应列值的字典。</returns>
+    public Dictionary<string, object?> ToDictionary()
+    {
+        var ret = new Dictionary<string, object?>(this.Record.Columns.Count, StringComparer.Ordinal);
+        foreach (var col in this.Record.Columns)
+        {
+            ret[col.Name] = col.GetValue(this);
+        }
+        return ret;
+    }
+
+    /// <summary>
+    /// 返回包含行号与当前行列值的字符串表示。
+    /// </summary>
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.Append("{ Row = ").Append(this.Row).Append(", Data = { ");
+        bool first = true;
+        foreach (var col in this.Record.Columns)
+        {
+            if (!first) sb.Append(", ");
+            var value = col.GetValue(this);
+            sb.Append(col.Name).Append(" = ").Append(value?.ToString() ?? string.Empty);
+            first = false;
+        }
+        sb.Append(" } }");
+        return sb.ToString();
+    }
 
     #endregion
 
