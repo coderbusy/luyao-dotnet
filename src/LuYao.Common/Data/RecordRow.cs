@@ -107,7 +107,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         foreach (var item in data)
         {
             if (!first) sb.Append(", ");
-            sb.Append(item.Key).Append(" = ").Append(Convert.ToString(item.Value));
+            sb.Append(item.Key).Append(" = ").Append(item.Value?.ToString() ?? string.Empty);
             first = false;
         }
         sb.Append(" } }");
