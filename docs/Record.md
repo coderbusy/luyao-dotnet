@@ -45,7 +45,7 @@
 `RecordRow` 是用户最常接触的类型之一，代表 `Record` 中的一行数据视图。
 
 - 定义为 `struct`，持有所属 `Record` 引用与行索引（`Row`）。
-- 提供类型安全的数据读取：`Field<T>(RecordColumn col)`、`Field<T>(string name)`（命名对齐 `System.Data.DataRowExtensions.Field<T>`，便于与 `DataTable` 互操作的用户迁移）。
+- 提供类型安全的数据读取：`Field<T>(string name)`（命名对齐 `System.Data.DataRowExtensions.Field<T>`，便于与 `DataTable` 互操作的用户迁移）。
 - 提供按列名写入：`Set<T>(string name, T value)`。**写入时若列不存在会按 `T` 自动建列**；同名列已存在但类型不一致时抛 `InvalidOperationException`。
 - 支持隐式转换为 `int`（返回行索引）。
 - 实现 `IDynamicMetaObjectProvider`：`dynamic` 成员/索引读取在列不存在时返回 `null`；写入时按 `value.GetType()` **自动建列**，若 `value` 为 `null` 且列不存在则跳过该次写入（无法推断列类型）。
@@ -307,22 +307,16 @@ for (int i = 0; i < count; i++)
 ### 11.2 读取数据
 
 ```csharp
-// 推荐：通过 foreach 遍历 + 列引用读取
-var idCol = record.Columns.Find<int>("Id")!;
-var nameCol = record.Columns.Find<string>("Name")!;
-
 foreach (var row in record)
 {
-    int id = row.Field<int>(idCol);
-    string name = row.Field<string>(nameCol);
+    int id = row.Field<int>("Id");
+    string name = row.Field<string>("Name");
 }
 ```
 
 **要点**：
 
-- 在循环外缓存列引用（`RecordColumn` / `RecordColumn<T>`），避免每行按名称查找。
-- 使用 `row.Field<T>(RecordColumn)` 比 `row.Field<T>(string)` 更快（跳过名称查找）。
-- `Field<T>` 在列不存在时返回 `default(T)`；如果你需要"列必须存在"的语义，请改用 `record.Columns.Get(name)` 取列后再读。
+- `Field<T>` 在列不存在时返回 `default(T)`；如果你需要"列必须存在"的语义，可先调用 `record.Columns.Get(name)` 显式校验列存在性（列不存在会抛异常），然后再用 `Field<T>(name)` 读取数据。该方式会进行两次列名查找，强调显式失败语义，而非性能最优。
 
 ### 11.3 dynamic 与自动建列
 

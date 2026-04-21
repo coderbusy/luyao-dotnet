@@ -49,14 +49,6 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     #region 数据读取
 
     /// <summary>
-    /// 根据列对象获取当前行指定列的泛型类型值。
-    /// </summary>
-    /// <typeparam name="T">要获取的值的类型。</typeparam>
-    /// <param name="col">要读取的列对象。</param>
-    /// <returns>如果列属于当前记录则直接返回转换后的泛型类型值，否则按列名在当前记录中查找。</returns>
-    public T? Field<T>(RecordColumn col) => col.Record == this.Record ? col.Get<T>(this.Row) : this.Field<T>(col.Name);
-
-    /// <summary>
     /// 根据列名获取当前行指定列的泛型类型值。列不存在时返回 <typeparamref name="T"/> 的默认值。
     /// </summary>
     /// <typeparam name="T">要获取的值的类型。</typeparam>
@@ -66,13 +58,6 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         var col = this.Record.Columns.Find(name);
         return col != null ? col.Get<T>(this.Row) : default;
     }
-
-    /// <summary>
-    /// 根据列对象获取当前行指定列的值。
-    /// </summary>
-    /// <param name="col">要读取的列对象。</param>
-    /// <returns>如果列属于当前记录则直接返回该列当前行的值，否则按列名在当前记录中查找；列不存在时返回 <see langword="null"/>。</returns>
-    public object? Field(RecordColumn col) => col.Record == this.Record ? col.GetValue(this) : this.GetValueOrDefault(col.Name);
 
     /// <summary>
     /// 根据列名获取当前行指定列的值。
