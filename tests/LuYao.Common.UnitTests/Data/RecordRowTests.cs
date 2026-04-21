@@ -672,7 +672,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 2);
         var nullableColumn = record.Columns.Add<string>("NullableColumn");
         record.AddRow();
-        nullableColumn.Set(null, 0);
+        nullableColumn.Set(0, null);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -711,7 +711,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 2);
         var nullableColumn = record.Columns.Add<string>("NullableColumn");
         record.AddRow();
-        nullableColumn.Set(null, 0);
+        nullableColumn.Set(0, null);
         var recordRow = new RecordRow(record, 0);
 
         // Act
