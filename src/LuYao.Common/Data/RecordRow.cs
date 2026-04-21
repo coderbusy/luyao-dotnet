@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Text;
 using LuYao.Data.Meta;
 
 namespace LuYao.Data;
@@ -92,6 +93,25 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
             ret[col.Name] = col.GetValue(this);
         }
         return ret;
+    }
+
+    /// <summary>
+    /// 返回包含行号与当前行列值的字符串表示。
+    /// </summary>
+    public override string ToString()
+    {
+        var data = this.ToDictionary();
+        var sb = new StringBuilder();
+        sb.Append("{ Row = ").Append(this.Row).Append(", Data = { ");
+        bool first = true;
+        foreach (var item in data)
+        {
+            if (!first) sb.Append(", ");
+            sb.Append(item.Key).Append(" = ").Append(Convert.ToString(item.Value) ?? string.Empty);
+            first = false;
+        }
+        sb.Append(" } }");
+        return sb.ToString();
     }
 
     #endregion

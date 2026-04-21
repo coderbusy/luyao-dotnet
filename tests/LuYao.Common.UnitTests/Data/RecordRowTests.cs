@@ -832,4 +832,41 @@ public class RecordRowTests
         Assert.IsNull(result["NullableColumn"]);
     }
 
+    /// <summary>
+    /// <see cref="RecordRow.ToString"/> 应输出行号以及字典风格的列值信息。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ShouldContainRowAndDictionaryLikeValues()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 1);
+
+        // Act
+        var result = recordRow.ToString();
+
+        // Assert
+        Assert.AreEqual("{ Row = 1, Data = { IntColumn = 200, StringColumn = Test2, BoolColumn = False } }", result);
+    }
+
+    /// <summary>
+    /// <see cref="RecordRow.ToString"/> 对于 null 值应按匿名类型风格输出空值。
+    /// </summary>
+    [TestMethod]
+    public void ToString_WhenValueIsNull_ShouldRenderEmptyValue()
+    {
+        // Arrange
+        var record = new Record("TestTable", 2);
+        var nullableColumn = record.Columns.Add<string>("NullableColumn");
+        record.AddRow();
+        nullableColumn.Set(null, 0);
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToString();
+
+        // Assert
+        Assert.AreEqual("{ Row = 0, Data = { NullableColumn =  } }", result);
+    }
+
 }
