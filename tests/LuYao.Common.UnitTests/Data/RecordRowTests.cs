@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao.Data;
@@ -544,6 +545,282 @@ public class RecordRowTests
         Assert.AreEqual(recordRow.Get<Int32>("IntColumn"), recordRow.Get<Int32>(intColumn));
         Assert.AreEqual(recordRow.Get<String>("StringColumn"), recordRow.Get<String>(stringColumn));
         Assert.AreEqual(recordRow.Get<Boolean>("BoolColumn"), recordRow.Get<Boolean>(boolColumn));
+    }
+
+    #endregion
+
+    #region IPropertyAccessor 测试
+
+    /// <summary>
+    /// Props 属性应返回 Record 的列集合
+    /// </summary>
+    [TestMethod]
+    public void Props_ShouldReturnRecordColumns()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var props = recordRow.Props;
+
+        // Assert
+        Assert.AreSame(record.Columns, props);
+    }
+
+    /// <summary>
+    /// 索引器 get - 列存在时应返回正确值
+    /// </summary>
+    [TestMethod]
+    public void Indexer_Get_ColumnExists_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow["StringColumn"];
+
+        // Assert
+        Assert.AreEqual("Test1", result);
+    }
+
+    /// <summary>
+    /// 索引器 get - 列不存在时应返回 null
+    /// </summary>
+    [TestMethod]
+    public void Indexer_Get_ColumnNotExists_ShouldReturnNull()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow["NoSuchColumn"];
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    /// <summary>
+    /// 索引器 set - 列存在时应更新值
+    /// </summary>
+    [TestMethod]
+    public void Indexer_Set_ColumnExists_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        recordRow["StringColumn"] = "Updated";
+
+        // Assert
+        Assert.AreEqual("Updated", recordRow.Get<string>("StringColumn"));
+    }
+
+    /// <summary>
+    /// 索引器 set - 列不存在时应静默跳过，不抛出异常
+    /// </summary>
+    [TestMethod]
+    public void Indexer_Set_ColumnNotExists_ShouldNotThrow()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act & Assert
+        recordRow["NoSuchColumn"] = "Value"; // should not throw
+    }
+
+    #endregion
+
+    #region Set<T> 测试
+
+    /// <summary>
+    /// Set<T> - 强类型列赋值应成功
+    /// </summary>
+    [TestMethod]
+    public void Set_TypedColumn_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        recordRow.Set("IntColumn", 999);
+
+        // Assert
+        Assert.AreEqual(999, recordRow.Get<int>("IntColumn"));
+    }
+
+    /// <summary>
+    /// Set<T> - string 列赋值应成功
+    /// </summary>
+    [TestMethod]
+    public void Set_StringColumn_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 1);
+
+        // Act
+        recordRow.Set("StringColumn", "NewValue");
+
+        // Assert
+        Assert.AreEqual("NewValue", recordRow.Get<string>("StringColumn"));
+    }
+
+    /// <summary>
+    /// Set<T> - 列不存在时应抛出 KeyNotFoundException
+    /// </summary>
+    [TestMethod]
+    public void Set_ColumnNotExists_ShouldThrowKeyNotFoundException()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act & Assert
+        Assert.Throws<KeyNotFoundException>(() => recordRow.Set("NoSuchColumn", 1));
+    }
+
+    /// <summary>
+    /// Set<T> 后通过索引器读取应一致
+    /// </summary>
+    [TestMethod]
+    public void Set_ThenReadViaIndexer_ShouldBeConsistent()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        recordRow.Set("IntColumn", 42);
+
+        // Assert
+        Assert.AreEqual(42, (int)recordRow["IntColumn"]!);
+    }
+
+    #endregion
+
+    #region IDynamicMetaObjectProvider (dynamic) 测试
+
+    /// <summary>
+    /// dynamic 成员读取 - 应返回正确值
+    /// </summary>
+    [TestMethod]
+    public void Dynamic_GetMember_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
+
+        // Act
+        var result = row.StringColumn;
+
+        // Assert
+        Assert.AreEqual("Test1", result);
+    }
+
+    /// <summary>
+    /// dynamic 成员写入 - 应更新列值
+    /// </summary>
+    [TestMethod]
+    public void Dynamic_SetMember_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
+
+        // Act
+        row.StringColumn = "DynValue";
+
+        // Assert
+        var recordRow = new RecordRow(record, 0);
+        Assert.AreEqual("DynValue", recordRow.Get<string>("StringColumn"));
+    }
+
+    /// <summary>
+    /// dynamic 索引器读取 - 应返回正确值
+    /// </summary>
+    [TestMethod]
+    public void Dynamic_GetIndex_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 1);
+
+        // Act
+        var result = row["IntColumn"];
+
+        // Assert
+        Assert.AreEqual(200, (int)result!);
+    }
+
+    /// <summary>
+    /// dynamic 索引器写入 - 应更新列值
+    /// </summary>
+    [TestMethod]
+    public void Dynamic_SetIndex_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
+
+        // Act
+        row["IntColumn"] = 777;
+
+        // Assert
+        var recordRow = new RecordRow(record, 0);
+        Assert.AreEqual(777, recordRow.Get<int>("IntColumn"));
+    }
+
+    /// <summary>
+    /// dynamic 读取不存在的列 - 应返回 null（不抛异常）
+    /// </summary>
+    [TestMethod]
+    public void Dynamic_GetMember_ColumnNotExists_ShouldReturnNull()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
+
+        // Act
+        var result = row.NoSuchColumn;
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    /// <summary>
+    /// dynamic 写入不存在的列 - 应静默跳过（不抛异常）
+    /// </summary>
+    [TestMethod]
+    public void Dynamic_SetMember_ColumnNotExists_ShouldNotThrow()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
+
+        // Act & Assert
+        row.NoSuchColumn = "ignored"; // should not throw
+    }
+
+    /// <summary>
+    /// dynamic 与强类型 Get 读取结果应一致
+    /// </summary>
+    [TestMethod]
+    public void Dynamic_GetMember_ShouldBeConsistentWithGetMethod()
+    {
+        // Arrange
+        var (record, intColumn, _, boolColumn) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
+        var recordRow = new RecordRow(record, 0);
+
+        // Act & Assert
+        Assert.AreEqual(recordRow.Get<int>("IntColumn"), (int)row.IntColumn!);
+        Assert.AreEqual(recordRow.Get<bool>("BoolColumn"), (bool)row.BoolColumn!);
     }
 
     #endregion
