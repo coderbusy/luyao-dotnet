@@ -289,6 +289,7 @@ We welcome contributions! Please feel free to:
 - Submit pull requests with improvements
 - Improve documentation
 - Share your use cases
+- If you need to attach screenshots, paste or drag images directly into the GitHub Issue/PR description editor. The hint below the editor is `Paste, drop, or click to add files`.
 
 ### License
 

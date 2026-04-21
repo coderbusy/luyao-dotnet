@@ -289,6 +289,7 @@ dotnet test tests/LuYao.Common.UnitTests/LuYao.Common.UnitTests.csproj
 - 提交改进的拉取请求
 - 改进文档
 - 分享您的使用案例
+- 如需附上截图，请在 GitHub 的 Issue/PR 描述编辑框内直接粘贴或拖拽图片，输入框下方提示为 `Paste, drop, or click to add files`
 
 ### 许可证
 
