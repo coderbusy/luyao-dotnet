@@ -66,6 +66,20 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         return col != null ? col.Get<T>(this.Row) : default;
     }
 
+    /// <summary>
+    /// 根据列对象获取当前行指定列的值。
+    /// </summary>
+    /// <param name="col">要读取的列对象。</param>
+    /// <returns>如果列属于当前记录则直接返回该列当前行的值，否则按列名在当前记录中查找；列不存在时返回 <see langword="null"/>。</returns>
+    public object? Field(RecordColumn col) => col.Record == this.Record ? col.GetValue(this) : this.GetValueOrDefault(col.Name);
+
+    /// <summary>
+    /// 根据列名获取当前行指定列的值。
+    /// </summary>
+    /// <param name="name">列的名称。</param>
+    /// <returns>列存在时返回当前行对应值；列不存在时返回 <see langword="null"/>。</returns>
+    public object? Field(string name) => this.GetValueOrDefault(name);
+
     #endregion
 
     /// <summary>
