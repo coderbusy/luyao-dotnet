@@ -103,21 +103,21 @@ public class NameFilterTests
     }
 
     [TestMethod]
-    public void AppendColumns_WithNames_RespectsInputOrder()
+    public void AddFrom_WithNames_RespectsInputOrder()
     {
         // 传入顺序与声明顺序故意相反，验证列顺序与传入顺序一致
         var record = new Record();
-        record.AppendColumns<SampleData>(new[] { nameof(SampleData.Email), nameof(SampleData.Id) });
+        record.Columns.AddFrom<SampleData>(new[] { nameof(SampleData.Email), nameof(SampleData.Id) });
         Assert.AreEqual(nameof(SampleData.Email), record.Columns[0].Name);
         Assert.AreEqual(nameof(SampleData.Id), record.Columns[1].Name);
     }
 
     [TestMethod]
-    public void AppendColumns_WithAnonymousTemplate_AddsColumnsFromTemplateType()
+    public void AddFrom_WithAnonymousTemplate_AddsColumnsFromTemplateType()
     {
         var record = new Record();
 
-        record.AppendColumns(new { Id = 1, Name = "Test", IsOk = true });
+        record.Columns.AddFrom(new { Id = 1, Name = "Test", IsOk = true });
 
         Assert.AreEqual(3, record.Columns.Count);
         Assert.AreEqual("Id", record.Columns[0].Name);
@@ -129,21 +129,21 @@ public class NameFilterTests
     }
 
     [TestMethod]
-    public void AppendColumns_WithNullTemplate_ThrowsArgumentNullException()
+    public void AddFrom_WithNullTemplate_ThrowsArgumentNullException()
     {
         var record = new Record();
         SampleData template = null;
 
-        var ex = Assert.Throws<ArgumentNullException>(() => record.AppendColumns(template));
+        var ex = Assert.Throws<ArgumentNullException>(() => record.Columns.AddFrom(template));
         Assert.AreEqual("template", ex.ParamName);
     }
 
     [TestMethod]
-    public void AppendColumns_WithFilter_RespectsManualIncludeOrder()
+    public void AddFrom_WithFilter_RespectsManualIncludeOrder()
     {
         // 通过 NameFilter 手动 Include 的顺序应正确反映到 Record 列顺序
         var record = new Record();
-        record.AppendColumns<SampleData>(f => f.Clear()
+        record.Columns.AddFrom<SampleData>(f => f.Clear()
             .Include(x => x.CreatedAt)
             .Include(x => x.Name));
         Assert.AreEqual(nameof(SampleData.CreatedAt), record.Columns[0].Name);
@@ -151,32 +151,32 @@ public class NameFilterTests
     }
 
     [TestMethod]
-    public void AppendColumns_WithNames_OnlyAddsSpecifiedColumns()
+    public void AddFrom_WithNames_OnlyAddsSpecifiedColumns()
     {
         var record = new Record();
-        record.AppendColumns<SampleData>(new[] { nameof(SampleData.Id), nameof(SampleData.Name) });
+        record.Columns.AddFrom<SampleData>(new[] { nameof(SampleData.Id), nameof(SampleData.Name) });
         Assert.AreEqual(2, record.Columns.Count);
         Assert.IsNotNull(record.Columns[nameof(SampleData.Id)]);
         Assert.IsNotNull(record.Columns[nameof(SampleData.Name)]);
     }
 
     [TestMethod]
-    public void AppendColumns_WithNullOrEmptyNames_AddsNoColumns()
+    public void AddFrom_WithNullOrEmptyNames_AddsNoColumns()
     {
         var record1 = new Record();
-        record1.AppendColumns<SampleData>(new string[0]);
+        record1.Columns.AddFrom<SampleData>(new string[0]);
         Assert.AreEqual(0, record1.Columns.Count, "空数组不应追加任何列。");
 
         var record2 = new Record();
-        record2.AppendColumns<SampleData>((string[])null);
+        record2.Columns.AddFrom<SampleData>((string[])null);
         Assert.AreEqual(0, record2.Columns.Count, "null 不应追加任何列。");
     }
 
     [TestMethod]
-    public void AppendColumns_WithFilter_ExcludesSpecifiedColumn()
+    public void AddFrom_WithFilter_ExcludesSpecifiedColumn()
     {
         var record = new Record();
-        record.AppendColumns<SampleData>(f => f.Exclude(x => x.Email));
+        record.Columns.AddFrom<SampleData>(f => f.Exclude(x => x.Email));
         Assert.AreEqual(3, record.Columns.Count);
         Assert.IsNull(record.Columns[nameof(SampleData.Email)], "Email column should not exist.");
     }
