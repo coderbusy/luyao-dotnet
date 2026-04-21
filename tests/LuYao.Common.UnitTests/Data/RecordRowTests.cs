@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using LuYao.Data.Meta;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,13 +6,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LuYao.Data;
 
 /// <summary>
-/// RecordRow �ṹ��ĵ�Ԫ������
+/// RecordRow ?????????????
 /// </summary>
 [TestClass]
 public class RecordRowTests
 {
     /// <summary>
-    /// ���������õ� Record ���������
+    /// ??????????? Record ?????????
     /// </summary>
     private (Record record, RecordColumn<int> intColumn, RecordColumn<string> stringColumn, RecordColumn<bool> boolColumn) CreateTestRecord()
     {
@@ -21,7 +21,7 @@ public class RecordRowTests
         var stringColumn = record.Columns.Add<string>("StringColumn");
         var boolColumn = record.Columns.Add<bool>("BoolColumn");
 
-        // ��Ӳ�������
+        // ??????????
         var row1 = record.AddRow();
         var row2 = record.AddRow();
 
@@ -35,10 +35,10 @@ public class RecordRowTests
         return (record, intColumn, stringColumn, boolColumn);
     }
 
-    #region ���캯������
+    #region ??????????
 
     /// <summary>
-    /// ���Թ��캯�� - ��������
+    /// ????????? - ????????
     /// </summary>
     [TestMethod]
     public void Constructor_ValidParameters_ShouldInitializeCorrectly()
@@ -55,7 +55,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���Թ��캯�� - Record Ϊ null
+    /// ????????? - Record ? null
     /// </summary>
     [TestMethod]
     public void Constructor_NullRecord_ShouldThrowArgumentNullException()
@@ -65,7 +65,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���Թ��캯�� - ������С��0
+    /// ????????? - ??????��??0
     /// </summary>
     [TestMethod]
     public void Constructor_NegativeRowIndex_ShouldThrowArgumentOutOfRangeException()
@@ -78,7 +78,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���Թ��캯�� - ���������ڻ���� Record.Count
+    /// ????????? - ?????????????? Record.Count
     /// </summary>
     [TestMethod]
     public void Constructor_RowIndexOutOfRange_ShouldThrowArgumentOutOfRangeException()
@@ -93,10 +93,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region ���Բ���
+    #region ???????
 
     /// <summary>
-    /// ���� Record ����
+    /// ???? Record ????
     /// </summary>
     [TestMethod]
     public void Record_Property_ShouldReturnCorrectRecord()
@@ -113,7 +113,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� Row ����
+    /// ???? Row ????
     /// </summary>
     [TestMethod]
     public void Row_Property_ShouldReturnCorrectRowIndex()
@@ -131,10 +131,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region ��ʽת������
+    #region ??????????
 
     /// <summary>
-    /// ������ʽת���� int
+    /// ???????????? int
     /// </summary>
     [TestMethod]
     public void ImplicitConversion_ToInt_ShouldReturnRowIndex()
@@ -152,10 +152,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region GetBoolean ����
+    #region GetBoolean ????
 
     /// <summary>
-    /// ���� GetBoolean(string name) - �д���
+    /// ???? GetBoolean(string name) - ?��???
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -172,7 +172,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetBoolean(string name) - �в�����
+    /// ???? GetBoolean(string name) - ?��?????
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -189,7 +189,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetBoolean(RecordColumn col) - �����ڵ�ǰ��¼
+    /// ???? GetBoolean(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -206,7 +206,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetBoolean(RecordColumn col) - �����ڲ�ͬ��¼
+    /// ???? GetBoolean(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByColumn_DifferentRecord_ShouldFallbackToNameSearch()
@@ -220,15 +220,15 @@ public class RecordRowTests
         var result = recordRow.Field<Boolean>(boolColumn2);
 
         // Assert
-        Assert.AreEqual(true, result); // Ӧ��ͨ���������ҵ� record1 �е� BoolColumn
+        Assert.AreEqual(true, result); // ??????????????? record1 ?��? BoolColumn
     }
 
     #endregion
 
-    #region GetString ����
+    #region GetString ????
 
     /// <summary>
-    /// ���� GetString(string name) - �д���
+    /// ???? GetString(string name) - ?��???
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -245,7 +245,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetString(string name) - �в�����
+    /// ???? GetString(string name) - ?��?????
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -262,7 +262,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetString(RecordColumn col) - �����ڵ�ǰ��¼
+    /// ???? GetString(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetString_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -280,10 +280,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region GetInt32 ����
+    #region GetInt32 ????
 
     /// <summary>
-    /// ���� GetInt32(string name) - �д���
+    /// ???? GetInt32(string name) - ?��???
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -300,7 +300,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetInt32(string name) - �в�����
+    /// ???? GetInt32(string name) - ?��?????
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -317,7 +317,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetInt32(RecordColumn col) - �����ڵ�ǰ��¼
+    /// ???? GetInt32(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetInt32_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -335,10 +335,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region ���� Get<T> ����
+    #region ???? Get<T> ????
 
     /// <summary>
-    /// ���� Get<T>(string name) - �д���
+    /// ???? Get<T>(string name) - ?��???
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -355,7 +355,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� Get<T>(string name) - �в�����
+    /// ???? Get<T>(string name) - ?��?????
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -372,7 +372,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� Get<T>(RecordColumn col) - �����ڵ�ǰ��¼
+    /// ???? Get<T>(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -391,10 +391,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region ��ֵ���Ͳ��� (��������)
+    #region ?????????? (????????)
 
     /// <summary>
-    /// ���� GetByte ����
+    /// ???? GetByte ????
     /// </summary>
     [TestMethod]
     public void GetByte_ByName_ShouldWork()
@@ -414,7 +414,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetDouble ����
+    /// ???? GetDouble ????
     /// </summary>
     [TestMethod]
     public void GetDouble_ByName_ShouldWork()
@@ -434,7 +434,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���� GetDateTime ����
+    /// ???? GetDateTime ????
     /// </summary>
     [TestMethod]
     public void GetDateTime_ByName_ShouldWork()
@@ -456,10 +456,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region �߽�������쳣����
+    #region ??????????????
 
     /// <summary>
-    /// ���Կ��ַ�������
+    /// ??????????????
     /// </summary>
     [TestMethod]
     public void GetMethods_EmptyColumnName_ShouldReturnDefault()
@@ -475,7 +475,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���Զ������ݵ���ȷ��
+    /// ?????????????????
     /// </summary>
     [TestMethod]
     public void GetMethods_MultipleRows_ShouldReturnCorrectValues()
@@ -483,7 +483,7 @@ public class RecordRowTests
         // Arrange
         var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
 
-        // ��Ӹ����������
+        // ?????????????
         var row3 = record.AddRow();
         intColumn.Set(300, row3.Row);
         stringColumn.Set("Test3", row3.Row);
@@ -509,10 +509,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region ���ܺ�һ���Բ���
+    #region ?????????????
 
     /// <summary>
-    /// ������ͬ���ݵ��ظ�����Ӧ�÷�����ͬ���
+    /// ?????????????????????��?????????
     /// </summary>
     [TestMethod]
     public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
@@ -533,7 +533,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ���Բ�ͬ��ȡ��ʽ(������ vs ���ж���)�Ľ��һ����
+    /// ????????????(?????? vs ???��???)?????????
     /// </summary>
     [TestMethod]
     public void GetMethods_ByNameVsByColumn_ShouldReturnSameResults()
@@ -550,97 +550,10 @@ public class RecordRowTests
 
     #endregion
 
-    #region IPropertyAccessor ����
+    #region Set<T> ????
 
     /// <summary>
-    /// Props ����Ӧ���� Record ���м���
-    /// </summary>
-    [TestMethod]
-    public void Props_ShouldReturnRecordColumns()
-    {
-        // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-
-        // Act
-        var props = recordRow.Props;
-
-        // Assert
-        Assert.AreSame(record.Columns, props);
-    }
-
-    /// <summary>
-    /// ������ get - �д���ʱӦ������ȷֵ
-    /// </summary>
-    [TestMethod]
-    public void Indexer_Get_ColumnExists_ShouldReturnCorrectValue()
-    {
-        // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-
-        // Act
-        var result = ((IPropertyAccessor)recordRow)["StringColumn"];
-
-        // Assert
-        Assert.AreEqual("Test1", result);
-    }
-
-    /// <summary>
-    /// ������ get - �в�����ʱӦ���� null
-    /// </summary>
-    [TestMethod]
-    public void Indexer_Get_ColumnNotExists_ShouldReturnNull()
-    {
-        // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-
-        // Act
-        var result = ((IPropertyAccessor)recordRow)["NoSuchColumn"];
-
-        // Assert
-        Assert.IsNull(result);
-    }
-
-    /// <summary>
-    /// ������ set - �д���ʱӦ����ֵ
-    /// </summary>
-    [TestMethod]
-    public void Indexer_Set_ColumnExists_ShouldUpdateValue()
-    {
-        // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-
-        // Act
-        ((IPropertyAccessor)recordRow)["StringColumn"] = "Updated";
-
-        // Assert
-        Assert.AreEqual("Updated", recordRow.Field<string>("StringColumn"));
-    }
-
-    /// <summary>
-    /// ������ set - �в�����ʱӦ��Ĭ���������׳��쳣
-    /// </summary>
-    [TestMethod]
-    public void Indexer_Set_ColumnNotExists_ShouldNotThrow()
-    {
-        // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-
-        // Act & Assert：通过 IPropertyAccessor（即 Mapping 路径）写入不存在的列应静默跳过，且不会自动建列。
-        ((IPropertyAccessor)recordRow)["NoSuchColumn"] = "Value";
-        Assert.IsFalse(record.Columns.Contains("NoSuchColumn"));
-    }
-
-    #endregion
-
-    #region Set<T> ����
-
-    /// <summary>
-    /// Set<T> - ǿ�����и�ֵӦ�ɹ�
+    /// Set<T> - ??????��??????
     /// </summary>
     [TestMethod]
     public void Set_TypedColumn_ShouldUpdateValue()
@@ -657,7 +570,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// Set<T> - string �и�ֵӦ�ɹ�
+    /// Set<T> - string ?��??????
     /// </summary>
     [TestMethod]
     public void Set_StringColumn_ShouldUpdateValue()
@@ -674,10 +587,10 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// Set<T> - �в�����ʱӦ�׳� KeyNotFoundException
+    /// Set<T> - ?��?????????? KeyNotFoundException
     /// </summary>
     /// <summary>
-    /// Set&lt;T&gt; - 列不存在时应自动建列（新语义）。
+    /// Set&lt;T&gt; - �в�����ʱӦ�Զ����У������壩��
     /// </summary>
     [TestMethod]
     public void Set_ColumnNotExists_ShouldAutoCreateColumn()
@@ -698,7 +611,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// Set<T> ��ͨ����������ȡӦһ��
+    /// Set<T> ??????????????????
     /// </summary>
     [TestMethod]
     public void Set_ThenReadViaIndexer_ShouldBeConsistent()
@@ -711,15 +624,15 @@ public class RecordRowTests
         recordRow.Set("IntColumn", 42);
 
         // Assert
-        Assert.AreEqual(42, (int)((IPropertyAccessor)recordRow)["IntColumn"]!);
+        Assert.AreEqual(42, recordRow.Field<int>("IntColumn"));
     }
 
     #endregion
 
-    #region IDynamicMetaObjectProvider (dynamic) ����
+    #region IDynamicMetaObjectProvider (dynamic) ????
 
     /// <summary>
-    /// dynamic ��Ա��ȡ - Ӧ������ȷֵ
+    /// dynamic ?????? - ?????????
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ShouldReturnCorrectValue()
@@ -736,7 +649,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ��Աд�� - Ӧ������ֵ
+    /// dynamic ???��?? - ????????
     /// </summary>
     [TestMethod]
     public void Dynamic_SetMember_ShouldUpdateValue()
@@ -754,7 +667,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ��������ȡ - Ӧ������ȷֵ
+    /// dynamic ????????? - ?????????
     /// </summary>
     [TestMethod]
     public void Dynamic_GetIndex_ShouldReturnCorrectValue()
@@ -763,7 +676,7 @@ public class RecordRowTests
         var (record, intColumn, _, _) = CreateTestRecord();
         dynamic row = new RecordRow(record, 1);
 
-        // Act：dynamic 索引访问
+        // Act��dynamic ��������
         var result = row["IntColumn"];
 
         // Assert
@@ -771,7 +684,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ������д�� - Ӧ������ֵ
+    /// dynamic ??????��?? - ????????
     /// </summary>
     [TestMethod]
     public void Dynamic_SetIndex_ShouldUpdateValue()
@@ -780,7 +693,7 @@ public class RecordRowTests
         var (record, intColumn, _, _) = CreateTestRecord();
         dynamic row = new RecordRow(record, 0);
 
-        // Act：dynamic 索引写入
+        // Act��dynamic ����д��
         row["IntColumn"] = 777;
 
         // Assert
@@ -789,7 +702,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ��ȡ�����ڵ��� - Ӧ���� null�������쳣��
+    /// dynamic ???????????? - ????? null??????????
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ColumnNotExists_ShouldReturnNull()
@@ -806,7 +719,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic д�벻���ڵ��� - Ӧ��Ĭ�����������쳣��
+    /// dynamic ��????????? - ??????????????????
     /// </summary>
     [TestMethod]
     public void Dynamic_SetMember_ColumnNotExists_ShouldNotThrow()
@@ -820,7 +733,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ��ǿ���� Get ��ȡ���Ӧһ��
+    /// dynamic ??????? Get ??????????
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ShouldBeConsistentWithGetMethod()
@@ -837,3 +750,4 @@ public class RecordRowTests
 
     #endregion
 }
+

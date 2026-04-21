@@ -115,50 +115,11 @@ public class RecordRowSemanticsTests
         Assert.AreEqual(7, record[0].Field<int>("Id"));
     }
 
-    [TestMethod]
-    public void StringIndexer_IsExplicitInterfaceImplementation_NotPubliclyAccessible()
-    {
-        // RecordRow 不应在公共表面提供 string 键索引器，必须通过 IPropertyAccessor 接口访问。
-        var indexers = typeof(RecordRow).GetProperties(
-            System.Reflection.BindingFlags.Instance |
-            System.Reflection.BindingFlags.Public |
-            System.Reflection.BindingFlags.DeclaredOnly);
-        foreach (var p in indexers)
-        {
-            var idxParams = p.GetIndexParameters();
-            if (idxParams.Length == 1 && idxParams[0].ParameterType == typeof(string))
-            {
-                Assert.Fail($"RecordRow 不应公开 string 键索引器，但发现：{p.Name}");
-            }
-        }
-    }
-
-    [TestMethod]
-    public void IPropertyAccessor_Indexer_ColumnMissing_DoesNotAutoCreate()
-    {
-        var record = new Record();
-        var row = record.AddRow();
-        IPropertyAccessor accessor = row;
-        accessor["NoSuch"] = 123;        // 缺列 → 静默跳过
-        Assert.AreEqual(0, record.Columns.Count);
-        Assert.IsNull(accessor["NoSuch"]); // 缺列 → 读取返回 null
-    }
-
-    [TestMethod]
-    public void IPropertyAccessor_Indexer_ColumnExists_ReadsAndWrites()
-    {
-        var record = new Record();
-        record.Columns.Add<int>("Id");
-        var row = record.AddRow();
-        IPropertyAccessor accessor = row;
-        accessor["Id"] = 42;
-        Assert.AreEqual(42, accessor["Id"]);
-    }
 
     [TestMethod]
     public void Mapping_CopyFromObject_DoesNotAutoCreateColumns()
     {
-        // Mapping 走 IPropertyAccessor，预期：缺列静默跳过，不建列。
+        // 预期：缺列静默跳过，不建列。
         var record = new Record();
         record.Columns.Add<int>("Id"); // 只声明 Id 列；Name 故意不建
         var row = record.AddRow();

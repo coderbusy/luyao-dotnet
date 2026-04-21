@@ -7,9 +7,8 @@ namespace LuYao.Data;
 
 /// <summary>
 /// 代表一行数据，提供对列存储数据集合中特定行数据的访问。
-/// 实现了 <see cref="IPropertyAccessor"/> 接口，支持按属性名读写数据。
 /// </summary>
-public partial struct RecordRow : IPropertyAccessor, IDynamicMetaObjectProvider
+public partial struct RecordRow : IDynamicMetaObjectProvider
 {
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
@@ -69,24 +68,6 @@ public partial struct RecordRow : IPropertyAccessor, IDynamicMetaObjectProvider
 
     #endregion
 
-    #region IPropertyAccessor 实现
-
-    /// <summary>
-    /// 获取当前行所在 Record 列集合对应的属性元数据列表。
-    /// </summary>
-    public IReadOnlyList<IXProp> Props => Record.Columns;
-
-    /// <summary>
-    /// IPropertyAccessor 显式实现：按列名读写当前行的值。
-    /// 读取时列不存在返回 <see langword="null"/>；写入时列不存在静默跳过，<b>不会自动建列</b>。
-    /// 该索引器仅供 Mapping/反射场景通过接口访问，不在公共 API 表面公开。
-    /// </summary>
-    object? IPropertyAccessor.this[string key]
-    {
-        get => GetValueOrDefault(key);
-        set => TrySetValue(key, value);
-    }
-
     /// <summary>
     /// 按列名读取值；列不存在时返回 <see langword="null"/>。
     /// 供 Mapping、dynamic 读取等内部路径使用。
@@ -124,8 +105,6 @@ public partial struct RecordRow : IPropertyAccessor, IDynamicMetaObjectProvider
         var col = this.Record.Columns.Add(name, value.GetType());
         col.SetValue(value, this);
     }
-
-    #endregion
 
     /// <summary>
     /// 返回 <see cref="DynamicMetaObject"/>，支持动态成员访问。
