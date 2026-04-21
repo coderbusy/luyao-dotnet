@@ -40,7 +40,7 @@ public class DisposableBaseTests
     {
         var sut = new TestDisposable();
         sut.Dispose();
-        sut.Dispose(); // 不应抛出异常
+        sut.Dispose(); // 涓嶅簲鎶涘嚭寮傚父
         Assert.IsTrue(sut.IsDisposed);
     }
 

@@ -28,7 +28,7 @@ public class Base62Tests
         string result = Base62.ToBase62(input);
 
         // Assert
-        // 预期值可通过 FromBase62 验证
+        // 棰勬湡鍊煎彲閫氳繃 FromBase62 楠岃瘉
         CollectionAssert.AreEqual(input, Base62.FromBase62(result));
     }
 

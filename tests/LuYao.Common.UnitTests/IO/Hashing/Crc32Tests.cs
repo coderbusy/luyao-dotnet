@@ -9,7 +9,7 @@ public class Crc32Tests
     [TestMethod]
     public void Compute_EmptyBuffer_ReturnsZero()
     {
-        // ¿ÕÊı×é CRC32 ½á¹ûÓ¦Îª 0
+        // ç©ºæ•°ç»„ CRC32 ç»“æœåº”ä¸º 0
         var buffer = Array.Empty<byte>();
         var crc = Crc32.Compute(buffer);
         Assert.AreEqual(0u, crc);
@@ -18,7 +18,7 @@ public class Crc32Tests
     [TestMethod]
     public void Compute_KnownAsciiString_ReturnsExpectedCrc()
     {
-        // "123456789" µÄ CRC32 ±ê×¼ÖµÎª 0xCBF43926
+        // "123456789" çš„ CRC32 æ ‡å‡†å€¼ä¸º 0xCBF43926
         var buffer = Encoding.ASCII.GetBytes("123456789");
         var crc = Crc32.Compute(buffer);
         Assert.AreEqual(0xCBF43926u, crc);
@@ -45,7 +45,7 @@ public class Crc32Tests
     [TestMethod]
     public void Reflect_KnownValue_ReturnsExpectedResult()
     {
-        // 0x3A (00111010) ·´Éä 8 Î»Ó¦Îª 0x5C (01011100)
+        // 0x3A (00111010) åå°„ 8 ä½åº”ä¸º 0x5C (01011100)
         uint input = 0x3A;
         uint expected = 0x5C;
         var reflected = Crc32.reflect(input, 8);
@@ -55,7 +55,7 @@ public class Crc32Tests
     [TestMethod]
     public void HashAlgorithm_StreamInput_ReturnsExpectedCrc()
     {
-        // Ê¹ÓÃ HashAlgorithm ½Ó¿Ú´¦ÀíÁ÷Ê½Êı¾İ
+        // ä½¿ç”¨ HashAlgorithm æ¥å£å¤„ç†æµå¼æ•°æ®
         var buffer = Encoding.ASCII.GetBytes("123456789");
         using (var crc32 = new Crc32())
         {
@@ -63,7 +63,7 @@ public class Crc32Tests
             crc32.TransformBlock(buffer, 0, buffer.Length, buffer, 0);
             crc32.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
             var hash = crc32.Hash;
-            // ½á¹ûÓ¦Îª 0xCBF43926
+            // ç»“æœåº”ä¸º 0xCBF43926
             Assert.IsNotNull(hash);
             Assert.AreEqual(4, hash.Length);
             Array.Reverse(hash);
@@ -75,7 +75,7 @@ public class Crc32Tests
     [TestMethod]
     public void Constructor_BigEndian_ThrowsPlatformNotSupportedException()
     {
-        // ½öÔÚ·ÇĞ¡¶ËÆ½Ì¨Å×³öÒì³££¬Í¨³£²»»á´¥·¢
+        // ä»…åœ¨éå°ç«¯å¹³å°æŠ›å‡ºå¼‚å¸¸ï¼Œé€šå¸¸ä¸ä¼šè§¦å‘
         if (!BitConverter.IsLittleEndian)
         {
             Assert.Throws<PlatformNotSupportedException>(() =>

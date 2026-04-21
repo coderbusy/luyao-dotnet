@@ -6,7 +6,7 @@ namespace LuYao;
 [TestClass]
 public class GZipStringTests
 {
-    private const string TestString = "ÕâÊÇÒ»¸ö²âÊÔ×Ö·û´® This is a test string 12345!@#$%";
+    private const string TestString = "è¿™æ˜¯ä¸€ä¸ªæµ‹è¯•å­—ç¬¦ä¸² This is a test string 12345!@#$%";
 
     [TestMethod]
     public void Compress_WithValidInputAndGzipBase64_ReturnsCompressedString()

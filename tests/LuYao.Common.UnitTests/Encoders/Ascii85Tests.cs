@@ -59,7 +59,7 @@ public class Ascii85Tests
         var ascii85 = new Ascii85 { EnforceMarks = false };
         byte[] original = Encoding.UTF8.GetBytes("data");
         string encoded = ascii85.Encode(original);
-        // ȥ��ǰ��׺
+        // 去掉前后缀
         encoded = encoded.TrimStart('<', '~').TrimEnd('~', '>');
         byte[] decoded = ascii85.Decode(encoded);
         CollectionAssert.AreEqual(original, decoded);

@@ -6,13 +6,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LuYao.Data;
 
 /// <summary>
-/// RecordRow ?????????????
 /// </summary>
 [TestClass]
 public class RecordRowTests
 {
     /// <summary>
-    /// ??????????? Record ?????????
     /// </summary>
     private (Record record, RecordColumn<int> intColumn, RecordColumn<string> stringColumn, RecordColumn<bool> boolColumn) CreateTestRecord()
     {
@@ -21,7 +19,6 @@ public class RecordRowTests
         var stringColumn = record.Columns.Add<string>("StringColumn");
         var boolColumn = record.Columns.Add<bool>("BoolColumn");
 
-        // ??????????
         var row1 = record.AddRow();
         var row2 = record.AddRow();
 
@@ -35,10 +32,8 @@ public class RecordRowTests
         return (record, intColumn, stringColumn, boolColumn);
     }
 
-    #region ??????????
 
     /// <summary>
-    /// ????????? - ????????
     /// </summary>
     [TestMethod]
     public void Constructor_ValidParameters_ShouldInitializeCorrectly()
@@ -55,7 +50,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ????????? - Record ? null
     /// </summary>
     [TestMethod]
     public void Constructor_NullRecord_ShouldThrowArgumentNullException()
@@ -65,7 +59,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ????????? - ??????С??0
     /// </summary>
     [TestMethod]
     public void Constructor_NegativeRowIndex_ShouldThrowArgumentOutOfRangeException()
@@ -78,7 +71,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ????????? - ?????????????? Record.Count
     /// </summary>
     [TestMethod]
     public void Constructor_RowIndexOutOfRange_ShouldThrowArgumentOutOfRangeException()
@@ -91,12 +83,9 @@ public class RecordRowTests
         Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count + 1));
     }
 
-    #endregion
 
-    #region ???????
 
     /// <summary>
-    /// ???? Record ????
     /// </summary>
     [TestMethod]
     public void Record_Property_ShouldReturnCorrectRecord()
@@ -113,7 +102,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? Row ????
     /// </summary>
     [TestMethod]
     public void Row_Property_ShouldReturnCorrectRowIndex()
@@ -129,12 +117,9 @@ public class RecordRowTests
         Assert.AreEqual(1, result);
     }
 
-    #endregion
 
-    #region ??????????
 
     /// <summary>
-    /// ???????????? int
     /// </summary>
     [TestMethod]
     public void ImplicitConversion_ToInt_ShouldReturnRowIndex()
@@ -150,12 +135,9 @@ public class RecordRowTests
         Assert.AreEqual(1, rowIndex);
     }
 
-    #endregion
 
-    #region GetBoolean ????
 
     /// <summary>
-    /// ???? GetBoolean(string name) - ?д???
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -172,7 +154,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetBoolean(string name) - ?в?????
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -189,7 +170,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetBoolean(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -206,7 +186,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetBoolean(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByColumn_DifferentRecord_ShouldFallbackToNameSearch()
@@ -220,15 +199,12 @@ public class RecordRowTests
         var result = recordRow.Field<Boolean>(boolColumn2);
 
         // Assert
-        Assert.AreEqual(true, result); // ??????????????? record1 ?е? BoolColumn
+        Assert.AreEqual(true, result);
     }
 
-    #endregion
 
-    #region GetString ????
 
     /// <summary>
-    /// ???? GetString(string name) - ?д???
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -245,7 +221,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetString(string name) - ?в?????
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -262,7 +237,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetString(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetString_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -278,12 +252,9 @@ public class RecordRowTests
         Assert.AreEqual("Test1", result);
     }
 
-    #endregion
 
-    #region GetInt32 ????
 
     /// <summary>
-    /// ???? GetInt32(string name) - ?д???
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -300,7 +271,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetInt32(string name) - ?в?????
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -317,7 +287,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetInt32(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetInt32_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -333,12 +302,9 @@ public class RecordRowTests
         Assert.AreEqual(100, result);
     }
 
-    #endregion
 
-    #region ???? Get<T> ????
 
     /// <summary>
-    /// ???? Get<T>(string name) - ?д???
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -355,7 +321,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? Get<T>(string name) - ?в?????
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -372,7 +337,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? Get<T>(RecordColumn col) - ???????????
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByColumn_SameRecord_ShouldReturnCorrectValue()
@@ -389,12 +353,9 @@ public class RecordRowTests
     }
 
 
-    #endregion
 
-    #region ?????????? (????????)
 
     /// <summary>
-    /// ???? GetByte ????
     /// </summary>
     [TestMethod]
     public void GetByte_ByName_ShouldWork()
@@ -414,7 +375,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetDouble ????
     /// </summary>
     [TestMethod]
     public void GetDouble_ByName_ShouldWork()
@@ -434,7 +394,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ???? GetDateTime ????
     /// </summary>
     [TestMethod]
     public void GetDateTime_ByName_ShouldWork()
@@ -454,12 +413,9 @@ public class RecordRowTests
         Assert.AreEqual(testDate, result);
     }
 
-    #endregion
 
-    #region ??????????????
 
     /// <summary>
-    /// ??????????????
     /// </summary>
     [TestMethod]
     public void GetMethods_EmptyColumnName_ShouldReturnDefault()
@@ -475,7 +431,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ?????????????????
     /// </summary>
     [TestMethod]
     public void GetMethods_MultipleRows_ShouldReturnCorrectValues()
@@ -483,7 +438,6 @@ public class RecordRowTests
         // Arrange
         var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
 
-        // ?????????????
         var row3 = record.AddRow();
         intColumn.Set(300, row3.Row);
         stringColumn.Set("Test3", row3.Row);
@@ -507,12 +461,9 @@ public class RecordRowTests
         Assert.AreEqual(true, recordRow2.Field<Boolean>("BoolColumn"));
     }
 
-    #endregion
 
-    #region ?????????????
 
     /// <summary>
-    /// ?????????????????????÷?????????
     /// </summary>
     [TestMethod]
     public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
@@ -533,7 +484,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// ????????????(?????? vs ???ж???)?????????
     /// </summary>
     [TestMethod]
     public void GetMethods_ByNameVsByColumn_ShouldReturnSameResults()
@@ -548,12 +498,9 @@ public class RecordRowTests
         Assert.AreEqual(recordRow.Field<Boolean>("BoolColumn"), recordRow.Field<Boolean>(boolColumn));
     }
 
-    #endregion
 
-    #region Set<T> ????
 
     /// <summary>
-    /// Set<T> - ??????и??????
     /// </summary>
     [TestMethod]
     public void Set_TypedColumn_ShouldUpdateValue()
@@ -570,7 +517,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// Set<T> - string ?и??????
     /// </summary>
     [TestMethod]
     public void Set_StringColumn_ShouldUpdateValue()
@@ -587,7 +533,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// Set<T> - ?в?????????? KeyNotFoundException
     /// </summary>
     /// <summary>
     /// Set&lt;T&gt; - 列不存在时应自动建列（新语义）。
@@ -611,7 +556,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// Set<T> ??????????????????
     /// </summary>
     [TestMethod]
     public void Set_ThenReadViaIndexer_ShouldBeConsistent()
@@ -627,12 +571,9 @@ public class RecordRowTests
         Assert.AreEqual(42, recordRow.Field<int>("IntColumn"));
     }
 
-    #endregion
 
-    #region IDynamicMetaObjectProvider (dynamic) ????
 
     /// <summary>
-    /// dynamic ?????? - ?????????
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ShouldReturnCorrectValue()
@@ -649,7 +590,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ???д?? - ????????
     /// </summary>
     [TestMethod]
     public void Dynamic_SetMember_ShouldUpdateValue()
@@ -667,7 +607,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ????????? - ?????????
     /// </summary>
     [TestMethod]
     public void Dynamic_GetIndex_ShouldReturnCorrectValue()
@@ -684,7 +623,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ??????д?? - ????????
     /// </summary>
     [TestMethod]
     public void Dynamic_SetIndex_ShouldUpdateValue()
@@ -702,7 +640,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ???????????? - ????? null??????????
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ColumnNotExists_ShouldReturnNull()
@@ -719,7 +656,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic д????????? - ??????????????????
     /// </summary>
     [TestMethod]
     public void Dynamic_SetMember_ColumnNotExists_ShouldNotThrow()
@@ -733,7 +669,6 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic ??????? Get ??????????
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ShouldBeConsistentWithGetMethod()
@@ -748,6 +683,5 @@ public class RecordRowTests
         Assert.AreEqual(recordRow.Field<bool>("BoolColumn"), (bool)row.BoolColumn!);
     }
 
-    #endregion
 }
 
