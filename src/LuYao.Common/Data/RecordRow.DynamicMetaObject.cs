@@ -1,4 +1,5 @@
 using System.Dynamic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -12,11 +13,10 @@ partial struct RecordRow
     private sealed class RecordRowMetaObject : DynamicMetaObject
     {
         private static readonly MethodInfo GetValueMethod =
-            typeof(RecordRow).GetMethod(nameof(RecordRow.Get), new[] { typeof(string) })!
-                             .MakeGenericMethod(typeof(object));
+            typeof(RecordRow).GetProperty("Item")!.GetGetMethod()!;
 
         private static readonly MethodInfo SetValueMethod =
-            typeof(RecordRow).GetMethod(nameof(RecordRow.Set), new[] { typeof(string), typeof(object) })!;
+            typeof(RecordRow).GetProperty("Item")!.GetSetMethod()!;
 
         public RecordRowMetaObject(Expression expression, RecordRow value)
             : base(expression, BindingRestrictions.Empty, value)
@@ -25,6 +25,10 @@ partial struct RecordRow
 
         private Expression GetLimitedSelf()
             => Expression.Convert(Expression, typeof(RecordRow));
+
+        /// <inheritdoc/>
+        public override System.Collections.Generic.IEnumerable<string> GetDynamicMemberNames()
+            => ((RecordRow)Value!).Record.Columns.Select(c => c.Name);
 
         /// <inheritdoc/>
         public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
@@ -41,21 +45,19 @@ partial struct RecordRow
         public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
         {
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
-            var indexerSetter = typeof(RecordRow).GetProperty("Item")!.GetSetMethod()!;
-            var convertedValue = Expression.Convert(value.Expression, typeof(object));
-            var call = Expression.Call(
-                GetLimitedSelf(),
-                indexerSetter,
-                Expression.Constant(binder.Name),
-                convertedValue);
+            var param = Expression.Variable(typeof(object));
+            var assign = Expression.Assign(param, Expression.Convert(value.Expression, typeof(object)));
+            var call = Expression.Call(GetLimitedSelf(), SetValueMethod, Expression.Constant(binder.Name), param);
             // DLR requires the expression to return object, not void
-            var block = Expression.Block(call, convertedValue);
+            var block = Expression.Block(new[] { param }, assign, call, param);
             return new DynamicMetaObject(block, restrictions);
         }
 
         /// <inheritdoc/>
         public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
         {
+            if (indexes.Length != 1 || indexes[0].LimitType != typeof(string))
+                return base.BindGetIndex(binder, indexes);
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
             var key = Expression.Convert(indexes[0].Expression, typeof(string));
             var call = Expression.Call(GetLimitedSelf(), GetValueMethod, key);
@@ -65,17 +67,15 @@ partial struct RecordRow
         /// <inheritdoc/>
         public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
         {
+            if (indexes.Length != 1 || indexes[0].LimitType != typeof(string))
+                return base.BindSetIndex(binder, indexes, value);
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
-            var indexerSetter = typeof(RecordRow).GetProperty("Item")!.GetSetMethod()!;
             var key = Expression.Convert(indexes[0].Expression, typeof(string));
-            var convertedValue = Expression.Convert(value.Expression, typeof(object));
-            var call = Expression.Call(
-                GetLimitedSelf(),
-                indexerSetter,
-                key,
-                convertedValue);
+            var param = Expression.Variable(typeof(object));
+            var assign = Expression.Assign(param, Expression.Convert(value.Expression, typeof(object)));
+            var call = Expression.Call(GetLimitedSelf(), SetValueMethod, key, param);
             // DLR requires the expression to return object, not void
-            var block = Expression.Block(call, convertedValue);
+            var block = Expression.Block(new[] { param }, assign, call, param);
             return new DynamicMetaObject(block, restrictions);
         }
     }
