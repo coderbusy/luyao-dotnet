@@ -31,8 +31,5 @@ partial struct RecordRow
     /// </summary>
     /// <typeparam name="T">数据来源的对象类型。</typeparam>
     /// <param name="data">属性值的来源对象。</param>
-    public void CopyFrom<T>(T data) where T : class
-    {
-        XCopy<T>.CopyTo(data, this);
-    }
+    public void CopyFrom<T>(T data) where T : class => XCopy<T>.CopyTo(data, this);
 }
