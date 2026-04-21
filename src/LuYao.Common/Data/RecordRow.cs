@@ -85,7 +85,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     internal void TrySetValue(string name, object? value)
     {
         var col = this.Record.Columns.Find(name);
-        if (col != null) col.SetValue(value, this);
+        if (col != null) col.SetValue(this.Row, value);
     }
 
     /// <summary>
@@ -98,12 +98,12 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         var existing = this.Record.Columns.Find(name);
         if (existing != null)
         {
-            existing.SetValue(value, this);
+            existing.SetValue(this.Row, value);
             return;
         }
         if (value is null) return;
         var col = this.Record.Columns.Add(name, value.GetType());
-        col.SetValue(value, this);
+        col.SetValue(this.Row, value);
     }
 
     /// <summary>

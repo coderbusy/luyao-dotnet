@@ -56,10 +56,10 @@ public abstract class RecordColumn : IXProp
     /// <summary>
     /// 在指定行设置列的值。
     /// </summary>
-    /// <param name="value">要设置的值，可以为 null。</param>
     /// <param name="row">目标行索引，从 0 开始。</param>
+    /// <param name="value">要设置的值，可以为 null。</param>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
-    public abstract void SetValue(object? value, int row);
+    public abstract void SetValue(int row, object? value);
 
     /// <summary>
     /// 获取指定行的列值。
@@ -138,7 +138,7 @@ public abstract class RecordColumn : IXProp
     bool IXProp.CanWrite => true;
 
     object? IXProp.GetValue(object instance) => GetValue(((RecordRow)instance).Row);
-    void IXProp.SetValue(object instance, object? value) => SetValue(value, ((RecordRow)instance).Row);
+    void IXProp.SetValue(object instance, object? value) => SetValue(((RecordRow)instance).Row, value);
 
     #endregion
 }

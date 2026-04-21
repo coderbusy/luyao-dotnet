@@ -248,13 +248,13 @@ public class RecordSetSerializationTests
         var orders = new Record("Orders", 1);
         orders.Columns.Add<int>("Id");
         var row = orders.AddRow();
-        orders.Columns[0].SetValue(1, row.Row);
+        orders.Columns[0].SetValue(row.Row, 1);
         set.Add("Orders", orders);
 
         var customers = new Record("Customers", 1);
         customers.Columns.Add<string>("Name");
         var row2 = customers.AddRow();
-        customers.Columns[0].SetValue("Alice", row2.Row);
+        customers.Columns[0].SetValue(row2.Row, "Alice");
         set.Add("Customers", customers);
 
         var bytes = set.ToBytes();

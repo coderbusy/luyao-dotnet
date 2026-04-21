@@ -117,11 +117,11 @@ public class GenericMethodTests
 
         // Act & Assert - nullable value
         int? nullableValue = 42;
-        intColumn.SetValue(nullableValue, 0);
+        intColumn.SetValue(0, nullableValue);
         Assert.AreEqual(42, intColumn.Get<Int32>(0));
 
         // Verify null assignment
-        intColumn.SetValue(null, 0);
+        intColumn.SetValue(0, null);
         int defaultValue = intColumn.Get<Int32>(0);
         Assert.AreEqual(0, defaultValue); // default value
     }

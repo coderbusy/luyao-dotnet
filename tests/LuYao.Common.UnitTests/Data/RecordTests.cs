@@ -382,8 +382,8 @@ public class RecordTests
         var row2 = table.AddRow();
 
         // Act
-        col.SetValue(100, row1.Row);
-        col.SetValue(200, row2.Row);
+        col.SetValue(row1.Row, 100);
+        col.SetValue(row2.Row, 200);
 
         // Assert
         Assert.AreEqual(100, col.GetValue(row1.Row));
@@ -731,7 +731,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue("test", -1));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(-1, "test"));
         Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
     }
 
@@ -744,7 +744,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue("test", 1));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(1, "test"));
         Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
     }
 
@@ -757,7 +757,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue("test", 5));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(5, "test"));
         Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
     }
 
@@ -850,9 +850,9 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert - Valid indices should work
-        col.SetValue("value0", 0);
-        col.SetValue("value1", 1);
-        col.SetValue("value2", 2);
+        col.SetValue(0, "value0");
+        col.SetValue(1, "value1");
+        col.SetValue(2, "value2");
 
         Assert.AreEqual("value0", col.GetValue(0));
         Assert.AreEqual("value1", col.GetValue(1));
@@ -872,9 +872,9 @@ public class RecordTests
         table.AddRow(); // Index 2 - should trigger expansion
 
         // Act & Assert - Valid indices work
-        col.SetValue("test0", 0);
-        col.SetValue("test1", 1);
-        col.SetValue("test2", 2);
+        col.SetValue(0, "test0");
+        col.SetValue(1, "test1");
+        col.SetValue(2, "test2");
 
         Assert.AreEqual("test0", col.GetValue(0));
         Assert.AreEqual("test1", col.GetValue(1));
@@ -882,7 +882,7 @@ public class RecordTests
 
         // Invalid indices should still throw
         Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(3));
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue("invalid", 4));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(4, "invalid"));
     }
 
     [TestMethod]
@@ -990,7 +990,7 @@ public class RecordTests
 
         // Act & Assert - Negative indices should always throw
         Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(-1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue("test", -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(-1, "test"));
     }
 
     [TestMethod]
@@ -1046,7 +1046,7 @@ public class RecordTests
         var id = re.Columns.Add<Int32>("Id");
 
         var row = re.AddRow();
-        name.SetValue("John Doe", row.Row);
+        name.SetValue(row.Row, "John Doe");
         id.Set(1, row.Row);
 
         // Assert
@@ -1062,6 +1062,6 @@ public class RecordTests
         var id = re.Columns.Add<Int32>("Id");
         var row = re.AddRow();
         // Act & Assert - DateTime cannot be converted to int via SetValue
-        Assert.Throws<InvalidCastException>(() => id.SetValue(DateTime.Now, row.Row));
+        Assert.Throws<InvalidCastException>(() => id.SetValue(row.Row, DateTime.Now));
     }
 }

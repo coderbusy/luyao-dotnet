@@ -244,7 +244,7 @@ public partial class Record : IEnumerable<RecordRow>
             {
                 object val = dr.GetValue(i);
                 if (val == DBNull.Value) continue;
-                this.Columns[i].SetValue(val, row);
+                this.Columns[i].SetValue(row, val);
             }
         }
     }
@@ -466,7 +466,7 @@ public partial class Record : IEnumerable<RecordRow>
             {
                 var col = ret.Columns[i];
                 if (row.IsNull(i)) continue;
-                col.SetValue(row[i], recordRow);
+                col.SetValue(recordRow, row[i]);
             }
         }
         return ret;
@@ -521,7 +521,7 @@ public partial class Record : IEnumerable<RecordRow>
             var val = oldCol.GetValue(r);
             if (val is not null)
             {
-                newCol.SetValue(Valid.To(val, newType), r);
+                newCol.SetValue(r, Valid.To(val, newType));
             }
         }
 
@@ -564,7 +564,7 @@ public partial class Record : IEnumerable<RecordRow>
                 var val = this.Columns[c].GetValue(r);
                 if (val is not null)
                 {
-                    clone.Columns[c].SetValue(val, r);
+                    clone.Columns[c].SetValue(r, val);
                 }
             }
         }
