@@ -790,5 +790,46 @@ public class RecordRowTests
         Assert.AreEqual(true, result);
     }
 
-}
+    /// <summary>
+    /// <see cref="RecordRow.ToDictionary"/> 应返回当前行的全部列与对应值。
+    /// </summary>
+    [TestMethod]
+    public void ToDictionary_ShouldReturnAllColumnsWithCurrentRowValues()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 1);
 
+        // Act
+        var result = recordRow.ToDictionary();
+
+        // Assert
+        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(200, (int)result["IntColumn"]!);
+        Assert.AreEqual("Test2", (string)result["StringColumn"]!);
+        Assert.AreEqual(false, (bool)result["BoolColumn"]!);
+    }
+
+    /// <summary>
+    /// <see cref="RecordRow.ToDictionary"/> 对于 null 列值应保留 null。
+    /// </summary>
+    [TestMethod]
+    public void ToDictionary_WhenColumnValueIsNull_ShouldKeepNullValue()
+    {
+        // Arrange
+        var record = new Record("TestTable", 2);
+        var nullableColumn = record.Columns.Add<string>("NullableColumn");
+        record.AddRow();
+        nullableColumn.Set(null, 0);
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToDictionary();
+
+        // Assert
+        Assert.AreEqual(1, result.Count);
+        Assert.IsTrue(result.ContainsKey("NullableColumn"));
+        Assert.IsNull(result["NullableColumn"]);
+    }
+
+}

@@ -80,6 +80,20 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// <returns>列存在时返回当前行对应值；列不存在时返回 <see langword="null"/>。</returns>
     public object? Field(string name) => this.GetValueOrDefault(name);
 
+    /// <summary>
+    /// 将当前行的所有列值转换为字典。
+    /// </summary>
+    /// <returns>键为列名、值为当前行对应列值的字典。</returns>
+    public Dictionary<string, object?> ToDictionary()
+    {
+        var ret = new Dictionary<string, object?>(this.Record.Columns.Count, StringComparer.Ordinal);
+        foreach (var col in this.Record.Columns)
+        {
+            ret[col.Name] = col.GetValue(this);
+        }
+        return ret;
+    }
+
     #endregion
 
     /// <summary>
