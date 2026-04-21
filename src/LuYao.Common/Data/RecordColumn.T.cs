@@ -52,7 +52,7 @@ public class RecordColumn<T> : RecordColumn
     }
 
     ///<inheritdoc/>
-    public override void SetValue(object? value, int row)
+    public override void SetValue(int row, object? value)
     {
         OnSet(row);
         if (value is null)
@@ -104,7 +104,7 @@ public class RecordColumn<T> : RecordColumn
     }
 
     ///<inheritdoc/>
-    public virtual void Set(T value, int row)
+    public virtual void Set(int row, T value)
     {
         OnSet(row);
         _data[row] = value;

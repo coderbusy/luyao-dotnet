@@ -17,9 +17,9 @@ public class RecordSchemaOperationsTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.Set(i + 1, row.Row);
-            nameCol.Set($"Person{i + 1}", row.Row);
-            ageCol.Set(20 + i, row.Row);
+            idCol.Set(row.Row, i + 1);
+            nameCol.Set(row.Row, $"Person{i + 1}");
+            ageCol.Set(row.Row, 20 + i);
         }
         return record;
     }
@@ -242,7 +242,7 @@ public class RecordSchemaOperationsTests
         var record = CreateTestRecord();
 
         var clone = record.Clone();
-        clone.Columns[0].SetValue(999, 0);
+        clone.Columns[0].SetValue(0, 999);
 
         Assert.AreEqual(1, record.Columns[0].GetValue(0));
         Assert.AreEqual(999, clone.Columns[0].GetValue(0));

@@ -18,7 +18,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < rowCount; i++)
         {
             var row = record.AddRow();
-            col.Set(i, row.Row);
+            col.Set(row.Row, i);
         }
 
         Assert.AreEqual(rowCount, record.Count);
@@ -41,7 +41,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < 5; i++)
         {
             var row = record.AddRow();
-            idCol.Set(i * 10, row.Row);
+            idCol.Set(row.Row, i * 10);
         }
 
         // Delete middle row (index 2, value 20)
@@ -62,8 +62,8 @@ public class RecordBoundaryTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.Set(i, row.Row);
-            nameCol.Set($"Item{i}", row.Row);
+            idCol.Set(row.Row, i);
+            nameCol.Set(row.Row, $"Item{i}");
         }
 
         // Delete row 1
@@ -72,8 +72,8 @@ public class RecordBoundaryTests
 
         // Add a new row
         var newRow = record.AddRow();
-        idCol.Set(99, newRow.Row);
-        nameCol.Set("New", newRow.Row);
+        idCol.Set(newRow.Row, 99);
+        nameCol.Set(newRow.Row, "New");
 
         Assert.AreEqual(3, record.Count);
         Assert.AreEqual(99, idCol.Get<int>(2));
@@ -93,7 +93,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < 5; i++)
         {
             var row = record.AddRow();
-            idCol.Set(i, row.Row);
+            idCol.Set(row.Row, i);
         }
 
         int deleted = record.DeleteWhere(r => r.Field<int>("Id") % 2 == 0);
@@ -113,7 +113,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < 5; i++)
         {
             var row = record.AddRow();
-            idCol.Set(i * 10, row.Row);
+            idCol.Set(row.Row, i * 10);
         }
 
         int deleted = record.DeleteRows(new[] { 0, 2, 4 });
@@ -133,7 +133,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.Set(i, row.Row);
+            idCol.Set(row.Row, i);
         }
 
         int deleted = record.DeleteRows(new[] { 1, 1, 1 });
@@ -151,7 +151,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.Set(i, row.Row);
+            idCol.Set(row.Row, i);
         }
 
         int deleted = record.DeleteWhere(r => r.Field<int>("Id") > 100);

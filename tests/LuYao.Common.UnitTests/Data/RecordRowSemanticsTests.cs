@@ -22,7 +22,7 @@ public class RecordRowSemanticsTests
         var record = new Record();
         var col = record.Columns.Add<int>("Id");
         var row = record.AddRow();
-        col.Set(123, row.Row);
+        col.Set(row.Row, 123);
         Assert.AreEqual(123, row.Field<int>("Id"));
     }
 

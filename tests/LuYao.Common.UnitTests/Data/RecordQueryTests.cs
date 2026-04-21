@@ -15,19 +15,19 @@ public class RecordQueryTests
         record.Columns.Add("IsActive", typeof(bool));
 
         var row1 = record.AddRow();
-        record.Columns["Id"].SetValue(1, row1);
-        record.Columns["Name"].SetValue("Alice", row1);
-        record.Columns["IsActive"].SetValue(true, row1);
+        record.Columns["Id"].SetValue(row1, 1);
+        record.Columns["Name"].SetValue(row1, "Alice");
+        record.Columns["IsActive"].SetValue(row1, true);
 
         var row2 = record.AddRow();
-        record.Columns["Id"].SetValue(2, row2);
-        record.Columns["Name"].SetValue("Bob", row2);
-        record.Columns["IsActive"].SetValue(false, row2);
+        record.Columns["Id"].SetValue(row2, 2);
+        record.Columns["Name"].SetValue(row2, "Bob");
+        record.Columns["IsActive"].SetValue(row2, false);
 
         var row3 = record.AddRow();
-        record.Columns["Id"].SetValue(3, row3);
-        record.Columns["Name"].SetValue("Charlie", row3);
-        record.Columns["IsActive"].SetValue(true, row3);
+        record.Columns["Id"].SetValue(row3, 3);
+        record.Columns["Name"].SetValue(row3, "Charlie");
+        record.Columns["IsActive"].SetValue(row3, true);
 
         return record;
     }

@@ -197,7 +197,7 @@ public partial class Record
                 if (!hasValue) continue;
             }
             var val = ReadPrimitiveValue(reader, col.ColumnType);
-            col.SetValue(val, r);
+            col.SetValue(r, val);
         }
     }
 
