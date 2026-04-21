@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using LuYao.Data.Meta;
 
 namespace LuYao.Data;
@@ -8,7 +9,7 @@ namespace LuYao.Data;
 /// 代表一行数据，提供对列存储数据集合中特定行数据的访问。
 /// 实现了 <see cref="IPropertyAccessor"/> 接口，支持按属性名读写数据。
 /// </summary>
-public partial struct RecordRow : IPropertyAccessor
+public partial struct RecordRow : IPropertyAccessor, IDynamicMetaObjectProvider
 {
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
@@ -93,6 +94,12 @@ public partial struct RecordRow : IPropertyAccessor
     }
 
     #endregion
+
+    /// <summary>
+    /// 返回 <see cref="DynamicMetaObject"/>，支持动态成员访问。
+    /// </summary>
+    public DynamicMetaObject GetMetaObject(System.Linq.Expressions.Expression parameter)
+        => new RecordRowMetaObject(parameter, this);
 
     /// <summary>
     /// 根据列名设置当前行指定列的泛型类型值，避免值类型 boxing。
