@@ -100,14 +100,13 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// </summary>
     public override string ToString()
     {
-        var data = this.ToDictionary();
         var sb = new StringBuilder();
         sb.Append("{ Row = ").Append(this.Row).Append(", Data = { ");
         bool first = true;
-        foreach (var item in data)
+        foreach (var col in this.Record.Columns)
         {
             if (!first) sb.Append(", ");
-            sb.Append(item.Key).Append(" = ").Append(item.Value?.ToString() ?? string.Empty);
+            sb.Append(col.Name).Append(" = ").Append(col.GetValue(this)?.ToString() ?? string.Empty);
             first = false;
         }
         sb.Append(" } }");
