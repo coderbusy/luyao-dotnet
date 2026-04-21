@@ -29,6 +29,7 @@ public class XProp : IXProp
             var list = new List<XProp>(props.Length);
             foreach (var p in props)
             {
+                if (p.GetIndexParameters().Length > 0) continue; // 跳过索引器属性
                 list.Add(new XProp(p));
             }
             return list.AsReadOnly();

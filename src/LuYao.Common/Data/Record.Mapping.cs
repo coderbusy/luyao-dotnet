@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LuYao.Data.Meta;
+using System;
 using System.Collections.Generic;
 
 namespace LuYao.Data;
@@ -27,7 +28,7 @@ partial class Record
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
     /// <param name="items">用于填充行数据的对象集合。</param>
     /// <returns>包含与集合等量行数据的新 <see cref="Record"/>。</returns>
-    public static Record From<T>(IEnumerable<T> items) where T : class
+    public static Record FromList<T>(IEnumerable<T> items) where T : class
     {
         var re = new Record();
         re.Columns.AddFrom<T>();
@@ -46,10 +47,12 @@ partial class Record
     /// <typeparam name="T">数据来源的对象类型。</typeparam>
     /// <param name="item">要追加的对象实例，不能为 <see langword="null"/>。</param>
     /// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <see langword="null"/>。</exception>
-    public void Append<T>(T item) where T : class
+    public RecordRow AddRow<T>(T item) where T : class
     {
         if (item == null) throw new ArgumentNullException(nameof(item));
-        this.AddRow().CopyFrom(item);
+        var ret = this.AddRow();
+        ret.CopyFrom(item);
+        return ret;
     }
 
     /// <summary>
@@ -57,11 +60,13 @@ partial class Record
     /// </summary>
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
     /// <param name="items">要批量追加的对象集合。</param>
-    public void Append<T>(IEnumerable<T> items) where T : class
+    public IEnumerable<RecordRow> AddRows<T>(IEnumerable<T> items) where T : class
     {
         foreach (var item in items)
         {
-            this.AddRow().CopyFrom(item);
+            var it = this.AddRow();
+            it.CopyFrom(item);
+            yield return it;
         }
     }
 
@@ -79,5 +84,21 @@ partial class Record
             list.Add(item);
         }
         return list;
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="Record"/> 的第一行转换为 <typeparamref name="T"/> 对象。
+    /// 如果 <see cref="Record"/> 没有任何行，则返回一个使用无参构造函数创建的默认实例。
+    /// </summary>
+    /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
+    /// <returns>转换后的对象实例。</returns>
+    public T To<T>() where T : class, new()
+    {
+        var ret = new T();
+        if (this.Count > 0)
+        {
+            XCopy<T>.CopyFrom(ret, this[0]);
+        }
+        return ret;
     }
 }
