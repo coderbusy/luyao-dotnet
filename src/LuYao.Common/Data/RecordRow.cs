@@ -123,6 +123,6 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     public void Set<T>(string name, T value)
     {
         var col = this.Record.Columns.Add<T>(name);
-        col.Set(value, this.Row);
+        col.Set(this.Row, value);
     }
 }

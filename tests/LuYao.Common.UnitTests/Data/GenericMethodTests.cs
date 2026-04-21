@@ -27,20 +27,20 @@ public class GenericMethodTests
         var rowIndex = 0;
 
         // Act & Assert - verify all supported types
-        intColumn.Set(42, rowIndex);
+        intColumn.Set(rowIndex, 42);
         Assert.AreEqual(42, intColumn.Get<Int32>(rowIndex));
 
-        stringColumn.Set("Hello World", rowIndex);
+        stringColumn.Set(rowIndex, "Hello World");
         Assert.AreEqual("Hello World", stringColumn.Get<String>(rowIndex));
 
-        boolColumn.Set(true, rowIndex);
+        boolColumn.Set(rowIndex, true);
         Assert.AreEqual(true, boolColumn.Get<Boolean>(rowIndex));
 
         var testDate = new DateTime(2023, 7, 28, 10, 30, 0);
-        dateTimeColumn.Set(testDate, rowIndex);
+        dateTimeColumn.Set(rowIndex, testDate);
         Assert.AreEqual(testDate, dateTimeColumn.Get<DateTime>(rowIndex));
 
-        doubleColumn.Set(3.14159, rowIndex);
+        doubleColumn.Set(rowIndex, 3.14159);
         Assert.AreEqual(3.14159, doubleColumn.Get<Double>(rowIndex), 0.00001);
     }
 
@@ -58,9 +58,9 @@ public class GenericMethodTests
         var row = record.AddRow();
 
         // Act
-        intColumn.Set(123, row.Row);
-        stringColumn.Set("Test String", row.Row);
-        boolColumn.Set(false, row.Row);
+        intColumn.Set(row.Row, 123);
+        stringColumn.Set(row.Row, "Test String");
+        boolColumn.Set(row.Row, false);
 
         // Assert
         Assert.AreEqual(123, row.Field<Int32>(intColumn));
@@ -82,8 +82,8 @@ public class GenericMethodTests
         var row = record.AddRow();
 
         // Seed test data
-        intColumn.Set(42, 0);
-        stringColumn.Set("Hello", 0);
+        intColumn.Set(0, 42);
+        stringColumn.Set(0, "Hello");
 
         // Act & Assert
         int intValue = intColumn.Get<int>(0);
@@ -138,11 +138,11 @@ public class GenericMethodTests
         var row = record.AddRow();
 
         // Act & Assert - empty string
-        stringColumn.Set("", 0);
+        stringColumn.Set(0, "");
         Assert.AreEqual("", stringColumn.Get<String>(0));
 
         // Verify null string
-        stringColumn.Set(null, 0);
+        stringColumn.Set(0, null);
         string result = stringColumn.Get<String>(0);
         Assert.IsNull(result); // should return null
     }
@@ -160,10 +160,10 @@ public class GenericMethodTests
 
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            intColumn.Set(42, 1)); // invalid index
+            intColumn.Set(1, 42)); // invalid index
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            intColumn.Set(42, -1)); // negative index
+            intColumn.Set(-1, 42)); // negative index
     }
 
     /// <summary>
@@ -240,23 +240,23 @@ public class GenericMethodTests
         // Act & Assert - verify conversions across types
 
         // int -> other types
-        intColumn.Set(42, 0);
+        intColumn.Set(0, 42);
         Assert.AreEqual(42.0, intColumn.Get<double>(0), 0.001);
         Assert.AreEqual("42", intColumn.Get<string>(0));
         Assert.AreEqual(true, intColumn.Get<bool>(0)); // non-zero means true
 
         // double -> other types
-        doubleColumn.Set(3.14, 0);
+        doubleColumn.Set(0, 3.14);
         Assert.AreEqual(3, doubleColumn.Get<int>(0)); // truncated
         Assert.AreEqual("3.14", doubleColumn.Get<string>(0));
 
         // string -> other types
-        stringColumn.Set("123", 0);
+        stringColumn.Set(0, "123");
         Assert.AreEqual(123, stringColumn.Get<int>(0));
         Assert.AreEqual(123.0, stringColumn.Get<double>(0), 0.001);
 
         // bool -> other types
-        boolColumn.Set(true, 0);
+        boolColumn.Set(0, true);
         Assert.AreEqual(1, boolColumn.Get<int>(0));
         Assert.AreEqual("True", boolColumn.Get<string>(0));
     }

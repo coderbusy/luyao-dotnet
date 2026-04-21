@@ -104,7 +104,7 @@ public class RecordColumn<T> : RecordColumn
     }
 
     ///<inheritdoc/>
-    public virtual void Set(T value, int row)
+    public virtual void Set(int row, T value)
     {
         OnSet(row);
         _data[row] = value;

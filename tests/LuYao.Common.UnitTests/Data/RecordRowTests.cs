@@ -24,12 +24,12 @@ public class RecordRowTests
         var row1 = record.AddRow();
         var row2 = record.AddRow();
 
-        intColumn.Set(100, 0);
-        intColumn.Set(200, 1);
-        stringColumn.Set("Test1", 0);
-        stringColumn.Set("Test2", 1);
-        boolColumn.Set(true, 0);
-        boolColumn.Set(false, 1);
+        intColumn.Set(0, 100);
+        intColumn.Set(1, 200);
+        stringColumn.Set(0, "Test1");
+        stringColumn.Set(1, "Test2");
+        boolColumn.Set(0, true);
+        boolColumn.Set(1, false);
 
         return (record, intColumn, stringColumn, boolColumn);
     }
@@ -387,7 +387,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 1);
         var byteColumn = record.Columns.Add<byte>("ByteColumn");
         var row = record.AddRow();
-        byteColumn.Set(255, row.Row);
+        byteColumn.Set(row.Row, 255);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -407,7 +407,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 1);
         var doubleColumn = record.Columns.Add<double>("DoubleColumn");
         var row = record.AddRow();
-        doubleColumn.Set(3.14159, row.Row);
+        doubleColumn.Set(row.Row, 3.14159);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -428,7 +428,7 @@ public class RecordRowTests
         var dateTimeColumn = record.Columns.Add<DateTime>("DateTimeColumn");
         var testDate = new DateTime(2023, 8, 15, 14, 30, 0);
         var row = record.AddRow();
-        dateTimeColumn.Set(testDate, row.Row);
+        dateTimeColumn.Set(row.Row, testDate);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -466,9 +466,9 @@ public class RecordRowTests
         var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
 
         var row3 = record.AddRow();
-        intColumn.Set(300, row3.Row);
-        stringColumn.Set("Test3", row3.Row);
-        boolColumn.Set(true, row3.Row);
+        intColumn.Set(row3.Row, 300);
+        stringColumn.Set(row3.Row, "Test3");
+        boolColumn.Set(row3.Row, true);
 
         var recordRow0 = new RecordRow(record, 0);
         var recordRow1 = new RecordRow(record, 1);
