@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,12 +12,15 @@ public static class RecordExtensions
         var col = re.Columns.Find(fld);
         if (col == null)
         {
-            ret.Add(default!, re.ToList());
+            var defaultKey = default(T);
+            if (defaultKey is null) throw new InvalidOperationException($"Cannot group by missing column \"{fld}\" when {typeof(T).Name} has no non-null default key.");
+            ret.Add(defaultKey, re.ToList());
             return ret;
         }
         foreach (var row in re)
         {
-            T key = col.To<T>(row)!;
+            T? key = col.To<T>(row);
+            if (key is null) throw new InvalidOperationException($"Column \"{fld}\" contains null key at row {row}.");
             if (!ret.TryGetValue(key, out var tmp))
             {
                 tmp = new List<RecordRow>();

@@ -53,4 +53,15 @@ public class RecordExtensionsTests
         Assert.AreEqual(2, result[default].Count);
         CollectionAssert.AreEqual(record.Select(r => r.To<int>("Id")).ToList(), result[default].Select(r => r.To<int>("Id")).ToList());
     }
+
+    [TestMethod]
+    public void Group_WithMissingColumnAndReferenceTypeKey_ThrowsInvalidOperationException()
+    {
+        var record = new Record("TestRecord");
+        record.Columns.Add("Id", typeof(int));
+        var row = record.AddRow();
+        record.Columns["Id"].Set(row, 1);
+
+        Assert.Throws<InvalidOperationException>(() => record.Group<string>("MissingColumn"));
+    }
 }
