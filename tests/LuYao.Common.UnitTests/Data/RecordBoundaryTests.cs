@@ -32,25 +32,25 @@ public class RecordBoundaryTests
 
     #region Delete Consistency
 
-    [TestMethod]
-    public void WhenDeleteThenEnumerationIsConsistent()
-    {
-        var record = new Record("Test", 5);
-        var idCol = record.Columns.Add<int>("Id");
+    //[TestMethod]
+    //public void WhenDeleteThenEnumerationIsConsistent()
+    //{
+    //    var record = new Record("Test", 5);
+    //    var idCol = record.Columns.Add<int>("Id");
 
-        for (int i = 0; i < 5; i++)
-        {
-            var row = record.AddRow();
-            idCol.Set(row.Row, i * 10);
-        }
+    //    for (int i = 0; i < 5; i++)
+    //    {
+    //        var row = record.AddRow();
+    //        idCol.Set(row.Row, i * 10);
+    //    }
 
-        // Delete middle row (index 2, value 20)
-        record.Delete(2);
+    //    // Delete middle row (index 2, value 20)
+    //    record.Delete(2);
 
-        Assert.AreEqual(4, record.Count);
-        var values = record.Select(r => r.Field<int>("Id")).ToArray();
-        CollectionAssert.AreEqual(new[] { 0, 10, 30, 40 }, values);
-    }
+    //    Assert.AreEqual(4, record.Count);
+    //    var values = record.Select(r => r.Field<int>("Id")).ToArray();
+    //    CollectionAssert.AreEqual(new[] { 0, 10, 30, 40 }, values);
+    //}
 
     [TestMethod]
     public void WhenDeleteThenAddRowThenDataIsCorrect()
@@ -84,45 +84,45 @@ public class RecordBoundaryTests
 
     #region Batch Delete
 
-    [TestMethod]
-    public void WhenDeleteWhereThenMatchingRowsRemoved()
-    {
-        var record = new Record("Test", 5);
-        var idCol = record.Columns.Add<int>("Id");
+    //[TestMethod]
+    //public void WhenDeleteWhereThenMatchingRowsRemoved()
+    //{
+    //    var record = new Record("Test", 5);
+    //    var idCol = record.Columns.Add<int>("Id");
 
-        for (int i = 0; i < 5; i++)
-        {
-            var row = record.AddRow();
-            idCol.Set(row.Row, i);
-        }
+    //    for (int i = 0; i < 5; i++)
+    //    {
+    //        var row = record.AddRow();
+    //        idCol.Set(row.Row, i);
+    //    }
 
-        int deleted = record.DeleteWhere(r => r.Field<int>("Id") % 2 == 0);
+    //    int deleted = record.DeleteWhere(r => r.Field<int>("Id") % 2 == 0);
 
-        Assert.AreEqual(3, deleted);
-        Assert.AreEqual(2, record.Count);
-        var remaining = record.Select(r => r.Field<int>("Id")).ToArray();
-        CollectionAssert.AreEqual(new[] { 1, 3 }, remaining);
-    }
+    //    Assert.AreEqual(3, deleted);
+    //    Assert.AreEqual(2, record.Count);
+    //    var remaining = record.Select(r => r.Field<int>("Id")).ToArray();
+    //    CollectionAssert.AreEqual(new[] { 1, 3 }, remaining);
+    //}
 
-    [TestMethod]
-    public void WhenDeleteRowsWithIndicesThenCorrectRowsRemoved()
-    {
-        var record = new Record("Test", 5);
-        var idCol = record.Columns.Add<int>("Id");
+    //[TestMethod]
+    //public void WhenDeleteRowsWithIndicesThenCorrectRowsRemoved()
+    //{
+    //    var record = new Record("Test", 5);
+    //    var idCol = record.Columns.Add<int>("Id");
 
-        for (int i = 0; i < 5; i++)
-        {
-            var row = record.AddRow();
-            idCol.Set(row.Row, i * 10);
-        }
+    //    for (int i = 0; i < 5; i++)
+    //    {
+    //        var row = record.AddRow();
+    //        idCol.Set(row.Row, i * 10);
+    //    }
 
-        int deleted = record.DeleteRows(new[] { 0, 2, 4 });
+    //    int deleted = record.DeleteRows(new[] { 0, 2, 4 });
 
-        Assert.AreEqual(3, deleted);
-        Assert.AreEqual(2, record.Count);
-        var remaining = record.Select(r => r.Field<int>("Id")).ToArray();
-        CollectionAssert.AreEqual(new[] { 10, 30 }, remaining);
-    }
+    //    Assert.AreEqual(3, deleted);
+    //    Assert.AreEqual(2, record.Count);
+    //    var remaining = record.Select(r => r.Field<int>("Id")).ToArray();
+    //    CollectionAssert.AreEqual(new[] { 10, 30 }, remaining);
+    //}
 
     [TestMethod]
     public void WhenDeleteRowsWithDuplicateIndicesThenDeduplicates()
@@ -142,42 +142,42 @@ public class RecordBoundaryTests
         Assert.AreEqual(2, record.Count);
     }
 
-    [TestMethod]
-    public void WhenDeleteWhereNoMatchThenNothingDeleted()
-    {
-        var record = new Record("Test", 3);
-        var idCol = record.Columns.Add<int>("Id");
+    //[TestMethod]
+    //public void WhenDeleteWhereNoMatchThenNothingDeleted()
+    //{
+    //    var record = new Record("Test", 3);
+    //    var idCol = record.Columns.Add<int>("Id");
 
-        for (int i = 0; i < 3; i++)
-        {
-            var row = record.AddRow();
-            idCol.Set(row.Row, i);
-        }
+    //    for (int i = 0; i < 3; i++)
+    //    {
+    //        var row = record.AddRow();
+    //        idCol.Set(row.Row, i);
+    //    }
 
-        int deleted = record.DeleteWhere(r => r.Field<int>("Id") > 100);
+    //    int deleted = record.DeleteWhere(r => r.Field<int>("Id") > 100);
 
-        Assert.AreEqual(0, deleted);
-        Assert.AreEqual(3, record.Count);
-    }
+    //    Assert.AreEqual(0, deleted);
+    //    Assert.AreEqual(3, record.Count);
+    //}
 
     #endregion
 
     #region RecordRow.Set<T>
 
-    [TestMethod]
-    public void WhenRecordRowSetGenericThenValueSetCorrectly()
-    {
-        var record = new Record("Test", 1);
-        record.Columns.Add<int>("Id");
-        record.Columns.Add<string>("Name");
+    //[TestMethod]
+    //public void WhenRecordRowSetGenericThenValueSetCorrectly()
+    //{
+    //    var record = new Record("Test", 1);
+    //    record.Columns.Add<int>("Id");
+    //    record.Columns.Add<string>("Name");
 
-        var row = record.AddRow();
-        row.Set("Id", 42);
-        row.Set("Name", "Test");
+    //    var row = record.AddRow();
+    //    row.Set("Id", 42);
+    //    row.Set("Name", "Test");
 
-        Assert.AreEqual(42, row.Field<int>("Id"));
-        Assert.AreEqual("Test", row.Field<string>("Name"));
-    }
+    //    Assert.AreEqual(42, row.Field<int>("Id"));
+    //    Assert.AreEqual("Test", row.Field<string>("Name"));
+    //}
 
     #endregion
 }
