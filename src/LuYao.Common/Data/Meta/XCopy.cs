@@ -46,7 +46,9 @@ public static class XCopy<T> where T : class
         var cols = row.Record.Columns;
         foreach (var prop in _readableProps)
         {
-            if (cols.Contains(prop.Name)) row[prop.Name] = prop.GetValue(data);
+            var col = cols.Find(prop.Name);
+            if (col == null) continue;
+            col.Set(row, prop.GetValue(data));
         }
     }
 
@@ -60,8 +62,9 @@ public static class XCopy<T> where T : class
         var cols = row.Record.Columns;
         foreach (var prop in _writableProps)
         {
-            if (!cols.Contains(prop.Name)) continue;
-            prop.SetValue(data, row[prop.Name]);
+            var col = cols.Find(prop.Name);
+            if (col == null) continue;
+            prop.SetValue(data, col.Get(row));
         }
     }
     #endregion

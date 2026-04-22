@@ -140,7 +140,7 @@ public abstract class RecordColumn : IXProp
     object? IXProp.GetValue(object instance)
     {
         if (instance is RecordRow row) return Get(row.Row);
-        throw new InvalidOperationException();
+        throw new InvalidCastException();
     }
 
     void IXProp.SetValue(object instance, object? value)
@@ -148,7 +148,7 @@ public abstract class RecordColumn : IXProp
         if (instance is RecordRow row)
             Set(row.Row, value);
         else
-            throw new InvalidOperationException();
+            throw new InvalidCastException();
     }
 
     #endregion
