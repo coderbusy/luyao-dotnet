@@ -226,12 +226,14 @@
 - `FindAll(Func<RecordRow, bool> filter)`
 - `FindByDynamic(Func<dynamic, bool> filter)`
 - `FindAllByDynamic(Func<dynamic, bool> filter)`
+- `Group<T>(string fld)`（扩展方法）
 
 行为说明：
 
 - `Find*` 未找到时返回 `null`。
 - `FindAll*` 未找到时返回空序列。
 - `FindAll*` 是延迟执行枚举。
+- `Group<T>` 按列值聚合并返回 `Dictionary<T, List<RecordRow>>`；当列不存在时返回单组（默认键）并包含全部行。
 
 ### 5.6 对象映射
 
