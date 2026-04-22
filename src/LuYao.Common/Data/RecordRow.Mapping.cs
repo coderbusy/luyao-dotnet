@@ -9,7 +9,7 @@ partial struct RecordRow
     /// </summary>
     /// <typeparam name="T">目标对象类型。</typeparam>
     /// <param name="data">要被填充的对象实例。</param>
-    public void Fill<T>(T data) where T : class
+    public void CopyTo<T>(T data) where T : class
     {
         XCopy<T>.CopyFrom(data, this);
     }
@@ -22,7 +22,7 @@ partial struct RecordRow
     public T To<T>() where T : class, new()
     {
         var ret = new T();
-        this.Fill(ret);
+        this.CopyTo(ret);
         return ret;
     }
 

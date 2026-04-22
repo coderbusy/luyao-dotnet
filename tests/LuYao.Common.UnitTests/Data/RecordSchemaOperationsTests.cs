@@ -17,9 +17,9 @@ public class RecordSchemaOperationsTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.SetField(row.Row, i + 1);
-            nameCol.SetField(row.Row, $"Person{i + 1}");
-            ageCol.SetField(row.Row, 20 + i);
+            idCol.SetValue(row.Row, i + 1);
+            nameCol.SetValue(row.Row, $"Person{i + 1}");
+            ageCol.SetValue(row.Row, 20 + i);
         }
         return record;
     }

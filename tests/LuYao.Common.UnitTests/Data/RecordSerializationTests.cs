@@ -22,12 +22,12 @@ public class RecordSerializationTests
         record.MaxCount = 50;
 
         var row1 = record.AddRow();
-        idCol.SetField(row1.Row, 1);
-        nameCol.SetField(row1.Row, "Order-1");
+        idCol.SetValue(row1.Row, 1);
+        nameCol.SetValue(row1.Row, "Order-1");
 
         var row2 = record.AddRow();
-        idCol.SetField(row2.Row, 2);
-        nameCol.SetField(row2.Row, "Order-2");
+        idCol.SetValue(row2.Row, 2);
+        nameCol.SetValue(row2.Row, "Order-2");
 
         return record;
     }
@@ -94,12 +94,12 @@ public class RecordSerializationTests
         var record = new Record("Binary", 1);
         var col = record.Columns.Add<byte[]>("Data");
         var row = record.AddRow();
-        col.SetField(row.Row, new byte[] { 1, 2, 3, 4, 5 });
+        col.SetValue(row.Row, new byte[] { 1, 2, 3, 4, 5 });
 
         var bytes = record.ToBytes();
         var deserialized = Record.FromBytes(bytes);
 
-        var data = deserialized.Columns.Find<byte[]>("Data")!.Field(0);
+        var data = deserialized.Columns.Find<byte[]>("Data")!.GetValue(0);
         CollectionAssert.AreEqual(new byte[] { 1, 2, 3, 4, 5 }, data);
     }
 
@@ -127,27 +127,27 @@ public class RecordSerializationTests
         record.Columns.Add<Guid>("Guid");
 
         var r = record.AddRow();
-        record.Columns.Find<bool>("Bool")!.SetField(r.Row, true);
-        record.Columns.Find<sbyte>("SByte")!.SetField(r.Row, -1);
-        record.Columns.Find<short>("Short")!.SetField(r.Row, short.MaxValue);
-        record.Columns.Find<int>("Int")!.SetField(r.Row, 42);
-        record.Columns.Find<long>("Long")!.SetField(r.Row, long.MaxValue);
-        record.Columns.Find<byte>("Byte")!.SetField(r.Row, 255);
-        record.Columns.Find<ushort>("UShort")!.SetField(r.Row, ushort.MaxValue);
-        record.Columns.Find<uint>("UInt")!.SetField(r.Row, uint.MaxValue);
-        record.Columns.Find<ulong>("ULong")!.SetField(r.Row, ulong.MaxValue);
-        record.Columns.Find<float>("Float")!.SetField(r.Row, 3.14f);
-        record.Columns.Find<double>("Double")!.SetField(r.Row, 3.14159265);
-        record.Columns.Find<decimal>("Decimal")!.SetField(r.Row, 99.99m);
-        record.Columns.Find<char>("Char")!.SetField(r.Row, 'A');
-        record.Columns.Find<string>("String")!.SetField(r.Row, "Hello");
+        record.Columns.Find<bool>("Bool")!.SetValue(r.Row, true);
+        record.Columns.Find<sbyte>("SByte")!.SetValue(r.Row, -1);
+        record.Columns.Find<short>("Short")!.SetValue(r.Row, short.MaxValue);
+        record.Columns.Find<int>("Int")!.SetValue(r.Row, 42);
+        record.Columns.Find<long>("Long")!.SetValue(r.Row, long.MaxValue);
+        record.Columns.Find<byte>("Byte")!.SetValue(r.Row, 255);
+        record.Columns.Find<ushort>("UShort")!.SetValue(r.Row, ushort.MaxValue);
+        record.Columns.Find<uint>("UInt")!.SetValue(r.Row, uint.MaxValue);
+        record.Columns.Find<ulong>("ULong")!.SetValue(r.Row, ulong.MaxValue);
+        record.Columns.Find<float>("Float")!.SetValue(r.Row, 3.14f);
+        record.Columns.Find<double>("Double")!.SetValue(r.Row, 3.14159265);
+        record.Columns.Find<decimal>("Decimal")!.SetValue(r.Row, 99.99m);
+        record.Columns.Find<char>("Char")!.SetValue(r.Row, 'A');
+        record.Columns.Find<string>("String")!.SetValue(r.Row, "Hello");
         var dt = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc);
-        record.Columns.Find<DateTime>("DateTime")!.SetField(r.Row, dt);
+        record.Columns.Find<DateTime>("DateTime")!.SetValue(r.Row, dt);
         var dto = new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.FromHours(8));
-        record.Columns.Find<DateTimeOffset>("DateTimeOffset")!.SetField(r.Row, dto);
-        record.Columns.Find<TimeSpan>("TimeSpan")!.SetField(r.Row, TimeSpan.FromHours(2.5));
+        record.Columns.Find<DateTimeOffset>("DateTimeOffset")!.SetValue(r.Row, dto);
+        record.Columns.Find<TimeSpan>("TimeSpan")!.SetValue(r.Row, TimeSpan.FromHours(2.5));
         var guid = Guid.NewGuid();
-        record.Columns.Find<Guid>("Guid")!.SetField(r.Row, guid);
+        record.Columns.Find<Guid>("Guid")!.SetValue(r.Row, guid);
 
         var bytes = record.ToBytes();
         var d = Record.FromBytes(bytes);
@@ -179,8 +179,8 @@ public class RecordSerializationTests
         var favoriteCol = record.Columns.Add<FavoriteType>("Favorite");
         var nullableFavoriteCol = record.Columns.Add<FavoriteType?>("NullableFavorite");
         var row = record.AddRow();
-        favoriteCol.SetField(row.Row, FavoriteType.Chat);
-        nullableFavoriteCol.SetField(row.Row, FavoriteType.Common);
+        favoriteCol.SetValue(row.Row, FavoriteType.Chat);
+        nullableFavoriteCol.SetValue(row.Row, FavoriteType.Common);
 
         var bytes = record.ToBytes();
         var deserialized = Record.FromBytes(bytes);

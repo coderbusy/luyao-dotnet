@@ -94,17 +94,17 @@ public class RecordColumn<T> : RecordColumn
         Array.Copy(src, _data, len);
     }
 
-    #region Field
+    #region Accessor
 
     ///<inheritdoc/>
-    public T Field(int row)
+    public T GetValue(int row)
     {
         OnGet(row);
         return _data[row];
     }
 
     ///<inheritdoc/>
-    public virtual void SetField(int row, T value)
+    public virtual void SetValue(int row, T value)
     {
         OnSet(row);
         _data[row] = value;

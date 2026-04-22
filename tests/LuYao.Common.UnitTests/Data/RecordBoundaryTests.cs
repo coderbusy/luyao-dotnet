@@ -18,7 +18,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < rowCount; i++)
         {
             var row = record.AddRow();
-            col.SetField(row.Row, i);
+            col.SetValue(row.Row, i);
         }
 
         Assert.AreEqual(rowCount, record.Count);
@@ -62,8 +62,8 @@ public class RecordBoundaryTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.SetField(row.Row, i);
-            nameCol.SetField(row.Row, $"Item{i}");
+            idCol.SetValue(row.Row, i);
+            nameCol.SetValue(row.Row, $"Item{i}");
         }
 
         // Delete row 1
@@ -72,8 +72,8 @@ public class RecordBoundaryTests
 
         // Add a new row
         var newRow = record.AddRow();
-        idCol.SetField(newRow.Row, 99);
-        nameCol.SetField(newRow.Row, "New");
+        idCol.SetValue(newRow.Row, 99);
+        nameCol.SetValue(newRow.Row, "New");
 
         Assert.AreEqual(3, record.Count);
         Assert.AreEqual(99, idCol.To<int>(2));
@@ -133,7 +133,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.SetField(row.Row, i);
+            idCol.SetValue(row.Row, i);
         }
 
         int deleted = record.DeleteRows(new[] { 1, 1, 1 });

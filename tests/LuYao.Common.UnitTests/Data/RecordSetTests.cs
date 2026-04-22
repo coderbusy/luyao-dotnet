@@ -15,8 +15,8 @@ public class RecordSetTests
         for (int i = 0; i < rowCount; i++)
         {
             var row = record.AddRow();
-            idCol.SetField(row.Row, i + 1);
-            nameCol.SetField(row.Row, $"Item{i + 1}");
+            idCol.SetValue(row.Row, i + 1);
+            nameCol.SetValue(row.Row, $"Item{i + 1}");
         }
         return record;
     }
