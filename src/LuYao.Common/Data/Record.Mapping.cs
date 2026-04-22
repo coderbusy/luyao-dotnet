@@ -53,13 +53,9 @@ partial class Record
     /// </summary>
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
     /// <param name="items">要批量追加的对象集合。</param>
-    public IEnumerable<RecordRow> AddRows<T>(IEnumerable<T> items) where T : class
+    public void AddRows<T>(IEnumerable<T> items) where T : class
     {
-        foreach (var item in items)
-        {
-            var it = this.AddRow(item);
-            yield return it;
-        }
+        foreach (var item in items) this.AddRow(item);
     }
 
     /// <summary>

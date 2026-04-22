@@ -1,5 +1,3 @@
-using System;
-
 namespace LuYao.Data;
 
 [TestClass]
@@ -8,48 +6,140 @@ public class RecordMappingTests
     private sealed class TestModel
     {
         public int Id { get; set; }
-
         public string? Name { get; set; }
     }
 
+    // ── AddRows ──────────────────────────────────────────────────────────────
+
     [TestMethod]
-    public void To_WithRows_ShouldMapFromFirstRow()
+    public void AddRows_ShouldAppendAllItemsAsRows()
     {
-        // Arrange
+        var list = new List<TestModel>
+        {
+            new TestModel { Id = 1, Name = "Name1" },
+            new TestModel { Id = 2, Name = "Name2" }
+        };
+
+        var record = new Record();
+        record.Columns.AddFrom<TestModel>();
+        record.AddRows(list);
+
+        Assert.AreEqual(2, record.Count);
+        Assert.AreEqual(1,       record[0]["Id"]);
+        Assert.AreEqual("Name1", record[0]["Name"]);
+        Assert.AreEqual(2,       record[1]["Id"]);
+        Assert.AreEqual("Name2", record[1]["Name"]);
+    }
+
+    // ── From<T> ──────────────────────────────────────────────────────────────
+
+    [TestMethod]
+    public void From_ShouldCreateRecordWithSingleRow()
+    {
+        var model = new TestModel { Id = 42, Name = "Alice" };
+
+        var record = Record.From(model);
+
+        Assert.AreEqual(1,       record.Count);
+        Assert.AreEqual(42,      record[0]["Id"]);
+        Assert.AreEqual("Alice", record[0]["Name"]);
+    }
+
+    // ── FromList<T> ───────────────────────────────────────────────────────────
+
+    [TestMethod]
+    public void FromList_ShouldCreateRecordWithAllRows()
+    {
+        var list = new List<TestModel>
+        {
+            new TestModel { Id = 1, Name = "Alice" },
+            new TestModel { Id = 2, Name = "Bob" },
+            new TestModel { Id = 3, Name = "Carol" }
+        };
+
+        var record = Record.FromList(list);
+
+        Assert.AreEqual(3,       record.Count);
+        Assert.AreEqual(1,       record[0]["Id"]);
+        Assert.AreEqual("Alice", record[0]["Name"]);
+        Assert.AreEqual(3,       record[2]["Id"]);
+        Assert.AreEqual("Carol", record[2]["Name"]);
+    }
+
+    [TestMethod]
+    public void FromList_WithEmptyCollection_ShouldCreateRecordWithNoRows()
+    {
+        var record = Record.FromList(new List<TestModel>());
+
+        Assert.AreEqual(0, record.Count);
+    }
+
+    // ── To<T> ─────────────────────────────────────────────────────────────────
+
+    [TestMethod]
+    public void To_WithRows_ShouldMapFirstRowToModel()
+    {
         var record = new Record("Users", 2);
-        var idColumn = record.Columns.Add<int>("Id");
-        var nameColumn = record.Columns.Add<string>("Name");
+        var idCol   = record.Columns.Add<int>("Id");
+        var nameCol = record.Columns.Add<string>("Name");
 
         var row1 = record.AddRow();
-        idColumn.SetValue(row1.Row, 1);
-        nameColumn.SetValue(row1.Row, "Alice");
+        idCol.SetValue(row1.Row, 1);
+        nameCol.SetValue(row1.Row, "Alice");
 
         var row2 = record.AddRow();
-        idColumn.SetValue(row2.Row, 2);
-        nameColumn.SetValue(row2.Row, "Bob");
+        idCol.SetValue(row2.Row, 2);
+        nameCol.SetValue(row2.Row, "Bob");
 
-        // Act
         var model = record.To<TestModel>();
 
-        // Assert
-        Assert.AreEqual(1, model.Id);
+        Assert.AreEqual(1,       model.Id);
         Assert.AreEqual("Alice", model.Name);
     }
 
     [TestMethod]
-    public void To_WithoutRows_ShouldReturnDefaultConstructedInstance()
+    public void To_WithNoRows_ShouldReturnDefaultInstance()
     {
-        // Arrange
         var record = new Record("Users", 0);
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Name");
 
-        // Act
         var model = record.To<TestModel>();
 
-        // Assert
         Assert.IsNotNull(model);
-        Assert.AreEqual(0, model.Id);
+        Assert.AreEqual(0,    model.Id);
         Assert.IsNull(model.Name);
+    }
+
+    // ── ToList<T> ─────────────────────────────────────────────────────────────
+
+    [TestMethod]
+    public void ToList_ShouldMapAllRowsToModels()
+    {
+        var source = new List<TestModel>
+        {
+            new TestModel { Id = 1, Name = "Alice" },
+            new TestModel { Id = 2, Name = "Bob" }
+        };
+        var record = Record.FromList(source);
+
+        var result = record.ToList<TestModel>();
+
+        Assert.AreEqual(2,       result.Count);
+        Assert.AreEqual(1,       result[0].Id);
+        Assert.AreEqual("Alice", result[0].Name);
+        Assert.AreEqual(2,       result[1].Id);
+        Assert.AreEqual("Bob",   result[1].Name);
+    }
+
+    [TestMethod]
+    public void ToList_WithNoRows_ShouldReturnEmptyList()
+    {
+        var record = new Record();
+        record.Columns.AddFrom<TestModel>();
+
+        var result = record.ToList<TestModel>();
+
+        Assert.AreEqual(0, result.Count);
     }
 }
