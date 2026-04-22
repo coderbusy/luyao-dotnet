@@ -226,12 +226,56 @@
 - `FindAll(Func<RecordRow, bool> filter)`
 - `FindByDynamic(Func<dynamic, bool> filter)`
 - `FindAllByDynamic(Func<dynamic, bool> filter)`
+- `Group<T>(string fld)`
 
 行为说明：
 
 - `Find*` 未找到时返回 `null`。
 - `FindAll*` 未找到时返回空序列。
 - `FindAll*` 是延迟执行枚举。
+
+### 5.5.1 `Group<T>` 分组
+
+`Group<T>(string fld)` 按指定列的值对所有行进行分组，返回 `IDictionary<T, List<RecordRow>>`。
+
+```csharp
+var groups = record.Group<string>("Category");
+foreach (var (key, rows) in groups)
+    Console.WriteLine($"{key}: {rows.Count} rows");
+```
+
+行为说明：
+
+- 返回类型为 `IDictionary<T, List<RecordRow>>`。
+- 分组键类型 `T` 须与列的实际类型兼容。
+- 若指定列不存在，返回空字典。
+- 空 `Record`（无行）时返回空字典。
+- 返回字典的枚举顺序取决于键的插入顺序（标准 `Dictionary<T, …>` 语义）。
+
+### 5.5.2 多字段 `Group` 重载（`NETSTANDARD2.0+` / `NET6.0+`）
+
+支持按 2～6 个列的组合值分组，键为对应的值元组：
+
+| 重载签名 | 键类型 |
+|---|---|
+| `Group<T1,T2>(fld1, fld2)` | `(T1, T2)` |
+| `Group<T1,T2,T3>(fld1, fld2, fld3)` | `(T1, T2, T3)` |
+| `Group<T1,T2,T3,T4>(…)` | `(T1, T2, T3, T4)` |
+| `Group<T1,T2,T3,T4,T5>(…)` | `(T1, T2, T3, T4, T5)` |
+| `Group<T1,T2,T3,T4,T5,T6>(…)` | `(T1, T2, T3, T4, T5, T6)` |
+
+```csharp
+// 按 Category + Id 双字段分组
+var groups = record.Group<string, int>("Category", "Id");
+foreach (var ((cat, id), rows) in groups)
+    Console.WriteLine($"{cat}/{id}: {rows.Count} rows");
+```
+
+行为说明：
+
+- 任意一个指定列不存在时，返回空字典。
+- 空 `Record`（无行）时返回空字典。
+- 仅在 `NETSTANDARD2.0+` / `NET6.0+` 目标下可用（依赖值元组语言特性）。
 
 ### 5.6 对象映射
 
