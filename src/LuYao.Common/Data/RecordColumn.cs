@@ -137,8 +137,19 @@ public abstract class RecordColumn : IXProp
     bool IXProp.CanRead => true;
     bool IXProp.CanWrite => true;
 
-    object? IXProp.GetValue(object instance) => Get(((RecordRow)instance).Row);
-    void IXProp.SetValue(object instance, object? value) => Set(((RecordRow)instance).Row, value);
+    object? IXProp.GetValue(object instance)
+    {
+        if (instance is RecordRow row) return Get(row.Row);
+        throw new InvalidOperationException();
+    }
+
+    void IXProp.SetValue(object instance, object? value)
+    {
+        if (instance is RecordRow row)
+            Set(row.Row, value);
+        else
+            throw new InvalidOperationException();
+    }
 
     #endregion
 }

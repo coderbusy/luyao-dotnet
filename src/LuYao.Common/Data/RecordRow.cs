@@ -39,7 +39,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// <summary>
     /// 返回 <see cref="DynamicMetaObject"/>，支持动态成员访问。
     /// </summary>
-    public DynamicMetaObject GetMetaObject(System.Linq.Expressions.Expression parameter)
+    public readonly DynamicMetaObject GetMetaObject(System.Linq.Expressions.Expression parameter)
         => new RecordRowMetaObject(parameter, this);
 
     /// <summary>
@@ -53,7 +53,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// <summary>
     /// 返回包含行号与当前行列值的字符串表示。
     /// </summary>
-    public override string ToString()
+    public readonly override string ToString()
     {
         var sb = new StringBuilder();
         sb.Append("{ Row = ").Append(this.Row).Append(", Data = { ");
@@ -73,7 +73,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// 将当前行的所有列值转换为字典。
     /// </summary>
     /// <returns>键为列名、值为当前行对应列值的字典。</returns>
-    public Dictionary<string, object?> ToDictionary()
+    public readonly Dictionary<string, object?> ToDictionary()
     {
         var ret = new Dictionary<string, object?>(this.Record.Columns.Count, StringComparer.Ordinal);
         foreach (var col in this.Record.Columns)
@@ -88,7 +88,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// </summary>
     /// <param name="name">要访问或设置的列名。若为 null、空或仅空白，将返回默认值；查找列时使用 Record.Columns.Find(name)。</param>
     /// <returns>若指定列存在，返回该列在当前行的值；否则返回 null（或默认）。在设置器中：若列不存在且 value 非 null，将根据 value 的运行时类型创建新列并赋值。</returns>
-    public object? this[String name]
+    public readonly object? this[String name]
     {
         get
         {
@@ -109,5 +109,19 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
             }
             col.Set(this, value);
         }
+    }
+
+    /// <summary>
+    /// 将指定列名的当前行值转换为目标类型并返回。
+    /// </summary>
+    /// <typeparam name="T">目标类型。</typeparam>
+    /// <param name="name">要转换的列名。若为 null 或空白，返回默认值。</param>
+    /// <returns>转换后的值；若列不存在或无法转换则返回默认值。</returns>
+    public readonly T? To<T>(String name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return default;
+        var col = this.Record.Columns.Find(name);
+        if (col == null) return default;
+        return col.To<T>(this);
     }
 }
