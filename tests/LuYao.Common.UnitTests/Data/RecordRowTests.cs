@@ -149,344 +149,345 @@ public class RecordRowTests
     /// <summary>
     /// 按列名读取已存在的布尔列时，应返回正确值。
     /// </summary>
-    //[TestMethod]
-    //public void GetBoolean_ByName_ColumnExists_ShouldReturnCorrectValue()
-    //{
-    //    // Arrange
-    //    var (record, _, _, boolColumn) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetBoolean_ByName_ColumnExists_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        var (record, _, _, boolColumn) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<Boolean>("BoolColumn");
+        // Act
+        var result = recordRow.To<bool>("BoolColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(true, result);
-    //}
+        // Assert
+        Assert.AreEqual(true, result);
+    }
 
     /// <summary>
     /// 按列名读取不存在的布尔列时，应返回默认值。
     /// </summary>
-    //[TestMethod]
-    //public void GetBoolean_ByName_ColumnNotExists_ShouldReturnDefault()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetBoolean_ByName_ColumnNotExists_ShouldReturnDefault()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<Boolean>("NonExistentColumn");
+        // Act
+        var result = recordRow.To<bool>("NonExistentColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(default(bool), result);
-    //}
+        // Assert
+        Assert.AreEqual(default(bool), result);
+    }
 
     /// <summary>
     /// 按列名读取已存在的字符串列时，应返回正确值。
     /// </summary>
-    //[TestMethod]
-    //public void GetString_ByName_ColumnExists_ShouldReturnCorrectValue()
-    //{
-    //    // Arrange
-    //    var (record, _, stringColumn, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 1);
+    [TestMethod]
+    public void GetString_ByName_ColumnExists_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 1);
 
-    //    // Act
-    //    var result = recordRow.Field<String>("StringColumn");
+        // Act
+        var result = recordRow.To<string>("StringColumn");
 
-    //    // Assert
-    //    Assert.AreEqual("Test2", result);
-    //}
+        // Assert
+        Assert.AreEqual("Test2", result);
+    }
 
     /// <summary>
     /// 按列名读取不存在的字符串列时，应返回默认值。
     /// </summary>
-    //[TestMethod]
-    //public void GetString_ByName_ColumnNotExists_ShouldReturnDefault()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetString_ByName_ColumnNotExists_ShouldReturnDefault()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<String>("NonExistentColumn");
+        // Act
+        var result = recordRow.To<string>("NonExistentColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(default(string), result);
-    //}
+        // Assert
+        Assert.AreEqual(default(string), result);
+    }
 
     /// <summary>
     /// 按列名读取已存在的整型列时，应返回正确值。
     /// </summary>
-    //[TestMethod]
-    //public void GetInt32_ByName_ColumnExists_ShouldReturnCorrectValue()
-    //{
-    //    // Arrange
-    //    var (record, intColumn, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 1);
+    [TestMethod]
+    public void GetInt32_ByName_ColumnExists_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 1);
 
-    //    // Act
-    //    var result = recordRow.Field<Int32>("IntColumn");
+        // Act
+        var result = recordRow.To<int>("IntColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(200, result);
-    //}
+        // Assert
+        Assert.AreEqual(200, result);
+    }
 
     /// <summary>
     /// 按列名读取不存在的整型列时，应返回默认值。
     /// </summary>
-    //[TestMethod]
-    //public void GetInt32_ByName_ColumnNotExists_ShouldReturnDefault()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetInt32_ByName_ColumnNotExists_ShouldReturnDefault()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<Int32>("NonExistentColumn");
+        // Act
+        var result = recordRow.To<int>("NonExistentColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(default(int), result);
-    //}
+        // Assert
+        Assert.AreEqual(default(int), result);
+    }
 
     /// <summary>
     /// 泛型按列名读取已存在列时，应返回正确值。
     /// </summary>
-    //[TestMethod]
-    //public void GetGeneric_ByName_ColumnExists_ShouldReturnCorrectValue()
-    //{
-    //    // Arrange
-    //    var (record, intColumn, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetGeneric_ByName_ColumnExists_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<int>("IntColumn");
+        // Act
+        var result = recordRow.To<int>("IntColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(100, result);
-    //}
+        // Assert
+        Assert.AreEqual(100, result);
+    }
 
     /// <summary>
     /// 泛型按列名读取不存在列时，应返回默认值。
     /// </summary>
-    //[TestMethod]
-    //public void GetGeneric_ByName_ColumnNotExists_ShouldReturnDefault()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetGeneric_ByName_ColumnNotExists_ShouldReturnDefault()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<int>("NonExistentColumn");
+        // Act
+        var result = recordRow.To<int>("NonExistentColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(default(int), result);
-    //}
+        // Assert
+        Assert.AreEqual(default(int), result);
+    }
 
     /// <summary>
     /// 应支持按列名读取字节值。
     /// </summary>
-    //[TestMethod]
-    //public void GetByte_ByName_ShouldWork()
-    //{
-    //    // Arrange
-    //    var record = new Record("TestTable", 1);
-    //    var byteColumn = record.Columns.Add<byte>("ByteColumn");
-    //    var row = record.AddRow();
-    //    byteColumn.Set(row.Row, 255);
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetByte_ByName_ShouldWork()
+    {
+        // Arrange
+        var record = new Record("TestTable", 1);
+        var byteColumn = record.Columns.Add<byte>("ByteColumn");
+        var row = record.AddRow();
+        byteColumn.Set(row.Row, 255);
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<Byte>("ByteColumn");
+        // Act
+        var result = recordRow.To<byte>("ByteColumn");
 
-    //    // Assert
-    //    Assert.AreEqual((byte)255, result);
-    //}
+        // Assert
+        Assert.AreEqual((byte)255, result);
+    }
 
     /// <summary>
     /// 应支持按列名读取双精度浮点值。
     /// </summary>
-    //[TestMethod]
-    //public void GetDouble_ByName_ShouldWork()
-    //{
-    //    // Arrange
-    //    var record = new Record("TestTable", 1);
-    //    var doubleColumn = record.Columns.Add<double>("DoubleColumn");
-    //    var row = record.AddRow();
-    //    doubleColumn.Set(row.Row, 3.14159);
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetDouble_ByName_ShouldWork()
+    {
+        // Arrange
+        var record = new Record("TestTable", 1);
+        var doubleColumn = record.Columns.Add<double>("DoubleColumn");
+        var row = record.AddRow();
+        doubleColumn.Set(row.Row, 3.14159);
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<Double>("DoubleColumn");
+        // Act
+        var result = recordRow.To<double>("DoubleColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(3.14159, result, 0.00001);
-    //}
+        // Assert
+        Assert.AreEqual(3.14159, result, 0.00001);
+    }
 
     /// <summary>
     /// 应支持按列名读取日期时间值。
     /// </summary>
-    //[TestMethod]
-    //public void GetDateTime_ByName_ShouldWork()
-    //{
-    //    // Arrange
-    //    var record = new Record("TestTable", 1);
-    //    var dateTimeColumn = record.Columns.Add<DateTime>("DateTimeColumn");
-    //    var testDate = new DateTime(2023, 8, 15, 14, 30, 0);
-    //    var row = record.AddRow();
-    //    dateTimeColumn.Set(row.Row, testDate);
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetDateTime_ByName_ShouldWork()
+    {
+        // Arrange
+        var record = new Record("TestTable", 1);
+        var dateTimeColumn = record.Columns.Add<DateTime>("DateTimeColumn");
+        var testDate = new DateTime(2023, 8, 15, 14, 30, 0);
+        var row = record.AddRow();
+        dateTimeColumn.Set(row.Row, testDate);
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field<DateTime>("DateTimeColumn");
+        // Act
+        var result = recordRow.To<DateTime>("DateTimeColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(testDate, result);
-    //}
+        // Assert
+        Assert.AreEqual(testDate, result);
+    }
 
 
 
     /// <summary>
     /// 当列名为空时，各类型读取方法应返回默认值。
     /// </summary>
-    //[TestMethod]
-    //public void GetMethods_EmptyColumnName_ShouldReturnDefault()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetMethods_EmptyColumnName_ShouldReturnDefault()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act & Assert
-    //    Assert.AreEqual(default(int), recordRow.Field<Int32>(""));
-    //    Assert.AreEqual(default(string), recordRow.Field<String>(""));
-    //    Assert.AreEqual(default(bool), recordRow.Field<Boolean>(""));
-    //}
+        // Act & Assert
+        Assert.AreEqual(default(int), recordRow.To<int>(""));
+        Assert.AreEqual(default(string), recordRow.To<string>(""));
+        Assert.AreEqual(default(bool), recordRow.To<bool>(""));
+    }
 
     /// <summary>
     /// 在多行数据场景下，应能读取到各行的正确值。
     /// </summary>
-    //[TestMethod]
-    //public void GetMethods_MultipleRows_ShouldReturnCorrectValues()
-    //{
-    //    // Arrange
-    //    var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
+    [TestMethod]
+    public void GetMethods_MultipleRows_ShouldReturnCorrectValues()
+    {
+        // Arrange
+        var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
 
-    //    var row3 = record.AddRow();
-    //    intColumn.Set(row3.Row, 300);
-    //    stringColumn.Set(row3.Row, "Test3");
-    //    boolColumn.Set(row3.Row, true);
+        var row3 = record.AddRow();
+        intColumn.Set(row3.Row, 300);
+        stringColumn.Set(row3.Row, "Test3");
+        boolColumn.Set(row3.Row, true);
 
-    //    var recordRow0 = new RecordRow(record, 0);
-    //    var recordRow1 = new RecordRow(record, 1);
-    //    var recordRow2 = new RecordRow(record, 2);
+        var recordRow0 = new RecordRow(record, 0);
+        var recordRow1 = new RecordRow(record, 1);
+        var recordRow2 = new RecordRow(record, 2);
 
-    //    // Act & Assert
-    //    Assert.AreEqual(100, recordRow0.Field<Int32>("IntColumn"));
-    //    Assert.AreEqual(200, recordRow1.Field<Int32>("IntColumn"));
-    //    Assert.AreEqual(300, recordRow2.Field<Int32>("IntColumn"));
+        // Act & Assert
+        Assert.AreEqual(100, recordRow0.To<int>("IntColumn"));
+        Assert.AreEqual(200, recordRow1.To<int>("IntColumn"));
+        Assert.AreEqual(300, recordRow2.To<int>("IntColumn"));
 
-    //    Assert.AreEqual("Test1", recordRow0.Field<String>("StringColumn"));
-    //    Assert.AreEqual("Test2", recordRow1.Field<String>("StringColumn"));
-    //    Assert.AreEqual("Test3", recordRow2.Field<String>("StringColumn"));
+        Assert.AreEqual("Test1", recordRow0.To<string>("StringColumn"));
+        Assert.AreEqual("Test2", recordRow1.To<string>("StringColumn"));
+        Assert.AreEqual("Test3", recordRow2.To<string>("StringColumn"));
 
-    //    Assert.AreEqual(true, recordRow0.Field<Boolean>("BoolColumn"));
-    //    Assert.AreEqual(false, recordRow1.Field<Boolean>("BoolColumn"));
-    //    Assert.AreEqual(true, recordRow2.Field<Boolean>("BoolColumn"));
-    //}
+        Assert.AreEqual(true, recordRow0.To<bool>("BoolColumn"));
+        Assert.AreEqual(false, recordRow1.To<bool>("BoolColumn"));
+        Assert.AreEqual(true, recordRow2.To<bool>("BoolColumn"));
+    }
 
 
 
     /// <summary>
     /// 多次访问同一字段时，应保持结果一致。
     /// </summary>
-    //[TestMethod]
-    //public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result1 = recordRow.Field<Int32>("IntColumn");
-    //    var result2 = recordRow.Field<Int32>("IntColumn");
+        // Act
+        var result1 = recordRow.To<int>("IntColumn");
+        var result2 = recordRow.To<int>("IntColumn");
 
-    //    // Assert
-    //    Assert.AreEqual(result1, result2);
-    //    Assert.AreEqual(100, result1);
-    //}
+        // Assert
+        Assert.AreEqual(result1, result2);
+        Assert.AreEqual(100, result1);
+    }
 
 
-
-    /// <summary>
-    /// 调用 <see cref="RecordRow.Set{T}(string, T)"/> 更新已存在的整型列时，应写入成功。
-    /// </summary>
-    //[TestMethod]
-    //public void Set_TypedColumn_ShouldUpdateValue()
-    //{
-    //    // Arrange
-    //    var (record, intColumn, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
-
-    //    // Act
-    //    recordRow.Set("IntColumn", 999);
-
-    //    // Assert
-    //    Assert.AreEqual(999, recordRow.Field<int>("IntColumn"));
-    //}
 
     /// <summary>
-    /// 调用 <see cref="RecordRow.Set{T}(string, T)"/> 更新已存在的字符串列时，应写入成功。
+    /// 使用索引器更新已存在的整型列时，应写入成功。
     /// </summary>
-    //[TestMethod]
-    //public void Set_StringColumn_ShouldUpdateValue()
-    //{
-    //    // Arrange
-    //    var (record, _, stringColumn, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 1);
+    [TestMethod]
+    public void Set_TypedColumn_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    recordRow.Set("StringColumn", "NewValue");
+        // Act
+        recordRow["IntColumn"] = 999;
 
-    //    // Assert
-    //    Assert.AreEqual("NewValue", recordRow.Field<string>("StringColumn"));
-    //}
+        // Assert
+        Assert.AreEqual(999, recordRow.To<int>("IntColumn"));
+    }
+
+    /// <summary>
+    /// 使用索引器更新已存在的字符串列时，应写入成功。
+    /// </summary>
+    [TestMethod]
+    public void Set_StringColumn_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 1);
+
+        // Act
+        recordRow["StringColumn"] = "NewValue";
+
+        // Assert
+        Assert.AreEqual("NewValue", recordRow.To<string>("StringColumn"));
+    }
 
     /// <summary>
     /// 当列不存在时，<see cref="RecordRow.Set{T}(string, T)"/> 应自动创建对应列。
     /// </summary>
-    //[TestMethod]
-    //public void Set_ColumnNotExists_ShouldAutoCreateColumn()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
-    //    int beforeCount = record.Columns.Count;
+    [TestMethod]
+    public void Set_ColumnNotExists_ShouldAutoCreateColumn()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+        int beforeCount = record.Columns.Count;
 
-    //    // Act
-    //    recordRow.Set("NewColumn", 12345);
+        // Act
+        recordRow["NewColumn"] = 12345;
 
-    //    // Assert
-    //    Assert.AreEqual(beforeCount + 1, record.Columns.Count);
-    //    var col = record.Columns.Get("NewColumn");
-    //    Assert.AreEqual(typeof(int), col.Type);
-    //    Assert.AreEqual(12345, recordRow.Field<int>("NewColumn"));
-    //}
+        // Assert
+        Assert.AreEqual(beforeCount + 1, record.Columns.Count);
+        var col = record.Columns.Find("NewColumn");
+        Assert.IsNotNull(col);
+        Assert.AreEqual(typeof(int), col.Type);
+        Assert.AreEqual(12345, recordRow.To<int>("NewColumn"));
+    }
 
     /// <summary>
     /// 写入后再读取时，应得到与写入一致的值。
     /// </summary>
-    //[TestMethod]
-    //public void Set_ThenReadViaIndexer_ShouldBeConsistent()
-    //{
-    //    // Arrange
-    //    var (record, intColumn, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void Set_ThenReadViaIndexer_ShouldBeConsistent()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    recordRow.Set("IntColumn", 42);
+        // Act
+        recordRow["IntColumn"] = 42;
 
-    //    // Assert
-    //    Assert.AreEqual(42, recordRow.Field<int>("IntColumn"));
-    //}
+        // Assert
+        Assert.AreEqual(42, recordRow.To<int>("IntColumn"));
+    }
 
 
 
@@ -510,20 +511,20 @@ public class RecordRowTests
     /// <summary>
     /// dynamic 按成员名写入时，应更新底层记录值。
     /// </summary>
-    //[TestMethod]
-    //public void Dynamic_SetMember_ShouldUpdateValue()
-    //{
-    //    // Arrange
-    //    var (record, _, stringColumn, _) = CreateTestRecord();
-    //    dynamic row = new RecordRow(record, 0);
+    [TestMethod]
+    public void Dynamic_SetMember_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
 
-    //    // Act
-    //    row.StringColumn = "DynValue";
+        // Act
+        row.StringColumn = "DynValue";
 
-    //    // Assert
-    //    var recordRow = new RecordRow(record, 0);
-    //    Assert.AreEqual("DynValue", recordRow.Field<string>("StringColumn"));
-    //}
+        // Assert
+        var recordRow = new RecordRow(record, 0);
+        Assert.AreEqual("DynValue", recordRow.To<string>("StringColumn"));
+    }
 
     /// <summary>
     /// dynamic 按索引器读取时，应返回正确值。
@@ -545,20 +546,20 @@ public class RecordRowTests
     /// <summary>
     /// dynamic 按索引器写入时，应更新底层记录值。
     /// </summary>
-    //[TestMethod]
-    //public void Dynamic_SetIndex_ShouldUpdateValue()
-    //{
-    //    // Arrange
-    //    var (record, intColumn, _, _) = CreateTestRecord();
-    //    dynamic row = new RecordRow(record, 0);
+    [TestMethod]
+    public void Dynamic_SetIndex_ShouldUpdateValue()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
 
-    //    // Act - dynamic 索引写入
-    //    row["IntColumn"] = 777;
+        // Act - dynamic 索引写入
+        row["IntColumn"] = 777;
 
-    //    // Assert
-    //    var recordRow = new RecordRow(record, 0);
-    //    Assert.AreEqual(777, recordRow.Field<int>("IntColumn"));
-    //}
+        // Assert
+        var recordRow = new RecordRow(record, 0);
+        Assert.AreEqual(777, recordRow.To<int>("IntColumn"));
+    }
 
     /// <summary>
     /// dynamic 读取不存在的成员时，应返回 null。
@@ -594,53 +595,53 @@ public class RecordRowTests
     /// <summary>
     /// dynamic 成员读取结果应与显式调用字段读取方法一致。
     /// </summary>
-    //[TestMethod]
-    //public void Dynamic_GetMember_ShouldBeConsistentWithGetMethod()
-    //{
-    //    // Arrange
-    //    var (record, intColumn, _, boolColumn) = CreateTestRecord();
-    //    dynamic row = new RecordRow(record, 0);
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void Dynamic_GetMember_ShouldBeConsistentWithGetMethod()
+    {
+        // Arrange
+        var (record, intColumn, _, boolColumn) = CreateTestRecord();
+        dynamic row = new RecordRow(record, 0);
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act & Assert
-    //    Assert.AreEqual(recordRow.Field<int>("IntColumn"), (int)row.IntColumn!);
-    //    Assert.AreEqual(recordRow.Field<bool>("BoolColumn"), (bool)row.BoolColumn!);
-    //}
-
-    /// <summary>
-    /// <see cref="RecordRow.Field(string)"/> 按列名读取已存在列时，应返回对应对象值。
-    /// </summary>
-    //[TestMethod]
-    //public void FieldObject_ByName_ColumnExists_ShouldReturnValue()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
-
-    //    // Act
-    //    var result = recordRow.Field("IntColumn");
-
-    //    // Assert
-    //    Assert.IsNotNull(result);
-    //    Assert.AreEqual(100, (int)result!);
-    //}
+        // Act & Assert
+        Assert.AreEqual(recordRow.To<int>("IntColumn"), (int)row.IntColumn!);
+        Assert.AreEqual(recordRow.To<bool>("BoolColumn"), (bool)row.BoolColumn!);
+    }
 
     /// <summary>
-    /// <see cref="RecordRow.Field(string)"/> 按列名读取不存在列时，应返回 null。
+    /// 索引器按列名读取已存在列时，应返回对应对象值。
     /// </summary>
-    //[TestMethod]
-    //public void FieldObject_ByName_ColumnNotExists_ShouldReturnNull()
-    //{
-    //    // Arrange
-    //    var (record, _, _, _) = CreateTestRecord();
-    //    var recordRow = new RecordRow(record, 0);
+    [TestMethod]
+    public void FieldObject_ByName_ColumnExists_ShouldReturnValue()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
 
-    //    // Act
-    //    var result = recordRow.Field("NonExistentColumn");
+        // Act
+        var result = recordRow["IntColumn"];
 
-    //    // Assert
-    //    Assert.IsNull(result);
-    //}
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(100, (int)result!);
+    }
+
+    /// <summary>
+    /// 按列名读取不存在列时，索引器应返回 null。
+    /// </summary>
+    [TestMethod]
+    public void FieldObject_ByName_ColumnNotExists_ShouldReturnNull()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow["NonExistentColumn"];
+
+        // Assert
+        Assert.IsNull(result);
+    }
 
     /// <summary>
     /// <see cref="RecordRow.ToDictionary"/> 应返回当前行的全部列与对应值。
