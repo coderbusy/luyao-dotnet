@@ -45,14 +45,14 @@ public class RecordColumn<T> : RecordColumn
     }
 
     ///<inheritdoc/>
-    public override object? GetValue(int row)
+    public override object? Get(int row)
     {
         OnGet(row);
         return _data[row];
     }
 
     ///<inheritdoc/>
-    public override void SetValue(int row, object? value)
+    public override void Set(int row, object? value)
     {
         OnSet(row);
         if (value is null)
@@ -94,17 +94,17 @@ public class RecordColumn<T> : RecordColumn
         Array.Copy(src, _data, len);
     }
 
-    #region Get / Set
+    #region Field
 
     ///<inheritdoc/>
-    public T Get(int row)
+    public T Field(int row)
     {
         OnGet(row);
         return _data[row];
     }
 
     ///<inheritdoc/>
-    public virtual void Set(int row, T value)
+    public virtual void SetField(int row, T value)
     {
         OnSet(row);
         _data[row] = value;

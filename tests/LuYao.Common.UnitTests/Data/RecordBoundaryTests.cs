@@ -18,14 +18,14 @@ public class RecordBoundaryTests
         for (int i = 0; i < rowCount; i++)
         {
             var row = record.AddRow();
-            col.Set(row.Row, i);
+            col.SetField(row.Row, i);
         }
 
         Assert.AreEqual(rowCount, record.Count);
         // Verify data integrity at boundaries
-        Assert.AreEqual(0, col.Get<int>(0));
-        Assert.AreEqual(rowCount - 1, col.Get<int>(rowCount - 1));
-        Assert.AreEqual(5000, col.Get<int>(5000));
+        Assert.AreEqual(0, col.To<int>(0));
+        Assert.AreEqual(rowCount - 1, col.To<int>(rowCount - 1));
+        Assert.AreEqual(5000, col.To<int>(5000));
     }
 
     #endregion
@@ -62,8 +62,8 @@ public class RecordBoundaryTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.Set(row.Row, i);
-            nameCol.Set(row.Row, $"Item{i}");
+            idCol.SetField(row.Row, i);
+            nameCol.SetField(row.Row, $"Item{i}");
         }
 
         // Delete row 1
@@ -72,12 +72,12 @@ public class RecordBoundaryTests
 
         // Add a new row
         var newRow = record.AddRow();
-        idCol.Set(newRow.Row, 99);
-        nameCol.Set(newRow.Row, "New");
+        idCol.SetField(newRow.Row, 99);
+        nameCol.SetField(newRow.Row, "New");
 
         Assert.AreEqual(3, record.Count);
-        Assert.AreEqual(99, idCol.Get<int>(2));
-        Assert.AreEqual("New", nameCol.Get<string>(2));
+        Assert.AreEqual(99, idCol.To<int>(2));
+        Assert.AreEqual("New", nameCol.To<string>(2));
     }
 
     #endregion
@@ -133,7 +133,7 @@ public class RecordBoundaryTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.Set(row.Row, i);
+            idCol.SetField(row.Row, i);
         }
 
         int deleted = record.DeleteRows(new[] { 1, 1, 1 });

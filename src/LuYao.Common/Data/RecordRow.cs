@@ -61,7 +61,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         foreach (var col in this.Record.Columns)
         {
             if (!first) sb.Append(", ");
-            var value = col.GetValue(this);
+            var value = col.Get(this);
             sb.Append(col.Name).Append(" = ").Append(value?.ToString() ?? string.Empty);
             first = false;
         }
@@ -78,7 +78,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         var ret = new Dictionary<string, object?>(this.Record.Columns.Count, StringComparer.Ordinal);
         foreach (var col in this.Record.Columns)
         {
-            ret[col.Name] = col.GetValue(this);
+            ret[col.Name] = col.Get(this);
         }
         return ret;
     }
@@ -95,7 +95,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
             if (!string.IsNullOrWhiteSpace(name))
             {
                 var col = this.Record.Columns.Find(name);
-                if (col != null) return col.GetValue(this);
+                if (col != null) return col.Get(this);
             }
             return default;
         }
@@ -107,7 +107,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
                 if (value == null) return;
                 col = this.Record.Columns.Add(name, value.GetType());
             }
-            col.SetValue(this, value);
+            col.Set(this, value);
         }
     }
 }

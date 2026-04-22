@@ -95,8 +95,8 @@ public class RecordToStringTests
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Name");
         var row = record.AddRow();
-        record.Columns[0].SetValue(row, 1);
-        record.Columns[1].SetValue(row, "Alice");
+        record.Columns[0].Set(row, 1);
+        record.Columns[1].Set(row, "Alice");
 
         // Act
         var result = record.ToString();
@@ -116,8 +116,8 @@ public class RecordToStringTests
         for (int i = 0; i < 2; i++)
         {
             var row = record.AddRow();
-            record.Columns[0].SetValue(row, i);
-            record.Columns[1].SetValue(row, "R" + i);
+            record.Columns[0].Set(row, i);
+            record.Columns[1].Set(row, "R" + i);
         }
 
         // Act
@@ -137,7 +137,7 @@ public class RecordToStringTests
         record.Columns.Add<string>("Val");
         var r1 = record.AddRow();
         var r2 = record.AddRow();
-        record.Columns[0].SetValue(r1, "A");
+        record.Columns[0].Set(r1, "A");
         // r2 不设置值，保持 null
 
         // Act
@@ -156,8 +156,8 @@ public class RecordToStringTests
         record.Columns.Add<int>("X");
         var r1 = record.AddRow();
         var r2 = record.AddRow();
-        record.Columns[0].SetValue(r1, 1);
-        record.Columns[0].SetValue(r2, 2);
+        record.Columns[0].Set(r1, 1);
+        record.Columns[0].Set(r2, 2);
 
         // Act
         var result = record.ToString();
@@ -178,8 +178,8 @@ public class RecordToStringTests
         record.Columns.Add<string>("Data");
         var r1 = record.AddRow();
         var r2 = record.AddRow();
-        record.Columns[0].SetValue(r1, new string('A', 100));
-        record.Columns[0].SetValue(r2, "short");
+        record.Columns[0].Set(r1, new string('A', 100));
+        record.Columns[0].Set(r2, "short");
 
         // Act
         var result = record.ToString();

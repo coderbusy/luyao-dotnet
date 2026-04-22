@@ -21,12 +21,12 @@ public class RecordMappingTests
         var nameColumn = record.Columns.Add<string>("Name");
 
         var row1 = record.AddRow();
-        idColumn.Set(row1.Row, 1);
-        nameColumn.Set(row1.Row, "Alice");
+        idColumn.SetField(row1.Row, 1);
+        nameColumn.SetField(row1.Row, "Alice");
 
         var row2 = record.AddRow();
-        idColumn.Set(row2.Row, 2);
-        nameColumn.Set(row2.Row, "Bob");
+        idColumn.SetField(row2.Row, 2);
+        nameColumn.SetField(row2.Row, "Bob");
 
         // Act
         var model = record.To<TestModel>();

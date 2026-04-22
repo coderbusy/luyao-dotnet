@@ -24,12 +24,12 @@ public class RecordRowTests
         var row1 = record.AddRow();
         var row2 = record.AddRow();
 
-        intColumn.Set(0, 100);
-        intColumn.Set(1, 200);
-        stringColumn.Set(0, "Test1");
-        stringColumn.Set(1, "Test2");
-        boolColumn.Set(0, true);
-        boolColumn.Set(1, false);
+        intColumn.SetField(0, 100);
+        intColumn.SetField(1, 200);
+        stringColumn.SetField(0, "Test1");
+        stringColumn.SetField(1, "Test2");
+        boolColumn.SetField(0, true);
+        boolColumn.SetField(1, false);
 
         return (record, intColumn, stringColumn, boolColumn);
     }
@@ -672,7 +672,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 2);
         var nullableColumn = record.Columns.Add<string>("NullableColumn");
         record.AddRow();
-        nullableColumn.Set(0, null);
+        nullableColumn.SetField(0, null);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -711,7 +711,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 2);
         var nullableColumn = record.Columns.Add<string>("NullableColumn");
         record.AddRow();
-        nullableColumn.Set(0, null);
+        nullableColumn.SetField(0, null);
         var recordRow = new RecordRow(record, 0);
 
         // Act

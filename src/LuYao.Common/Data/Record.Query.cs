@@ -22,7 +22,7 @@ public partial class Record
         var comparer = EqualityComparer<T>.Default;
         for (int i = 0; i < this.Count; i++)
         {
-            var val = col.Get<T>(i);
+            var val = col.To<T>(i);
             if (comparer.Equals(val, value)) return new RecordRow(this, i);
         }
         return null;
@@ -42,7 +42,7 @@ public partial class Record
         var comparer = EqualityComparer<T>.Default;
         for (int i = 0; i < this.Count; i++)
         {
-            var val = col.Get<T>(i);
+            var val = col.To<T>(i);
             if (comparer.Equals(val, value)) yield return new RecordRow(this, i);
         }
     }

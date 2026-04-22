@@ -17,9 +17,9 @@ public class RecordSchemaOperationsTests
         for (int i = 0; i < 3; i++)
         {
             var row = record.AddRow();
-            idCol.Set(row.Row, i + 1);
-            nameCol.Set(row.Row, $"Person{i + 1}");
-            ageCol.Set(row.Row, 20 + i);
+            idCol.SetField(row.Row, i + 1);
+            nameCol.SetField(row.Row, $"Person{i + 1}");
+            ageCol.SetField(row.Row, 20 + i);
         }
         return record;
     }
@@ -35,7 +35,7 @@ public class RecordSchemaOperationsTests
 
         Assert.IsNotNull(record.Columns.Find("FullName"));
         Assert.IsNull(record.Columns.Find("Name"));
-        Assert.AreEqual("Person1", record.Columns.Find("FullName")!.GetValue(0));
+        Assert.AreEqual("Person1", record.Columns.Find("FullName")!.Get(0));
     }
 
     [TestMethod]
@@ -81,9 +81,9 @@ public class RecordSchemaOperationsTests
 
         var col = record.Columns.Find("RecordId");
         Assert.IsNotNull(col);
-        Assert.AreEqual(1, col!.GetValue(0));
-        Assert.AreEqual(2, col.GetValue(1));
-        Assert.AreEqual(3, col.GetValue(2));
+        Assert.AreEqual(1, col!.Get(0));
+        Assert.AreEqual(2, col.Get(1));
+        Assert.AreEqual(3, col.Get(2));
     }
 
     #endregion
@@ -110,9 +110,9 @@ public class RecordSchemaOperationsTests
         record.CastColumn("Id", typeof(string));
 
         var col = record.Columns.Find("Id");
-        Assert.AreEqual("1", col!.GetValue(0));
-        Assert.AreEqual("2", col.GetValue(1));
-        Assert.AreEqual("3", col.GetValue(2));
+        Assert.AreEqual("1", col!.Get(0));
+        Assert.AreEqual("2", col.Get(1));
+        Assert.AreEqual("3", col.Get(2));
     }
 
     [TestMethod]
@@ -231,9 +231,9 @@ public class RecordSchemaOperationsTests
 
         Assert.AreEqual(3, clone.Columns.Count);
         Assert.AreEqual(3, clone.Count);
-        Assert.AreEqual(1, clone.Columns[0].GetValue(0));
-        Assert.AreEqual("Person2", clone.Columns[1].GetValue(1));
-        Assert.AreEqual(22, clone.Columns[2].GetValue(2));
+        Assert.AreEqual(1, clone.Columns[0].Get(0));
+        Assert.AreEqual("Person2", clone.Columns[1].Get(1));
+        Assert.AreEqual(22, clone.Columns[2].Get(2));
     }
 
     [TestMethod]
@@ -242,10 +242,10 @@ public class RecordSchemaOperationsTests
         var record = CreateTestRecord();
 
         var clone = record.Clone();
-        clone.Columns[0].SetValue(0, 999);
+        clone.Columns[0].Set(0, 999);
 
-        Assert.AreEqual(1, record.Columns[0].GetValue(0));
-        Assert.AreEqual(999, clone.Columns[0].GetValue(0));
+        Assert.AreEqual(1, record.Columns[0].Get(0));
+        Assert.AreEqual(999, clone.Columns[0].Get(0));
     }
 
     [TestMethod]
