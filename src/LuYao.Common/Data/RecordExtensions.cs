@@ -13,14 +13,14 @@ public static class RecordExtensions
         if (col == null)
         {
             var defaultKey = default(T);
-            if (defaultKey is null) throw new InvalidOperationException($"Cannot group by missing column \"{fld}\" when {typeof(T).Name} has no non-null default key.");
+            if (defaultKey is null) throw new InvalidOperationException($"Cannot group by missing column \"{fld}\" when {typeof(T).Name} has a null default value.");
             ret.Add(defaultKey, re.ToList());
             return ret;
         }
         foreach (var row in re)
         {
             T? key = col.To<T>(row);
-            if (key is null) throw new InvalidOperationException($"Column \"{fld}\" contains null key at row {row}.");
+            if (key is null) throw new InvalidOperationException($"Column \"{fld}\" contains null key at row index {(int)row}.");
             if (!ret.TryGetValue(key, out var tmp))
             {
                 tmp = new List<RecordRow>();

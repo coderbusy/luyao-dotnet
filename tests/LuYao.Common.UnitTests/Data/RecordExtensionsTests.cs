@@ -62,6 +62,8 @@ public class RecordExtensionsTests
         var row = record.AddRow();
         record.Columns["Id"].Set(row, 1);
 
-        Assert.Throws<InvalidOperationException>(() => record.Group<string>("MissingColumn"));
+        var ex = Assert.Throws<InvalidOperationException>(() => record.Group<string>("MissingColumn"));
+        StringAssert.Contains(ex.Message, "MissingColumn");
+        StringAssert.Contains(ex.Message, "null default value");
     }
 }
