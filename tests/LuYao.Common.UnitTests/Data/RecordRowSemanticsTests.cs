@@ -23,7 +23,7 @@ public class RecordRowSemanticsTests
         var col = record.Columns.Add<int>("Id");
         var row = record.AddRow();
         col.Set(row.Row, 123);
-        Assert.AreEqual(123, row.Field<int>("Id"));
+        Assert.AreEqual(123, row.To<int>("Id"));
     }
 
     [TestMethod]
@@ -32,8 +32,8 @@ public class RecordRowSemanticsTests
         var record = new Record();
         record.AddRow();
         var row = record[0];
-        Assert.AreEqual(0, row.Field<int>("NoSuch"));
-        Assert.IsNull(row.Field<string>("NoSuch"));
+        Assert.AreEqual(0, row.To<int>("NoSuch"));
+        Assert.IsNull(row.To<string>("NoSuch"));
     }
 
     [TestMethod]
@@ -41,12 +41,12 @@ public class RecordRowSemanticsTests
     {
         var record = new Record();
         var row = record.AddRow();
-        row.Set<int>("Id", 100);
+        row["Id"] = 100;
 
         Assert.AreEqual(1, record.Columns.Count);
         var col = record.Columns.Get("Id");
         Assert.AreEqual(typeof(int), col.Type);
-        Assert.AreEqual(100, row.Field<int>("Id"));
+        Assert.AreEqual(100, row.To<int>("Id"));
     }
 
     [TestMethod]
@@ -55,17 +55,8 @@ public class RecordRowSemanticsTests
         var record = new Record();
         record.Columns.Add<string>("Name");
         var row = record.AddRow();
-        row.Set<string>("Name", "abc");
-        Assert.AreEqual("abc", row.Field<string>("Name"));
-    }
-
-    [TestMethod]
-    public void Set_ColumnExistsDifferentType_Throws()
-    {
-        var record = new Record();
-        record.Columns.Add<string>("Id");
-        var row = record.AddRow();
-        Assert.Throws<InvalidOperationException>(() => row.Set<int>("Id", 1));
+        row["Name"] = "abc";
+        Assert.AreEqual("abc", row.To<string>("Name"));
     }
 
     [TestMethod]
@@ -81,8 +72,8 @@ public class RecordRowSemanticsTests
         Assert.AreEqual(typeof(string), record.Columns.Get("Name").Type);
 
         var row = record[0];
-        Assert.AreEqual(100, row.Field<int>("Id"));
-        Assert.AreEqual("abc", row.Field<string>("Name"));
+        Assert.AreEqual(100, row.To<int>("Id"));
+        Assert.AreEqual("abc", row.To<string>("Name"));
     }
 
     [TestMethod]
@@ -102,7 +93,7 @@ public class RecordRowSemanticsTests
         dynamic dto = record.AddRow();
         dto.Name = "x";
         dto.Name = null;
-        Assert.IsNull(((RecordRow)dto).Field<string>("Name"));
+        Assert.IsNull(((RecordRow)dto).To<string>("Name"));
     }
 
     [TestMethod]
@@ -112,9 +103,8 @@ public class RecordRowSemanticsTests
         dynamic dto = record.AddRow();
         dto["Id"] = 7;
         Assert.AreEqual(1, record.Columns.Count);
-        Assert.AreEqual(7, record[0].Field<int>("Id"));
+        Assert.AreEqual(7, record[0].To<int>("Id"));
     }
-
 
     [TestMethod]
     public void Mapping_CopyFromObject_DoesNotAutoCreateColumns()
@@ -126,7 +116,7 @@ public class RecordRowSemanticsTests
         row.CopyFrom(new MappingDto { Id = 9, Name = "ignored" });
 
         Assert.AreEqual(1, record.Columns.Count);
-        Assert.AreEqual(9, row.Field<int>("Id"));
+        Assert.AreEqual(9, row.To<int>("Id"));
     }
 
     private sealed class MappingDto

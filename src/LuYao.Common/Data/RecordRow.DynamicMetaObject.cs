@@ -1,7 +1,6 @@
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace LuYao.Data;
 
@@ -12,17 +11,9 @@ partial struct RecordRow
     /// </summary>
     private sealed class RecordRowMetaObject : DynamicMetaObject
     {
-        // dynamic 读取走 GetValueOrDefault：列不存在返回 null。
-        private static readonly MethodInfo GetMethod =
-            typeof(RecordRow).GetMethod(
-                nameof(RecordRow.GetValueOrDefault),
-                BindingFlags.Instance | BindingFlags.NonPublic)!;
-
-        // dynamic 写入走 SetAndEnsureColumn：列不存在时按运行时类型自动建列；null 值且列不存在则跳过。
-        private static readonly MethodInfo SetMethod =
-            typeof(RecordRow).GetMethod(
-                nameof(RecordRow.SetAndEnsureColumn),
-                BindingFlags.Instance | BindingFlags.NonPublic)!;
+        // dynamic 读取/写入走 this[string] 索引器
+        private static readonly System.Reflection.PropertyInfo IndexerProperty =
+            typeof(RecordRow).GetProperty("Item", new[] { typeof(string) })!;
 
         public RecordRowMetaObject(Expression expression, RecordRow value)
             : base(expression, BindingRestrictions.Empty, value)
@@ -40,10 +31,7 @@ partial struct RecordRow
         public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
         {
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
-            var call = Expression.Call(
-                GetLimitedSelf(),
-                GetMethod,
-                Expression.Constant(binder.Name));
+            var call = Expression.MakeIndex(GetLimitedSelf(), IndexerProperty, new[] { Expression.Constant(binder.Name) });
             return new DynamicMetaObject(call, restrictions);
         }
 
@@ -51,12 +39,9 @@ partial struct RecordRow
         public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
         {
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
-            var param = Expression.Variable(typeof(object));
-            var assign = Expression.Assign(param, Expression.Convert(value.Expression, typeof(object)));
-            var call = Expression.Call(GetLimitedSelf(), SetMethod, Expression.Constant(binder.Name), param);
-            // DLR requires the expression to return object, not void
-            var block = Expression.Block(new[] { param }, assign, call, param);
-            return new DynamicMetaObject(block, restrictions);
+            var indexAccess = Expression.MakeIndex(GetLimitedSelf(), IndexerProperty, new[] { Expression.Constant(binder.Name) });
+            var assign = Expression.Assign(indexAccess, Expression.Convert(value.Expression, typeof(object)));
+            return new DynamicMetaObject(assign, restrictions);
         }
 
         /// <inheritdoc/>
@@ -66,7 +51,7 @@ partial struct RecordRow
                 return base.BindGetIndex(binder, indexes);
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
             var key = Expression.Convert(indexes[0].Expression, typeof(string));
-            var call = Expression.Call(GetLimitedSelf(), GetMethod, key);
+            var call = Expression.MakeIndex(GetLimitedSelf(), IndexerProperty, new[] { key });
             return new DynamicMetaObject(call, restrictions);
         }
 
@@ -77,12 +62,9 @@ partial struct RecordRow
                 return base.BindSetIndex(binder, indexes, value);
             var restrictions = BindingRestrictions.GetTypeRestriction(Expression, typeof(RecordRow));
             var key = Expression.Convert(indexes[0].Expression, typeof(string));
-            var param = Expression.Variable(typeof(object));
-            var assign = Expression.Assign(param, Expression.Convert(value.Expression, typeof(object)));
-            var call = Expression.Call(GetLimitedSelf(), SetMethod, key, param);
-            // DLR requires the expression to return object, not void
-            var block = Expression.Block(new[] { param }, assign, call, param);
-            return new DynamicMetaObject(block, restrictions);
+            var indexAccess = Expression.MakeIndex(GetLimitedSelf(), IndexerProperty, new[] { key });
+            var assign = Expression.Assign(indexAccess, Expression.Convert(value.Expression, typeof(object)));
+            return new DynamicMetaObject(assign, restrictions);
         }
     }
 }

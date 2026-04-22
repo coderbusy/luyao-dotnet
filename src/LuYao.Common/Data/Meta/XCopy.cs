@@ -43,9 +43,12 @@ public static class XCopy<T> where T : class
     /// <param name="row">目标行；仅写入类型受支持的可读属性。Mapping 路径下若列不存在则静默跳过，<b>不会自动建列</b>。</param>
     public static void CopyTo(T data, RecordRow row)
     {
+        var cols = row.Record.Columns;
         foreach (var prop in _readableProps)
         {
-            row.TrySetValue(prop.Name, prop.GetValue(data));
+            var col = cols.Find(prop.Name);
+            if (col == null) continue;
+            col.Set(row, prop.GetValue(data));
         }
     }
 
@@ -56,11 +59,12 @@ public static class XCopy<T> where T : class
     /// <param name="row">数据来源行。</param>
     public static void CopyFrom(T data, RecordRow row)
     {
-        var columns = row.Record.Columns;
+        var cols = row.Record.Columns;
         foreach (var prop in _writableProps)
         {
-            if (!columns.Contains(prop.Name)) continue;
-            prop.SetValue(data, row.GetValueOrDefault(prop.Name));
+            var col = cols.Find(prop.Name);
+            if (col == null) continue;
+            prop.SetValue(data, col.Get(row));
         }
     }
     #endregion

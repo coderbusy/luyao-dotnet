@@ -244,7 +244,7 @@ public partial class Record : IEnumerable<RecordRow>
             {
                 object val = dr.GetValue(i);
                 if (val == DBNull.Value) continue;
-                this.Columns[i].SetValue(row, val);
+                this.Columns[i].Set(row, val);
             }
         }
     }
@@ -268,7 +268,7 @@ public partial class Record : IEnumerable<RecordRow>
             {
                 sb.Append(PadRightByWidth(col.Name, max));
                 sb.Append(" | ");
-                sb.Append(col.GetValue(0));
+                sb.Append(col.Get(0));
                 sb.AppendLine();
             }
         }
@@ -285,7 +285,7 @@ public partial class Record : IEnumerable<RecordRow>
 
                 for (int i = 0; i < Count; i++)
                 {
-                    string s = Convert.ToString(col.GetValue(i)) ?? string.Empty;
+                    string s = Convert.ToString(col.Get(i)) ?? string.Empty;
                     int w = DisplayWidth(s);
                     if (w > MAX_WIDTH)
                     {
@@ -441,7 +441,7 @@ public partial class Record : IEnumerable<RecordRow>
             DataRow row = dt.Rows.Add();
             for (int i = 0; i < this.Columns.Count; i++)
             {
-                var val = this.Columns[i].GetValue(r);
+                var val = this.Columns[i].Get(r);
                 if (val is not null) row[i] = val;
             }
         }
@@ -466,7 +466,7 @@ public partial class Record : IEnumerable<RecordRow>
             {
                 var col = ret.Columns[i];
                 if (row.IsNull(i)) continue;
-                col.SetValue(recordRow, row[i]);
+                col.Set(recordRow, row[i]);
             }
         }
         return ret;
@@ -518,10 +518,10 @@ public partial class Record : IEnumerable<RecordRow>
 
         for (int r = 0; r < this.Count; r++)
         {
-            var val = oldCol.GetValue(r);
+            var val = oldCol.Get(r);
             if (val is not null)
             {
-                newCol.SetValue(r, Valid.To(val, newType));
+                newCol.Set(r, Valid.To(val, newType));
             }
         }
 
@@ -561,10 +561,10 @@ public partial class Record : IEnumerable<RecordRow>
             clone.AddRow();
             for (int c = 0; c < this.Columns.Count; c++)
             {
-                var val = this.Columns[c].GetValue(r);
+                var val = this.Columns[c].Get(r);
                 if (val is not null)
                 {
-                    clone.Columns[c].SetValue(r, val);
+                    clone.Columns[c].Set(r, val);
                 }
             }
         }

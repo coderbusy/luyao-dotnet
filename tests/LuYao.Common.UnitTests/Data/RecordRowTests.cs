@@ -24,12 +24,12 @@ public class RecordRowTests
         var row1 = record.AddRow();
         var row2 = record.AddRow();
 
-        intColumn.Set(0, 100);
-        intColumn.Set(1, 200);
-        stringColumn.Set(0, "Test1");
-        stringColumn.Set(1, "Test2");
-        boolColumn.Set(0, true);
-        boolColumn.Set(1, false);
+        intColumn.SetValue(0, 100);
+        intColumn.SetValue(1, 200);
+        stringColumn.SetValue(0, "Test1");
+        stringColumn.SetValue(1, "Test2");
+        boolColumn.SetValue(0, true);
+        boolColumn.SetValue(1, false);
 
         return (record, intColumn, stringColumn, boolColumn);
     }
@@ -157,7 +157,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<Boolean>("BoolColumn");
+        var result = recordRow.To<bool>("BoolColumn");
 
         // Assert
         Assert.AreEqual(true, result);
@@ -174,7 +174,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<Boolean>("NonExistentColumn");
+        var result = recordRow.To<bool>("NonExistentColumn");
 
         // Assert
         Assert.AreEqual(default(bool), result);
@@ -191,7 +191,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 1);
 
         // Act
-        var result = recordRow.Field<String>("StringColumn");
+        var result = recordRow.To<string>("StringColumn");
 
         // Assert
         Assert.AreEqual("Test2", result);
@@ -208,7 +208,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<String>("NonExistentColumn");
+        var result = recordRow.To<string>("NonExistentColumn");
 
         // Assert
         Assert.AreEqual(default(string), result);
@@ -225,7 +225,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 1);
 
         // Act
-        var result = recordRow.Field<Int32>("IntColumn");
+        var result = recordRow.To<int>("IntColumn");
 
         // Assert
         Assert.AreEqual(200, result);
@@ -242,7 +242,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<Int32>("NonExistentColumn");
+        var result = recordRow.To<int>("NonExistentColumn");
 
         // Assert
         Assert.AreEqual(default(int), result);
@@ -259,7 +259,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<int>("IntColumn");
+        var result = recordRow.To<int>("IntColumn");
 
         // Assert
         Assert.AreEqual(100, result);
@@ -276,7 +276,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<int>("NonExistentColumn");
+        var result = recordRow.To<int>("NonExistentColumn");
 
         // Assert
         Assert.AreEqual(default(int), result);
@@ -296,7 +296,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<Byte>("ByteColumn");
+        var result = recordRow.To<byte>("ByteColumn");
 
         // Assert
         Assert.AreEqual((byte)255, result);
@@ -316,7 +316,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<Double>("DoubleColumn");
+        var result = recordRow.To<double>("DoubleColumn");
 
         // Assert
         Assert.AreEqual(3.14159, result, 0.00001);
@@ -337,7 +337,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field<DateTime>("DateTimeColumn");
+        var result = recordRow.To<DateTime>("DateTimeColumn");
 
         // Assert
         Assert.AreEqual(testDate, result);
@@ -356,9 +356,9 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act & Assert
-        Assert.AreEqual(default(int), recordRow.Field<Int32>(""));
-        Assert.AreEqual(default(string), recordRow.Field<String>(""));
-        Assert.AreEqual(default(bool), recordRow.Field<Boolean>(""));
+        Assert.AreEqual(default(int), recordRow.To<int>(""));
+        Assert.AreEqual(default(string), recordRow.To<string>(""));
+        Assert.AreEqual(default(bool), recordRow.To<bool>(""));
     }
 
     /// <summary>
@@ -380,17 +380,17 @@ public class RecordRowTests
         var recordRow2 = new RecordRow(record, 2);
 
         // Act & Assert
-        Assert.AreEqual(100, recordRow0.Field<Int32>("IntColumn"));
-        Assert.AreEqual(200, recordRow1.Field<Int32>("IntColumn"));
-        Assert.AreEqual(300, recordRow2.Field<Int32>("IntColumn"));
+        Assert.AreEqual(100, recordRow0.To<int>("IntColumn"));
+        Assert.AreEqual(200, recordRow1.To<int>("IntColumn"));
+        Assert.AreEqual(300, recordRow2.To<int>("IntColumn"));
 
-        Assert.AreEqual("Test1", recordRow0.Field<String>("StringColumn"));
-        Assert.AreEqual("Test2", recordRow1.Field<String>("StringColumn"));
-        Assert.AreEqual("Test3", recordRow2.Field<String>("StringColumn"));
+        Assert.AreEqual("Test1", recordRow0.To<string>("StringColumn"));
+        Assert.AreEqual("Test2", recordRow1.To<string>("StringColumn"));
+        Assert.AreEqual("Test3", recordRow2.To<string>("StringColumn"));
 
-        Assert.AreEqual(true, recordRow0.Field<Boolean>("BoolColumn"));
-        Assert.AreEqual(false, recordRow1.Field<Boolean>("BoolColumn"));
-        Assert.AreEqual(true, recordRow2.Field<Boolean>("BoolColumn"));
+        Assert.AreEqual(true, recordRow0.To<bool>("BoolColumn"));
+        Assert.AreEqual(false, recordRow1.To<bool>("BoolColumn"));
+        Assert.AreEqual(true, recordRow2.To<bool>("BoolColumn"));
     }
 
 
@@ -406,8 +406,8 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result1 = recordRow.Field<Int32>("IntColumn");
-        var result2 = recordRow.Field<Int32>("IntColumn");
+        var result1 = recordRow.To<int>("IntColumn");
+        var result2 = recordRow.To<int>("IntColumn");
 
         // Assert
         Assert.AreEqual(result1, result2);
@@ -417,7 +417,7 @@ public class RecordRowTests
 
 
     /// <summary>
-    /// 调用 <see cref="RecordRow.Set{T}(string, T)"/> 更新已存在的整型列时，应写入成功。
+    /// 使用索引器更新已存在的整型列时，应写入成功。
     /// </summary>
     [TestMethod]
     public void Set_TypedColumn_ShouldUpdateValue()
@@ -427,14 +427,14 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        recordRow.Set("IntColumn", 999);
+        recordRow["IntColumn"] = 999;
 
         // Assert
-        Assert.AreEqual(999, recordRow.Field<int>("IntColumn"));
+        Assert.AreEqual(999, recordRow.To<int>("IntColumn"));
     }
 
     /// <summary>
-    /// 调用 <see cref="RecordRow.Set{T}(string, T)"/> 更新已存在的字符串列时，应写入成功。
+    /// 使用索引器更新已存在的字符串列时，应写入成功。
     /// </summary>
     [TestMethod]
     public void Set_StringColumn_ShouldUpdateValue()
@@ -444,10 +444,10 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 1);
 
         // Act
-        recordRow.Set("StringColumn", "NewValue");
+        recordRow["StringColumn"] = "NewValue";
 
         // Assert
-        Assert.AreEqual("NewValue", recordRow.Field<string>("StringColumn"));
+        Assert.AreEqual("NewValue", recordRow.To<string>("StringColumn"));
     }
 
     /// <summary>
@@ -462,13 +462,14 @@ public class RecordRowTests
         int beforeCount = record.Columns.Count;
 
         // Act
-        recordRow.Set("NewColumn", 12345);
+        recordRow["NewColumn"] = 12345;
 
         // Assert
         Assert.AreEqual(beforeCount + 1, record.Columns.Count);
-        var col = record.Columns.Get("NewColumn");
+        var col = record.Columns.Find("NewColumn");
+        Assert.IsNotNull(col);
         Assert.AreEqual(typeof(int), col.Type);
-        Assert.AreEqual(12345, recordRow.Field<int>("NewColumn"));
+        Assert.AreEqual(12345, recordRow.To<int>("NewColumn"));
     }
 
     /// <summary>
@@ -482,10 +483,10 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        recordRow.Set("IntColumn", 42);
+        recordRow["IntColumn"] = 42;
 
         // Assert
-        Assert.AreEqual(42, recordRow.Field<int>("IntColumn"));
+        Assert.AreEqual(42, recordRow.To<int>("IntColumn"));
     }
 
 
@@ -522,7 +523,7 @@ public class RecordRowTests
 
         // Assert
         var recordRow = new RecordRow(record, 0);
-        Assert.AreEqual("DynValue", recordRow.Field<string>("StringColumn"));
+        Assert.AreEqual("DynValue", recordRow.To<string>("StringColumn"));
     }
 
     /// <summary>
@@ -557,7 +558,7 @@ public class RecordRowTests
 
         // Assert
         var recordRow = new RecordRow(record, 0);
-        Assert.AreEqual(777, recordRow.Field<int>("IntColumn"));
+        Assert.AreEqual(777, recordRow.To<int>("IntColumn"));
     }
 
     /// <summary>
@@ -603,12 +604,12 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act & Assert
-        Assert.AreEqual(recordRow.Field<int>("IntColumn"), (int)row.IntColumn!);
-        Assert.AreEqual(recordRow.Field<bool>("BoolColumn"), (bool)row.BoolColumn!);
+        Assert.AreEqual(recordRow.To<int>("IntColumn"), (int)row.IntColumn!);
+        Assert.AreEqual(recordRow.To<bool>("BoolColumn"), (bool)row.BoolColumn!);
     }
 
     /// <summary>
-    /// <see cref="RecordRow.Field(string)"/> 按列名读取已存在列时，应返回对应对象值。
+    /// 索引器按列名读取已存在列时，应返回对应对象值。
     /// </summary>
     [TestMethod]
     public void FieldObject_ByName_ColumnExists_ShouldReturnValue()
@@ -618,7 +619,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field("IntColumn");
+        var result = recordRow["IntColumn"];
 
         // Assert
         Assert.IsNotNull(result);
@@ -626,7 +627,7 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.Field(string)"/> 按列名读取不存在列时，应返回 null。
+    /// 按列名读取不存在列时，索引器应返回 null。
     /// </summary>
     [TestMethod]
     public void FieldObject_ByName_ColumnNotExists_ShouldReturnNull()
@@ -636,7 +637,7 @@ public class RecordRowTests
         var recordRow = new RecordRow(record, 0);
 
         // Act
-        var result = recordRow.Field("NonExistentColumn");
+        var result = recordRow["NonExistentColumn"];
 
         // Assert
         Assert.IsNull(result);
@@ -672,7 +673,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 2);
         var nullableColumn = record.Columns.Add<string>("NullableColumn");
         record.AddRow();
-        nullableColumn.Set(0, null);
+        nullableColumn.SetValue(0, null);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -711,7 +712,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 2);
         var nullableColumn = record.Columns.Add<string>("NullableColumn");
         record.AddRow();
-        nullableColumn.Set(0, null);
+        nullableColumn.SetValue(0, null);
         var recordRow = new RecordRow(record, 0);
 
         // Act

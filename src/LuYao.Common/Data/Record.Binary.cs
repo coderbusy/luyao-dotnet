@@ -171,7 +171,7 @@ public partial class Record
 
         for (int r = 0; r < rowCount; r++)
         {
-            var val = col.GetValue(r);
+            var val = col.Get(r);
             if (needsNullCheck)
             {
                 if (val is null)
@@ -197,7 +197,7 @@ public partial class Record
                 if (!hasValue) continue;
             }
             var val = ReadPrimitiveValue(reader, col.ColumnType);
-            col.SetValue(r, val);
+            col.Set(r, val);
         }
     }
 

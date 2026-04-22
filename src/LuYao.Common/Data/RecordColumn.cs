@@ -59,7 +59,7 @@ public abstract class RecordColumn : IXProp
     /// <param name="row">目标行索引，从 0 开始。</param>
     /// <param name="value">要设置的值，可以为 null。</param>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
-    public abstract void SetValue(int row, object? value);
+    public abstract void Set(int row, object? value);
 
     /// <summary>
     /// 获取指定行的列值。
@@ -67,7 +67,7 @@ public abstract class RecordColumn : IXProp
     /// <param name="row">行索引，从 0 开始。</param>
     /// <returns>指定行的列值，可能为 null。</returns>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
-    public abstract object? GetValue(int row);
+    public abstract object? Get(int row);
 
     /// <summary>
     /// 删除指定行的列值。
@@ -112,7 +112,7 @@ public abstract class RecordColumn : IXProp
         if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
     }
 
-    #region Get 
+    #region To 
     /// <summary>
     /// 获取指定行的值并转换为指定的泛型类型。
     /// </summary>
@@ -121,10 +121,10 @@ public abstract class RecordColumn : IXProp
     /// <returns>转换后的值，如果原值为 null 则返回类型 T 的默认值。</returns>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
     /// <exception cref="InvalidCastException">当值无法转换为目标类型时抛出。</exception>
-    public virtual T? Get<T>(int row)
+    public virtual T? To<T>(int row)
     {
         OnGet(row);
-        object? value = this.GetValue(row);
+        object? value = this.Get(row);
         if (value is null) return default;
         if (value is T direct) return direct;
         return (T)Valid.To(value, typeof(T));
@@ -137,8 +137,19 @@ public abstract class RecordColumn : IXProp
     bool IXProp.CanRead => true;
     bool IXProp.CanWrite => true;
 
-    object? IXProp.GetValue(object instance) => GetValue(((RecordRow)instance).Row);
-    void IXProp.SetValue(object instance, object? value) => SetValue(((RecordRow)instance).Row, value);
+    object? IXProp.GetValue(object instance)
+    {
+        if (instance is RecordRow row) return Get(row.Row);
+        throw new InvalidCastException();
+    }
+
+    void IXProp.SetValue(object instance, object? value)
+    {
+        if (instance is RecordRow row)
+            Set(row.Row, value);
+        else
+            throw new InvalidCastException();
+    }
 
     #endregion
 }

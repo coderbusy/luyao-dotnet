@@ -16,9 +16,7 @@ partial class Record
     {
         var re = new Record();
         re.Columns.AddFrom<T>();
-
-        re.AddRow().CopyFrom(data);
-
+        re.AddRow(data);
         return re;
     }
 
@@ -32,12 +30,7 @@ partial class Record
     {
         var re = new Record();
         re.Columns.AddFrom<T>();
-
-        foreach (var item in items)
-        {
-            re.AddRow().CopyFrom(item);
-        }
-
+        re.AddRows(items);
         return re;
     }
 
@@ -64,8 +57,7 @@ partial class Record
     {
         foreach (var item in items)
         {
-            var it = this.AddRow();
-            it.CopyFrom(item);
+            var it = this.AddRow(item);
             yield return it;
         }
     }

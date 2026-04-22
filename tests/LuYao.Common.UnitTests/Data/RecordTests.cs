@@ -32,14 +32,14 @@ public class RecordTests
 
         // Act
         var row = table.AddRow();
-        colId.Set(row.Row, 1);
-        colName.Set(row.Row, "Test");
+        colId.SetValue(row.Row, 1);
+        colName.SetValue(row.Row, "Test");
 
         // Assert
         Assert.AreEqual(1, table.Count);
         Assert.AreEqual(2, table.Columns.Count);
-        Assert.AreEqual(1, colId.Get<int>(row.Row)); // 替换 GetValue 为 Get<T>
-        Assert.AreEqual("Test", colName.Get<string>(row.Row)); // 替换 GetValue 为 Get<T>
+        Assert.AreEqual(1, colId.To<int>(row.Row)); // 替换 GetValue 为 Get<T>
+        Assert.AreEqual("Test", colName.To<string>(row.Row)); // 替换 GetValue 为 Get<T>
     }
 
     [TestMethod]
@@ -66,26 +66,26 @@ public class RecordTests
 
         // Act
         var row1 = table.AddRow();
-        colId.Set(row1.Row, 1);
-        colName.Set(row1.Row, "Alice");
-        colAge.Set(row1.Row, 25);
+        colId.SetValue(row1.Row, 1);
+        colName.SetValue(row1.Row, "Alice");
+        colAge.SetValue(row1.Row, 25);
 
         var row2 = table.AddRow();
-        colId.Set(row2.Row, 2);
-        colName.Set(row2.Row, "Bob");
-        colAge.Set(row2.Row, 30);
+        colId.SetValue(row2.Row, 2);
+        colName.SetValue(row2.Row, "Bob");
+        colAge.SetValue(row2.Row, 30);
 
         // Assert
         Assert.AreEqual(2, table.Count);
         Assert.AreEqual(3, table.Columns.Count);
 
-        Assert.AreEqual(1, colId.Get<int>(row1.Row)); // 替换 GetValue 为 Get<T>
-        Assert.AreEqual("Alice", colName.Get<string>(row1.Row)); // 替换 GetValue 为 Get<T>
-        Assert.AreEqual(25, colAge.Get<int>(row1.Row)); // 替换 GetValue 为 Get<T>
+        Assert.AreEqual(1, colId.To<int>(row1.Row)); // 替换 GetValue 为 Get<T>
+        Assert.AreEqual("Alice", colName.To<string>(row1.Row)); // 替换 GetValue 为 Get<T>
+        Assert.AreEqual(25, colAge.To<int>(row1.Row)); // 替换 GetValue 为 Get<T>
 
-        Assert.AreEqual(2, colId.Get<int>(row2.Row)); // 替换 GetValue 为 Get<T>
-        Assert.AreEqual("Bob", colName.Get<string>(row2.Row)); // 替换 GetValue 为 Get<T>
-        Assert.AreEqual(30, colAge.Get<int>(row2.Row)); // 替换 GetValue 为 Get<T>
+        Assert.AreEqual(2, colId.To<int>(row2.Row)); // 替换 GetValue 为 Get<T>
+        Assert.AreEqual("Bob", colName.To<string>(row2.Row)); // 替换 GetValue 为 Get<T>
+        Assert.AreEqual(30, colAge.To<int>(row2.Row)); // 替换 GetValue 为 Get<T>
     }
 
     [TestMethod]
@@ -98,12 +98,12 @@ public class RecordTests
         table.AddRow();
 
         // Act
-        idCol.Set(0, 42);
-        nameCol.Set(0, "TestUser");
+        idCol.SetValue(0, 42);
+        nameCol.SetValue(0, "TestUser");
 
         // Assert
-        Assert.AreEqual(42, idCol.Get<int>(0));
-        Assert.AreEqual("TestUser", nameCol.Get<string>(0));
+        Assert.AreEqual(42, idCol.To<int>(0));
+        Assert.AreEqual("TestUser", nameCol.To<string>(0));
     }
 
     [TestMethod]
@@ -114,12 +114,12 @@ public class RecordTests
         var colId = table.Columns.Add<int>("Id");
         var colName = table.Columns.Add<string>("Name");
         var row = table.AddRow();
-        colId.Set(row.Row, 123);
-        colName.Set(row.Row, "TestValue");
+        colId.SetValue(row.Row, 123);
+        colName.SetValue(row.Row, "TestValue");
 
         // Act & Assert
-        Assert.AreEqual(123, colId.Get<int>(0));
-        Assert.AreEqual("TestValue", colName.Get<string>(0));
+        Assert.AreEqual(123, colId.To<int>(0));
+        Assert.AreEqual("TestValue", colName.To<string>(0));
     }
 
     [TestMethod]
@@ -168,8 +168,8 @@ public class RecordTests
         var colId = table.Columns.Add<int>("Id");
         table.AddRow();
         table.AddRow();
-        colId.Set(0, 10);
-        colId.Set(1, 20);
+        colId.SetValue(0, 10);
+        colId.SetValue(1, 20);
 
         // Act
         var rows = table.ToArray();
@@ -179,8 +179,8 @@ public class RecordTests
         // Assert
         Assert.AreEqual(0, row0.Row);
         Assert.AreEqual(1, row1.Row);
-        Assert.AreEqual(10, colId.Get<int>(row0.Row));
-        Assert.AreEqual(20, colId.Get<int>(row1.Row));
+        Assert.AreEqual(10, colId.To<int>(row0.Row));
+        Assert.AreEqual(20, colId.To<int>(row1.Row));
     }
 
     [TestMethod]
@@ -204,9 +204,9 @@ public class RecordTests
         table.AddRow();
         table.AddRow();
         table.AddRow();
-        colId.Set(0, 1);
-        colId.Set(1, 2);
-        colId.Set(2, 3);
+        colId.SetValue(0, 1);
+        colId.SetValue(1, 2);
+        colId.SetValue(2, 3);
 
         // Act
         var rows = new List<RecordRow>();
@@ -220,9 +220,9 @@ public class RecordTests
         Assert.AreEqual(0, rows[0].Row);
         Assert.AreEqual(1, rows[1].Row);
         Assert.AreEqual(2, rows[2].Row);
-        Assert.AreEqual(1, colId.Get<int>(rows[0].Row));
-        Assert.AreEqual(2, colId.Get<int>(rows[1].Row));
-        Assert.AreEqual(3, colId.Get<int>(rows[2].Row));
+        Assert.AreEqual(1, colId.To<int>(rows[0].Row));
+        Assert.AreEqual(2, colId.To<int>(rows[1].Row));
+        Assert.AreEqual(3, colId.To<int>(rows[2].Row));
     }
 
     [TestMethod]
@@ -244,26 +244,26 @@ public class RecordTests
         var testDate = new DateTime(2023, 12, 25);
 
         // Act
-        colBool.Set(row.Row, true);
-        colByte.Set(row.Row, (byte)255);
-        colDateTime.Set(row.Row, testDate);
-        colDecimal.Set(row.Row, 123.45m);
-        colDouble.Set(row.Row, 123.456);
-        colInt16.Set(row.Row, (short)1000);
-        colInt32.Set(row.Row, 100000);
-        colInt64.Set(row.Row, 10000000000L);
-        colString.Set(row.Row, "Hello World");
+        colBool.SetValue(row.Row, true);
+        colByte.SetValue(row.Row, (byte)255);
+        colDateTime.SetValue(row.Row, testDate);
+        colDecimal.SetValue(row.Row, 123.45m);
+        colDouble.SetValue(row.Row, 123.456);
+        colInt16.SetValue(row.Row, (short)1000);
+        colInt32.SetValue(row.Row, 100000);
+        colInt64.SetValue(row.Row, 10000000000L);
+        colString.SetValue(row.Row, "Hello World");
 
         // Assert
-        Assert.AreEqual(true, colBool.GetValue(row.Row));
-        Assert.AreEqual((byte)255, colByte.GetValue(row.Row));
-        Assert.AreEqual(testDate, colDateTime.GetValue(row.Row));
-        Assert.AreEqual(123.45m, colDecimal.GetValue(row.Row));
-        Assert.AreEqual(123.456, colDouble.GetValue(row.Row));
-        Assert.AreEqual((short)1000, colInt16.GetValue(row.Row));
-        Assert.AreEqual(100000, colInt32.GetValue(row.Row));
-        Assert.AreEqual(10000000000L, colInt64.GetValue(row.Row));
-        Assert.AreEqual("Hello World", colString.GetValue(row.Row));
+        Assert.AreEqual(true, (object?)colBool.Get(row.Row));
+        Assert.AreEqual((byte)255, (object?)colByte.Get(row.Row));
+        Assert.AreEqual(testDate, (object?)colDateTime.Get(row.Row));
+        Assert.AreEqual(123.45m, (object?)colDecimal.Get(row.Row));
+        Assert.AreEqual(123.456, (object?)colDouble.Get(row.Row));
+        Assert.AreEqual((short)1000, (object?)colInt16.Get(row.Row));
+        Assert.AreEqual(100000, (object?)colInt32.Get(row.Row));
+        Assert.AreEqual(10000000000L, (object?)colInt64.Get(row.Row));
+        Assert.AreEqual("Hello World", (object?)colString.Get(row.Row));
     }
 
     [TestMethod]
@@ -294,14 +294,14 @@ public class RecordTests
         var row = table.AddRow();
 
         // Act & Assert
-        colInt.Set(row.Row, 42);
-        Assert.AreEqual(42, colInt.Get<Int32>(row.Row));
+        colInt.SetValue(row.Row, 42);
+        Assert.AreEqual(42, colInt.To<Int32>(row.Row));
 
-        colString.Set(row.Row, "Test");
-        Assert.AreEqual("Test", colString.Get<String>(row.Row));
+        colString.SetValue(row.Row, "Test");
+        Assert.AreEqual("Test", colString.To<String>(row.Row));
 
-        colBool.Set(row.Row, true);
-        Assert.AreEqual(true, colBool.Get<Boolean>(row.Row));
+        colBool.SetValue(row.Row, true);
+        Assert.AreEqual(true, colBool.To<Boolean>(row.Row));
     }
 
     [TestMethod]
@@ -359,16 +359,16 @@ public class RecordTests
         var table = new Record();
         var col = table.Columns.Add<String>("TestCol");
         var row = table.AddRow();
-        col.Set(row.Row, "TestValue");
+        col.SetValue(row.Row, "TestValue");
 
         // Verify data exists
-        Assert.AreEqual("TestValue", col.GetValue(row.Row));
+        Assert.AreEqual("TestValue", (object?)col.Get(row.Row));
 
         // Act
         col.Clear();
 
         // Assert - After clear, should return null or default value
-        var value = col.GetValue(row.Row);
+        var value = col.Get(row.Row);
         Assert.IsNull(value);
     }
 
@@ -382,12 +382,12 @@ public class RecordTests
         var row2 = table.AddRow();
 
         // Act
-        col.SetValue(row1.Row, 100);
-        col.SetValue(row2.Row, 200);
+        col.Set(row1.Row, (object)100);
+        col.Set(row2.Row, (object)200);
 
         // Assert
-        Assert.AreEqual(100, col.GetValue(row1.Row));
-        Assert.AreEqual(200, col.GetValue(row2.Row));
+        Assert.AreEqual(100, (object?)col.Get(row1.Row));
+        Assert.AreEqual(200, (object?)col.Get(row2.Row));
     }
 
     [TestMethod]
@@ -415,23 +415,23 @@ public class RecordTests
         var row = table.AddRow();
 
         // Act & Assert
-        colChar.Set(row.Row, 'A');
-        Assert.AreEqual('A', colChar.Get<Char>(row.Row));
+        colChar.SetValue(row.Row, 'A');
+        Assert.AreEqual('A', colChar.To<Char>(row.Row));
 
-        colSByte.Set(row.Row, (sbyte)-100);
-        Assert.AreEqual((sbyte)-100, colSByte.Get<SByte>(row.Row));
+        colSByte.SetValue(row.Row, (sbyte)-100);
+        Assert.AreEqual((sbyte)-100, colSByte.To<SByte>(row.Row));
 
-        colSingle.Set(row.Row, 3.14f);
-        Assert.AreEqual(3.14f, colSingle.Get<Single>(row.Row));
+        colSingle.SetValue(row.Row, 3.14f);
+        Assert.AreEqual(3.14f, colSingle.To<Single>(row.Row));
 
-        colUInt16.Set(row.Row, (ushort)65535);
-        Assert.AreEqual((ushort)65535, colUInt16.Get<UInt16>(row.Row));
+        colUInt16.SetValue(row.Row, (ushort)65535);
+        Assert.AreEqual((ushort)65535, colUInt16.To<UInt16>(row.Row));
 
-        colUInt32.Set(row.Row, 4294967295u);
-        Assert.AreEqual(4294967295u, colUInt32.Get<UInt32>(row.Row));
+        colUInt32.SetValue(row.Row, 4294967295u);
+        Assert.AreEqual(4294967295u, colUInt32.To<UInt32>(row.Row));
 
-        colUInt64.Set(row.Row, 18446744073709551615ul);
-        Assert.AreEqual(18446744073709551615ul, colUInt64.Get<UInt64>(row.Row));
+        colUInt64.SetValue(row.Row, 18446744073709551615ul);
+        Assert.AreEqual(18446744073709551615ul, colUInt64.To<UInt64>(row.Row));
     }
 
     [TestMethod]
@@ -492,8 +492,8 @@ public class RecordTests
         var row = table.AddRow();
 
         // Act & Assert - Test null value
-        col.Set(row.Row, (string?)null);
-        Assert.IsNull(col.GetValue(row.Row));
+        col.SetValue(row.Row, (string?)null);
+        Assert.IsNull(col.Get(row.Row));
     }
 
     [TestMethod]
@@ -586,18 +586,18 @@ public class RecordTests
         var idCol = record.Columns.Add<Int32>("Id");
         var nameCol = record.Columns.Add<String>("Name");
         record.AddRow();
-        idCol.Set(0, 1);
-        nameCol.Set(0, "A");
+        idCol.SetValue(0, 1);
+        nameCol.SetValue(0, "A");
         record.AddRow();
-        idCol.Set(1, 2);
-        nameCol.Set(1, "B");
+        idCol.SetValue(1, 2);
+        nameCol.SetValue(1, "B");
 
         var result = record.Delete(0);
 
         Assert.IsTrue(result);
         Assert.AreEqual(1, record.Count);
-        Assert.AreEqual(2, idCol.GetValue(0));
-        Assert.AreEqual("B", nameCol.GetValue(0));
+        Assert.AreEqual(2, (object?)idCol.Get(0));
+        Assert.AreEqual("B", (object?)nameCol.Get(0));
     }
 
     [TestMethod]
@@ -606,15 +606,15 @@ public class RecordTests
         var record = new Record("Test", 0);
         var idCol = record.Columns.Add<Int32>("Id");
         record.AddRow();
-        idCol.Set(0, 1);
+        idCol.SetValue(0, 1);
         record.AddRow();
-        idCol.Set(1, 2);
+        idCol.SetValue(1, 2);
 
         var result = record.Delete(1);
 
         Assert.IsTrue(result);
         Assert.AreEqual(1, record.Count);
-        Assert.AreEqual(1, idCol.GetValue(0));
+        Assert.AreEqual(1, (object?)idCol.Get(0));
     }
 
     [TestMethod]
@@ -632,8 +632,8 @@ public class RecordTests
         var nameCol = record.Columns.Add<String>("Name");
         var ageCol = record.Columns.Add<Int32>("Age");
         record.AddRow();
-        nameCol.Set(0, "Alice");
-        ageCol.Set(0, 30);
+        nameCol.SetValue(0, "Alice");
+        ageCol.SetValue(0, 30);
 
         var result = record.ToString();
         Assert.IsTrue(result.Contains("TestTable"));
@@ -651,10 +651,10 @@ public class RecordTests
         var ageCol = record.Columns.Add<Int32>("Age");
         record.AddRow();
         record.AddRow();
-        nameCol.Set(0, "Bob");
-        ageCol.Set(0, 25);
-        nameCol.Set(1, "Carol");
-        ageCol.Set(1, 28);
+        nameCol.SetValue(0, "Bob");
+        ageCol.SetValue(0, 25);
+        nameCol.SetValue(1, "Carol");
+        ageCol.SetValue(1, 28);
 
         var result = record.ToString();
         Assert.IsTrue(result.Contains("People"));
@@ -675,7 +675,7 @@ public class RecordTests
         record.AddRow();
         record.AddRow();
         string longValue = new string('A', 100);
-        descCol.Set(0, longValue);
+        descCol.SetValue(0, longValue);
 
         var result = record.ToString();
         Assert.IsTrue(result.Contains("..") || result.Contains("LongStringTest"));
@@ -692,7 +692,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(-1));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(-1));
         Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
     }
 
@@ -705,7 +705,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(1));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(1));
         Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
     }
 
@@ -718,7 +718,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(5));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(5));
         Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
     }
 
@@ -731,7 +731,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(-1, "test"));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(-1, (object)"test"));
         Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
     }
 
@@ -744,7 +744,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(1, "test"));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(1, (object)"test"));
         Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
     }
 
@@ -757,7 +757,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(5, "test"));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(5, (object)"test"));
         Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
     }
 
@@ -770,7 +770,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(-1, true));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(-1, true));
         Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
     }
 
@@ -783,7 +783,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(1, true));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(1, true));
         Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
     }
 
@@ -796,7 +796,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(5, 42));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(5, 42));
         Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
     }
 
@@ -809,7 +809,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get<Boolean>(-1));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<Boolean>(-1));
         Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
     }
 
@@ -822,7 +822,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get<Int32>(1));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<Int32>(1));
         Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
     }
 
@@ -835,7 +835,7 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get<String>(10));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<String>(10));
         Assert.IsTrue(exception.Message.Contains("行索引 10 超出有效范围"));
     }
 
@@ -850,13 +850,13 @@ public class RecordTests
         table.AddRow();
 
         // Act & Assert - Valid indices should work
-        col.SetValue(0, "value0");
-        col.SetValue(1, "value1");
-        col.SetValue(2, "value2");
+        col.Set(0, (object)"value0");
+        col.Set(1, (object)"value1");
+        col.Set(2, (object)"value2");
 
-        Assert.AreEqual("value0", col.GetValue(0));
-        Assert.AreEqual("value1", col.GetValue(1));
-        Assert.AreEqual("value2", col.GetValue(2));
+        Assert.AreEqual("value0", (object?)col.Get(0));
+        Assert.AreEqual("value1", (object?)col.Get(1));
+        Assert.AreEqual("value2", (object?)col.Get(2));
     }
 
     [TestMethod]
@@ -872,17 +872,17 @@ public class RecordTests
         table.AddRow(); // Index 2 - should trigger expansion
 
         // Act & Assert - Valid indices work
-        col.SetValue(0, "test0");
-        col.SetValue(1, "test1");
-        col.SetValue(2, "test2");
+        col.Set(0, (object)"test0");
+        col.Set(1, (object)"test1");
+        col.Set(2, (object)"test2");
 
-        Assert.AreEqual("test0", col.GetValue(0));
-        Assert.AreEqual("test1", col.GetValue(1));
-        Assert.AreEqual("test2", col.GetValue(2));
+        Assert.AreEqual("test0", (object?)col.Get(0));
+        Assert.AreEqual("test1", (object?)col.Get(1));
+        Assert.AreEqual("test2", (object?)col.Get(2));
 
         // Invalid indices should still throw
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(3));
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(4, "invalid"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(3));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(4, (object)"invalid"));
     }
 
     [TestMethod]
@@ -909,21 +909,21 @@ public class RecordTests
         table.AddRow(); // Only one row, valid index is 0
 
         // Act & Assert - Test all Set methods with invalid index
-        Assert.Throws<ArgumentOutOfRangeException>(() => boolCol.Set(1, true));
-        Assert.Throws<ArgumentOutOfRangeException>(() => byteCol.Set(1, (byte)1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => charCol.Set(1, 'A'));
-        Assert.Throws<ArgumentOutOfRangeException>(() => dateTimeCol.Set(1, DateTime.Now));
-        Assert.Throws<ArgumentOutOfRangeException>(() => decimalCol.Set(1, 1.0m));
-        Assert.Throws<ArgumentOutOfRangeException>(() => doubleCol.Set(1, 1.0));
-        Assert.Throws<ArgumentOutOfRangeException>(() => int16Col.Set(1, (short)1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => int32Col.Set(1, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => int64Col.Set(1, 1L));
-        Assert.Throws<ArgumentOutOfRangeException>(() => sbyteCol.Set(1, (sbyte)1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => singleCol.Set(1, 1.0f));
-        Assert.Throws<ArgumentOutOfRangeException>(() => stringCol.Set(1, "test"));
-        Assert.Throws<ArgumentOutOfRangeException>(() => uint16Col.Set(1, (ushort)1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => uint32Col.Set(1, 1u));
-        Assert.Throws<ArgumentOutOfRangeException>(() => uint64Col.Set(1, 1ul));
+        Assert.Throws<ArgumentOutOfRangeException>(() => boolCol.SetValue(1, true));
+        Assert.Throws<ArgumentOutOfRangeException>(() => byteCol.SetValue(1, (byte)1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => charCol.SetValue(1, 'A'));
+        Assert.Throws<ArgumentOutOfRangeException>(() => dateTimeCol.SetValue(1, DateTime.Now));
+        Assert.Throws<ArgumentOutOfRangeException>(() => decimalCol.SetValue(1, 1.0m));
+        Assert.Throws<ArgumentOutOfRangeException>(() => doubleCol.SetValue(1, 1.0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => int16Col.SetValue(1, (short)1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => int32Col.SetValue(1, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => int64Col.SetValue(1, 1L));
+        Assert.Throws<ArgumentOutOfRangeException>(() => sbyteCol.SetValue(1, (sbyte)1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => singleCol.SetValue(1, 1.0f));
+        Assert.Throws<ArgumentOutOfRangeException>(() => stringCol.SetValue(1, "test"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => uint16Col.SetValue(1, (ushort)1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => uint32Col.SetValue(1, 1u));
+        Assert.Throws<ArgumentOutOfRangeException>(() => uint64Col.SetValue(1, 1ul));
     }
 
     [TestMethod]
@@ -950,21 +950,21 @@ public class RecordTests
         table.AddRow(); // Only one row, valid index is 0
 
         // Act & Assert - Test all To methods with invalid index
-        Assert.Throws<ArgumentOutOfRangeException>(() => boolCol.Get<Boolean>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => byteCol.Get<Byte>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => charCol.Get<Char>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => dateTimeCol.Get<DateTime>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => decimalCol.Get<Decimal>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => doubleCol.Get<Double>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => int16Col.Get<Int16>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => int32Col.Get<Int32>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => int64Col.Get<Int64>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => sbyteCol.Get<SByte>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => singleCol.Get<Single>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => stringCol.Get<String>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => uint16Col.Get<UInt16>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => uint32Col.Get<UInt32>(1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => uint64Col.Get<UInt64>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => boolCol.To<Boolean>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => byteCol.To<Byte>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => charCol.To<Char>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => dateTimeCol.To<DateTime>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => decimalCol.To<Decimal>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => doubleCol.To<Double>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => int16Col.To<Int16>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => int32Col.To<Int32>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => int64Col.To<Int64>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => sbyteCol.To<SByte>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => singleCol.To<Single>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => stringCol.To<String>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => uint16Col.To<UInt16>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => uint32Col.To<UInt32>(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => uint64Col.To<UInt64>(1));
     }
 
     [TestMethod]
@@ -976,8 +976,8 @@ public class RecordTests
         // No rows added, Count = 0
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(0));
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.Get<Boolean>(0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.To<Boolean>(0));
     }
 
     [TestMethod]
@@ -989,8 +989,8 @@ public class RecordTests
         // No rows added, Count = 0
 
         // Act & Assert - Negative indices should always throw
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.GetValue(-1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(-1, "test"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(-1, (object)"test"));
     }
 
     [TestMethod]
@@ -1002,8 +1002,8 @@ public class RecordTests
         // No rows added, Count = 0
 
         // Act & Assert - Indices > 0 should throw even with auto-row creation
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(1, "test"));
-        Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(2, "test"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(1, "test"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(2, "test"));
     }
 
     [TestMethod]
@@ -1046,12 +1046,12 @@ public class RecordTests
         var id = re.Columns.Add<Int32>("Id");
 
         var row = re.AddRow();
-        name.SetValue(row.Row, "John Doe");
-        id.Set(row.Row, 1);
+        name.Set(row.Row, (object)"John Doe");
+        id.SetValue(row.Row, 1);
 
         // Assert
         Assert.AreEqual("John Doe", name.Get(row.Row));
-        Assert.AreEqual(1, id.Get<Int32>(row.Row));
+        Assert.AreEqual(1, id.To<Int32>(row.Row));
     }
 
     [TestMethod]
@@ -1062,6 +1062,6 @@ public class RecordTests
         var id = re.Columns.Add<Int32>("Id");
         var row = re.AddRow();
         // Act & Assert - DateTime cannot be converted to int via SetValue
-        Assert.Throws<InvalidCastException>(() => id.SetValue(row.Row, DateTime.Now));
+        Assert.Throws<InvalidCastException>(() => id.Set(row.Row, DateTime.Now));
     }
 }
