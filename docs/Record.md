@@ -250,19 +250,19 @@ foreach (var (key, rows) in groups)
 - 分组键类型 `T` 须与列的实际类型兼容。
 - 若指定列不存在，返回空字典。
 - 空 `Record`（无行）时返回空字典。
-- 返回字典的枚举顺序取决于键的插入顺序（标准 `Dictionary<T, …>` 语义）。
+
+另外有无泛型的重载版本，将键转为字符串进行分组：
+- `Group(string fld)`：单独字段转字符串分组。
+- `Group(params string[] flds)`：多字段值使用 `-` 拼接转字符串进行分组。返回结果类型为 `IDictionary<String, IList<RecordRow>>`。
 
 ### 5.5.2 多字段 `Group` 重载（`NETSTANDARD2.0+` / `NET6.0+`）
 
-支持按 2～6 个列的组合值分组，键为对应的值元组：
+支持按 2～3 个列的组合值分组，键为对应的值元组：
 
 | 重载签名 | 键类型 |
 |---|---|
 | `Group<T1,T2>(fld1, fld2)` | `(T1, T2)` |
 | `Group<T1,T2,T3>(fld1, fld2, fld3)` | `(T1, T2, T3)` |
-| `Group<T1,T2,T3,T4>(…)` | `(T1, T2, T3, T4)` |
-| `Group<T1,T2,T3,T4,T5>(…)` | `(T1, T2, T3, T4, T5)` |
-| `Group<T1,T2,T3,T4,T5,T6>(…)` | `(T1, T2, T3, T4, T5, T6)` |
 
 ```csharp
 // 按 Category + Id 双字段分组
