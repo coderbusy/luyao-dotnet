@@ -126,6 +126,24 @@ public partial class Record : IEnumerable<RecordRow>
     }
 
     /// <summary>
+    /// 添加一行数据并使用指定的值填充各列。
+    /// </summary>
+    /// <param name="values">用于填充列的值数组，按列顺序赋值。</param>
+    /// <returns>新添加的行数据。</returns>
+    /// <remarks>
+    /// 如果提供的值数量少于列数，则只填充对应的列；如果值数量多于列数，则忽略多余的值。
+    /// </remarks>
+    public RecordRow AddRowFromValues(params object[] values)
+    {
+        var row = AddRow();
+        for (int i = 0; i < values.Length && i < this.Columns.Count; i++)
+        {
+            this.Columns[i].Set(row, values[i]);
+        }
+        return row;
+    }
+
+    /// <summary>
     /// 删除指定索引的行。
     /// </summary>
     public bool Delete(int row)

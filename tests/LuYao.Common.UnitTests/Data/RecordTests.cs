@@ -1064,4 +1064,184 @@ public class RecordTests
         // Act & Assert - DateTime cannot be converted to int via SetValue
         Assert.Throws<InvalidCastException>(() => id.Set(row.Row, DateTime.Now));
     }
+
+    [TestMethod]
+    public void AddRowFromValues_ExactNumberOfValues_SetsAllColumns()
+    {
+        // Arrange
+        var table = new Record();
+        var colId = table.Columns.Add<Int32>("Id");
+        var colName = table.Columns.Add<String>("Name");
+        var colAge = table.Columns.Add<Int32>("Age");
+
+        // Act
+        var row = table.AddRowFromValues(1, "Alice", 25);
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(1, colId.To<Int32>(row.Row));
+        Assert.AreEqual("Alice", colName.To<String>(row.Row));
+        Assert.AreEqual(25, colAge.To<Int32>(row.Row));
+    }
+
+    [TestMethod]
+    public void AddRowFromValues_FewerValuesThanColumns_SetsOnlyProvidedValues()
+    {
+        // Arrange
+        var table = new Record();
+        var colId = table.Columns.Add<Int32>("Id");
+        var colName = table.Columns.Add<String>("Name");
+        var colAge = table.Columns.Add<Int32>("Age");
+
+        // Act
+        var row = table.AddRowFromValues(1, "Bob");
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(1, colId.To<Int32>(row.Row));
+        Assert.AreEqual("Bob", colName.To<String>(row.Row));
+        // colAge should remain default (not set)
+        Assert.AreEqual(0, colAge.To<Int32>(row.Row));
+    }
+
+    [TestMethod]
+    public void AddRowFromValues_MoreValuesThanColumns_IgnoresExtraValues()
+    {
+        // Arrange
+        var table = new Record();
+        var colId = table.Columns.Add<Int32>("Id");
+        var colName = table.Columns.Add<String>("Name");
+
+        // Act
+        var row = table.AddRowFromValues(1, "Charlie", 30, "ExtraValue");
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(1, colId.To<Int32>(row.Row));
+        Assert.AreEqual("Charlie", colName.To<String>(row.Row));
+        // Extra values should be ignored without errors
+    }
+
+    [TestMethod]
+    public void AddRowFromValues_EmptyValuesArray_CreatesEmptyRow()
+    {
+        // Arrange
+        var table = new Record();
+        var colId = table.Columns.Add<Int32>("Id");
+        var colName = table.Columns.Add<String>("Name");
+
+        // Act
+        var row = table.AddRowFromValues();
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        // Columns should have default values
+        Assert.AreEqual(0, colId.To<Int32>(row.Row));
+        Assert.IsNull(colName.Get(row.Row));
+    }
+
+    [TestMethod]
+    public void AddRowFromValues_NoColumns_CreatesRowWithoutErrors()
+    {
+        // Arrange
+        var table = new Record();
+
+        // Act
+        var row = table.AddRowFromValues(1, "Test", 30);
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(0, row.Row);
+        // No columns, so values should be ignored
+    }
+
+    [TestMethod]
+    public void AddRowFromValues_DifferentDataTypes_SetsCorrectly()
+    {
+        // Arrange
+        var table = new Record();
+        var colBool = table.Columns.Add<Boolean>("Bool");
+        var colByte = table.Columns.Add<Byte>("Byte");
+        var colDateTime = table.Columns.Add<DateTime>("DateTime");
+        var colDecimal = table.Columns.Add<Decimal>("Decimal");
+        var colDouble = table.Columns.Add<Double>("Double");
+        var testDate = new DateTime(2023, 12, 25);
+
+        // Act
+        var row = table.AddRowFromValues(true, (byte)255, testDate, 123.45m, 456.78);
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(true, colBool.To<Boolean>(row.Row));
+        Assert.AreEqual((byte)255, colByte.To<Byte>(row.Row));
+        Assert.AreEqual(testDate, colDateTime.To<DateTime>(row.Row));
+        Assert.AreEqual(123.45m, colDecimal.To<Decimal>(row.Row));
+        Assert.AreEqual(456.78, colDouble.To<Double>(row.Row));
+    }
+
+    [TestMethod]
+    public void AddRowFromValues_WithNullValues_SetsNullCorrectly()
+    {
+        // Arrange
+        var table = new Record();
+        var colId = table.Columns.Add<Int32>("Id");
+        var colName = table.Columns.Add<String>("Name");
+        var colAge = table.Columns.Add<Int32>("Age");
+
+        // Act
+        object? nullValue = null;
+        var row = table.AddRowFromValues(1, nullValue!, 25);
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(1, colId.To<Int32>(row.Row));
+        Assert.IsNull(colName.Get(row.Row));
+        Assert.AreEqual(25, colAge.To<Int32>(row.Row));
+    }
+
+    [TestMethod]
+    public void AddRowFromValues_MultipleRowsCalls_IncrementsCountCorrectly()
+    {
+        // Arrange
+        var table = new Record();
+        var colId = table.Columns.Add<Int32>("Id");
+        var colName = table.Columns.Add<String>("Name");
+
+        // Act
+        var row1 = table.AddRowFromValues(1, "First");
+        var row2 = table.AddRowFromValues(2, "Second");
+        var row3 = table.AddRowFromValues(3, "Third");
+
+        // Assert
+        Assert.AreEqual(3, table.Count);
+        Assert.AreEqual(0, row1.Row);
+        Assert.AreEqual(1, row2.Row);
+        Assert.AreEqual(2, row3.Row);
+        Assert.AreEqual(1, colId.To<Int32>(row1.Row));
+        Assert.AreEqual("First", colName.To<String>(row1.Row));
+        Assert.AreEqual(2, colId.To<Int32>(row2.Row));
+        Assert.AreEqual("Second", colName.To<String>(row2.Row));
+        Assert.AreEqual(3, colId.To<Int32>(row3.Row));
+        Assert.AreEqual("Third", colName.To<String>(row3.Row));
+    }
+
+    [TestMethod]
+    public void AddRowFromValues_SingleValue_SetsFirstColumnOnly()
+    {
+        // Arrange
+        var table = new Record();
+        var colId = table.Columns.Add<Int32>("Id");
+        var colName = table.Columns.Add<String>("Name");
+        var colAge = table.Columns.Add<Int32>("Age");
+
+        // Act
+        var row = table.AddRowFromValues(42);
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(42, colId.To<Int32>(row.Row));
+        // Other columns should have default values
+        Assert.IsNull(colName.Get(row.Row));
+        Assert.AreEqual(0, colAge.To<Int32>(row.Row));
+    }
 }

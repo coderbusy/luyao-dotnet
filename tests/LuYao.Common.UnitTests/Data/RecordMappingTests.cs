@@ -12,7 +12,7 @@ public class RecordMappingTests
     // ── AddRows ──────────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void AddRows_ShouldAppendAllItemsAsRows()
+    public void AddRowsFromList_ShouldAppendAllItemsAsRows()
     {
         var list = new List<TestModel>
         {
@@ -22,7 +22,7 @@ public class RecordMappingTests
 
         var record = new Record();
         record.Columns.AddFrom<TestModel>();
-        record.AddRows(list);
+        record.AddRowsFromList(list);
 
         Assert.AreEqual(2, record.Count);
         Assert.AreEqual(1,       record[0]["Id"]);

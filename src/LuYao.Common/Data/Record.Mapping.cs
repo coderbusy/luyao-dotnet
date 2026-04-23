@@ -16,7 +16,7 @@ partial class Record
     {
         var re = new Record();
         re.Columns.AddFrom<T>();
-        re.AddRow(data);
+        re.AddRowFrom(data);
         return re;
     }
 
@@ -30,7 +30,7 @@ partial class Record
     {
         var re = new Record();
         re.Columns.AddFrom<T>();
-        re.AddRows(items);
+        re.AddRowsFromList(items);
         return re;
     }
 
@@ -40,7 +40,7 @@ partial class Record
     /// <typeparam name="T">数据来源的对象类型。</typeparam>
     /// <param name="item">要追加的对象实例，不能为 <see langword="null"/>。</param>
     /// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <see langword="null"/>。</exception>
-    public RecordRow AddRow<T>(T item) where T : class
+    public RecordRow AddRowFrom<T>(T item) where T : class
     {
         if (item == null) throw new ArgumentNullException(nameof(item));
         var ret = this.AddRow();
@@ -53,9 +53,9 @@ partial class Record
     /// </summary>
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
     /// <param name="items">要批量追加的对象集合。</param>
-    public void AddRows<T>(IEnumerable<T> items) where T : class
+    public void AddRowsFromList<T>(IEnumerable<T> items) where T : class
     {
-        foreach (var item in items) this.AddRow(item);
+        foreach (var item in items) this.AddRowFrom(item);
     }
 
     /// <summary>
