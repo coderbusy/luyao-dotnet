@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace LuYao.Data;
@@ -131,14 +132,46 @@ public partial class Record
     /// 以列值为键、对应 <see cref="RecordRow"/> 列表为值的字典。
     /// 若指定列不存在，则返回空字典。
     /// </returns>
-    public IDictionary<T, List<RecordRow>> Group<T>(string fld) where T : notnull
+    public IDictionary<T, List<RecordRow>> Group<T>(string fld) where T : struct
     {
         var ret = new Dictionary<T, List<RecordRow>>();
-        var col = this.Columns.Find<T>(fld);
-        if (col == null) return ret;
+        var col = this.Columns.Find(fld);
         foreach (var row in this)
         {
-            T key = col.GetValue(row);
+            T key = col?.To<T>(row) ?? default;
+            if (!ret.TryGetValue(key, out var tmp))
+            {
+                tmp = new List<RecordRow>();
+                ret.Add(key, tmp);
+            }
+            tmp.Add(row);
+        }
+        return ret;
+    }
+
+    public IDictionary<String, IList<RecordRow>> Group(string fld)
+    {
+        var ret = new Dictionary<String, IList<RecordRow>>();
+        var col = this.Columns.Find(fld);
+        foreach (var row in this)
+        {
+            String key = col?.To<string>(row) ?? string.Empty;
+            if (!ret.TryGetValue(key, out var tmp))
+            {
+                tmp = new List<RecordRow>();
+                ret.Add(key, tmp);
+            }
+            tmp.Add(row);
+        }
+        return ret;
+    }
+    public IDictionary<String, IList<RecordRow>> Group(params string[] flds)
+    {
+        var ret = new Dictionary<String, IList<RecordRow>>();
+        var cols = flds.Select(Columns.Find).ToArray();
+        foreach (var row in this)
+        {
+            String key = string.Join("-", cols.Select(c => c?.To<string>(row) ?? string.Empty));
             if (!ret.TryGetValue(key, out var tmp))
             {
                 tmp = new List<RecordRow>();
@@ -162,17 +195,18 @@ public partial class Record
     /// <param name="fld1">第一个分组列的列名。</param>
     /// <param name="fld2">第二个分组列的列名。</param>
     /// <returns>以 <c>(T1, T2)</c> 元组为键、对应 <see cref="RecordRow"/> 列表为值的字典。若任意列不存在，则返回空字典。</returns>
-    public IDictionary<(T1, T2), List<RecordRow>> Group<T1, T2>(string fld1, string fld2)
+    public IDictionary<(T1?, T2?), IList<RecordRow>> Group<T1, T2>(string fld1, string fld2)
     {
-        var ret = new Dictionary<(T1, T2), List<RecordRow>>();
-        var col1 = this.Columns.Find<T1>(fld1);
-        var col2 = this.Columns.Find<T2>(fld2);
-        if (col1 == null || col2 == null) return ret;
+        var ret = new Dictionary<(T1?, T2?), IList<RecordRow>>();
+        var col1 = this.Columns.Find(fld1);
+        var col2 = this.Columns.Find(fld2);
         foreach (var row in this)
         {
-            T1 key1 = col1.GetValue(row);
-            T2 key2 = col2.GetValue(row);
-            var key = (key1, key2);
+            T1? val1 = default;
+            T2? val2 = default;
+            if (col1 != null) val1 = col1.To<T1>(row);
+            if (col2 != null) val2 = col2.To<T2>(row);
+            (T1?, T2?) key = (val1, val2);
             if (!ret.TryGetValue(key, out var tmp))
             {
                 tmp = new List<RecordRow>();
@@ -196,9 +230,9 @@ public partial class Record
     /// <param name="fld2">第二个分组列的列名。</param>
     /// <param name="fld3">第三个分组列的列名。</param>
     /// <returns>以 <c>(T1, T2, T3)</c> 元组为键、对应 <see cref="RecordRow"/> 列表为值的字典。若任意列不存在，则返回空字典。</returns>
-    public IDictionary<(T1, T2, T3), List<RecordRow>> Group<T1, T2, T3>(string fld1, string fld2, string fld3)
+    public IDictionary<(T1, T2, T3), IList<RecordRow>> Group<T1, T2, T3>(string fld1, string fld2, string fld3)
     {
-        var ret = new Dictionary<(T1, T2, T3), List<RecordRow>>();
+        var ret = new Dictionary<(T1, T2, T3), IList<RecordRow>>();
         var col1 = this.Columns.Find<T1>(fld1);
         var col2 = this.Columns.Find<T2>(fld2);
         var col3 = this.Columns.Find<T3>(fld3);
@@ -231,9 +265,9 @@ public partial class Record
     /// <param name="fld3">第三个分组列的列名。</param>
     /// <param name="fld4">第四个分组列的列名。</param>
     /// <returns>以 <c>(T1, T2, T3, T4)</c> 元组为键、对应 <see cref="RecordRow"/> 列表为值的字典。若任意列不存在，则返回空字典。</returns>
-    public IDictionary<(T1, T2, T3, T4), List<RecordRow>> Group<T1, T2, T3, T4>(string fld1, string fld2, string fld3, string fld4)
+    public IDictionary<(T1, T2, T3, T4), IList<RecordRow>> Group<T1, T2, T3, T4>(string fld1, string fld2, string fld3, string fld4)
     {
-        var ret = new Dictionary<(T1, T2, T3, T4), List<RecordRow>>();
+        var ret = new Dictionary<(T1, T2, T3, T4), IList<RecordRow>>();
         var col1 = this.Columns.Find<T1>(fld1);
         var col2 = this.Columns.Find<T2>(fld2);
         var col3 = this.Columns.Find<T3>(fld3);
@@ -269,9 +303,9 @@ public partial class Record
     /// <param name="fld4">第四个分组列的列名。</param>
     /// <param name="fld5">第五个分组列的列名。</param>
     /// <returns>以 <c>(T1, T2, T3, T4, T5)</c> 元组为键、对应 <see cref="RecordRow"/> 列表为值的字典。若任意列不存在，则返回空字典。</returns>
-    public IDictionary<(T1, T2, T3, T4, T5), List<RecordRow>> Group<T1, T2, T3, T4, T5>(string fld1, string fld2, string fld3, string fld4, string fld5)
+    public IDictionary<(T1, T2, T3, T4, T5), IList<RecordRow>> Group<T1, T2, T3, T4, T5>(string fld1, string fld2, string fld3, string fld4, string fld5)
     {
-        var ret = new Dictionary<(T1, T2, T3, T4, T5), List<RecordRow>>();
+        var ret = new Dictionary<(T1, T2, T3, T4, T5), IList<RecordRow>>();
         var col1 = this.Columns.Find<T1>(fld1);
         var col2 = this.Columns.Find<T2>(fld2);
         var col3 = this.Columns.Find<T3>(fld3);
@@ -310,9 +344,9 @@ public partial class Record
     /// <param name="fld5">第五个分组列的列名。</param>
     /// <param name="fld6">第六个分组列的列名。</param>
     /// <returns>以 <c>(T1, T2, T3, T4, T5, T6)</c> 元组为键、对应 <see cref="RecordRow"/> 列表为值的字典。若任意列不存在，则返回空字典。</returns>
-    public IDictionary<(T1, T2, T3, T4, T5, T6), List<RecordRow>> Group<T1, T2, T3, T4, T5, T6>(string fld1, string fld2, string fld3, string fld4, string fld5, string fld6)
+    public IDictionary<(T1, T2, T3, T4, T5, T6), IList<RecordRow>> Group<T1, T2, T3, T4, T5, T6>(string fld1, string fld2, string fld3, string fld4, string fld5, string fld6)
     {
-        var ret = new Dictionary<(T1, T2, T3, T4, T5, T6), List<RecordRow>>();
+        var ret = new Dictionary<(T1, T2, T3, T4, T5, T6), IList<RecordRow>>();
         var col1 = this.Columns.Find<T1>(fld1);
         var col2 = this.Columns.Find<T2>(fld2);
         var col3 = this.Columns.Find<T3>(fld3);
