@@ -5,8 +5,6 @@ namespace LuYao.Data;
 
 public partial class Record
 {
-    #region Query
-
     /// <summary>
     /// 在当前记录的所有数据行中，查找指定列与目标值匹配的第一行数据。
     /// 如果指定的列名不存在，或者未找到匹配项，则直接返回 null。
@@ -113,6 +111,4 @@ public partial class Record
             if (filter(row)) yield return row;
         }
     }
-
-    #endregion
 }
