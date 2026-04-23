@@ -11,14 +11,14 @@
 
 `RecordSet` 是多个 `Record` 的命名集合，用于统一管理多张内存表，并提供与 `DataSet` 的双向互操作。
 
-当前实现重点是：
+设计重点：
 
 - API 简单直接
 - 类型白名单明确
 - 与对象映射、ADO.NET 互通
 - 支持二进制序列化
 
-当前实现**不是线程安全容器**。`Record`、`RecordRow`、`RecordSet` 在多线程场景下需要调用方自行同步。
+`Record`、`RecordRow`、`RecordSet` 都不是线程安全容器。多线程场景需要调用方自行同步。
 
 ---
 
@@ -26,7 +26,7 @@
 
 ### 2.1 `Record`
 
-当前源码中的 `Record` 已实现：
+`Record` 提供：
 
 - 列结构管理：添加列、重命名列、类型转换、导出 schema
 - 行管理：新增、删除、批量删除、清空、按索引访问
@@ -40,7 +40,7 @@
 
 ### 2.2 `RecordSet`
 
-当前源码中的 `RecordSet` 已实现：
+`RecordSet` 提供：
 
 - 按名称管理多个 `Record`
 - 名称比较器可配置
@@ -49,7 +49,7 @@
 
 ### 2.3 非目标
 
-当前实现不包含以下能力：
+不包含以下能力：
 
 - SQL 翻译
 - JSON / CSV / 文本协议层
@@ -92,7 +92,7 @@
 
 `RecordRow` 是一个轻量 `struct`，表示某个 `Record` 中的单行视图。
 
-当前实现包含：
+`RecordRow` 提供：
 
 - `Record`：所属 `Record`
 - `Row`：当前行号
@@ -124,7 +124,7 @@
 
 `RecordColumn` 是列的抽象基类，`RecordColumn<T>` 是泛型实现。
 
-当前实现中常用成员：
+常用成员：
 
 - `Name`
 - `Type`
@@ -145,7 +145,7 @@
 
 ### 3.4 `RecordColumnCollection`
 
-`Record.Columns` 的类型是 `RecordColumnCollection`，当前实现：
+`Record.Columns` 的类型是 `RecordColumnCollection`，其特性如下：
 
 - 实现 `IReadOnlyList<RecordColumn>`
 - 内部使用 `KeyedList<string, RecordColumn>` 存储
@@ -181,7 +181,7 @@
 
 ### 3.5 `RecordSchema`
 
-`Record.GetSchema()` 返回 `RecordSchema`，用于导出当前列定义。
+`Record.GetSchema()` 返回 `RecordSchema`，用于导出列定义。
 
 每个 `ColumnDef` 包含：
 
@@ -200,7 +200,7 @@
 
 `RecordSet` 是 `Record` 的命名集合，实现 `IEnumerable<Record>`。
 
-当前实现包含：
+它提供：
 
 - `Add(name, record)`
 - `Set(name, record)`
@@ -224,7 +224,7 @@
 
 ## 4. 支持的列类型
 
-当前实现支持以下列类型：
+支持以下列类型：
 
 | 类别 | 类型 |
 |------|------|
@@ -266,7 +266,7 @@ nameCol.SetValue(row.Row, "Order-1");
 amountCol.SetValue(row.Row, 99.5m);
 ```
 
-当前实现提供：
+提供：
 
 - `AddRow()`：新增一行并返回 `RecordRow`
 - `AddRowFromValues(params object[] values)`：按列顺序填值，超出列数的值会被忽略
@@ -282,7 +282,7 @@ record.AddRowFromValues(2, "B", "Ignored");
 
 ### 5.2 删除与清空
 
-当前实现提供：
+提供：
 
 - `Delete(int row)`：删除指定行，越界返回 `false`
 - `DeleteWhere(Func<RecordRow, bool>)`：按条件批量删除
@@ -297,7 +297,7 @@ record.AddRowFromValues(2, "B", "Ignored");
 
 ### 5.3 行访问与枚举
 
-当前实现提供：
+提供：
 
 - `record[row]`
 - `foreach (var row in record)`
@@ -310,7 +310,7 @@ record.AddRowFromValues(2, "B", "Ignored");
 
 ### 5.4 查询
 
-当前实现提供：
+提供：
 
 - `Find<T>(string name, T value)`
 - `FindAll<T>(string name, T value)`
@@ -415,7 +415,7 @@ var groups = record.Group<int, int>("Year", "Month");
 
 ### 5.7 `ToString()`
 
-`Record.ToString()` 当前实现会输出调试友好的文本内容：
+会输出调试友好的文本内容：
 
 - 先输出表名、行数、列数
 - 当仅有一行时，以“列名 | 值”的方式逐列输出
@@ -431,7 +431,7 @@ var groups = record.Group<int, int>("Year", "Month");
 
 ### 6.1 `Record` 级别映射
 
-当前实现提供：
+提供：
 
 - `Record.From<T>(T data)`
 - `Record.FromList<T>(IEnumerable<T> items)`
@@ -455,7 +455,7 @@ OrderDto first = record.To<OrderDto>();
 
 ### 6.2 `RecordRow` 级别映射
 
-当前实现提供：
+提供：
 
 - `row.CopyTo<T>(T data)`
 - `row.CopyFrom<T>(T data)`
@@ -494,7 +494,7 @@ record.AddRowFrom(dto);
 
 ### 7.1 `Record` 与 `IDataReader` / `DataTable`
 
-当前实现提供：
+提供：
 
 - `void Read(IDataReader dr)`
 - `static Record Read(DataTable dt)`
@@ -524,7 +524,7 @@ DataTable table = fromTable.ToDataTable();
 
 ### 7.2 `RecordSet` 与 `DataSet`
 
-当前实现提供：
+提供：
 
 - `RecordSet.FromDataSet(DataSet ds)`
 - `ToDataSet()`
@@ -549,7 +549,7 @@ DataSet ds = set.ToDataSet();
 
 ### 8.1 `Record`
 
-当前实现提供：
+提供：
 
 - `WriteTo(Stream)` / `WriteTo(BinaryWriter)`
 - `ReadFrom(Stream)` / `ReadFrom(BinaryReader)`
@@ -605,7 +605,7 @@ RecordSet copy = RecordSet.FromBytes(bytes);
 
 ## 9. 异常与边界行为
 
-以下行为与当前实现一致：
+行为如下：
 
 | 场景 | 当前行为 |
 |------|----------|
@@ -693,14 +693,4 @@ DataSet ds = set.ToDataSet();
 
 ---
 
-## 11. 当前文档与实现对齐说明
-
-下面这些说法不再适用于当前源码，应以现实现为准：
-
-- `Record` 上的对象映射写入 API 不是 `AddRow<T>` / `AddRows<T>`，而是 `AddRowFrom<T>` / `AddRowsFromList<T>`
-- `Group*` 在列不存在时不会返回空字典
-- `RecordSet` 枚举顺序不是添加顺序，而是按名称排序后的顺序
-- 枚举列二进制往返后不会恢复为原始枚举列，而是恢复为基础数值列
-- `RecordRow` 当前公开访问模式仍以索引器、`To<T>(name)`、`CopyTo`、`CopyFrom`、`To<T>()` 为主
-
-后续如源码有调整，请优先以 `src/LuYao.Common/Data/` 下实现与单元测试为准更新本文。
+后续如源码有调整，请同步更新本文，并以 `src/LuYao.Common/Data/` 下实现与单元测试为准。
