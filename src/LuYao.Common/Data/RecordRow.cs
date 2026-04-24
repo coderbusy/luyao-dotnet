@@ -125,4 +125,17 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         if (col == null) return default;
         return col.To<T>(this);
     }
+
+    /// <summary>
+    /// 将指定列名的当前行值转换为字符串并返回。
+    /// </summary>
+    /// <param name="name">要转换的列名。若为 null 或空白，返回空字符串。</param>
+    /// <returns>列值的字符串表示；若列不存在则返回空字符串。</returns>
+    public readonly String ToString(String name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return string.Empty;
+        var col = this.Record.Columns.Find(name);
+        if (col == null) return string.Empty;
+        return col.ToString(this);
+    }
 }

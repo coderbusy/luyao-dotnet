@@ -69,6 +69,15 @@ public class RecordColumn<T> : RecordColumn
         }
     }
 
+    ///<inheritdoc/>
+    public override string ToString(int row)
+    {
+        OnGet(row);
+        T value = _data[row];
+        if (value is null) return string.Empty;
+        return value.ToString() ?? string.Empty;
+    }
+
     internal override void Extend(int length)
     {
         if (_data.Length >= length) return;
@@ -109,5 +118,6 @@ public class RecordColumn<T> : RecordColumn
         OnSet(row);
         _data[row] = value;
     }
+
     #endregion
 }
