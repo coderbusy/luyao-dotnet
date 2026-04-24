@@ -136,6 +136,6 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;
         var col = this.Record.Columns.Find(name);
         if (col == null) return string.Empty;
-        return col.ToString(this);
+        return col.ToString(this.Row);
     }
 }
