@@ -131,7 +131,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// </summary>
     /// <param name="name">要转换的列名。若为 null 或空白，返回空字符串。</param>
     /// <returns>列值的字符串表示；若列不存在则返回空字符串。</returns>
-    public readonly String ToString(String name)
+    public readonly String ToString(string? name)
     {
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;
         var col = this.Record.Columns.Find(name);
