@@ -286,7 +286,7 @@ public partial class Record : IEnumerable<RecordRow>
             {
                 sb.Append(PadRightByWidth(col.Name, max));
                 sb.Append(" | ");
-                sb.Append(col.Get(0));
+                sb.Append(col.ToString(0));
                 sb.AppendLine();
             }
         }
@@ -303,7 +303,7 @@ public partial class Record : IEnumerable<RecordRow>
 
                 for (int i = 0; i < Count; i++)
                 {
-                    string s = Convert.ToString(col.Get(i)) ?? string.Empty;
+                    string s = col.ToString(i);
                     int w = DisplayWidth(s);
                     if (w > MAX_WIDTH)
                     {

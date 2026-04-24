@@ -673,7 +673,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 2);
         var nullableColumn = record.Columns.Add<string>("NullableColumn");
         record.AddRow();
-        nullableColumn.SetValue(0, null);
+        nullableColumn.SetValue(0, null!);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -712,7 +712,7 @@ public class RecordRowTests
         var record = new Record("TestTable", 2);
         var nullableColumn = record.Columns.Add<string>("NullableColumn");
         record.AddRow();
-        nullableColumn.SetValue(0, null);
+        nullableColumn.SetValue(0, null!);
         var recordRow = new RecordRow(record, 0);
 
         // Act
@@ -720,5 +720,144 @@ public class RecordRowTests
 
         // Assert
         Assert.AreEqual("{ Row = 0, Data = { NullableColumn =  } }", result);
+    }
+
+    /// <summary>
+    /// 按列名转换为字符串时，若列存在且有值，应返回该值的字符串表示。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ByName_ColumnExistsWithValue_ShouldReturnStringRepresentation()
+    {
+        // Arrange
+        var (record, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToString("StringColumn");
+
+        // Assert
+        Assert.AreEqual("Test1", result);
+    }
+
+    /// <summary>
+    /// 按列名转换为字符串时，若列名为 null，应返回空字符串。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ByName_NullColumnName_ShouldReturnEmptyString()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToString(null!);
+
+        // Assert
+        Assert.AreEqual(string.Empty, result);
+    }
+
+    /// <summary>
+    /// 按列名转换为字符串时，若列名为空字符串，应返回空字符串。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ByName_EmptyColumnName_ShouldReturnEmptyString()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToString("");
+
+        // Assert
+        Assert.AreEqual(string.Empty, result);
+    }
+
+    /// <summary>
+    /// 按列名转换为字符串时，若列名仅包含空白字符，应返回空字符串。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ByName_WhitespaceColumnName_ShouldReturnEmptyString()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToString("   ");
+
+        // Assert
+        Assert.AreEqual(string.Empty, result);
+    }
+
+    /// <summary>
+    /// 按列名转换为字符串时，若列不存在，应返回空字符串。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ByName_ColumnNotExists_ShouldReturnEmptyString()
+    {
+        // Arrange
+        var (record, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToString("NonExistentColumn");
+
+        // Assert
+        Assert.AreEqual(string.Empty, result);
+    }
+
+    /// <summary>
+    /// 按列名转换为字符串时，若列存在但值为 null，应返回空字符串。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ByName_ColumnExistsWithNullValue_ShouldReturnEmptyString()
+    {
+        // Arrange
+        var record = new Record("TestTable", 1);
+        var nullableColumn = record.Columns.Add<string>("NullableColumn");
+        record.AddRow();
+        nullableColumn.SetValue(0, null!);
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToString("NullableColumn");
+
+        // Assert
+        Assert.AreEqual(string.Empty, result);
+    }
+
+    /// <summary>
+    /// 按列名转换为字符串时，若列存在且为整型值，应返回整型值的字符串表示。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ByName_IntColumnExists_ShouldReturnStringRepresentation()
+    {
+        // Arrange
+        var (record, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 1);
+
+        // Act
+        var result = recordRow.ToString("IntColumn");
+
+        // Assert
+        Assert.AreEqual("200", result);
+    }
+
+    /// <summary>
+    /// 按列名转换为字符串时，若列存在且为布尔值，应返回布尔值的字符串表示。
+    /// </summary>
+    [TestMethod]
+    public void ToString_ByName_BoolColumnExists_ShouldReturnStringRepresentation()
+    {
+        // Arrange
+        var (record, _, _, boolColumn) = CreateTestRecord();
+        var recordRow = new RecordRow(record, 0);
+
+        // Act
+        var result = recordRow.ToString("BoolColumn");
+
+        // Assert
+        Assert.AreEqual("True", result);
     }
 }

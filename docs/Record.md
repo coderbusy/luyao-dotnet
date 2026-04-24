@@ -103,6 +103,7 @@
 - `CopyTo<T>(T data)`：当前行写入已有对象
 - `CopyFrom<T>(T data)`：对象属性写入当前行
 - `To<T>()`：当前行转新对象
+- `ToString(string? name)`：按列名获取当前行该列的字符串值
 - `IDynamicMetaObjectProvider`：支持 `dynamic` 成员读写
 
 访问语义：
@@ -116,6 +117,7 @@
 
 补充说明：
 
+- `ToString(string? name)`：若 `name` 为 `null`/空白或列不存在，返回空字符串；否则等同于调用对应列的 `RecordColumn.ToString(int row)`。
 - 索引器读取时，如果列名为 `null`、空字符串或空白字符串，也直接返回 `null`。
 - 索引器写入时，如果列不存在且值非 `null`，会调用 `Columns.Add(name, value.GetType())` 自动建列；如果运行时类型不在支持白名单内，会抛出异常。
 - `RecordRow` 的公开获取方式通常是 `record[row]` 或通过枚举 `foreach (var row in record)`。
@@ -133,6 +135,7 @@
 - `Capacity`
 - `Get(int row)` / `Set(int row, object? value)`
 - `To<T>(int row)`
+- `ToString(int row)`：获取指定行列值的字符串表示；`null` 值返回空字符串
 - `Delete(int row)` / `Clear()`
 - `GetValue(int row)` / `SetValue(int row, T value)`（泛型列）
 
@@ -422,6 +425,7 @@ var groups = record.Group<int, int>("Year", "Month");
 - 多行时以表格形式输出
 - 对宽字符做显示宽度处理
 - 单元格内容过长时按显示宽度截断
+- 单元格字符串值统一通过 `RecordColumn.ToString(int row)` 获取（`null` 渲染为空字符串）
 
 这个输出更适合调试、日志和快速查看数据，而不是稳定的序列化格式。
 

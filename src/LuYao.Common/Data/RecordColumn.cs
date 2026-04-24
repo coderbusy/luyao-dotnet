@@ -130,6 +130,13 @@ public abstract class RecordColumn : IXProp
         return (T)Valid.To(value, typeof(T));
     }
 
+    /// <summary>
+    /// 将指定行的列值转换为字符串表示。
+    /// </summary>
+    /// <param name="row">行索引，从 0 开始。</param>
+    /// <returns>列值的字符串表示。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
+    public abstract String ToString(int row);
     #endregion
 
     #region IXProp 实现
