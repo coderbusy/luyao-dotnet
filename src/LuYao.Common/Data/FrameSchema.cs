@@ -1,16 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace LuYao.Data;
 
 /// <summary>
-/// 表示 Record 的列定义信息（列名 + 类型），用于序列化、传输或 Schema 比较。
+/// 表示 Frame 的列定义信息（列名 + 类型），用于序列化、传输或 Schema 比较。
 /// </summary>
-public sealed class RecordSchema
+public sealed class FrameSchema
 {
     private readonly List<ColumnDef> _columns;
 
-    internal RecordSchema(List<ColumnDef> columns)
+    internal FrameSchema(List<ColumnDef> columns)
     {
         _columns = columns ?? throw new ArgumentNullException(nameof(columns));
     }
@@ -33,7 +33,7 @@ public sealed class RecordSchema
         /// <summary>
         /// 列的基础枚举类型标识。
         /// </summary>
-        public RecordColumnType ColumnType { get; }
+        public FrameColumnType ColumnType { get; }
 
         /// <summary>
         /// 列是否为可空类型。
@@ -45,7 +45,7 @@ public sealed class RecordSchema
         /// </summary>
         public Type Type => Helpers.GetClrType(ColumnType, IsNullable);
 
-        internal ColumnDef(string name, RecordColumnType columnType, bool isNullable)
+        internal ColumnDef(string name, FrameColumnType columnType, bool isNullable)
         {
             Name = name;
             ColumnType = columnType;

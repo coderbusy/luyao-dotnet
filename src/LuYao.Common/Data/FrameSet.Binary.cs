@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
 namespace LuYao.Data;
 
-public partial class RecordSet
+public partial class FrameSet
 {
     private const byte BinaryFormatVersion = 1;
 
     /// <summary>
-    /// 将当前 <see cref="RecordSet"/> 写入二进制流。
+    /// 将当前 <see cref="FrameSet"/> 写入二进制流。
     /// </summary>
     /// <param name="stream">目标流。</param>
     public void WriteTo(Stream stream)
@@ -20,25 +20,25 @@ public partial class RecordSet
     }
 
     /// <summary>
-    /// 将当前 <see cref="RecordSet"/> 写入 <see cref="BinaryWriter"/>。
+    /// 将当前 <see cref="FrameSet"/> 写入 <see cref="BinaryWriter"/>。
     /// </summary>
     /// <param name="writer">目标写入器。</param>
     public void WriteTo(BinaryWriter writer)
     {
         if (writer == null) throw new ArgumentNullException(nameof(writer));
-        BinaryPayloadHeader.Write(writer, BinaryPayloadType.RecordSet);
+        BinaryPayloadHeader.Write(writer, BinaryPayloadType.FrameSet);
         writer.Write(BinaryFormatVersion);
         writer.Write(_records.Count);
         foreach (var kvp in _records)
         {
-            // 以字典键作为权威名称，防止 Record.Name 被外部修改后产生漂移
+            // 以字典键作为权威名称，防止 Frame.Name 被外部修改后产生漂移
             kvp.Value.Name = kvp.Key;
             kvp.Value.WriteTo(writer);
         }
     }
 
     /// <summary>
-    /// 从二进制流读取并填充当前 <see cref="RecordSet"/> 实例。
+    /// 从二进制流读取并填充当前 <see cref="FrameSet"/> 实例。
     /// </summary>
     /// <param name="stream">源流。</param>
     public void ReadFrom(Stream stream)
@@ -49,13 +49,13 @@ public partial class RecordSet
     }
 
     /// <summary>
-    /// 从 <see cref="BinaryReader"/> 读取并填充当前 <see cref="RecordSet"/> 实例。
+    /// 从 <see cref="BinaryReader"/> 读取并填充当前 <see cref="FrameSet"/> 实例。
     /// </summary>
     /// <param name="reader">源读取器。</param>
     public void ReadFrom(BinaryReader reader)
     {
         if (reader == null) throw new ArgumentNullException(nameof(reader));
-        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.RecordSet);
+        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.FrameSet);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 
@@ -63,20 +63,20 @@ public partial class RecordSet
         int count = reader.ReadInt32();
         for (int i = 0; i < count; i++)
         {
-            var record = new Record();
+            var record = new Frame();
             record.ReadFrom(reader);
             this.Add(record.Name, record);
         }
     }
 
     /// <summary>
-    /// 从二进制流创建新的 <see cref="RecordSet"/> 实例。
+    /// 从二进制流创建新的 <see cref="FrameSet"/> 实例。
     /// </summary>
     /// <param name="stream">源流。</param>
-    /// <returns>反序列化的 <see cref="RecordSet"/> 实例。</returns>
-    public static RecordSet FromStream(Stream stream)
+    /// <returns>反序列化的 <see cref="FrameSet"/> 实例。</returns>
+    public static FrameSet FromStream(Stream stream)
     {
-        var set = new RecordSet();
+        var set = new FrameSet();
         set.ReadFrom(stream);
         return set;
     }
@@ -95,8 +95,8 @@ public partial class RecordSet
     /// 从字节数组反序列化。
     /// </summary>
     /// <param name="data">二进制数据。</param>
-    /// <returns>反序列化的 <see cref="RecordSet"/> 实例。</returns>
-    public static RecordSet FromBytes(byte[] data)
+    /// <returns>反序列化的 <see cref="FrameSet"/> 实例。</returns>
+    public static FrameSet FromBytes(byte[] data)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         using var ms = new MemoryStream(data, writable: false);
@@ -104,14 +104,14 @@ public partial class RecordSet
     }
 
     /// <summary>
-    /// 检测二进制数据是否为带类型头的 <see cref="RecordSet"/>。
+    /// 检测二进制数据是否为带类型头的 <see cref="FrameSet"/>。
     /// </summary>
     /// <param name="data">二进制数据。</param>
-    /// <returns>当数据包含 <see cref="RecordSet"/> 类型头时返回 true；否则返回 false。</returns>
+    /// <returns>当数据包含 <see cref="FrameSet"/> 类型头时返回 true；否则返回 false。</returns>
     public static bool IsBinaryPayload(byte[] data)
     {
         if (data == null) return false;
         return BinaryPayloadHeader.TryGetPayloadType(data, out var payloadType)
-            && payloadType == BinaryPayloadType.RecordSet;
+            && payloadType == BinaryPayloadType.FrameSet;
     }
 }

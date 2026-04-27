@@ -1,7 +1,7 @@
-namespace LuYao.Data;
+﻿namespace LuYao.Data;
 
 [TestClass]
-public class RecordMappingTests
+public class FrameMappingTests
 {
     private sealed class TestModel
     {
@@ -20,7 +20,7 @@ public class RecordMappingTests
             new TestModel { Id = 2, Name = "Name2" }
         };
 
-        var record = new Record();
+        var record = new Frame();
         record.Columns.AddFrom<TestModel>();
         record.AddRowsFromList(list);
 
@@ -34,11 +34,11 @@ public class RecordMappingTests
     // ── From<T> ──────────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void From_ShouldCreateRecordWithSingleRow()
+    public void From_ShouldCreateFrameWithSingleRow()
     {
         var model = new TestModel { Id = 42, Name = "Alice" };
 
-        var record = Record.From(model);
+        var record = Frame.From(model);
 
         Assert.AreEqual(1,       record.Count);
         Assert.AreEqual(42,      record[0]["Id"]);
@@ -48,7 +48,7 @@ public class RecordMappingTests
     // ── FromList<T> ───────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void FromList_ShouldCreateRecordWithAllRows()
+    public void FromList_ShouldCreateFrameWithAllRows()
     {
         var list = new List<TestModel>
         {
@@ -57,7 +57,7 @@ public class RecordMappingTests
             new TestModel { Id = 3, Name = "Carol" }
         };
 
-        var record = Record.FromList(list);
+        var record = Frame.FromList(list);
 
         Assert.AreEqual(3,       record.Count);
         Assert.AreEqual(1,       record[0]["Id"]);
@@ -67,9 +67,9 @@ public class RecordMappingTests
     }
 
     [TestMethod]
-    public void FromList_WithEmptyCollection_ShouldCreateRecordWithNoRows()
+    public void FromList_WithEmptyCollection_ShouldCreateFrameWithNoRows()
     {
-        var record = Record.FromList(new List<TestModel>());
+        var record = Frame.FromList(new List<TestModel>());
 
         Assert.AreEqual(0, record.Count);
     }
@@ -79,7 +79,7 @@ public class RecordMappingTests
     [TestMethod]
     public void To_WithRows_ShouldMapFirstRowToModel()
     {
-        var record = new Record("Users", 2);
+        var record = new Frame("Users", 2);
         var idCol   = record.Columns.Add<int>("Id");
         var nameCol = record.Columns.Add<string>("Name");
 
@@ -100,7 +100,7 @@ public class RecordMappingTests
     [TestMethod]
     public void To_WithNoRows_ShouldReturnDefaultInstance()
     {
-        var record = new Record("Users", 0);
+        var record = new Frame("Users", 0);
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Name");
 
@@ -121,7 +121,7 @@ public class RecordMappingTests
             new TestModel { Id = 1, Name = "Alice" },
             new TestModel { Id = 2, Name = "Bob" }
         };
-        var record = Record.FromList(source);
+        var record = Frame.FromList(source);
 
         var result = record.ToList<TestModel>();
 
@@ -135,7 +135,7 @@ public class RecordMappingTests
     [TestMethod]
     public void ToList_WithNoRows_ShouldReturnEmptyList()
     {
-        var record = new Record();
+        var record = new Frame();
         record.Columns.AddFrom<TestModel>();
 
         var result = record.ToList<TestModel>();

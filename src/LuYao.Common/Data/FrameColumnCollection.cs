@@ -23,24 +23,24 @@ namespace LuYao.Data;
 ///     同名不同类型抛 <see cref="InvalidOperationException"/>。</description></item>
 /// </list>
 /// </remarks>
-public class RecordColumnCollection : IReadOnlyList<RecordColumn>
+public class FrameColumnCollection : IReadOnlyList<FrameColumn>
 {
-    private readonly KeyedList<string, RecordColumn> _items
-        = new KeyedList<string, RecordColumn>(c => c.Name, StringComparer.Ordinal);
+    private readonly KeyedList<string, FrameColumn> _items
+        = new KeyedList<string, FrameColumn>(c => c.Name, StringComparer.Ordinal);
 
     /// <summary>
     /// 关联的记录。
     /// </summary>
-    public Record Record { get; }
+    public Frame Frame { get; }
 
     /// <summary>
-    /// 初始化 <see cref="RecordColumnCollection"/> 类的新实例。
+    /// 初始化 <see cref="FrameColumnCollection"/> 类的新实例。
     /// </summary>
     /// <param name="record">关联的记录实例。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出。</exception>
-    internal RecordColumnCollection(Record record)
+    internal FrameColumnCollection(Frame record)
     {
-        this.Record = record ?? throw new ArgumentNullException(nameof(record));
+        this.Frame = record ?? throw new ArgumentNullException(nameof(record));
     }
 
     /// <summary>
@@ -52,13 +52,13 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// 按索引访问列。
     /// </summary>
     /// <param name="index">从零开始的列索引。</param>
-    public RecordColumn this[int index] => _items[index];
+    public FrameColumn this[int index] => _items[index];
 
     /// <summary>
     /// 按列名访问列。列不存在时返回 <see langword="null"/>。
     /// </summary>
     /// <param name="name">要查找的列名。</param>
-    public RecordColumn? this[string name]
+    public FrameColumn? this[string name]
     {
         get
         {
@@ -73,13 +73,13 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     internal void OnAddRow()
     {
         if (_items.Count == 0) return;
-        int num = this.Record.Count;
-        foreach (RecordColumn col in _items)
+        int num = this.Frame.Count;
+        foreach (FrameColumn col in _items)
         {
             if (col.Capacity >= num) continue;
             col.Extend(num);
         }
-        this.Record.Capacity = _items.Min(f => f.Capacity);
+        this.Frame.Capacity = _items.Min(f => f.Capacity);
     }
 
     /// <summary>
@@ -108,8 +108,8 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// 根据列名查找列。
     /// </summary>
     /// <param name="name">要查找的列名。</param>
-    /// <returns>如果找到列则返回 <see cref="RecordColumn"/> 实例，否则返回 <see langword="null"/>。</returns>
-    public RecordColumn? Find(string name)
+    /// <returns>如果找到列则返回 <see cref="FrameColumn"/> 实例，否则返回 <see langword="null"/>。</returns>
+    public FrameColumn? Find(string name)
     {
         if (name == null) return null;
         int idx = _items.IndexOfKey(name);
@@ -117,12 +117,12 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     }
 
     /// <summary>
-    /// 根据列名获取 <see cref="RecordColumn"/> 实例。
+    /// 根据列名获取 <see cref="FrameColumn"/> 实例。
     /// </summary>
     /// <param name="name">要查找的列名。</param>
-    /// <returns>对应的 <see cref="RecordColumn"/> 实例。</returns>
+    /// <returns>对应的 <see cref="FrameColumn"/> 实例。</returns>
     /// <exception cref="KeyNotFoundException">当列名不存在时抛出。</exception>
-    public RecordColumn Get(string name)
+    public FrameColumn Get(string name)
     {
         var col = Find(name);
         if (col == null) throw new KeyNotFoundException($"列 '{name}' 不存在");
@@ -134,13 +134,13 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// </summary>
     /// <typeparam name="T">要查找的列的数据类型。</typeparam>
     /// <param name="name">要查找的列名。</param>
-    /// <returns>如果找到且类型匹配则返回 <see cref="RecordColumn{T}"/> 实例；列不存在时返回 <see langword="null"/>。</returns>
+    /// <returns>如果找到且类型匹配则返回 <see cref="FrameColumn{T}"/> 实例；列不存在时返回 <see langword="null"/>。</returns>
     /// <exception cref="InvalidCastException">当找到的列类型与 <typeparamref name="T"/> 不匹配时抛出。</exception>
-    public RecordColumn<T>? Find<T>(string name)
+    public FrameColumn<T>? Find<T>(string name)
     {
         var col = this.Find(name);
         if (col == null) return null;
-        if (col.Type == typeof(T)) return (RecordColumn<T>)col;
+        if (col.Type == typeof(T)) return (FrameColumn<T>)col;
         throw new InvalidCastException($"列 '{name}' 的类型为 {col.Type.Name}，无法转换为 {typeof(T).Name}");
     }
 
@@ -166,7 +166,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     public void Clear()
     {
         _items.Clear();
-        this.Record.OnClear();
+        this.Frame.OnClear();
     }
 
     #region Add
@@ -176,10 +176,10 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// </summary>
     /// <param name="name">列名。</param>
     /// <param name="type">列的数据类型。</param>
-    /// <returns>新建或已有的 <see cref="RecordColumn"/> 实例。</returns>
+    /// <returns>新建或已有的 <see cref="FrameColumn"/> 实例。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为空或空白时抛出。</exception>
     /// <exception cref="InvalidOperationException">当列名已存在但类型与 <paramref name="type"/> 不一致时抛出。</exception>
-    public RecordColumn Add(string name, Type type)
+    public FrameColumn Add(string name, Type type)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
         if (type == null) throw new ArgumentNullException(nameof(type));
@@ -191,7 +191,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
                     $"列 '{name}' 已存在且类型为 {existing.Type.Name}，无法以类型 {type.Name} 重新添加。");
             return existing;
         }
-        RecordColumn col = Helpers.MakeRecordColumn(this.Record, name, type);
+        FrameColumn col = Helpers.MakeFrameColumn(this.Frame, name, type);
         _items.Add(col);
         return col;
     }
@@ -201,10 +201,10 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// </summary>
     /// <typeparam name="T">列的数据类型。</typeparam>
     /// <param name="name">列名。</param>
-    /// <returns>新建或已有的 <see cref="RecordColumn{T}"/> 实例。</returns>
+    /// <returns>新建或已有的 <see cref="FrameColumn{T}"/> 实例。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="name"/> 为空或空白时抛出。</exception>
     /// <exception cref="InvalidOperationException">当列名已存在但类型与 <typeparamref name="T"/> 不一致时抛出。</exception>
-    public RecordColumn<T> Add<T>(string name)
+    public FrameColumn<T> Add<T>(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
         var existing = Find(name);
@@ -213,10 +213,10 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
             if (existing.Type != typeof(T))
                 throw new InvalidOperationException(
                     $"列 '{name}' 已存在且类型为 {existing.Type.Name}，无法以类型 {typeof(T).Name} 重新添加。");
-            return (RecordColumn<T>)existing;
+            return (FrameColumn<T>)existing;
         }
         Helpers.ValidateColumnType(typeof(T));
-        var col = new RecordColumn<T>(this.Record, name, typeof(T));
+        var col = new FrameColumn<T>(this.Frame, name, typeof(T));
         _items.Add(col);
         return col;
     }
@@ -313,13 +313,13 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// </summary>
     /// <param name="index">要替换的列索引。</param>
     /// <param name="column">新的列实例。</param>
-    internal void ReplaceAt(int index, RecordColumn column)
+    internal void ReplaceAt(int index, FrameColumn column)
     {
         _items[index] = column;
     }
 
     /// <inheritdoc/>
-    public IEnumerator<RecordColumn> GetEnumerator() => _items.GetEnumerator();
+    public IEnumerator<FrameColumn> GetEnumerator() => _items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
 }

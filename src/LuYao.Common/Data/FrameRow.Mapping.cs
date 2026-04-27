@@ -2,7 +2,7 @@
 
 namespace LuYao.Data;
 
-partial struct RecordRow
+partial struct FrameRow
 {
     /// <summary>
     /// 将当前行的列值填充到已有对象 <paramref name="data"/> 的对应属性中。

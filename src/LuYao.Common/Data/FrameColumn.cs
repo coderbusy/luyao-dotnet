@@ -6,13 +6,13 @@ namespace LuYao.Data;
 /// <summary>
 /// 表示一个数据列。
 /// </summary>
-public abstract class RecordColumn : IXProp
+public abstract class FrameColumn : IXProp
 {
     /// <summary>
     /// 获取关联的记录实例。
     /// </summary>
-    /// <value>包含此列的 <see cref="Record"/> 对象。</value>
-    public Record Record { get; }
+    /// <value>包含此列的 <see cref="Frame"/> 对象。</value>
+    public Frame Frame { get; }
 
     /// <summary>
     /// 创建一个数据列实例。
@@ -22,9 +22,9 @@ public abstract class RecordColumn : IXProp
     /// <param name="type">列的实际数据类型。</param>
     /// 
     /// <exception cref="ArgumentNullException">当 <paramref name="record"/>、<paramref name="name"/> 或 <paramref name="type"/> 为 null 时抛出。</exception>
-    internal RecordColumn(Record record, string name, Type type)
+    internal FrameColumn(Frame record, string name, Type type)
     {
-        this.Record = record ?? throw new ArgumentNullException(nameof(record));
+        this.Frame = record ?? throw new ArgumentNullException(nameof(record));
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
         this._type = type ?? throw new ArgumentNullException(nameof(type));
         this.ColumnType = Helpers.GetColumnType(type);
@@ -46,7 +46,7 @@ public abstract class RecordColumn : IXProp
     /// <summary>
     /// 获取列的基础枚举类型标识（不含可空信息）。
     /// </summary>
-    public RecordColumnType ColumnType { get; }
+    public FrameColumnType ColumnType { get; }
 
     /// <summary>
     /// 获取列是否为可空类型。
@@ -105,11 +105,11 @@ public abstract class RecordColumn : IXProp
 
     internal void OnSet(int row)
     {
-        if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
+        if (row < 0 || row >= this.Frame.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Frame.Count - 1}]");
     }
     internal void OnGet(int row)
     {
-        if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
+        if (row < 0 || row >= this.Frame.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Frame.Count - 1}]");
     }
 
     #region To 
@@ -146,13 +146,13 @@ public abstract class RecordColumn : IXProp
 
     object? IXProp.GetValue(object instance)
     {
-        if (instance is RecordRow row) return Get(row.Row);
+        if (instance is FrameRow row) return Get(row.Row);
         throw new InvalidCastException();
     }
 
     void IXProp.SetValue(object instance, object? value)
     {
-        if (instance is RecordRow row)
+        if (instance is FrameRow row)
             Set(row.Row, value);
         else
             throw new InvalidCastException();
