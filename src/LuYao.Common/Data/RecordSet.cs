@@ -8,59 +8,59 @@ using System.Linq;
 namespace LuYao.Data;
 
 /// <summary>
-/// 命名 Frame 集合，用于组织和管理多个 <see cref="Frame"/>。
-/// 以 <see cref="Frame.Name"/> 作为管理键，支持按名称增删改查。
+/// 命名 Record 集合，用于组织和管理多个 <see cref="Record"/>。
+/// 以 <see cref="Record.Name"/> 作为管理键，支持按名称增删改查。
 /// </summary>
-public partial class FrameSet : IEnumerable<Frame>
+public partial class RecordSet : IEnumerable<Record>
 {
-    private readonly SortedDictionary<string, Frame> _records;
+    private readonly SortedDictionary<string, Record> _records;
     private readonly StringComparer _comparer;
 
     /// <summary>
-    /// 使用默认名称比较策略（区分大小写）初始化 <see cref="FrameSet"/> 的新实例。
+    /// 使用默认名称比较策略（区分大小写）初始化 <see cref="RecordSet"/> 的新实例。
     /// </summary>
-    public FrameSet() : this(StringComparer.Ordinal)
+    public RecordSet() : this(StringComparer.Ordinal)
     {
     }
 
     /// <summary>
-    /// 使用指定的名称比较策略初始化 <see cref="FrameSet"/> 的新实例。
+    /// 使用指定的名称比较策略初始化 <see cref="RecordSet"/> 的新实例。
     /// </summary>
-    /// <param name="comparer">用于比较 Frame 名称的比较器。</param>
+    /// <param name="comparer">用于比较 Record 名称的比较器。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="comparer"/> 为 null 时抛出。</exception>
-    public FrameSet(StringComparer comparer)
+    public RecordSet(StringComparer comparer)
     {
         _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
-        _records = new SortedDictionary<string, Frame>(_comparer);
+        _records = new SortedDictionary<string, Record>(_comparer);
     }
 
     /// <summary>
-    /// 获取集合中 Frame 的数量。
+    /// 获取集合中 Record 的数量。
     /// </summary>
     public int Count => _records.Count;
 
     /// <summary>
-    /// 获取集合中所有 Frame 的名称。
+    /// 获取集合中所有 Record 的名称。
     /// </summary>
     public IEnumerable<string> Names => _records.Keys;
 
     /// <summary>
-    /// 按名称获取 Frame。
+    /// 按名称获取 Record。
     /// </summary>
-    /// <param name="name">Frame 的名称。</param>
-    /// <returns>对应的 <see cref="Frame"/> 实例。</returns>
+    /// <param name="name">Record 的名称。</param>
+    /// <returns>对应的 <see cref="Record"/> 实例。</returns>
     /// <exception cref="KeyNotFoundException">当名称不存在时抛出。</exception>
-    public Frame this[string name] => Get(name);
+    public Record this[string name] => Get(name);
 
     /// <summary>
-    /// 按名称添加一个 Frame。如果名称已存在则抛出异常。
+    /// 按名称添加一个 Record。如果名称已存在则抛出异常。
     /// </summary>
-    /// <param name="name">Frame 的名称。</param>
-    /// <param name="record">要添加的 <see cref="Frame"/> 实例。</param>
+    /// <param name="name">Record 的名称。</param>
+    /// <param name="record">要添加的 <see cref="Record"/> 实例。</param>
     /// <exception cref="ArgumentException">当 <paramref name="name"/> 为空或空白时抛出。</exception>
     /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出。</exception>
     /// <exception cref="ArgumentException">当名称已存在时抛出。</exception>
-    public void Add(string name, Frame record)
+    public void Add(string name, Record record)
     {
         ValidateName(name);
         if (record == null) throw new ArgumentNullException(nameof(record));
@@ -70,13 +70,13 @@ public partial class FrameSet : IEnumerable<Frame>
     }
 
     /// <summary>
-    /// 按名称设置一个 Frame。如果名称已存在则覆盖，不存在则添加。
+    /// 按名称设置一个 Record。如果名称已存在则覆盖，不存在则添加。
     /// </summary>
-    /// <param name="name">Frame 的名称。</param>
-    /// <param name="record">要设置的 <see cref="Frame"/> 实例。</param>
+    /// <param name="name">Record 的名称。</param>
+    /// <param name="record">要设置的 <see cref="Record"/> 实例。</param>
     /// <exception cref="ArgumentException">当 <paramref name="name"/> 为空或空白时抛出。</exception>
     /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出。</exception>
-    public void Set(string name, Frame record)
+    public void Set(string name, Record record)
     {
         ValidateName(name);
         if (record == null) throw new ArgumentNullException(nameof(record));
@@ -85,12 +85,12 @@ public partial class FrameSet : IEnumerable<Frame>
     }
 
     /// <summary>
-    /// 按名称获取 Frame。
+    /// 按名称获取 Record。
     /// </summary>
-    /// <param name="name">Frame 的名称。</param>
-    /// <returns>对应的 <see cref="Frame"/> 实例。</returns>
+    /// <param name="name">Record 的名称。</param>
+    /// <returns>对应的 <see cref="Record"/> 实例。</returns>
     /// <exception cref="KeyNotFoundException">当名称不存在时抛出。</exception>
-    public Frame Get(string name)
+    public Record Get(string name)
     {
         if (!_records.TryGetValue(name, out var record))
             throw new KeyNotFoundException($"名称 '{name}' 不存在");
@@ -98,28 +98,28 @@ public partial class FrameSet : IEnumerable<Frame>
     }
 
     /// <summary>
-    /// 尝试按名称获取 Frame。
+    /// 尝试按名称获取 Record。
     /// </summary>
-    /// <param name="name">Frame 的名称。</param>
-    /// <param name="record">如果找到则返回对应的 <see cref="Frame"/> 实例，否则为 null。</param>
+    /// <param name="name">Record 的名称。</param>
+    /// <param name="record">如果找到则返回对应的 <see cref="Record"/> 实例，否则为 null。</param>
     /// <returns>如果找到则返回 true，否则返回 false。</returns>
 
 #if NETCOREAPP2_0_OR_GREATER
-    public bool TryGet(string name, [MaybeNullWhen(false)] out Frame record)
+    public bool TryGet(string name, [MaybeNullWhen(false)] out Record record)
     {
         return _records.TryGetValue(name, out record);
     }
 #else
-    public bool TryGet(string name, out Frame record)
+    public bool TryGet(string name, out Record record)
     {
         return _records.TryGetValue(name, out record);
     }
 #endif
 
     /// <summary>
-    /// 按名称删除 Frame。
+    /// 按名称删除 Record。
     /// </summary>
-    /// <param name="name">要删除的 Frame 的名称。</param>
+    /// <param name="name">要删除的 Record 的名称。</param>
     /// <returns>如果成功删除则返回 true，否则返回 false。</returns>
     public bool Remove(string name)
     {
@@ -127,7 +127,7 @@ public partial class FrameSet : IEnumerable<Frame>
     }
 
     /// <summary>
-    /// 判断指定名称的 Frame 是否存在。
+    /// 判断指定名称的 Record 是否存在。
     /// </summary>
     /// <param name="name">要检查的名称。</param>
     /// <returns>如果存在则返回 true，否则返回 false。</returns>
@@ -137,7 +137,7 @@ public partial class FrameSet : IEnumerable<Frame>
     }
 
     /// <summary>
-    /// 重命名一个 Frame。
+    /// 重命名一个 Record。
     /// </summary>
     /// <param name="oldName">原名称。</param>
     /// <param name="newName">新名称。</param>
@@ -158,7 +158,7 @@ public partial class FrameSet : IEnumerable<Frame>
     }
 
     /// <summary>
-    /// 清空所有 Frame。
+    /// 清空所有 Record。
     /// </summary>
     public void Clear()
     {
@@ -166,27 +166,27 @@ public partial class FrameSet : IEnumerable<Frame>
     }
 
     /// <summary>
-    /// 从 <see cref="DataSet"/> 创建 <see cref="FrameSet"/>。
+    /// 从 <see cref="DataSet"/> 创建 <see cref="RecordSet"/>。
     /// </summary>
     /// <param name="ds">源 <see cref="DataSet"/> 实例。</param>
-    /// <returns>包含所有表数据的 <see cref="FrameSet"/> 实例。</returns>
+    /// <returns>包含所有表数据的 <see cref="RecordSet"/> 实例。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="ds"/> 为 null 时抛出。</exception>
-    public static FrameSet FromDataSet(DataSet ds)
+    public static RecordSet FromDataSet(DataSet ds)
     {
         if (ds == null) throw new ArgumentNullException(nameof(ds));
-        var set = new FrameSet();
+        var set = new RecordSet();
         foreach (DataTable dt in ds.Tables)
         {
-            var record = Frame.Read(dt);
+            var record = Record.Read(dt);
             set.Add(dt.TableName, record);
         }
         return set;
     }
 
     /// <summary>
-    /// 将当前 <see cref="FrameSet"/> 导出为 <see cref="DataSet"/>。
+    /// 将当前 <see cref="RecordSet"/> 导出为 <see cref="DataSet"/>。
     /// </summary>
-    /// <returns>包含所有 Frame 数据的 <see cref="DataSet"/> 实例。</returns>
+    /// <returns>包含所有 Record 数据的 <see cref="DataSet"/> 实例。</returns>
     public DataSet ToDataSet()
     {
         var ds = new DataSet();
@@ -211,7 +211,7 @@ public partial class FrameSet : IEnumerable<Frame>
     }
 
     /// <inheritdoc/>
-    public IEnumerator<Frame> GetEnumerator() => _records.Values.GetEnumerator();
+    public IEnumerator<Record> GetEnumerator() => _records.Values.GetEnumerator();
 
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

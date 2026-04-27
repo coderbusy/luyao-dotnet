@@ -6,7 +6,7 @@ namespace LuYao.Data;
 /// 泛型列
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class FrameColumn<T> : FrameColumn
+public class RecordColumn<T> : RecordColumn
 {
     /// <summary>
     /// 数据存储数组
@@ -16,7 +16,7 @@ public class FrameColumn<T> : FrameColumn
     /// <summary>
     /// 创建一个泛型列
     /// </summary>
-    public FrameColumn(Frame record, string name, Type type)
+    public RecordColumn(Record record, string name, Type type)
         : base(record, name, type)
     {
         var capacity = record.Capacity;
@@ -37,7 +37,7 @@ public class FrameColumn<T> : FrameColumn
     public override void Delete(int row)
     {
         OnGet(row);
-        var count = this.Frame.Count;
+        var count = this.Record.Count;
         for (int i = row; i < count - 1; i++)
         {
             this._data[i] = this._data[i + 1];

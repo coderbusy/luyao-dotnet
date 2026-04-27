@@ -4,7 +4,7 @@ using System.IO;
 namespace LuYao.Data;
 
 [TestClass]
-public class FrameSerializationTests
+public class RecordSerializationTests
 {
     private enum FavoriteType
     {
@@ -12,9 +12,9 @@ public class FrameSerializationTests
         Chat = 200,
     }
 
-    private static Frame CreateTestFrame()
+    private static Record CreateTestRecord()
     {
-        var record = new Frame("Orders", 2);
+        var record = new Record("Orders", 2);
         var idCol = record.Columns.Add<int>("Id");
         var nameCol = record.Columns.Add<string>("Name");
         record.Page = 2;
@@ -37,10 +37,10 @@ public class FrameSerializationTests
     [TestMethod]
     public void WhenBinaryRoundTripThenDataPreserved()
     {
-        var original = CreateTestFrame();
+        var original = CreateTestRecord();
 
         var bytes = original.ToBytes();
-        var deserialized = Frame.FromBytes(bytes);
+        var deserialized = Record.FromBytes(bytes);
 
         Assert.AreEqual("Orders", deserialized.Name);
         Assert.AreEqual(2, deserialized.Count);
@@ -56,14 +56,14 @@ public class FrameSerializationTests
     }
 
     [TestMethod]
-    public void WhenBinaryRoundTripEmptyFrameThenSchemaPreserved()
+    public void WhenBinaryRoundTripEmptyRecordThenSchemaPreserved()
     {
-        var original = new Frame("Empty", 0);
+        var original = new Record("Empty", 0);
         original.Columns.Add<int>("Id");
         original.Columns.Add<string>("Name");
 
         var bytes = original.ToBytes();
-        var deserialized = Frame.FromBytes(bytes);
+        var deserialized = Record.FromBytes(bytes);
 
         Assert.AreEqual("Empty", deserialized.Name);
         Assert.AreEqual(0, deserialized.Count);
@@ -75,13 +75,13 @@ public class FrameSerializationTests
     [TestMethod]
     public void WhenBinaryRoundTripWithNullValuesThenPreserved()
     {
-        var record = new Frame("Test", 1);
+        var record = new Record("Test", 1);
         record.Columns.Add<string>("Name");
         record.Columns.Add<int?>("Value");
         record.AddRow();
 
         var bytes = record.ToBytes();
-        var deserialized = Frame.FromBytes(bytes);
+        var deserialized = Record.FromBytes(bytes);
 
         Assert.AreEqual(1, deserialized.Count);
         Assert.IsNull(deserialized.Columns[0].Get(0));
@@ -91,13 +91,13 @@ public class FrameSerializationTests
     [TestMethod]
     public void WhenBinaryRoundTripWithByteArrayThenPreserved()
     {
-        var record = new Frame("Binary", 1);
+        var record = new Record("Binary", 1);
         var col = record.Columns.Add<byte[]>("Data");
         var row = record.AddRow();
         col.SetValue(row.Row, new byte[] { 1, 2, 3, 4, 5 });
 
         var bytes = record.ToBytes();
-        var deserialized = Frame.FromBytes(bytes);
+        var deserialized = Record.FromBytes(bytes);
 
         var data = deserialized.Columns.Find<byte[]>("Data")!.GetValue(0);
         CollectionAssert.AreEqual(new byte[] { 1, 2, 3, 4, 5 }, data);
@@ -106,7 +106,7 @@ public class FrameSerializationTests
     [TestMethod]
     public void WhenBinaryRoundTripWithAllTypesThenPreserved()
     {
-        var record = new Frame("AllTypes", 1);
+        var record = new Record("AllTypes", 1);
         record.Columns.Add<bool>("Bool");
         record.Columns.Add<sbyte>("SByte");
         record.Columns.Add<short>("Short");
@@ -150,7 +150,7 @@ public class FrameSerializationTests
         record.Columns.Find<Guid>("Guid")!.SetValue(r.Row, guid);
 
         var bytes = record.ToBytes();
-        var d = Frame.FromBytes(bytes);
+        var d = Record.FromBytes(bytes);
 
         Assert.AreEqual(true, d.Columns.Find<bool>("Bool")!.Get(0));
         Assert.AreEqual((sbyte)-1, d.Columns.Find<sbyte>("SByte")!.Get(0));
@@ -175,7 +175,7 @@ public class FrameSerializationTests
     [TestMethod]
     public void WhenBinaryRoundTripWithEnumColumnThenPreserved()
     {
-        var record = new Frame("EnumFrame", 1);
+        var record = new Record("EnumRecord", 1);
         var favoriteCol = record.Columns.Add<FavoriteType>("Favorite");
         var nullableFavoriteCol = record.Columns.Add<FavoriteType?>("NullableFavorite");
         var row = record.AddRow();
@@ -183,16 +183,16 @@ public class FrameSerializationTests
         nullableFavoriteCol.SetValue(row.Row, FavoriteType.Common);
 
         var bytes = record.ToBytes();
-        var deserialized = Frame.FromBytes(bytes);
+        var deserialized = Record.FromBytes(bytes);
 
         Assert.AreEqual(200, deserialized.Columns.Find<int>("Favorite")!.Get(0));
         Assert.AreEqual(100, deserialized.Columns.Find<int?>("NullableFavorite")!.Get(0));
     }
 
     [TestMethod]
-    public void WhenSerializeToBytesThenFrameHeaderContainsFrameType()
+    public void WhenSerializeToBytesThenRecordHeaderContainsRecordType()
     {
-        var record = new Frame("Orders", 1);
+        var record = new Record("Orders", 1);
         record.Columns.Add<int>("Id");
         record.AddRow();
 
@@ -206,59 +206,59 @@ public class FrameSerializationTests
     }
 
     [TestMethod]
-    public void WhenReadFrameFromFrameSetPayloadThenThrowTypeMismatch()
+    public void WhenReadRecordFromRecordSetPayloadThenThrowTypeMismatch()
     {
-        var set = new FrameSet();
-        set.Add("Orders", new Frame("Orders", 0));
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
 
         var bytes = set.ToBytes();
 
-        Assert.Throws<InvalidOperationException>(() => Frame.FromBytes(bytes));
+        Assert.Throws<InvalidOperationException>(() => Record.FromBytes(bytes));
     }
 
     [TestMethod]
-    public void IsBinaryPayload_DetectsFrameAndFrameSetCorrectly()
+    public void IsBinaryPayload_DetectsRecordAndRecordSetCorrectly()
     {
-        var record = new Frame("Orders", 0);
-        var set = new FrameSet();
-        set.Add("Orders", new Frame("Orders", 0));
+        var record = new Record("Orders", 0);
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
 
         var recordBytes = record.ToBytes();
         var setBytes = set.ToBytes();
 
-        Assert.IsTrue(Frame.IsBinaryPayload(recordBytes));
-        Assert.IsFalse(Frame.IsBinaryPayload(setBytes));
-        Assert.IsFalse(Frame.IsBinaryPayload(new byte[] { 1, 2, 3, 4 }));
-        Assert.IsFalse(Frame.IsBinaryPayload((byte[])null));
+        Assert.IsTrue(Record.IsBinaryPayload(recordBytes));
+        Assert.IsFalse(Record.IsBinaryPayload(setBytes));
+        Assert.IsFalse(Record.IsBinaryPayload(new byte[] { 1, 2, 3, 4 }));
+        Assert.IsFalse(Record.IsBinaryPayload((byte[])null));
     }
 
     #endregion
 }
 
 [TestClass]
-public class FrameSetSerializationTests
+public class RecordSetSerializationTests
 {
     #region Binary Serialization
 
     [TestMethod]
-    public void WhenBinaryRoundTripThenAllFramesPreserved()
+    public void WhenBinaryRoundTripThenAllRecordsPreserved()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
-        var orders = new Frame("Orders", 1);
+        var orders = new Record("Orders", 1);
         orders.Columns.Add<int>("Id");
         var row = orders.AddRow();
         orders.Columns[0].Set(row.Row, 1);
         set.Add("Orders", orders);
 
-        var customers = new Frame("Customers", 1);
+        var customers = new Record("Customers", 1);
         customers.Columns.Add<string>("Name");
         var row2 = customers.AddRow();
         customers.Columns[0].Set(row2.Row, "Alice");
         set.Add("Customers", customers);
 
         var bytes = set.ToBytes();
-        var deserialized = FrameSet.FromBytes(bytes);
+        var deserialized = RecordSet.FromBytes(bytes);
 
         Assert.AreEqual(2, deserialized.Count);
         Assert.IsTrue(deserialized.Contains("Orders"));
@@ -270,19 +270,19 @@ public class FrameSetSerializationTests
     [TestMethod]
     public void WhenBinaryRoundTripEmptySetThenEmpty()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         var bytes = set.ToBytes();
-        var deserialized = FrameSet.FromBytes(bytes);
+        var deserialized = RecordSet.FromBytes(bytes);
 
         Assert.AreEqual(0, deserialized.Count);
     }
 
     [TestMethod]
-    public void WhenSerializeToBytesThenFrameSetHeaderContainsFrameSetType()
+    public void WhenSerializeToBytesThenRecordSetHeaderContainsRecordSetType()
     {
-        var set = new FrameSet();
-        set.Add("Orders", new Frame("Orders", 0));
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
 
         var bytes = set.ToBytes();
 
@@ -294,28 +294,28 @@ public class FrameSetSerializationTests
     }
 
     [TestMethod]
-    public void WhenReadFrameSetFromFramePayloadThenThrowTypeMismatch()
+    public void WhenReadRecordSetFromRecordPayloadThenThrowTypeMismatch()
     {
-        var record = new Frame("Orders", 0);
+        var record = new Record("Orders", 0);
         var bytes = record.ToBytes();
 
-        Assert.Throws<InvalidOperationException>(() => FrameSet.FromBytes(bytes));
+        Assert.Throws<InvalidOperationException>(() => RecordSet.FromBytes(bytes));
     }
 
     [TestMethod]
-    public void IsBinaryPayload_DetectsFrameSetAndFrameCorrectly()
+    public void IsBinaryPayload_DetectsRecordSetAndRecordCorrectly()
     {
-        var record = new Frame("Orders", 0);
-        var set = new FrameSet();
-        set.Add("Orders", new Frame("Orders", 0));
+        var record = new Record("Orders", 0);
+        var set = new RecordSet();
+        set.Add("Orders", new Record("Orders", 0));
 
         var recordBytes = record.ToBytes();
         var setBytes = set.ToBytes();
 
-        Assert.IsTrue(FrameSet.IsBinaryPayload(setBytes));
-        Assert.IsFalse(FrameSet.IsBinaryPayload(recordBytes));
-        Assert.IsFalse(FrameSet.IsBinaryPayload(new byte[] { 0xFF, (byte)'L', (byte)'Y', 9 }));
-        Assert.IsFalse(FrameSet.IsBinaryPayload((byte[])null));
+        Assert.IsTrue(RecordSet.IsBinaryPayload(setBytes));
+        Assert.IsFalse(RecordSet.IsBinaryPayload(recordBytes));
+        Assert.IsFalse(RecordSet.IsBinaryPayload(new byte[] { 0xFF, (byte)'L', (byte)'Y', 9 }));
+        Assert.IsFalse(RecordSet.IsBinaryPayload((byte[])null));
     }
 
     #endregion

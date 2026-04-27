@@ -3,26 +3,26 @@
 namespace LuYao.Data;
 
 [TestClass]
-public class FramePagingTests
+public class RecordPagingTests
 {
     [TestMethod]
     public void WhenDefaultConstructorThenPageIsOne()
     {
-        var record = new Frame();
+        var record = new Record();
         Assert.AreEqual(1, record.Page);
     }
 
     [TestMethod]
     public void WhenDefaultConstructorThenPageSizeIsZero()
     {
-        var record = new Frame();
+        var record = new Record();
         Assert.AreEqual(0, record.PageSize);
     }
 
     [TestMethod]
     public void WhenMaxCountNotSetThenReturnsCount()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("Id");
         record.AddRow();
         record.AddRow();
@@ -33,7 +33,7 @@ public class FramePagingTests
     [TestMethod]
     public void WhenMaxCountSetThenReturnsSetValue()
     {
-        var record = new Frame();
+        var record = new Record();
         record.MaxCount = 100;
 
         Assert.AreEqual(100, record.MaxCount);
@@ -42,7 +42,7 @@ public class FramePagingTests
     [TestMethod]
     public void WhenMaxCountZeroThenMaxPageIsZero()
     {
-        var record = new Frame();
+        var record = new Record();
 
         Assert.AreEqual(0, record.MaxPage);
     }
@@ -50,7 +50,7 @@ public class FramePagingTests
     [TestMethod]
     public void WhenPageSizeZeroThenMaxPageUsesDefault20()
     {
-        var record = new Frame();
+        var record = new Record();
         record.MaxCount = 50;
 
         Assert.AreEqual(3, record.MaxPage); // (50-1)/20+1 = 3
@@ -59,7 +59,7 @@ public class FramePagingTests
     [TestMethod]
     public void WhenPageSizeSetThenMaxPageCalculatesCorrectly()
     {
-        var record = new Frame();
+        var record = new Record();
         record.MaxCount = 100;
         record.PageSize = 10;
 
@@ -69,7 +69,7 @@ public class FramePagingTests
     [TestMethod]
     public void WhenMaxCountNotExactMultipleThenMaxPageRoundsUp()
     {
-        var record = new Frame();
+        var record = new Record();
         record.MaxCount = 101;
         record.PageSize = 10;
 
@@ -79,7 +79,7 @@ public class FramePagingTests
     [TestMethod]
     public void WhenCloneThenPagingPropertiesAreCopied()
     {
-        var record = new Frame("Test", 0);
+        var record = new Record("Test", 0);
         record.Page = 3;
         record.PageSize = 25;
         record.MaxCount = 200;

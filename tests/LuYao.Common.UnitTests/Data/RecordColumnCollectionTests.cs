@@ -6,27 +6,27 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LuYao.Data;
 
 /// <summary>
-/// FrameColumnCollection 新语义单元测试：
+/// RecordColumnCollection 新语义单元测试：
 /// - Find 不存在返回 null；
 /// - Get 不存在抛 KeyNotFoundException；
 /// - Add 同名同类型返回已存在列；
 /// - Add 同名不同类型抛 InvalidOperationException；
-/// - 实现 IReadOnlyList&lt;FrameColumn&gt; 而不再继承 List。
+/// - 实现 IReadOnlyList&lt;RecordColumn&gt; 而不再继承 List。
 /// </summary>
 [TestClass]
-public class FrameColumnCollectionTests
+public class RecordColumnCollectionTests
 {
     [TestMethod]
     public void Find_ColumnNotExist_ReturnsNull()
     {
-        var record = new Frame();
+        var record = new Record();
         Assert.IsNull(record.Columns.Find("NoSuchColumn"));
     }
 
     [TestMethod]
     public void Find_ColumnExists_ReturnsColumn()
     {
-        var record = new Frame();
+        var record = new Record();
         var added = record.Columns.Add<int>("Id");
         var found = record.Columns.Find("Id");
         Assert.AreSame(added, found);
@@ -35,14 +35,14 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Get_ColumnNotExist_ThrowsKeyNotFoundException()
     {
-        var record = new Frame();
+        var record = new Record();
         Assert.Throws<KeyNotFoundException>(() => record.Columns.Get("NoSuchColumn"));
     }
 
     [TestMethod]
     public void Get_ColumnExists_ReturnsColumn()
     {
-        var record = new Frame();
+        var record = new Record();
         var added = record.Columns.Add<string>("Name");
         var got = record.Columns.Get("Name");
         Assert.AreSame(added, got);
@@ -51,7 +51,7 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Add_SameNameSameType_ReturnsExistingInstance()
     {
-        var record = new Frame();
+        var record = new Record();
         var first = record.Columns.Add<int>("Id");
         var second = record.Columns.Add<int>("Id");
         Assert.AreSame(first, second);
@@ -61,7 +61,7 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Add_SameNameSameType_NonGeneric_ReturnsExistingInstance()
     {
-        var record = new Frame();
+        var record = new Record();
         var first = record.Columns.Add("Id", typeof(int));
         var second = record.Columns.Add("Id", typeof(int));
         Assert.AreSame(first, second);
@@ -71,7 +71,7 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Add_SameNameDifferentType_ThrowsInvalidOperationException()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("Id");
         Assert.Throws<InvalidOperationException>(() => record.Columns.Add<string>("Id"));
     }
@@ -79,7 +79,7 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Add_SameNameDifferentType_NonGeneric_ThrowsInvalidOperationException()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add("Id", typeof(int));
         Assert.Throws<InvalidOperationException>(() => record.Columns.Add("Id", typeof(string)));
     }
@@ -87,9 +87,9 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Collection_IsReadOnlyList()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("Id");
-        IReadOnlyList<FrameColumn> readOnly = record.Columns;
+        IReadOnlyList<RecordColumn> readOnly = record.Columns;
         Assert.AreEqual(1, readOnly.Count);
         Assert.AreEqual("Id", readOnly[0].Name);
     }
@@ -97,15 +97,15 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Collection_DoesNotInheritList()
     {
-        // 显式破坏期望：不应再继承 List<FrameColumn>，避免 Add(FrameColumn)、Insert 等绕过校验。
-        var record = new Frame();
-        Assert.IsFalse(typeof(System.Collections.Generic.List<FrameColumn>).IsAssignableFrom(typeof(FrameColumnCollection)));
+        // 显式破坏期望：不应再继承 List<RecordColumn>，避免 Add(RecordColumn)、Insert 等绕过校验。
+        var record = new Record();
+        Assert.IsFalse(typeof(System.Collections.Generic.List<RecordColumn>).IsAssignableFrom(typeof(RecordColumnCollection)));
     }
 
     [TestMethod]
     public void IndexOf_ByName_ReturnsCorrectIndex()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("A");
         record.Columns.Add<string>("B");
         record.Columns.Add<bool>("C");
@@ -119,7 +119,7 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Contains_Name_Works()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("A");
         Assert.IsTrue(record.Columns.Contains("A"));
         Assert.IsFalse(record.Columns.Contains("B"));
@@ -128,7 +128,7 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Remove_ByName_RemovesAndReturnsTrue()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("A");
         Assert.IsTrue(record.Columns.Remove("A"));
         Assert.AreEqual(0, record.Columns.Count);
@@ -138,7 +138,7 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Rename_Works()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("A");
         record.Columns.Rename("A", "B");
         Assert.IsFalse(record.Columns.Contains("A"));
@@ -148,7 +148,7 @@ public class FrameColumnCollectionTests
     [TestMethod]
     public void Enumerate_PreservesInsertionOrder()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("A");
         record.Columns.Add<string>("B");
         record.Columns.Add<bool>("C");

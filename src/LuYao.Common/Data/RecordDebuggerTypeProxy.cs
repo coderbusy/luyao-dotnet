@@ -3,12 +3,12 @@ using System.Diagnostics;
 
 namespace LuYao.Data;
 
-internal class FrameDebuggerTypeProxy
+internal class RecordDebuggerTypeProxy
 {
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly Frame _record;
+    private readonly Record _record;
 
-    public FrameDebuggerTypeProxy(Frame record)
+    public RecordDebuggerTypeProxy(Record record)
     {
         _record = record ?? throw new ArgumentNullException(nameof(record));
     }

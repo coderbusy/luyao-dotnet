@@ -15,25 +15,25 @@ public class HelperTests
     }
 
     [TestMethod]
-    public void MakeFrameColumn_ShouldCreateFrameColumnOfType()
+    public void MakeRecordColumn_ShouldCreateRecordColumnOfType()
     {
         // Arrange
-        var record = new Frame();
+        var record = new Record();
         string name = "TestColumn";
         Type type = typeof(int);
         // Act
-        var column = Helpers.MakeFrameColumn(record, name, type);
+        var column = Helpers.MakeRecordColumn(record, name, type);
         // Assert
         Assert.IsNotNull(column);
         Assert.AreEqual(name, column.Name);
         Assert.AreEqual(type, column.Type);
-        Assert.IsInstanceOfType(column, typeof(FrameColumn<int>));
+        Assert.IsInstanceOfType(column, typeof(RecordColumn<int>));
     }
 
     [TestMethod]
-    public void MakeFrameColumn_UnsupportedType_ShouldThrow()
+    public void MakeRecordColumn_UnsupportedType_ShouldThrow()
     {
-        var record = new Frame();
-        Assert.Throws<NotSupportedException>(() => Helpers.MakeFrameColumn(record, "Test", typeof(Foo)));
+        var record = new Record();
+        Assert.Throws<NotSupportedException>(() => Helpers.MakeRecordColumn(record, "Test", typeof(Foo)));
     }
 }
