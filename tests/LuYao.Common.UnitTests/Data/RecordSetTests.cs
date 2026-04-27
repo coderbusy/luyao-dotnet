@@ -5,11 +5,11 @@ using System.Linq;
 namespace LuYao.Data;
 
 [TestClass]
-public class FrameSetTests
+public class RecordSetTests
 {
-    private static Frame CreateTestFrame(string name, int rowCount)
+    private static Record CreateTestRecord(string name, int rowCount)
     {
-        var record = new Frame(name, rowCount);
+        var record = new Record(name, rowCount);
         var idCol = record.Columns.Add<int>("Id");
         var nameCol = record.Columns.Add<string>("Name");
         for (int i = 0; i < rowCount; i++)
@@ -26,7 +26,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenDefaultConstructorThenEmptySet()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         Assert.AreEqual(0, set.Count);
         Assert.AreEqual(0, set.Names.Count());
@@ -35,7 +35,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenNullComparerThenThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new FrameSet(null!));
+        Assert.Throws<ArgumentNullException>(() => new RecordSet(null!));
     }
 
     #endregion
@@ -43,10 +43,10 @@ public class FrameSetTests
     #region Add
 
     [TestMethod]
-    public void WhenAddValidFrameThenCountIncreases()
+    public void WhenAddValidRecordThenCountIncreases()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("Orders", 2);
+        var set = new RecordSet();
+        var record = CreateTestRecord("Orders", 2);
 
         set.Add("Orders", record);
 
@@ -57,8 +57,8 @@ public class FrameSetTests
     [TestMethod]
     public void WhenAddNullNameThenThrowsArgumentException()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("test", 1);
+        var set = new RecordSet();
+        var record = CreateTestRecord("test", 1);
 
         Assert.Throws<ArgumentException>(() => set.Add(null!, record));
     }
@@ -66,8 +66,8 @@ public class FrameSetTests
     [TestMethod]
     public void WhenAddEmptyNameThenThrowsArgumentException()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("test", 1);
+        var set = new RecordSet();
+        var record = CreateTestRecord("test", 1);
 
         Assert.Throws<ArgumentException>(() => set.Add("", record));
     }
@@ -75,16 +75,16 @@ public class FrameSetTests
     [TestMethod]
     public void WhenAddWhitespaceNameThenThrowsArgumentException()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("test", 1);
+        var set = new RecordSet();
+        var record = CreateTestRecord("test", 1);
 
         Assert.Throws<ArgumentException>(() => set.Add("   ", record));
     }
 
     [TestMethod]
-    public void WhenAddNullFrameThenThrowsArgumentNullException()
+    public void WhenAddNullRecordThenThrowsArgumentNullException()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         Assert.Throws<ArgumentNullException>(() => set.Add("Orders", null!));
     }
@@ -92,18 +92,18 @@ public class FrameSetTests
     [TestMethod]
     public void WhenAddDuplicateNameThenThrowsArgumentException()
     {
-        var set = new FrameSet();
-        set.Add("Orders", CreateTestFrame("Orders", 1));
+        var set = new RecordSet();
+        set.Add("Orders", CreateTestRecord("Orders", 1));
 
-        Assert.Throws<ArgumentException>(() => set.Add("Orders", CreateTestFrame("Orders", 2)));
+        Assert.Throws<ArgumentException>(() => set.Add("Orders", CreateTestRecord("Orders", 2)));
     }
 
     [TestMethod]
     public void WhenAddWithCaseSensitiveComparerThenDifferentCaseIsAllowed()
     {
-        var set = new FrameSet(StringComparer.Ordinal);
-        set.Add("Orders", CreateTestFrame("Orders", 1));
-        set.Add("orders", CreateTestFrame("orders", 2));
+        var set = new RecordSet(StringComparer.Ordinal);
+        set.Add("Orders", CreateTestRecord("Orders", 1));
+        set.Add("orders", CreateTestRecord("orders", 2));
 
         Assert.AreEqual(2, set.Count);
     }
@@ -111,10 +111,10 @@ public class FrameSetTests
     [TestMethod]
     public void WhenAddWithCaseInsensitiveComparerThenDifferentCaseThrows()
     {
-        var set = new FrameSet(StringComparer.OrdinalIgnoreCase);
-        set.Add("Orders", CreateTestFrame("Orders", 1));
+        var set = new RecordSet(StringComparer.OrdinalIgnoreCase);
+        set.Add("Orders", CreateTestRecord("Orders", 1));
 
-        Assert.Throws<ArgumentException>(() => set.Add("orders", CreateTestFrame("orders", 2)));
+        Assert.Throws<ArgumentException>(() => set.Add("orders", CreateTestRecord("orders", 2)));
     }
 
     #endregion
@@ -122,10 +122,10 @@ public class FrameSetTests
     #region Set
 
     [TestMethod]
-    public void WhenSetNewNameThenAddsFrame()
+    public void WhenSetNewNameThenAddsRecord()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("Orders", 2);
+        var set = new RecordSet();
+        var record = CreateTestRecord("Orders", 2);
 
         set.Set("Orders", record);
 
@@ -134,11 +134,11 @@ public class FrameSetTests
     }
 
     [TestMethod]
-    public void WhenSetExistingNameThenReplacesFrame()
+    public void WhenSetExistingNameThenReplacesRecord()
     {
-        var set = new FrameSet();
-        var record1 = CreateTestFrame("Orders", 1);
-        var record2 = CreateTestFrame("Orders", 3);
+        var set = new RecordSet();
+        var record1 = CreateTestRecord("Orders", 1);
+        var record2 = CreateTestRecord("Orders", 3);
 
         set.Add("Orders", record1);
         set.Set("Orders", record2);
@@ -148,9 +148,9 @@ public class FrameSetTests
     }
 
     [TestMethod]
-    public void WhenSetNullFrameThenThrowsArgumentNullException()
+    public void WhenSetNullRecordThenThrowsArgumentNullException()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         Assert.Throws<ArgumentNullException>(() => set.Set("Orders", null!));
     }
@@ -158,9 +158,9 @@ public class FrameSetTests
     [TestMethod]
     public void WhenSetEmptyNameThenThrowsArgumentException()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
-        Assert.Throws<ArgumentException>(() => set.Set("", CreateTestFrame("test", 1)));
+        Assert.Throws<ArgumentException>(() => set.Set("", CreateTestRecord("test", 1)));
     }
 
     #endregion
@@ -168,10 +168,10 @@ public class FrameSetTests
     #region Get / TryGet
 
     [TestMethod]
-    public void WhenGetExistingNameThenReturnsFrame()
+    public void WhenGetExistingNameThenReturnsRecord()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("Orders", 2);
+        var set = new RecordSet();
+        var record = CreateTestRecord("Orders", 2);
         set.Add("Orders", record);
 
         var result = set.Get("Orders");
@@ -182,16 +182,16 @@ public class FrameSetTests
     [TestMethod]
     public void WhenGetNonExistingNameThenThrowsKeyNotFoundException()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         Assert.Throws<KeyNotFoundException>(() => set.Get("NonExistent"));
     }
 
     [TestMethod]
-    public void WhenTryGetExistingNameThenReturnsTrueAndFrame()
+    public void WhenTryGetExistingNameThenReturnsTrueAndRecord()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("Orders", 2);
+        var set = new RecordSet();
+        var record = CreateTestRecord("Orders", 2);
         set.Add("Orders", record);
 
         var found = set.TryGet("Orders", out var result);
@@ -203,7 +203,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenTryGetNonExistingNameThenReturnsFalse()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         var found = set.TryGet("NonExistent", out var result);
 
@@ -216,10 +216,10 @@ public class FrameSetTests
     #region Indexer
 
     [TestMethod]
-    public void WhenIndexerExistingNameThenReturnsFrame()
+    public void WhenIndexerExistingNameThenReturnsRecord()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("Orders", 1);
+        var set = new RecordSet();
+        var record = CreateTestRecord("Orders", 1);
         set.Add("Orders", record);
 
         var result = set["Orders"];
@@ -230,7 +230,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenIndexerNonExistingNameThenThrowsKeyNotFoundException()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         Assert.Throws<KeyNotFoundException>(() => _ = set["NonExistent"]);
     }
@@ -242,8 +242,8 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRemoveExistingThenReturnsTrueAndRemoves()
     {
-        var set = new FrameSet();
-        set.Add("Orders", CreateTestFrame("Orders", 1));
+        var set = new RecordSet();
+        set.Add("Orders", CreateTestRecord("Orders", 1));
 
         var removed = set.Remove("Orders");
 
@@ -255,7 +255,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRemoveNonExistingThenReturnsFalse()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         var removed = set.Remove("NonExistent");
 
@@ -265,10 +265,10 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRemoveThenNamesListUpdated()
     {
-        var set = new FrameSet();
-        set.Add("A", CreateTestFrame("A", 1));
-        set.Add("B", CreateTestFrame("B", 1));
-        set.Add("C", CreateTestFrame("C", 1));
+        var set = new RecordSet();
+        set.Add("A", CreateTestRecord("A", 1));
+        set.Add("B", CreateTestRecord("B", 1));
+        set.Add("C", CreateTestRecord("C", 1));
 
         set.Remove("B");
 
@@ -283,8 +283,8 @@ public class FrameSetTests
     [TestMethod]
     public void WhenContainsExistingNameThenReturnsTrue()
     {
-        var set = new FrameSet();
-        set.Add("Orders", CreateTestFrame("Orders", 1));
+        var set = new RecordSet();
+        set.Add("Orders", CreateTestRecord("Orders", 1));
 
         Assert.IsTrue(set.Contains("Orders"));
     }
@@ -292,7 +292,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenContainsNonExistingNameThenReturnsFalse()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         Assert.IsFalse(set.Contains("NonExistent"));
     }
@@ -304,8 +304,8 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRenameExistingThenNameChanges()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("Orders", 1);
+        var set = new RecordSet();
+        var record = CreateTestRecord("Orders", 1);
         set.Add("Orders", record);
 
         set.Rename("Orders", "AllOrders");
@@ -319,7 +319,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRenameNonExistingThenThrowsKeyNotFoundException()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         Assert.Throws<KeyNotFoundException>(() => set.Rename("NonExistent", "NewName"));
     }
@@ -327,9 +327,9 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRenameToExistingNameThenThrowsArgumentException()
     {
-        var set = new FrameSet();
-        set.Add("A", CreateTestFrame("A", 1));
-        set.Add("B", CreateTestFrame("B", 1));
+        var set = new RecordSet();
+        set.Add("A", CreateTestRecord("A", 1));
+        set.Add("B", CreateTestRecord("B", 1));
 
         Assert.Throws<ArgumentException>(() => set.Rename("A", "B"));
     }
@@ -337,8 +337,8 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRenameToEmptyNameThenThrowsArgumentException()
     {
-        var set = new FrameSet();
-        set.Add("A", CreateTestFrame("A", 1));
+        var set = new RecordSet();
+        set.Add("A", CreateTestRecord("A", 1));
 
         Assert.Throws<ArgumentException>(() => set.Rename("A", ""));
     }
@@ -346,8 +346,8 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRenameToSameNameThenSucceeds()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("Orders", 1);
+        var set = new RecordSet();
+        var record = CreateTestRecord("Orders", 1);
         set.Add("Orders", record);
 
         set.Rename("Orders", "Orders");
@@ -359,10 +359,10 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRenameThenNamesListHasDeterministicOrder()
     {
-        var set = new FrameSet();
-        set.Add("A", CreateTestFrame("A", 1));
-        set.Add("B", CreateTestFrame("B", 1));
-        set.Add("C", CreateTestFrame("C", 1));
+        var set = new RecordSet();
+        set.Add("A", CreateTestRecord("A", 1));
+        set.Add("B", CreateTestRecord("B", 1));
+        set.Add("C", CreateTestRecord("C", 1));
 
         set.Rename("B", "D");
 
@@ -376,9 +376,9 @@ public class FrameSetTests
     [TestMethod]
     public void WhenClearThenSetIsEmpty()
     {
-        var set = new FrameSet();
-        set.Add("A", CreateTestFrame("A", 1));
-        set.Add("B", CreateTestFrame("B", 1));
+        var set = new RecordSet();
+        set.Add("A", CreateTestRecord("A", 1));
+        set.Add("B", CreateTestRecord("B", 1));
 
         set.Clear();
 
@@ -391,12 +391,12 @@ public class FrameSetTests
     #region Enumeration
 
     [TestMethod]
-    public void WhenEnumerateThenReturnsAllFramesInOrder()
+    public void WhenEnumerateThenReturnsAllRecordsInOrder()
     {
-        var set = new FrameSet();
-        var r1 = CreateTestFrame("A", 1);
-        var r2 = CreateTestFrame("B", 2);
-        var r3 = CreateTestFrame("C", 3);
+        var set = new RecordSet();
+        var r1 = CreateTestRecord("A", 1);
+        var r2 = CreateTestRecord("B", 2);
+        var r3 = CreateTestRecord("C", 3);
         set.Add("A", r1);
         set.Add("B", r2);
         set.Add("C", r3);
@@ -412,7 +412,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenEnumerateEmptySetThenReturnsEmpty()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         var records = set.ToArray();
 
@@ -424,7 +424,7 @@ public class FrameSetTests
     #region DataSet Interop
 
     [TestMethod]
-    public void WhenFromDataSetThenCreatesFrameSet()
+    public void WhenFromDataSetThenCreatesRecordSet()
     {
         var ds = new DataSet();
         var dt1 = ds.Tables.Add("Orders");
@@ -438,7 +438,7 @@ public class FrameSetTests
         dt2.Columns.Add("Name", typeof(string));
         dt2.Rows.Add(1, "Alice");
 
-        var set = FrameSet.FromDataSet(ds);
+        var set = RecordSet.FromDataSet(ds);
 
         Assert.AreEqual(2, set.Count);
         Assert.IsTrue(set.Contains("Orders"));
@@ -450,15 +450,15 @@ public class FrameSetTests
     [TestMethod]
     public void WhenFromDataSetNullThenThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => FrameSet.FromDataSet(null!));
+        Assert.Throws<ArgumentNullException>(() => RecordSet.FromDataSet(null!));
     }
 
     [TestMethod]
     public void WhenToDataSetThenCreatesDataSet()
     {
-        var set = new FrameSet();
-        var r1 = CreateTestFrame("Orders", 2);
-        var r2 = CreateTestFrame("Customers", 1);
+        var set = new RecordSet();
+        var r1 = CreateTestRecord("Orders", 2);
+        var r2 = CreateTestRecord("Customers", 1);
         set.Add("Orders", r1);
         set.Add("Customers", r2);
 
@@ -474,7 +474,7 @@ public class FrameSetTests
     [TestMethod]
     public void WhenWriteToNullDataSetThenThrowsArgumentNullException()
     {
-        var set = new FrameSet();
+        var set = new RecordSet();
 
         Assert.Throws<ArgumentNullException>(() => set.WriteTo((System.Data.DataSet)null!));
     }
@@ -482,12 +482,12 @@ public class FrameSetTests
     [TestMethod]
     public void WhenRoundTripThroughDataSetThenDataPreserved()
     {
-        var set = new FrameSet();
-        var record = CreateTestFrame("Products", 3);
+        var set = new RecordSet();
+        var record = CreateTestRecord("Products", 3);
         set.Add("Products", record);
 
         var ds = set.ToDataSet();
-        var set2 = FrameSet.FromDataSet(ds);
+        var set2 = RecordSet.FromDataSet(ds);
 
         Assert.AreEqual(1, set2.Count);
         Assert.IsTrue(set2.Contains("Products"));
@@ -497,11 +497,11 @@ public class FrameSetTests
     }
 
     [TestMethod]
-    public void WhenFromEmptyDataSetThenCreatesEmptyFrameSet()
+    public void WhenFromEmptyDataSetThenCreatesEmptyRecordSet()
     {
         var ds = new DataSet();
 
-        var set = FrameSet.FromDataSet(ds);
+        var set = RecordSet.FromDataSet(ds);
 
         Assert.AreEqual(0, set.Count);
     }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace LuYao.Data.Meta;
 
 /// <summary>
-/// 提供在强类型对象与 <see cref="FrameRow"/> 之间进行属性双向复制的静态工具类。
+/// 提供在强类型对象与 <see cref="RecordRow"/> 之间进行属性双向复制的静态工具类。
 /// </summary>
 /// <typeparam name="T">要映射的对象类型，必须为引用类型。</typeparam>
 public static class XCopy<T> where T : class
@@ -35,15 +35,15 @@ public static class XCopy<T> where T : class
         return list.AsReadOnly();
     }
 
-    #region FrameRow
+    #region RecordRow
     /// <summary>
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="row"/> 对应的列。
     /// </summary>
     /// <param name="data">数据来源对象。</param>
     /// <param name="row">目标行；仅写入类型受支持的可读属性。Mapping 路径下若列不存在则静默跳过，<b>不会自动建列</b>。</param>
-    public static void CopyTo(T data, FrameRow row)
+    public static void CopyTo(T data, RecordRow row)
     {
-        var cols = row.Frame.Columns;
+        var cols = row.Record.Columns;
         foreach (var prop in _readableProps)
         {
             var col = cols.Find(prop.Name);
@@ -57,9 +57,9 @@ public static class XCopy<T> where T : class
     /// </summary>
     /// <param name="data">目标对象；仅更新类型受支持且行中存在对应列的可写属性。</param>
     /// <param name="row">数据来源行。</param>
-    public static void CopyFrom(T data, FrameRow row)
+    public static void CopyFrom(T data, RecordRow row)
     {
-        var cols = row.Frame.Columns;
+        var cols = row.Record.Columns;
         foreach (var prop in _writableProps)
         {
             var col = cols.Find(prop.Name);

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace LuYao.Data;
 
-partial class Frame
+partial class Record
 {
     /// <summary>
     /// 按指定列的值对记录进行分组。
@@ -12,16 +12,16 @@ partial class Frame
     /// <typeparam name="T">分组键的类型。</typeparam>
     /// <param name="fld">要分组的列名。</param>
     /// <returns>针对所指定列名分组的记录行的字典。</returns>
-    public IDictionary<T, List<FrameRow>> Group<T>(string fld) where T : struct
+    public IDictionary<T, List<RecordRow>> Group<T>(string fld) where T : struct
     {
-        var ret = new Dictionary<T, List<FrameRow>>();
+        var ret = new Dictionary<T, List<RecordRow>>();
         var col = this.Columns.Find(fld);
         foreach (var row in this)
         {
             T key = col?.To<T>(row) ?? default;
             if (!ret.TryGetValue(key, out var tmp))
             {
-                tmp = new List<FrameRow>();
+                tmp = new List<RecordRow>();
                 ret.Add(key, tmp);
             }
             tmp.Add(row);
@@ -34,16 +34,16 @@ partial class Frame
     /// </summary>
     /// <param name="fld">要分组的列名。</param>
     /// <returns>针对所指定列名分组的记录行的字典。</returns>
-    public IDictionary<String, IList<FrameRow>> Group(string fld)
+    public IDictionary<String, IList<RecordRow>> Group(string fld)
     {
-        var ret = new Dictionary<String, IList<FrameRow>>();
+        var ret = new Dictionary<String, IList<RecordRow>>();
         var col = this.Columns.Find(fld);
         foreach (var row in this)
         {
             String key = col?.To<string>(row) ?? string.Empty;
             if (!ret.TryGetValue(key, out var tmp))
             {
-                tmp = new List<FrameRow>();
+                tmp = new List<RecordRow>();
                 ret.Add(key, tmp);
             }
             tmp.Add(row);
@@ -56,16 +56,16 @@ partial class Frame
     /// </summary>
     /// <param name="flds">要分组的列名数组。</param>
     /// <returns>针对所指定列名拼接后分组的记录行的字典。</returns>
-    public IDictionary<String, IList<FrameRow>> Group(params string[] flds)
+    public IDictionary<String, IList<RecordRow>> Group(params string[] flds)
     {
-        var ret = new Dictionary<String, IList<FrameRow>>();
+        var ret = new Dictionary<String, IList<RecordRow>>();
         var cols = flds.Select(Columns.Find).ToArray();
         foreach (var row in this)
         {
             String key = string.Join("-", cols.Select(c => c?.To<string>(row) ?? string.Empty));
             if (!ret.TryGetValue(key, out var tmp))
             {
-                tmp = new List<FrameRow>();
+                tmp = new List<RecordRow>();
                 ret.Add(key, tmp);
             }
             tmp.Add(row);
@@ -82,9 +82,9 @@ partial class Frame
     /// <param name="fld1">第一列的名称。</param>
     /// <param name="fld2">第二列的名称。</param>
     /// <returns>按指定两个列的值分组的记录行的字典。</returns>
-    public IDictionary<(T1?, T2?), IList<FrameRow>> Group<T1, T2>(string fld1, string fld2)
+    public IDictionary<(T1?, T2?), IList<RecordRow>> Group<T1, T2>(string fld1, string fld2)
     {
-        var ret = new Dictionary<(T1?, T2?), IList<FrameRow>>();
+        var ret = new Dictionary<(T1?, T2?), IList<RecordRow>>();
         var col1 = this.Columns.Find(fld1);
         var col2 = this.Columns.Find(fld2);
         foreach (var row in this)
@@ -96,7 +96,7 @@ partial class Frame
             (T1?, T2?) key = (val1, val2);
             if (!ret.TryGetValue(key, out var tmp))
             {
-                tmp = new List<FrameRow>();
+                tmp = new List<RecordRow>();
                 ret.Add(key, tmp);
             }
             tmp.Add(row);
@@ -114,9 +114,9 @@ partial class Frame
     /// <param name="fld2">第二列的名称。</param>
     /// <param name="fld3">第三列的名称。</param>
     /// <returns>按指定三个列的值分组的记录行的字典。</returns>
-    public IDictionary<(T1?, T2?, T3?), IList<FrameRow>> Group<T1, T2, T3>(string fld1, string fld2, string fld3)
+    public IDictionary<(T1?, T2?, T3?), IList<RecordRow>> Group<T1, T2, T3>(string fld1, string fld2, string fld3)
     {
-        var ret = new Dictionary<(T1?, T2?, T3?), IList<FrameRow>>();
+        var ret = new Dictionary<(T1?, T2?, T3?), IList<RecordRow>>();
         var col1 = this.Columns.Find(fld1);
         var col2 = this.Columns.Find(fld2);
         var col3 = this.Columns.Find(fld3);
@@ -131,7 +131,7 @@ partial class Frame
             var key = (val1, val2, val3);
             if (!ret.TryGetValue(key, out var tmp))
             {
-                tmp = new List<FrameRow>();
+                tmp = new List<RecordRow>();
                 ret.Add(key, tmp);
             }
             tmp.Add(row);

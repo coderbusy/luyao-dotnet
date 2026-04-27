@@ -5,11 +5,11 @@ using System.Linq;
 namespace LuYao.Data;
 
 [TestClass]
-public class FrameQueryTests
+public class RecordQueryTests
 {
-    private Frame CreateTestFrame()
+    private Record CreateTestRecord()
     {
-        var record = new Frame("TestFrame");
+        var record = new Record("TestRecord");
         record.Columns.Add("Id", typeof(int));
         record.Columns.Add("Name", typeof(string));
         record.Columns.Add("IsActive", typeof(bool));
@@ -36,7 +36,7 @@ public class FrameQueryTests
     public void FindT_WithExistingValue_ReturnsFirstMatch()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var result = record.Find<bool>("IsActive", true);
@@ -50,7 +50,7 @@ public class FrameQueryTests
     public void FindT_WithNonExistingValue_ReturnsNull()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var result = record.Find<int>("Id", 99);
@@ -63,7 +63,7 @@ public class FrameQueryTests
     public void FindT_WithNonExistingColumn_ReturnsNull()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var result = record.Find<string>("NonExisting", "Alice");
@@ -76,7 +76,7 @@ public class FrameQueryTests
     public void FindAllT_WithExistingValue_ReturnsAllMatches()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var results = record.FindAll<bool>("IsActive", true).ToList();
@@ -91,7 +91,7 @@ public class FrameQueryTests
     public void Find_WithValidPredicate_ReturnsFirstMatch()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var result = record.Find(r => r.To<string>("Name") == "Bob");
@@ -105,7 +105,7 @@ public class FrameQueryTests
     public void Find_WithInvalidPredicate_ReturnsNull()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var result = record.Find(r => r.To<int>("Id") > 10);
@@ -118,7 +118,7 @@ public class FrameQueryTests
     public void FindAll_WithValidPredicate_ReturnsAllMatches()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var results = record.FindAll(r => r.To<bool>("IsActive")).ToList();
@@ -133,7 +133,7 @@ public class FrameQueryTests
     public void FindByDynamic_WithValidPredicate_ReturnsFirstMatch()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var result = record.FindByDynamic(d => d.Name == "Charlie");
@@ -147,7 +147,7 @@ public class FrameQueryTests
     public void FindByDynamic_WithInvalidPredicate_ReturnsNull()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var result = record.FindByDynamic(d => d.Id == 99);
@@ -160,7 +160,7 @@ public class FrameQueryTests
     public void FindAllByDynamic_WithValidPredicate_ReturnsAllMatches()
     {
         // Arrange
-        var record = CreateTestFrame();
+        var record = CreateTestRecord();
 
         // Act
         var results = record.FindAllByDynamic(d => d.IsActive == true).ToList();

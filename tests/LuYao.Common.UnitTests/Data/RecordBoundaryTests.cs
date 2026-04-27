@@ -4,14 +4,14 @@ using System.Linq;
 namespace LuYao.Data;
 
 [TestClass]
-public class FrameBoundaryTests
+public class RecordBoundaryTests
 {
     #region Large Row Count Expansion
 
     [TestMethod]
     public void WhenAddingManyRowsThenCapacityGrowsEfficiently()
     {
-        var record = new Frame("Big", 0);
+        var record = new Record("Big", 0);
         var col = record.Columns.Add<int>("Id");
 
         const int rowCount = 10000;
@@ -35,7 +35,7 @@ public class FrameBoundaryTests
     [TestMethod]
     public void WhenDeleteThenEnumerationIsConsistent()
     {
-        var record = new Frame("Test", 5);
+        var record = new Record("Test", 5);
         var idCol = record.Columns.Add<int>("Id");
 
         for (int i = 0; i < 5; i++)
@@ -55,7 +55,7 @@ public class FrameBoundaryTests
     [TestMethod]
     public void WhenDeleteThenAddRowThenDataIsCorrect()
     {
-        var record = new Frame("Test", 3);
+        var record = new Record("Test", 3);
         var idCol = record.Columns.Add<int>("Id");
         var nameCol = record.Columns.Add<string>("Name");
 
@@ -87,7 +87,7 @@ public class FrameBoundaryTests
     [TestMethod]
     public void WhenDeleteWhereThenMatchingRowsRemoved()
     {
-        var record = new Frame("Test", 5);
+        var record = new Record("Test", 5);
         var idCol = record.Columns.Add<int>("Id");
 
         for (int i = 0; i < 5; i++)
@@ -107,7 +107,7 @@ public class FrameBoundaryTests
     [TestMethod]
     public void WhenDeleteRowsWithIndicesThenCorrectRowsRemoved()
     {
-        var record = new Frame("Test", 5);
+        var record = new Record("Test", 5);
         var idCol = record.Columns.Add<int>("Id");
 
         for (int i = 0; i < 5; i++)
@@ -127,7 +127,7 @@ public class FrameBoundaryTests
     [TestMethod]
     public void WhenDeleteRowsWithDuplicateIndicesThenDeduplicates()
     {
-        var record = new Frame("Test", 3);
+        var record = new Record("Test", 3);
         var idCol = record.Columns.Add<int>("Id");
 
         for (int i = 0; i < 3; i++)
@@ -145,7 +145,7 @@ public class FrameBoundaryTests
     [TestMethod]
     public void WhenDeleteWhereNoMatchThenNothingDeleted()
     {
-        var record = new Frame("Test", 3);
+        var record = new Record("Test", 3);
         var idCol = record.Columns.Add<int>("Id");
 
         for (int i = 0; i < 3; i++)
@@ -162,12 +162,12 @@ public class FrameBoundaryTests
 
     #endregion
 
-    #region FrameRow.Set<T>
+    #region RecordRow.Set<T>
 
     [TestMethod]
-    public void WhenFrameRowSetGenericThenValueSetCorrectly()
+    public void WhenRecordRowSetGenericThenValueSetCorrectly()
     {
-        var record = new Frame("Test", 1);
+        var record = new Record("Test", 1);
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Name");
 

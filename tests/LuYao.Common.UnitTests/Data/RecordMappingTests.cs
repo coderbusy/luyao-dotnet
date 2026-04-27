@@ -1,7 +1,7 @@
 ﻿namespace LuYao.Data;
 
 [TestClass]
-public class FrameMappingTests
+public class RecordMappingTests
 {
     private sealed class TestModel
     {
@@ -20,7 +20,7 @@ public class FrameMappingTests
             new TestModel { Id = 2, Name = "Name2" }
         };
 
-        var record = new Frame();
+        var record = new Record();
         record.Columns.AddFrom<TestModel>();
         record.AddRowsFromList(list);
 
@@ -34,11 +34,11 @@ public class FrameMappingTests
     // ── From<T> ──────────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void From_ShouldCreateFrameWithSingleRow()
+    public void From_ShouldCreateRecordWithSingleRow()
     {
         var model = new TestModel { Id = 42, Name = "Alice" };
 
-        var record = Frame.From(model);
+        var record = Record.From(model);
 
         Assert.AreEqual(1,       record.Count);
         Assert.AreEqual(42,      record[0]["Id"]);
@@ -48,7 +48,7 @@ public class FrameMappingTests
     // ── FromList<T> ───────────────────────────────────────────────────────────
 
     [TestMethod]
-    public void FromList_ShouldCreateFrameWithAllRows()
+    public void FromList_ShouldCreateRecordWithAllRows()
     {
         var list = new List<TestModel>
         {
@@ -57,7 +57,7 @@ public class FrameMappingTests
             new TestModel { Id = 3, Name = "Carol" }
         };
 
-        var record = Frame.FromList(list);
+        var record = Record.FromList(list);
 
         Assert.AreEqual(3,       record.Count);
         Assert.AreEqual(1,       record[0]["Id"]);
@@ -67,9 +67,9 @@ public class FrameMappingTests
     }
 
     [TestMethod]
-    public void FromList_WithEmptyCollection_ShouldCreateFrameWithNoRows()
+    public void FromList_WithEmptyCollection_ShouldCreateRecordWithNoRows()
     {
-        var record = Frame.FromList(new List<TestModel>());
+        var record = Record.FromList(new List<TestModel>());
 
         Assert.AreEqual(0, record.Count);
     }
@@ -79,7 +79,7 @@ public class FrameMappingTests
     [TestMethod]
     public void To_WithRows_ShouldMapFirstRowToModel()
     {
-        var record = new Frame("Users", 2);
+        var record = new Record("Users", 2);
         var idCol   = record.Columns.Add<int>("Id");
         var nameCol = record.Columns.Add<string>("Name");
 
@@ -100,7 +100,7 @@ public class FrameMappingTests
     [TestMethod]
     public void To_WithNoRows_ShouldReturnDefaultInstance()
     {
-        var record = new Frame("Users", 0);
+        var record = new Record("Users", 0);
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Name");
 
@@ -121,7 +121,7 @@ public class FrameMappingTests
             new TestModel { Id = 1, Name = "Alice" },
             new TestModel { Id = 2, Name = "Bob" }
         };
-        var record = Frame.FromList(source);
+        var record = Record.FromList(source);
 
         var result = record.ToList<TestModel>();
 
@@ -135,7 +135,7 @@ public class FrameMappingTests
     [TestMethod]
     public void ToList_WithNoRows_ShouldReturnEmptyList()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.AddFrom<TestModel>();
 
         var result = record.ToList<TestModel>();

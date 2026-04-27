@@ -1,15 +1,15 @@
-﻿# Frame
+﻿# Record
 
 ## 1. 定位
 
-`Frame` 是一个面向内存场景的列存储数据容器，适合：
+`Record` 是一个面向内存场景的列存储数据容器，适合：
 
 - 轻量表结构数据处理
 - 对象列表与表结构之间转换
 - 与 ADO.NET 的 `IDataReader` / `DataTable` / `DataSet` 互操作
 - 需要按列存储、按行访问的业务代码
 
-`FrameSet` 是多个 `Frame` 的命名集合，用于统一管理多张内存表，并提供与 `DataSet` 的双向互操作。
+`RecordSet` 是多个 `Record` 的命名集合，用于统一管理多张内存表，并提供与 `DataSet` 的双向互操作。
 
 设计重点：
 
@@ -18,31 +18,31 @@
 - 与对象映射、ADO.NET 互通
 - 支持二进制序列化
 
-`Frame`、`FrameRow`、`FrameSet` 都不是线程安全容器。多线程场景需要调用方自行同步。
+`Record`、`RecordRow`、`RecordSet` 都不是线程安全容器。多线程场景需要调用方自行同步。
 
 ---
 
 ## 2. 当前实现范围
 
-### 2.1 `Frame`
+### 2.1 `Record`
 
-`Frame` 提供：
+`Record` 提供：
 
 - 列结构管理：添加列、重命名列、类型转换、导出 schema
 - 行管理：新增、删除、批量删除、清空、按索引访问
-- 行枚举：实现 `IEnumerable<FrameRow>`
+- 行枚举：实现 `IEnumerable<RecordRow>`
 - 查询：按列值、Lambda、`dynamic` 条件查找
 - 分组：单字段、多字段字符串分组，以及 2/3 字段元组分组
-- 对象映射：对象/对象集合与 `Frame` 之间转换
+- 对象映射：对象/对象集合与 `Record` 之间转换
 - ADO.NET 互操作：`IDataReader`、`DataTable`、`DataSet`
-- 二进制序列化：`Frame` / `FrameSet` 都支持字节流读写
+- 二进制序列化：`Record` / `RecordSet` 都支持字节流读写
 - 服务端翻页元数据：`Page`、`PageSize`、`MaxCount`、`MaxPage`
 
-### 2.2 `FrameSet`
+### 2.2 `RecordSet`
 
-`FrameSet` 提供：
+`RecordSet` 提供：
 
-- 按名称管理多个 `Frame`
+- 按名称管理多个 `Record`
 - 名称比较器可配置
 - 与 `DataSet` 双向互操作
 - 二进制序列化
@@ -60,18 +60,18 @@
 
 ## 3. 核心类型
 
-### 3.1 `Frame`
+### 3.1 `Record`
 
 常用构造：
 
-- `new Frame()`
-- `new Frame(string name)`
-- `new Frame(string? name, int rows)`
+- `new Record()`
+- `new Record(string name)`
+- `new Record(string? name, int rows)`
 
 常用属性：
 
 - `Name`：表名
-- `Columns`：`FrameColumnCollection`
+- `Columns`：`RecordColumnCollection`
 - `Capacity`：当前容量
 - `Count`：实际行数
 - `IsEmpty`：是否空表
@@ -88,13 +88,13 @@
 - `CloneSchema()` 只复制结构，不复制分页元数据。
 - `Clone()` 会复制结构、全部数据以及分页元数据。
 
-### 3.2 `FrameRow`
+### 3.2 `RecordRow`
 
-`FrameRow` 是一个轻量 `struct`，表示某个 `Frame` 中的单行视图。
+`RecordRow` 是一个轻量 `struct`，表示某个 `Record` 中的单行视图。
 
-`FrameRow` 提供：
+`RecordRow` 提供：
 
-- `Frame`：所属 `Frame`
+- `Record`：所属 `Record`
 - `Row`：当前行号
 - `implicit operator int`
 - `this[string name]`：按列名读写当前行值
@@ -117,14 +117,14 @@
 
 补充说明：
 
-- `ToString(string? name)`：若 `name` 为 `null`/空白或列不存在，返回空字符串；否则等同于调用对应列的 `FrameColumn.ToString(int row)`。
+- `ToString(string? name)`：若 `name` 为 `null`/空白或列不存在，返回空字符串；否则等同于调用对应列的 `RecordColumn.ToString(int row)`。
 - 索引器读取时，如果列名为 `null`、空字符串或空白字符串，也直接返回 `null`。
 - 索引器写入时，如果列不存在且值非 `null`，会调用 `Columns.Add(name, value.GetType())` 自动建列；如果运行时类型不在支持白名单内，会抛出异常。
-- `FrameRow` 的公开获取方式通常是 `record[row]` 或通过枚举 `foreach (var row in record)`。
+- `RecordRow` 的公开获取方式通常是 `record[row]` 或通过枚举 `foreach (var row in record)`。
 
-### 3.3 `FrameColumn` / `FrameColumn<T>`
+### 3.3 `RecordColumn` / `RecordColumn<T>`
 
-`FrameColumn` 是列的抽象基类，`FrameColumn<T>` 是泛型实现。
+`RecordColumn` 是列的抽象基类，`RecordColumn<T>` 是泛型实现。
 
 常用成员：
 
@@ -141,17 +141,17 @@
 
 说明：
 
-- 列绑定到所属 `Frame`。
-- 列名可通过 `Frame.RenameColumn` 或 `Frame.Columns.Rename` 修改。
+- 列绑定到所属 `Record`。
+- 列名可通过 `Record.RenameColumn` 或 `Record.Columns.Rename` 修改。
 - `CastColumn()` 会创建新列替换旧列，旧列引用应视为失效。
 - 列删除行时会把后续数据左移。
 
-### 3.4 `FrameColumnCollection`
+### 3.4 `RecordColumnCollection`
 
-`Frame.Columns` 的类型是 `FrameColumnCollection`，其特性如下：
+`Record.Columns` 的类型是 `RecordColumnCollection`，其特性如下：
 
-- 实现 `IReadOnlyList<FrameColumn>`
-- 内部使用 `KeyedList<string, FrameColumn>` 存储
+- 实现 `IReadOnlyList<RecordColumn>`
+- 内部使用 `KeyedList<string, RecordColumn>` 存储
 - 名称比较使用 `StringComparer.Ordinal`
 
 常用 API：
@@ -165,7 +165,7 @@
 | 查索引 | `IndexOf(name)` | 不存在返回 `-1` |
 | 添加 | `Add(name, type)` / `Add<T>(name)` | 同名同类型返回已有列；同名不同类型抛 `InvalidOperationException` |
 | 删除 | `Remove(name)` | 不存在返回 `false` |
-| 清空 | `Clear()` | 清空列并把 `Frame.Count` 重置为 `0` |
+| 清空 | `Clear()` | 清空列并把 `Record.Count` 重置为 `0` |
 | 重命名 | `Rename(oldName, newName)` | 新名重复时抛 `DuplicateNameException` |
 | 按对象建列 | `AddFrom<T>()` 及相关重载 | 仅添加受支持属性 |
 
@@ -182,9 +182,9 @@
 - 指定属性名时，不存在或不支持的属性会被忽略
 - `filter` 方式本质上最终也是转成属性名列表后再加列
 
-### 3.5 `FrameSchema`
+### 3.5 `RecordSchema`
 
-`Frame.GetSchema()` 返回 `FrameSchema`，用于导出列定义。
+`Record.GetSchema()` 返回 `RecordSchema`，用于导出列定义。
 
 每个 `ColumnDef` 包含：
 
@@ -199,9 +199,9 @@
 - 调试与诊断
 - 序列化相关元信息输出
 
-### 3.6 `FrameSet`
+### 3.6 `RecordSet`
 
-`FrameSet` 是 `Frame` 的命名集合，实现 `IEnumerable<Frame>`。
+`RecordSet` 是 `Record` 的命名集合，实现 `IEnumerable<Record>`。
 
 它提供：
 
@@ -219,7 +219,7 @@
 
 说明：
 
-- 内部使用 `SortedDictionary<string, Frame>`。
+- 内部使用 `SortedDictionary<string, Record>`。
 - 枚举顺序与 `Names` 顺序都是**按比较器排序后的名称顺序**，不是按添加顺序。
 - `Add` / `Set` / `Rename` 都会同步更新 `record.Name`。
 
@@ -250,14 +250,14 @@
 
 ---
 
-## 5. `Frame` API 概览
+## 5. `Record` API 概览
 
 ### 5.1 建列与加行
 
 最常见的用法是先建列，再加行：
 
 ```csharp
-var record = new Frame("Orders", 1000);
+var record = new Record("Orders", 1000);
 
 var idCol = record.Columns.Add<int>("Id");
 var nameCol = record.Columns.Add<string>("Name");
@@ -271,11 +271,11 @@ amountCol.SetValue(row.Row, 99.5m);
 
 提供：
 
-- `AddRow()`：新增一行并返回 `FrameRow`
+- `AddRow()`：新增一行并返回 `RecordRow`
 - `AddRowFromValues(params object[] values)`：按列顺序填值，超出列数的值会被忽略
 
 ```csharp
-var record = new Frame();
+var record = new Record();
 record.Columns.Add<int>("Id");
 record.Columns.Add<string>("Name");
 
@@ -288,7 +288,7 @@ record.AddRowFromValues(2, "B", "Ignored");
 提供：
 
 - `Delete(int row)`：删除指定行，越界返回 `false`
-- `DeleteWhere(Func<FrameRow, bool>)`：按条件批量删除
+- `DeleteWhere(Func<RecordRow, bool>)`：按条件批量删除
 - `DeleteRows(IEnumerable<int>)`：按索引集合批量删除
 - `ClearRows()`：清空全部行，保留列结构
 
@@ -309,7 +309,7 @@ record.AddRowFromValues(2, "B", "Ignored");
 行为说明：
 
 - `record[row]` 越界时抛 `ArgumentOutOfRangeException`
-- 枚举时按 `0..Count-1` 顺序返回 `FrameRow`
+- 枚举时按 `0..Count-1` 顺序返回 `RecordRow`
 
 ### 5.4 查询
 
@@ -317,8 +317,8 @@ record.AddRowFromValues(2, "B", "Ignored");
 
 - `Find<T>(string name, T value)`
 - `FindAll<T>(string name, T value)`
-- `Find(Func<FrameRow, bool> filter)`
-- `FindAll(Func<FrameRow, bool> filter)`
+- `Find(Func<RecordRow, bool> filter)`
+- `FindAll(Func<RecordRow, bool> filter)`
 - `FindByDynamic(Func<dynamic, bool> filter)`
 - `FindAllByDynamic(Func<dynamic, bool> filter)`
 
@@ -363,8 +363,8 @@ foreach (var pair in groups)
 
 说明：
 
-- `Group<T>(string fld)` 的返回类型是 `IDictionary<T, List<FrameRow>>`
-- `Group(string fld)` 的返回类型是 `IDictionary<string, IList<FrameRow>>`
+- `Group<T>(string fld)` 的返回类型是 `IDictionary<T, List<RecordRow>>`
+- `Group(string fld)` 的返回类型是 `IDictionary<string, IList<RecordRow>>`
 - `Group<T>(string fld)` 仅支持值类型键；字符串键请使用 `Group(string fld)`
 
 #### 5.5.2 多字段字符串分组
@@ -382,8 +382,8 @@ var groups = record.Group("Category", "Status");
 
 在 `NETSTANDARD2.0+` / `NET6.0+` 目标下，还提供 2～3 字段元组分组：
 
-- `Group<T1, T2>(fld1, fld2)` -> `IDictionary<(T1?, T2?), IList<FrameRow>>`
-- `Group<T1, T2, T3>(fld1, fld2, fld3)` -> `IDictionary<(T1?, T2?, T3?), IList<FrameRow>>`
+- `Group<T1, T2>(fld1, fld2)` -> `IDictionary<(T1?, T2?), IList<RecordRow>>`
+- `Group<T1, T2, T3>(fld1, fld2, fld3)` -> `IDictionary<(T1?, T2?, T3?), IList<RecordRow>>`
 
 ```csharp
 var groups = record.Group<int, int>("Year", "Month");
@@ -425,7 +425,7 @@ var groups = record.Group<int, int>("Year", "Month");
 - 多行时以表格形式输出
 - 对宽字符做显示宽度处理
 - 单元格内容过长时按显示宽度截断
-- 单元格字符串值统一通过 `FrameColumn.ToString(int row)` 获取（`null` 渲染为空字符串）
+- 单元格字符串值统一通过 `RecordColumn.ToString(int row)` 获取（`null` 渲染为空字符串）
 
 这个输出更适合调试、日志和快速查看数据，而不是稳定的序列化格式。
 
@@ -433,12 +433,12 @@ var groups = record.Group<int, int>("Year", "Month");
 
 ## 6. 对象映射
 
-### 6.1 `Frame` 级别映射
+### 6.1 `Record` 级别映射
 
 提供：
 
-- `Frame.From<T>(T data)`
-- `Frame.FromList<T>(IEnumerable<T> items)`
+- `Record.From<T>(T data)`
+- `Record.FromList<T>(IEnumerable<T> items)`
 - `record.AddRowFrom<T>(T item)`
 - `record.AddRowsFromList<T>(IEnumerable<T> items)`
 - `record.ToList<T>()`
@@ -447,7 +447,7 @@ var groups = record.Group<int, int>("Year", "Month");
 示例：
 
 ```csharp
-var record = Frame.From(new OrderDto
+var record = Record.From(new OrderDto
 {
     Id = 1,
     Name = "Order-1"
@@ -457,7 +457,7 @@ List<OrderDto> list = record.ToList<OrderDto>();
 OrderDto first = record.To<OrderDto>();
 ```
 
-### 6.2 `FrameRow` 级别映射
+### 6.2 `RecordRow` 级别映射
 
 提供：
 
@@ -479,15 +479,15 @@ row.CopyTo(existing);
 
 实现上的关键点：
 
-- `Frame.From<T>` / `FromList<T>` 会先 `Columns.AddFrom<T>()`，再写入数据
+- `Record.From<T>` / `FromList<T>` 会先 `Columns.AddFrom<T>()`，再写入数据
 - `AddRowFrom<T>` 本身**不会自动建列**，它只是新增一行后执行 `CopyFrom`
 - `CopyFrom` / `AddRowFrom` / `AddRowsFromList` 写入时，仅对已存在列赋值；缺失列会被忽略
 - 对象映射只处理支持白名单中的属性类型
 
-因此，若不是使用 `Frame.From<T>` / `FromList<T>`，通常应先显式建列：
+因此，若不是使用 `Record.From<T>` / `FromList<T>`，通常应先显式建列：
 
 ```csharp
-var record = new Frame();
+var record = new Record();
 record.Columns.AddFrom<OrderDto>();
 record.AddRowFrom(dto);
 ```
@@ -496,12 +496,12 @@ record.AddRowFrom(dto);
 
 ## 7. ADO.NET 互操作
 
-### 7.1 `Frame` 与 `IDataReader` / `DataTable`
+### 7.1 `Record` 与 `IDataReader` / `DataTable`
 
 提供：
 
 - `void Read(IDataReader dr)`
-- `static Frame Read(DataTable dt)`
+- `static Record Read(DataTable dt)`
 - `void Write(DataTable dt)`
 - `DataTable ToDataTable()`
 
@@ -510,15 +510,15 @@ record.AddRowFrom(dto);
 - `Read(IDataReader)` 会先 `Columns.Clear()`，然后根据 reader 的字段结构重建整张表
 - `Read(IDataReader)` 读取到 `DBNull.Value` 时会跳过赋值，目标列保持默认值
 - `Write(DataTable dt)` 会把当前列结构和所有行写入到传入 `DataTable`
-- `ToDataTable()` 会创建新表，表名取 `Frame.Name`
+- `ToDataTable()` 会创建新表，表名取 `Record.Name`
 
 示例：
 
 ```csharp
-var record = new Frame();
+var record = new Record();
 record.Read(dataReader);
 
-var fromTable = Frame.Read(dataTable);
+var fromTable = Record.Read(dataTable);
 DataTable table = fromTable.ToDataTable();
 ```
 
@@ -526,32 +526,32 @@ DataTable table = fromTable.ToDataTable();
 
 - `Write(DataTable dt)` 是向目标表追加列和行，通常应传入空表。
 
-### 7.2 `FrameSet` 与 `DataSet`
+### 7.2 `RecordSet` 与 `DataSet`
 
 提供：
 
-- `FrameSet.FromDataSet(DataSet ds)`
+- `RecordSet.FromDataSet(DataSet ds)`
 - `ToDataSet()`
 - `WriteTo(DataSet ds)`
 
 示例：
 
 ```csharp
-var set = FrameSet.FromDataSet(dataSet);
+var set = RecordSet.FromDataSet(dataSet);
 DataSet ds = set.ToDataSet();
 ```
 
 行为说明：
 
-- `FromDataSet` 会把每个 `DataTable` 转成 `Frame`
-- `WriteTo(DataSet ds)` 会把每个 `Frame` 作为新表追加到目标 `DataSet`
+- `FromDataSet` 会把每个 `DataTable` 转成 `Record`
+- `WriteTo(DataSet ds)` 会把每个 `Record` 作为新表追加到目标 `DataSet`
 - 目标 `DataSet` 中表名冲突时，`DataSet.Tables.Add` 会抛异常，因此通常应传入空 `DataSet` 或自行保证不重名
 
 ---
 
 ## 8. 二进制序列化
 
-### 8.1 `Frame`
+### 8.1 `Record`
 
 提供：
 
@@ -566,7 +566,7 @@ DataSet ds = set.ToDataSet();
 1. payload header
 2. 格式版本号
 3. `Name`、`Page`、`PageSize`、`MaxCount`
-4. 列定义：列名、`FrameColumnType`、`IsNullable`
+4. 列定义：列名、`RecordColumnType`、`IsNullable`
 5. 行数
 6. 每列的顺序数据
 
@@ -581,10 +581,10 @@ DataSet ds = set.ToDataSet();
 
 ```csharp
 byte[] bytes = record.ToBytes();
-Frame copy = Frame.FromBytes(bytes);
+Record copy = Record.FromBytes(bytes);
 ```
 
-### 8.2 `FrameSet`
+### 8.2 `RecordSet`
 
 当前实现提供：
 
@@ -596,13 +596,13 @@ Frame copy = Frame.FromBytes(bytes);
 
 说明：
 
-- `FrameSet` 序列化时会先写自己的 payload header 与版本号
-- 内部逐个写出每个 `Frame`
-- 以字典键作为权威名称，避免外部修改 `Frame.Name` 后与集合键不一致
+- `RecordSet` 序列化时会先写自己的 payload header 与版本号
+- 内部逐个写出每个 `Record`
+- 以字典键作为权威名称，避免外部修改 `Record.Name` 后与集合键不一致
 
 ```csharp
 byte[] bytes = set.ToBytes();
-FrameSet copy = FrameSet.FromBytes(bytes);
+RecordSet copy = RecordSet.FromBytes(bytes);
 ```
 
 ---
@@ -620,7 +620,7 @@ FrameSet copy = FrameSet.FromBytes(bytes);
 | `Columns.Add(name, type)` 同名同类型 | 返回已有列 |
 | `Columns.Add(name, type)` 同名不同类型 | 抛 `InvalidOperationException` |
 | `Columns.Rename(old, new)` 新名已存在 | 抛 `DuplicateNameException` |
-| `Frame.Delete(row)` 越界 | 返回 `false` |
+| `Record.Delete(row)` 越界 | 返回 `false` |
 | `DeleteWhere(null)` | 抛 `ArgumentNullException` |
 | `DeleteRows(null)` | 抛 `ArgumentNullException` |
 | `Find(null)` / `FindAll(null)` | 抛 `ArgumentNullException` |
@@ -628,9 +628,9 @@ FrameSet copy = FrameSet.FromBytes(bytes);
 | `row["Missing"]` | 返回 `null` |
 | `row.To<T>("Missing")` | 返回 `default` |
 | `row["New"] = null` | 不建列，直接忽略 |
-| `FrameSet.Get(name)` 不存在 | 抛 `KeyNotFoundException` |
-| `FrameSet.Add(null/空白, record)` | 抛 `ArgumentException` |
-| `FrameSet.Add(name, null)` | 抛 `ArgumentNullException` |
+| `RecordSet.Get(name)` 不存在 | 抛 `KeyNotFoundException` |
+| `RecordSet.Add(null/空白, record)` | 抛 `ArgumentException` |
+| `RecordSet.Add(name, null)` | 抛 `ArgumentNullException` |
 
 特别说明：
 
@@ -657,7 +657,7 @@ for (int i = 0; i < count; i++)
 
 要点：
 
-- 热路径优先使用 `FrameColumn<T>.SetValue` / `GetValue`
+- 热路径优先使用 `RecordColumn<T>.SetValue` / `GetValue`
 - 避免在循环中反复按名称查列
 
 ### 10.2 schema 已知时优先先建列

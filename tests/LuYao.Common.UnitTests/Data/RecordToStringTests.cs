@@ -4,13 +4,13 @@ using System.Linq;
 namespace LuYao.Data;
 
 [TestClass]
-public class FrameToStringTests
+public class RecordToStringTests
 {
     [TestMethod]
-    public void WhenEmptyFrameThenContainsCountAndColumnInfo()
+    public void WhenEmptyRecordThenContainsCountAndColumnInfo()
     {
         // Arrange
-        var record = new Frame();
+        var record = new Record();
 
         // Act
         var result = record.ToString();
@@ -23,7 +23,7 @@ public class FrameToStringTests
     public void WhenNoNameThenShowsNone()
     {
         // Arrange
-        var record = new Frame();
+        var record = new Record();
 
         // Act
         var result = record.ToString();
@@ -36,7 +36,7 @@ public class FrameToStringTests
     public void WhenHasNameThenShowsName()
     {
         // Arrange
-        var record = new Frame("Users");
+        var record = new Record("Users");
 
         // Act
         var result = record.ToString();
@@ -49,7 +49,7 @@ public class FrameToStringTests
     public void WhenZeroColumnsAndZeroRowsThenDoesNotThrow()
     {
         // Arrange
-        var record = new Frame();
+        var record = new Record();
 
         // Act
         var result = record.ToString();
@@ -62,7 +62,7 @@ public class FrameToStringTests
     public void WhenColumnsButZeroRowsThenDoesNotThrow()
     {
         // Arrange
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Name");
 
@@ -77,7 +77,7 @@ public class FrameToStringTests
     public void WhenOneRowAndZeroColumnsThenDoesNotThrow()
     {
         // Arrange — 通过 DataTable 构造一个有行但无列的情况不可行，直接 AddRow
-        var record = new Frame();
+        var record = new Record();
         record.AddRow();
 
         // Act
@@ -91,7 +91,7 @@ public class FrameToStringTests
     public void WhenOneRowThenOutputsVerticalLayout()
     {
         // Arrange
-        var record = new Frame("Test");
+        var record = new Record("Test");
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Name");
         var row = record.AddRow();
@@ -110,7 +110,7 @@ public class FrameToStringTests
     public void WhenMultipleRowsThenOutputsTableWithSeparator()
     {
         // Arrange
-        var record = new Frame("Test");
+        var record = new Record("Test");
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Name");
         for (int i = 0; i < 2; i++)
@@ -133,7 +133,7 @@ public class FrameToStringTests
     public void WhenNullValueThenOutputsEmptyString()
     {
         // Arrange
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<string>("Val");
         var r1 = record.AddRow();
         var r2 = record.AddRow();
@@ -152,7 +152,7 @@ public class FrameToStringTests
     public void WhenSingleColumnThenNoSeparatorPrefix()
     {
         // Arrange
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("X");
         var r1 = record.AddRow();
         var r2 = record.AddRow();
@@ -174,7 +174,7 @@ public class FrameToStringTests
     public void WhenLongValueThenTruncatedWithDots()
     {
         // Arrange
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<string>("Data");
         var r1 = record.AddRow();
         var r2 = record.AddRow();

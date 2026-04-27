@@ -5,8 +5,8 @@ namespace LuYao.Data;
 
 internal enum BinaryPayloadType : byte
 {
-    Frame = 1,
-    FrameSet = 2
+    Record = 1,
+    RecordSet = 2
 }
 
 internal static class BinaryPayloadHeader
@@ -57,7 +57,7 @@ internal static class BinaryPayloadHeader
         if (data[0] != Marker || data[1] != Signature1 || data[2] != Signature2) return false;
 
         byte rawType = data[3];
-        if (rawType != (byte)BinaryPayloadType.Frame && rawType != (byte)BinaryPayloadType.FrameSet)
+        if (rawType != (byte)BinaryPayloadType.Record && rawType != (byte)BinaryPayloadType.RecordSet)
             return false;
 
         payloadType = (BinaryPayloadType)rawType;

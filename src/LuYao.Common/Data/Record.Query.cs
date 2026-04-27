@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LuYao.Data;
 
-public partial class Frame
+public partial class Record
 {
     /// <summary>
     /// 在当前记录的所有数据行中，查找指定列与目标值匹配的第一行数据。
@@ -12,8 +12,8 @@ public partial class Frame
     /// <typeparam name="T">要查找的列对应的数据类型。</typeparam>
     /// <param name="name">要查找的列名称。</param>
     /// <param name="value">要匹配的目标值。</param>
-    /// <returns>符合条件的第一条 <see cref="FrameRow"/>，未找到则返回 null。</returns>
-    public FrameRow? Find<T>(string name, T value)
+    /// <returns>符合条件的第一条 <see cref="RecordRow"/>，未找到则返回 null。</returns>
+    public RecordRow? Find<T>(string name, T value)
     {
         var col = this.Columns.Find(name);
         if (col == null) return null;
@@ -21,7 +21,7 @@ public partial class Frame
         for (int i = 0; i < this.Count; i++)
         {
             var val = col.To<T>(i);
-            if (comparer.Equals(val, value)) return new FrameRow(this, i);
+            if (comparer.Equals(val, value)) return new RecordRow(this, i);
         }
         return null;
     }
@@ -32,8 +32,8 @@ public partial class Frame
     /// <typeparam name="T">要查找的列对应的数据类型。</typeparam>
     /// <param name="name">要查找的列名称。</param>
     /// <param name="value">要匹配的目标值。</param>
-    /// <returns>一个包含所有符合条件 <see cref="FrameRow"/> 的枚举器序列。</returns>
-    public IEnumerable<FrameRow> FindAll<T>(string name, T value)
+    /// <returns>一个包含所有符合条件 <see cref="RecordRow"/> 的枚举器序列。</returns>
+    public IEnumerable<RecordRow> FindAll<T>(string name, T value)
     {
         var col = this.Columns.Find(name);
         if (col == null) yield break;
@@ -41,22 +41,22 @@ public partial class Frame
         for (int i = 0; i < this.Count; i++)
         {
             var val = col.To<T>(i);
-            if (comparer.Equals(val, value)) yield return new FrameRow(this, i);
+            if (comparer.Equals(val, value)) yield return new RecordRow(this, i);
         }
     }
 
     /// <summary>
     /// 使用指定的条件筛选器，查找符合要求的第一条行数据。
     /// </summary>
-    /// <param name="filter">用于筛选 <see cref="FrameRow"/> 数据行的条件委托。</param>
-    /// <returns>符合条件的第一条 <see cref="FrameRow"/>，未找到则返回 null。</returns>
+    /// <param name="filter">用于筛选 <see cref="RecordRow"/> 数据行的条件委托。</param>
+    /// <returns>符合条件的第一条 <see cref="RecordRow"/>，未找到则返回 null。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="filter"/> 为 null 时抛出。</exception>
-    public FrameRow? Find(Func<FrameRow, bool> filter)
+    public RecordRow? Find(Func<RecordRow, bool> filter)
     {
         if (filter == null) throw new ArgumentNullException(nameof(filter));
         for (int i = 0; i < this.Count; i++)
         {
-            var row = new FrameRow(this, i);
+            var row = new RecordRow(this, i);
             if (filter(row)) return row;
         }
         return null;
@@ -65,32 +65,32 @@ public partial class Frame
     /// <summary>
     /// 使用指定的条件筛选器，查找所有符合要求的行数据。
     /// </summary>
-    /// <param name="filter">用于筛选 <see cref="FrameRow"/> 数据行的条件委托。</param>
-    /// <returns>所有符合条件的 <see cref="FrameRow"/> 数据流序列。</returns>
+    /// <param name="filter">用于筛选 <see cref="RecordRow"/> 数据行的条件委托。</param>
+    /// <returns>所有符合条件的 <see cref="RecordRow"/> 数据流序列。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="filter"/> 为 null 时抛出。</exception>
-    public IEnumerable<FrameRow> FindAll(Func<FrameRow, bool> filter)
+    public IEnumerable<RecordRow> FindAll(Func<RecordRow, bool> filter)
     {
         if (filter == null) throw new ArgumentNullException(nameof(filter));
         for (int i = 0; i < this.Count; i++)
         {
-            var row = new FrameRow(this, i);
+            var row = new RecordRow(this, i);
             if (filter(row)) yield return row;
         }
     }
 
     /// <summary>
     /// 使用基于 dynamic 的动态类型筛选器，查找符合要求的第一条行数据。
-    /// （依赖 <see cref="FrameRow"/> 对 <see cref="System.Dynamic.IDynamicMetaObjectProvider"/> 的实现）
+    /// （依赖 <see cref="RecordRow"/> 对 <see cref="System.Dynamic.IDynamicMetaObjectProvider"/> 的实现）
     /// </summary>
     /// <param name="filter">用于动态筛选数据行的条件委托。</param>
-    /// <returns>符合条件的第一条 <see cref="FrameRow"/>，未找到则返回 null。</returns>
+    /// <returns>符合条件的第一条 <see cref="RecordRow"/>，未找到则返回 null。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="filter"/> 为 null 时抛出。</exception>
-    public FrameRow? FindByDynamic(Func<dynamic, bool> filter)
+    public RecordRow? FindByDynamic(Func<dynamic, bool> filter)
     {
         if (filter == null) throw new ArgumentNullException(nameof(filter));
         for (int i = 0; i < this.Count; i++)
         {
-            var row = new FrameRow(this, i);
+            var row = new RecordRow(this, i);
             if (filter(row)) return row;
         }
         return null;
@@ -100,14 +100,14 @@ public partial class Frame
     /// 使用基于 dynamic 的动态类型筛选器，查找所有符合要求的行数据。
     /// </summary>
     /// <param name="filter">用于动态筛选数据行的条件委托。</param>
-    /// <returns>所有符合条件的 <see cref="FrameRow"/> 数据流序列。</returns>
+    /// <returns>所有符合条件的 <see cref="RecordRow"/> 数据流序列。</returns>
     /// <exception cref="ArgumentNullException">当 <paramref name="filter"/> 为 null 时抛出。</exception>
-    public IEnumerable<FrameRow> FindAllByDynamic(Func<dynamic, bool> filter)
+    public IEnumerable<RecordRow> FindAllByDynamic(Func<dynamic, bool> filter)
     {
         if (filter == null) throw new ArgumentNullException(nameof(filter));
         for (int i = 0; i < this.Count; i++)
         {
-            var row = new FrameRow(this, i);
+            var row = new RecordRow(this, i);
             if (filter(row)) yield return row;
         }
     }

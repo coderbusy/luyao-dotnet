@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LuYao.Data;
 
 /// <summary>
-/// 验证 FrameRow 新的访问语义：
+/// 验证 RecordRow 新的访问语义：
 /// - Field&lt;T&gt; 取值（替代旧 Get&lt;T&gt;）；
 /// - Set&lt;T&gt; 写入时若列不存在自动建列；
 /// - dynamic 写入时按运行时类型自动建列，null 值跳过；
@@ -14,12 +14,12 @@ namespace LuYao.Data;
 /// - Mapping（IPropertyAccessor）写入不会自动建列。
 /// </summary>
 [TestClass]
-public class FrameRowSemanticsTests
+public class RecordRowSemanticsTests
 {
     [TestMethod]
     public void Field_ColumnExists_ReturnsTypedValue()
     {
-        var record = new Frame();
+        var record = new Record();
         var col = record.Columns.Add<int>("Id");
         var row = record.AddRow();
         col.Set(row.Row, 123);
@@ -29,7 +29,7 @@ public class FrameRowSemanticsTests
     [TestMethod]
     public void Field_ColumnNotExist_ReturnsDefault()
     {
-        var record = new Frame();
+        var record = new Record();
         record.AddRow();
         var row = record[0];
         Assert.AreEqual(0, row.To<int>("NoSuch"));
@@ -39,7 +39,7 @@ public class FrameRowSemanticsTests
     [TestMethod]
     public void Set_ColumnNotExist_AutoCreatesColumn()
     {
-        var record = new Frame();
+        var record = new Record();
         var row = record.AddRow();
         row["Id"] = 100;
 
@@ -52,7 +52,7 @@ public class FrameRowSemanticsTests
     [TestMethod]
     public void Set_ColumnExistsSameType_WritesValue()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<string>("Name");
         var row = record.AddRow();
         row["Name"] = "abc";
@@ -62,7 +62,7 @@ public class FrameRowSemanticsTests
     [TestMethod]
     public void Dynamic_SetMember_AutoCreatesColumnByRuntimeType()
     {
-        var record = new Frame();
+        var record = new Record();
         dynamic dto = record.AddRow();
         dto.Id = 100;
         dto.Name = "abc";
@@ -79,7 +79,7 @@ public class FrameRowSemanticsTests
     [TestMethod]
     public void Dynamic_SetMember_NullAndColumnMissing_IsSkipped()
     {
-        var record = new Frame();
+        var record = new Record();
         dynamic dto = record.AddRow();
         dto.Tag = null;
         Assert.AreEqual(0, record.Columns.Count);
@@ -88,18 +88,18 @@ public class FrameRowSemanticsTests
     [TestMethod]
     public void Dynamic_SetMember_NullOnExistingColumn_IsWritten()
     {
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<string>("Name");
         dynamic dto = record.AddRow();
         dto.Name = "x";
         dto.Name = null;
-        Assert.IsNull(((FrameRow)dto).To<string>("Name"));
+        Assert.IsNull(((RecordRow)dto).To<string>("Name"));
     }
 
     [TestMethod]
     public void Dynamic_SetIndex_AutoCreatesColumn()
     {
-        var record = new Frame();
+        var record = new Record();
         dynamic dto = record.AddRow();
         dto["Id"] = 7;
         Assert.AreEqual(1, record.Columns.Count);
@@ -110,7 +110,7 @@ public class FrameRowSemanticsTests
     public void Mapping_CopyFromObject_DoesNotAutoCreateColumns()
     {
         // 预期：缺列静默跳过，不建列。
-        var record = new Frame();
+        var record = new Record();
         record.Columns.Add<int>("Id"); // 只声明 Id 列；Name 故意不建
         var row = record.AddRow();
         row.CopyFrom(new MappingDto { Id = 9, Name = "ignored" });

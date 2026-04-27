@@ -10,13 +10,13 @@ namespace LuYao.Data;
 public class GenericMethodTests
 {
     /// <summary>
-    /// Verifies generic Set on FrameColumn.
+    /// Verifies generic Set on RecordColumn.
     /// </summary>
     [TestMethod]
-    public void FrameColumn_GenericSet_ShouldWorkWithAllTypes()
+    public void RecordColumn_GenericSet_ShouldWorkWithAllTypes()
     {
         // Arrange
-        var record = new Frame("TestTable", 1);
+        var record = new Record("TestTable", 1);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
         var stringColumn = record.Columns.Add<String>("StringColumn");
         var boolColumn = record.Columns.Add<Boolean>("BoolColumn");
@@ -45,13 +45,13 @@ public class GenericMethodTests
     }
 
     /// <summary>
-    /// Verifies generic Set through FrameRow.
+    /// Verifies generic Set through RecordRow.
     /// </summary>
     [TestMethod]
-    public void FrameRow_GenericSet_ShouldWorkWithAllTypes()
+    public void RecordRow_GenericSet_ShouldWorkWithAllTypes()
     {
         // Arrange
-        var record = new Frame("TestTable", 1);
+        var record = new Record("TestTable", 1);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
         var stringColumn = record.Columns.Add<String>("StringColumn");
         var boolColumn = record.Columns.Add<Boolean>("BoolColumn");
@@ -76,7 +76,7 @@ public class GenericMethodTests
     public void GenericTo_ShouldReturnCorrectTypes()
     {
         // Arrange
-        var record = new Frame("TestTable", 1);
+        var record = new Record("TestTable", 1);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
         var stringColumn = record.Columns.Add<String>("StringColumn");
         var row = record.AddRow();
@@ -96,7 +96,7 @@ public class GenericMethodTests
         string intAsString = intColumn.To<string>(0);
         Assert.AreEqual("42", intAsString);
 
-        // Verify access through FrameRow
+        // Verify access through RecordRow
         int intFromRow = row.To<int>("IntColumn");
         Assert.AreEqual(42, intFromRow);
 
@@ -111,7 +111,7 @@ public class GenericMethodTests
     public void GenericMethods_NullableTypes_ShouldWork()
     {
         // Arrange
-        var record = new Frame("TestTable", 1);
+        var record = new Record("TestTable", 1);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
         var row = record.AddRow();
 
@@ -133,7 +133,7 @@ public class GenericMethodTests
     public void GenericMethods_EdgeCases_ShouldHandleCorrectly()
     {
         // Arrange
-        var record = new Frame("TestTable", 1);
+        var record = new Record("TestTable", 1);
         var stringColumn = record.Columns.Add<String>("StringColumn");
         var row = record.AddRow();
 
@@ -154,7 +154,7 @@ public class GenericMethodTests
     public void GenericSet_InvalidIndex_ShouldThrowException()
     {
         // Arrange
-        var record = new Frame("TestTable", 1);
+        var record = new Record("TestTable", 1);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
         record.AddRow(); // only one row, valid index is 0
 
@@ -173,7 +173,7 @@ public class GenericMethodTests
     public void GenericMethods_PerformanceComparison()
     {
         // Arrange
-        var record = new Frame("PerfTest", 1000);
+        var record = new Record("PerfTest", 1000);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
 
         // Add 1000 rows
@@ -229,7 +229,7 @@ public class GenericMethodTests
     public void GenericMethods_TypeConversionMatrix_ShouldWork()
     {
         // Arrange
-        var record = new Frame("ConversionTest", 1);
+        var record = new Record("ConversionTest", 1);
         var intColumn = record.Columns.Add<Int32>("IntColumn");
         var doubleColumn = record.Columns.Add<Double>("DoubleColumn");
         var stringColumn = record.Columns.Add<String>("StringColumn");
