@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -6,11 +6,11 @@ using System.Linq;
 namespace LuYao.Data;
 
 [TestClass]
-public class RecordSchemaOperationsTests
+public class FrameSchemaOperationsTests
 {
-    private static Record CreateTestRecord()
+    private static Frame CreateTestFrame()
     {
-        var record = new Record("Test", 3);
+        var record = new Frame("Test", 3);
         var idCol = record.Columns.Add<int>("Id");
         var nameCol = record.Columns.Add<string>("Name");
         var ageCol = record.Columns.Add<int>("Age");
@@ -29,7 +29,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenRenameColumnThenColumnNameChanges()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         record.RenameColumn("Name", "FullName");
 
@@ -41,7 +41,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenRenameColumnNonExistentThenThrowsKeyNotFoundException()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         Assert.Throws<KeyNotFoundException>(() => record.RenameColumn("NonExistent", "NewName"));
     }
@@ -49,7 +49,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenRenameColumnToExistingNameThenThrowsDuplicateNameException()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         Assert.Throws<DuplicateNameException>(() => record.RenameColumn("Name", "Id"));
     }
@@ -57,7 +57,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenRenameColumnToEmptyNameThenThrowsArgumentException()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         Assert.Throws<ArgumentException>(() => record.RenameColumn("Name", ""));
     }
@@ -65,7 +65,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenRenameColumnToSameNameThenSucceeds()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         record.RenameColumn("Name", "Name");
 
@@ -75,11 +75,11 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenRenameColumnThenDataPreserved()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
-        record.RenameColumn("Id", "RecordId");
+        record.RenameColumn("Id", "FrameId");
 
-        var col = record.Columns.Find("RecordId");
+        var col = record.Columns.Find("FrameId");
         Assert.IsNotNull(col);
         Assert.AreEqual(1, col!.Get(0));
         Assert.AreEqual(2, col.Get(1));
@@ -93,7 +93,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCastColumnThenTypeChanges()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         record.CastColumn("Id", typeof(string));
 
@@ -105,7 +105,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCastColumnThenDataConverted()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         record.CastColumn("Id", typeof(string));
 
@@ -118,7 +118,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCastColumnToSameTypeThenNoChange()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
         var originalCol = record.Columns.Find("Id");
 
         record.CastColumn("Id", typeof(int));
@@ -130,7 +130,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCastColumnNonExistentThenThrowsKeyNotFoundException()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         Assert.Throws<KeyNotFoundException>(() => record.CastColumn("NonExistent", typeof(string)));
     }
@@ -138,7 +138,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCastColumnNullTypeThenThrowsArgumentNullException()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         Assert.Throws<ArgumentNullException>(() => record.CastColumn("Id", null!));
     }
@@ -146,7 +146,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCastColumnThenColumnPositionPreserved()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         record.CastColumn("Age", typeof(long));
 
@@ -161,9 +161,9 @@ public class RecordSchemaOperationsTests
     #region CloneSchema
 
     [TestMethod]
-    public void WhenCloneSchemaThenNewRecordHasSameColumns()
+    public void WhenCloneSchemaThenNewFrameHasSameColumns()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         var clone = record.CloneSchema();
 
@@ -177,9 +177,9 @@ public class RecordSchemaOperationsTests
     }
 
     [TestMethod]
-    public void WhenCloneSchemaThenNewRecordHasZeroRows()
+    public void WhenCloneSchemaThenNewFrameHasZeroRows()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         var clone = record.CloneSchema();
 
@@ -189,7 +189,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCloneSchemaThenNamePreserved()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         var clone = record.CloneSchema();
 
@@ -199,7 +199,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCloneSchemaThenOriginalUnchanged()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         var clone = record.CloneSchema();
         clone.Columns.Add<double>("Score");
@@ -208,9 +208,9 @@ public class RecordSchemaOperationsTests
     }
 
     [TestMethod]
-    public void WhenCloneSchemaEmptyRecordThenReturnsEmptySchema()
+    public void WhenCloneSchemaEmptyFrameThenReturnsEmptySchema()
     {
-        var record = new Record();
+        var record = new Frame();
 
         var clone = record.CloneSchema();
 
@@ -223,9 +223,9 @@ public class RecordSchemaOperationsTests
     #region Clone
 
     [TestMethod]
-    public void WhenCloneThenNewRecordHasSameColumnsAndData()
+    public void WhenCloneThenNewFrameHasSameColumnsAndData()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         var clone = record.Clone();
 
@@ -239,7 +239,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCloneThenModifyingCloneDoesNotAffectOriginal()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         var clone = record.Clone();
         clone.Columns[0].Set(0, 999);
@@ -251,7 +251,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenCloneThenNamePreserved()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         var clone = record.Clone();
 
@@ -259,9 +259,9 @@ public class RecordSchemaOperationsTests
     }
 
     [TestMethod]
-    public void WhenCloneEmptyRecordThenReturnsEmptyRecord()
+    public void WhenCloneEmptyFrameThenReturnsEmptyFrame()
     {
-        var record = new Record("Empty", 0);
+        var record = new Frame("Empty", 0);
         record.Columns.Add<int>("Id");
 
         var clone = record.Clone();
@@ -277,7 +277,7 @@ public class RecordSchemaOperationsTests
     [TestMethod]
     public void WhenGetSchemaThenReturnsColumnDefinitions()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
 
         var schema = record.GetSchema();
 
@@ -291,9 +291,9 @@ public class RecordSchemaOperationsTests
     }
 
     [TestMethod]
-    public void WhenGetSchemaEmptyRecordThenReturnsEmptySchema()
+    public void WhenGetSchemaEmptyFrameThenReturnsEmptySchema()
     {
-        var record = new Record();
+        var record = new Frame();
 
         var schema = record.GetSchema();
 
@@ -301,12 +301,12 @@ public class RecordSchemaOperationsTests
     }
 
     [TestMethod]
-    public void WhenGetSchemaThenChangingRecordDoesNotAffectSchema()
+    public void WhenGetSchemaThenChangingFrameDoesNotAffectSchema()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
         var schema = record.GetSchema();
 
-        record.RenameColumn("Id", "RecordId");
+        record.RenameColumn("Id", "FrameId");
 
         Assert.AreEqual("Id", schema.Columns[0].Name);
     }

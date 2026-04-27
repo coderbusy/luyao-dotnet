@@ -1,14 +1,14 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao.Data;
 
 [TestClass]
-public class RecordGroupTests
+public class FrameGroupTests
 {
-    private Record CreateTestRecord()
+    private Frame CreateTestFrame()
     {
-        var record = new Record();
+        var record = new Frame();
         record.Columns.Add<int>("Id");
         record.Columns.Add<string>("Category");
         record.Columns.Add<string>("Status");
@@ -25,7 +25,7 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByStructColumn_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
         var groups = record.Group<int>("Id");
 
         Assert.IsNotNull(groups);
@@ -36,7 +36,7 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByStringColumn_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
         var groups = record.Group("Category");
 
         Assert.IsNotNull(groups);
@@ -52,7 +52,7 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByParamsStringColumns_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
         var groups = record.Group("Category", "Status");
 
         Assert.IsNotNull(groups);
@@ -71,7 +71,7 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByTwoColumns_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
         var groups = record.Group<string, string>("Category", "Status");
 
         Assert.IsNotNull(groups);
@@ -83,7 +83,7 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByThreeColumns_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
+        var record = CreateTestFrame();
         var groups = record.Group<string, string, int>("Category", "Status", "Id");
 
         Assert.IsNotNull(groups);

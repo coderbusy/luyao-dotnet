@@ -1,10 +1,10 @@
-namespace LuYao.Data;
+﻿namespace LuYao.Data;
 
 /// <summary>
-/// 定义 <see cref="RecordColumn"/> 支持的所有基础列数据类型。
-/// 白名单封闭，不可外部扩展。可空性通过 <see cref="RecordColumn.IsNullable"/> 独立表达。
+/// 定义 <see cref="FrameColumn"/> 支持的所有基础列数据类型。
+/// 白名单封闭，不可外部扩展。可空性通过 <see cref="FrameColumn.IsNullable"/> 独立表达。
 /// </summary>
-public enum RecordColumnType : byte
+public enum FrameColumnType : byte
 {
     /// <summary>布尔类型 (<see cref="bool"/>)。</summary>
     Boolean = 1,

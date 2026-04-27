@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace LuYao.Data;
 
 [TestClass]
-public class RecordTests
+public class FrameTests
 {
     [TestMethod]
     public void Constructor_ValidParameters_InitializesCorrectly()
     {
         // Arrange
-        var dt = new Record();
+        var dt = new Frame();
 
         // Assert
         Assert.AreEqual(0, dt.Count);
@@ -26,7 +26,7 @@ public class RecordTests
     public void AddRowAndSetColumnValue_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<int>("Id"); // 替换 Add<Int32> 为 Add<int>
         var colName = table.Columns.Add<string>("Name"); // 替换 Add<String> 为 Add<string>
 
@@ -46,7 +46,7 @@ public class RecordTests
     public void Constructor_WithNameAndRows_InitializesCorrectly()
     {
         // Arrange & Act
-        var table = new Record("TestTable", 10);
+        var table = new Frame("TestTable", 10);
 
         // Assert
         Assert.AreEqual("TestTable", table.Name);
@@ -59,7 +59,7 @@ public class RecordTests
     public void AddMultipleRowsAndColumns_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<int>("Id"); // 替换 Add<Int32> 为 Add<int>
         var colName = table.Columns.Add<string>("Name"); // 替换 Add<String> 为 Add<string>
         var colAge = table.Columns.Add<int>("Age"); // 替换 Add<Int32> 为 Add<int>
@@ -92,7 +92,7 @@ public class RecordTests
     public void SetValue_ByColumnName_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var idCol = table.Columns.Add<int>("Id");
         var nameCol = table.Columns.Add<string>("Name");
         table.AddRow();
@@ -110,7 +110,7 @@ public class RecordTests
     public void GetValue_ByColumnName_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<int>("Id");
         var colName = table.Columns.Add<string>("Name");
         var row = table.AddRow();
@@ -126,7 +126,7 @@ public class RecordTests
     public void Contains_ExistingColumn_ReturnsTrue()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.Columns.Add<int>("Id");
         table.Columns.Add<string>("Name");
 
@@ -140,7 +140,7 @@ public class RecordTests
     public void GetValue_NonExistentColumn_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.AddRow();
 
         // Act & Assert
@@ -152,7 +152,7 @@ public class RecordTests
     public void SetValue_NonExistentColumn_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.AddRow();
 
         // Act & Assert
@@ -164,7 +164,7 @@ public class RecordTests
     public void GetRow_ValidIndex_ReturnsCorrectRow()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<int>("Id");
         table.AddRow();
         table.AddRow();
@@ -187,7 +187,7 @@ public class RecordTests
     public void GetRow_InvalidIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.AddRow();
 
         // Act & Assert
@@ -199,7 +199,7 @@ public class RecordTests
     public void Enumeration_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<int>("Id");
         table.AddRow();
         table.AddRow();
@@ -209,7 +209,7 @@ public class RecordTests
         colId.SetValue(2, 3);
 
         // Act
-        var rows = new List<RecordRow>();
+        var rows = new List<FrameRow>();
         foreach (var row in table)
         {
             rows.Add(row);
@@ -229,7 +229,7 @@ public class RecordTests
     public void DifferentDataTypes_WorkCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colBool = table.Columns.Add<Boolean>("Bool");
         var colByte = table.Columns.Add<Byte>("Byte");
         var colDateTime = table.Columns.Add<DateTime>("DateTime");
@@ -270,7 +270,7 @@ public class RecordTests
     public void RowImplicitConversion_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.AddRow();
         table.AddRow();
         var rows = table.ToArray();
@@ -287,7 +287,7 @@ public class RecordTests
     public void TypedSetAndGet_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colInt = table.Columns.Add<Int32>("Int");
         var colString = table.Columns.Add<String>("String");
         var colBool = table.Columns.Add<Boolean>("Bool");
@@ -308,7 +308,7 @@ public class RecordTests
     public void AddRow_MultipleRows_CountIncreases()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
 
         // Act & Assert
         Assert.AreEqual(0, table.Count);
@@ -327,7 +327,7 @@ public class RecordTests
     public void Columns_Find_ExistingColumn_ReturnsColumn()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var originalCol = table.Columns.Add<Int32>("TestColumn");
 
         // Act
@@ -342,7 +342,7 @@ public class RecordTests
     public void Columns_Find_NonExistentColumn_ReturnsNull()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.Columns.Add<Int32>("TestColumn");
 
         // Act
@@ -353,10 +353,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumn_Clear_DataIsEmpty()
+    public void FrameColumn_Clear_DataIsEmpty()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         var row = table.AddRow();
         col.SetValue(row.Row, "TestValue");
@@ -373,10 +373,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumn_SetValue_WithRecordRowIndex_WorksCorrectly()
+    public void FrameColumn_SetValue_WithFrameRowIndex_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<Int32>("TestCol");
         var row1 = table.AddRow();
         var row2 = table.AddRow();
@@ -394,17 +394,17 @@ public class RecordTests
     public void Constructor_DefaultName_IsEmpty()
     {
         // Arrange & Act
-        var table = new Record();
+        var table = new Frame();
 
         // Assert
         Assert.AreEqual(string.Empty, table.Name);
     }
 
     [TestMethod]
-    public void RecordRow_AllTypedMethods_WorkCorrectly()
+    public void FrameRow_AllTypedMethods_WorkCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colChar = table.Columns.Add<Char>("Char");
         var colSByte = table.Columns.Add<SByte>("SByte");
         var colSingle = table.Columns.Add<Single>("Single");
@@ -435,10 +435,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumnCollection_IndexOf_ReturnsCorrectIndex()
+    public void FrameColumnCollection_IndexOf_ReturnsCorrectIndex()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.Columns.Add<String>("First");
         table.Columns.Add<Int32>("Second");
         table.Columns.Add<Boolean>("Third");
@@ -451,10 +451,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumnCollection_Remove_RemovesColumn()
+    public void FrameColumnCollection_Remove_RemovesColumn()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col1 = table.Columns.Add<String>("Col1");
         var col2 = table.Columns.Add<Int32>("Col2");
 
@@ -468,10 +468,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumnCollection_Clear_RemovesAllColumns()
+    public void FrameColumnCollection_Clear_RemovesAllColumns()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.Columns.Add<String>("Col1");
         table.Columns.Add<Int32>("Col2");
         table.Columns.Add<Boolean>("Col3");
@@ -487,7 +487,7 @@ public class RecordTests
     public void NullAndDbNullValues_HandledCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         var row = table.AddRow();
 
@@ -497,10 +497,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumn_Name_ReturnsCorrectName()
+    public void FrameColumn_Name_ReturnsCorrectName()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestColumnName");
 
         // Act & Assert
@@ -508,10 +508,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumn_Type_ReturnsCorrectType()
+    public void FrameColumn_Type_ReturnsCorrectType()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var stringCol = table.Columns.Add<String>("StringCol");
         var intCol = table.Columns.Add<Int32>("IntCol");
         var boolCol = table.Columns.Add<Boolean>("BoolCol");
@@ -523,10 +523,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void Record_Name_CanBeSetAndRetrieved()
+    public void Frame_Name_CanBeSetAndRetrieved()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
 
         // Act
         table.Name = "ModifiedName";
@@ -536,10 +536,10 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumnCollection_Indexer_ReturnsCorrectColumn()
+    public void FrameColumnCollection_Indexer_ReturnsCorrectColumn()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col1 = table.Columns.Add<String>("First");
         var col2 = table.Columns.Add<Int32>("Second");
 
@@ -549,12 +549,12 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void RecordColumnCollection_Capacity_InitializedCorrectly()
+    public void FrameColumnCollection_Capacity_InitializedCorrectly()
     {
         // Arrange & Act
-        var table1 = new Record();
-        var table2 = new Record("Test", 50);
-        var table3 = new Record("Test", 5); // Should be set to minimum 20
+        var table1 = new Frame();
+        var table2 = new Frame("Test", 50);
+        var table3 = new Frame("Test", 5); // Should be set to minimum 20
 
         // Assert
         Assert.AreEqual(20, table1.Capacity); // Default minimum
@@ -565,7 +565,7 @@ public class RecordTests
     [TestMethod]
     public void Delete_RowIndexLessThanZero_ReturnsFalse()
     {
-        var record = new Record("Test", 2);
+        var record = new Frame("Test", 2);
         var result = record.Delete(-1);
         Assert.IsFalse(result);
     }
@@ -573,7 +573,7 @@ public class RecordTests
     [TestMethod]
     public void Delete_RowIndexGreaterThanOrEqualCount_ReturnsFalse()
     {
-        var record = new Record("Test", 2);
+        var record = new Frame("Test", 2);
         record.AddRow();
         var result = record.Delete(1); // Only 1 row, index 1 is out of range
         Assert.IsFalse(result);
@@ -582,7 +582,7 @@ public class RecordTests
     [TestMethod]
     public void Delete_ValidRowIndex_RowIsDeleted()
     {
-        var record = new Record("Test", 0);
+        var record = new Frame("Test", 0);
         var idCol = record.Columns.Add<Int32>("Id");
         var nameCol = record.Columns.Add<String>("Name");
         record.AddRow();
@@ -603,7 +603,7 @@ public class RecordTests
     [TestMethod]
     public void Delete_LastRow_RowIsDeleted()
     {
-        var record = new Record("Test", 0);
+        var record = new Frame("Test", 0);
         var idCol = record.Columns.Add<Int32>("Id");
         record.AddRow();
         idCol.SetValue(0, 1);
@@ -618,9 +618,9 @@ public class RecordTests
     }
 
     [TestMethod]
-    public void ToString_EmptyRecord_ReturnsDefaultString()
+    public void ToString_EmptyFrame_ReturnsDefaultString()
     {
-        var record = new Record();
+        var record = new Frame();
         var result = record.ToString();
         Assert.IsTrue(result.Contains("None") || result.Contains("count 0"));
     }
@@ -628,7 +628,7 @@ public class RecordTests
     [TestMethod]
     public void ToString_OneRowMultipleColumns_ReturnsColumnValues()
     {
-        var record = new Record("TestTable", 1);
+        var record = new Frame("TestTable", 1);
         var nameCol = record.Columns.Add<String>("Name");
         var ageCol = record.Columns.Add<Int32>("Age");
         record.AddRow();
@@ -646,7 +646,7 @@ public class RecordTests
     [TestMethod]
     public void ToString_MultipleRowsMultipleColumns_ReturnsTableFormat()
     {
-        var record = new Record("People", 2);
+        var record = new Frame("People", 2);
         var nameCol = record.Columns.Add<String>("Name");
         var ageCol = record.Columns.Add<Int32>("Age");
         record.AddRow();
@@ -669,7 +669,7 @@ public class RecordTests
     [TestMethod]
     public void ToString_LongStringValue_TruncatesWithEllipsis()
     {
-        var record = new Record("LongStringTest", 1);
+        var record = new Frame("LongStringTest", 1);
         var nameCol = record.Columns.Add<String>("Name");
         var descCol = record.Columns.Add<String>("Description");
         record.AddRow();
@@ -687,7 +687,7 @@ public class RecordTests
     public void GetValue_NegativeRowIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
@@ -700,7 +700,7 @@ public class RecordTests
     public void GetValue_RowIndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
@@ -713,7 +713,7 @@ public class RecordTests
     public void GetValue_RowIndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
@@ -726,7 +726,7 @@ public class RecordTests
     public void SetValue_NegativeRowIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
@@ -739,7 +739,7 @@ public class RecordTests
     public void SetValue_RowIndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
@@ -752,7 +752,7 @@ public class RecordTests
     public void SetValue_RowIndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
@@ -765,7 +765,7 @@ public class RecordTests
     public void SetBoolean_NegativeIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<Boolean>("BoolCol");
         table.AddRow();
 
@@ -778,7 +778,7 @@ public class RecordTests
     public void SetBoolean_IndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<Boolean>("BoolCol");
         table.AddRow();
 
@@ -791,7 +791,7 @@ public class RecordTests
     public void SetInt32_IndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<Int32>("IntCol");
         table.AddRow();
 
@@ -804,7 +804,7 @@ public class RecordTests
     public void ToBoolean_NegativeIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<Boolean>("BoolCol");
         table.AddRow();
 
@@ -817,7 +817,7 @@ public class RecordTests
     public void ToInt32_IndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<Int32>("IntCol");
         table.AddRow();
 
@@ -830,7 +830,7 @@ public class RecordTests
     public void ToString_IndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("StringCol");
         table.AddRow();
 
@@ -843,7 +843,7 @@ public class RecordTests
     public void BoundaryCheck_ValidIndex_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
         table.AddRow();
@@ -863,7 +863,7 @@ public class RecordTests
     public void BoundaryCheck_AfterCapacityExpansion_StillEnforcesBounds()
     {
         // Arrange
-        var table = new Record("Test", 2); // Small initial capacity
+        var table = new Frame("Test", 2); // Small initial capacity
         var col = table.Columns.Add<String>("TestCol");
 
         // Add rows to trigger capacity expansion
@@ -889,7 +889,7 @@ public class RecordTests
     public void AllTypedSetMethods_InvalidIndex_ThrowArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var boolCol = table.Columns.Add<Boolean>("Bool");
         var byteCol = table.Columns.Add<Byte>("Byte");
         var charCol = table.Columns.Add<Char>("Char");
@@ -930,7 +930,7 @@ public class RecordTests
     public void AllTypedToMethods_InvalidIndex_ThrowArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var boolCol = table.Columns.Add<Boolean>("Bool");
         var byteCol = table.Columns.Add<Byte>("Byte");
         var charCol = table.Columns.Add<Char>("Char");
@@ -971,7 +971,7 @@ public class RecordTests
     public void BoundaryCheck_EmptyTable_AnyIndexThrowsException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         // No rows added, Count = 0
 
@@ -984,7 +984,7 @@ public class RecordTests
     public void BoundaryCheck_EmptyTable_NegativeIndexStillThrowsException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         // No rows added, Count = 0
 
@@ -997,7 +997,7 @@ public class RecordTests
     public void BoundaryCheck_EmptyTable_IndexGreaterThanZeroThrowsException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col = table.Columns.Add<String>("TestCol");
         // No rows added, Count = 0
 
@@ -1010,7 +1010,7 @@ public class RecordTests
     public void Columns_AddDuplicateName_ReturnsExisting()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var col1 = table.Columns.Add<String>("TestColumn");
 
         // Act
@@ -1025,7 +1025,7 @@ public class RecordTests
     public void Columns_AddDuplicateNameDifferentType_ThrowsInvalidOperationException()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         table.Columns.Add<String>("TestColumn");
 
         // Act & Assert - 同名不同类型应抛 InvalidOperationException（不再是 InvalidCastException）
@@ -1041,7 +1041,7 @@ public class RecordTests
     [TestMethod]
     public void Columns_SetObject_WorksCorrectly()
     {
-        var re = new Record();
+        var re = new Frame();
         var name = re.Columns.Add<string>("Name");
         var id = re.Columns.Add<Int32>("Id");
 
@@ -1058,7 +1058,7 @@ public class RecordTests
     public void Columns_SetObjectNotMatchType_ThrowsInvalidCastException()
     {
         // Arrange
-        var re = new Record();
+        var re = new Frame();
         var id = re.Columns.Add<Int32>("Id");
         var row = re.AddRow();
         // Act & Assert - DateTime cannot be converted to int via SetValue
@@ -1069,7 +1069,7 @@ public class RecordTests
     public void AddRowFromValues_ExactNumberOfValues_SetsAllColumns()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
         var colAge = table.Columns.Add<Int32>("Age");
@@ -1088,7 +1088,7 @@ public class RecordTests
     public void AddRowFromValues_FewerValuesThanColumns_SetsOnlyProvidedValues()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
         var colAge = table.Columns.Add<Int32>("Age");
@@ -1108,7 +1108,7 @@ public class RecordTests
     public void AddRowFromValues_MoreValuesThanColumns_IgnoresExtraValues()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
 
@@ -1126,7 +1126,7 @@ public class RecordTests
     public void AddRowFromValues_EmptyValuesArray_CreatesEmptyRow()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
 
@@ -1144,7 +1144,7 @@ public class RecordTests
     public void AddRowFromValues_NoColumns_CreatesRowWithoutErrors()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
 
         // Act
         var row = table.AddRowFromValues(1, "Test", 30);
@@ -1159,7 +1159,7 @@ public class RecordTests
     public void AddRowFromValues_DifferentDataTypes_SetsCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colBool = table.Columns.Add<Boolean>("Bool");
         var colByte = table.Columns.Add<Byte>("Byte");
         var colDateTime = table.Columns.Add<DateTime>("DateTime");
@@ -1183,7 +1183,7 @@ public class RecordTests
     public void AddRowFromValues_WithNullValues_SetsNullCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
         var colAge = table.Columns.Add<Int32>("Age");
@@ -1203,7 +1203,7 @@ public class RecordTests
     public void AddRowFromValues_MultipleRowsCalls_IncrementsCountCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
 
@@ -1229,7 +1229,7 @@ public class RecordTests
     public void AddRowFromValues_SingleValue_SetsFirstColumnOnly()
     {
         // Arrange
-        var table = new Record();
+        var table = new Frame();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
         var colAge = table.Columns.Add<Int32>("Age");

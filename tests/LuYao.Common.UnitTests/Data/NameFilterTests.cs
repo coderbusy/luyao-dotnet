@@ -1,4 +1,4 @@
-namespace LuYao.Data;
+﻿namespace LuYao.Data;
 
 [TestClass]
 public class NameFilterTests
@@ -106,7 +106,7 @@ public class NameFilterTests
     public void AddFrom_WithNames_RespectsInputOrder()
     {
         // 传入顺序与声明顺序故意相反，验证列顺序与传入顺序一致
-        var record = new Record();
+        var record = new Frame();
         record.Columns.AddFrom<SampleData>(new[] { nameof(SampleData.Email), nameof(SampleData.Id) });
         Assert.AreEqual(nameof(SampleData.Email), record.Columns[0].Name);
         Assert.AreEqual(nameof(SampleData.Id), record.Columns[1].Name);
@@ -115,7 +115,7 @@ public class NameFilterTests
     [TestMethod]
     public void AddFrom_WithAnonymousTemplate_AddsColumnsFromTemplateType()
     {
-        var record = new Record();
+        var record = new Frame();
 
         record.Columns.AddFrom(new { Id = 1, Name = "Test", IsOk = true });
 
@@ -131,7 +131,7 @@ public class NameFilterTests
     [TestMethod]
     public void AddFrom_WithNullTemplate_ThrowsArgumentNullException()
     {
-        var record = new Record();
+        var record = new Frame();
         SampleData template = null;
 
         var ex = Assert.Throws<ArgumentNullException>(() => record.Columns.AddFrom(template));
@@ -141,8 +141,8 @@ public class NameFilterTests
     [TestMethod]
     public void AddFrom_WithFilter_RespectsManualIncludeOrder()
     {
-        // 通过 NameFilter 手动 Include 的顺序应正确反映到 Record 列顺序
-        var record = new Record();
+        // 通过 NameFilter 手动 Include 的顺序应正确反映到 Frame 列顺序
+        var record = new Frame();
         record.Columns.AddFrom<SampleData>(f => f.Clear()
             .Include(x => x.CreatedAt)
             .Include(x => x.Name));
@@ -153,7 +153,7 @@ public class NameFilterTests
     [TestMethod]
     public void AddFrom_WithNames_OnlyAddsSpecifiedColumns()
     {
-        var record = new Record();
+        var record = new Frame();
         record.Columns.AddFrom<SampleData>(new[] { nameof(SampleData.Id), nameof(SampleData.Name) });
         Assert.AreEqual(2, record.Columns.Count);
         Assert.IsNotNull(record.Columns[nameof(SampleData.Id)]);
@@ -163,11 +163,11 @@ public class NameFilterTests
     [TestMethod]
     public void AddFrom_WithNullOrEmptyNames_AddsNoColumns()
     {
-        var record1 = new Record();
+        var record1 = new Frame();
         record1.Columns.AddFrom<SampleData>(new string[0]);
         Assert.AreEqual(0, record1.Columns.Count, "空数组不应追加任何列。");
 
-        var record2 = new Record();
+        var record2 = new Frame();
         record2.Columns.AddFrom<SampleData>((string[])null);
         Assert.AreEqual(0, record2.Columns.Count, "null 不应追加任何列。");
     }
@@ -175,7 +175,7 @@ public class NameFilterTests
     [TestMethod]
     public void AddFrom_WithFilter_ExcludesSpecifiedColumn()
     {
-        var record = new Record();
+        var record = new Frame();
         record.Columns.AddFrom<SampleData>(f => f.Exclude(x => x.Email));
         Assert.AreEqual(3, record.Columns.Count);
         Assert.IsNull(record.Columns[nameof(SampleData.Email)], "Email column should not exist.");

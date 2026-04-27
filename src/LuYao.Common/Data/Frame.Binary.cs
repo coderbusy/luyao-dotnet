@@ -1,16 +1,16 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
 namespace LuYao.Data;
 
-public partial class Record
+public partial class Frame
 {
     // 二进制格式版本号，用于未来兼容性检查
     private const byte BinaryFormatVersion = 1;
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 写入二进制流。
+    /// 将当前 <see cref="Frame"/> 写入二进制流。
     /// </summary>
     /// <param name="stream">目标流。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="stream"/> 为 null 时抛出。</exception>
@@ -22,7 +22,7 @@ public partial class Record
     }
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 写入 <see cref="BinaryWriter"/>。
+    /// 将当前 <see cref="Frame"/> 写入 <see cref="BinaryWriter"/>。
     /// </summary>
     /// <param name="writer">目标写入器。</param>
     public void WriteTo(BinaryWriter writer)
@@ -30,7 +30,7 @@ public partial class Record
         if (writer == null) throw new ArgumentNullException(nameof(writer));
 
         // Header
-        BinaryPayloadHeader.Write(writer, BinaryPayloadType.Record);
+        BinaryPayloadHeader.Write(writer, BinaryPayloadType.Frame);
         writer.Write(BinaryFormatVersion);
         writer.Write(this.Name ?? string.Empty);
         writer.Write(this.Page);
@@ -59,7 +59,7 @@ public partial class Record
     }
 
     /// <summary>
-    /// 从二进制流读取并填充当前 <see cref="Record"/> 实例。
+    /// 从二进制流读取并填充当前 <see cref="Frame"/> 实例。
     /// </summary>
     /// <param name="stream">源流。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="stream"/> 为 null 时抛出。</exception>
@@ -71,7 +71,7 @@ public partial class Record
     }
 
     /// <summary>
-    /// 从 <see cref="BinaryReader"/> 读取并填充当前 <see cref="Record"/> 实例。
+    /// 从 <see cref="BinaryReader"/> 读取并填充当前 <see cref="Frame"/> 实例。
     /// </summary>
     /// <param name="reader">源读取器。</param>
     public void ReadFrom(BinaryReader reader)
@@ -79,7 +79,7 @@ public partial class Record
         if (reader == null) throw new ArgumentNullException(nameof(reader));
 
         // Header
-        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.Record);
+        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.Frame);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 
@@ -94,7 +94,7 @@ public partial class Record
         for (int c = 0; c < colCount; c++)
         {
             string name = reader.ReadString();
-            var columnType = (RecordColumnType)reader.ReadByte();
+            var columnType = (FrameColumnType)reader.ReadByte();
             bool isNullable = reader.ReadBoolean();
             Type clrType = Helpers.GetClrType(columnType, isNullable);
             this.Columns.Add(name, clrType);
@@ -117,13 +117,13 @@ public partial class Record
     }
 
     /// <summary>
-    /// 从二进制流创建新的 <see cref="Record"/> 实例。
+    /// 从二进制流创建新的 <see cref="Frame"/> 实例。
     /// </summary>
     /// <param name="stream">源流。</param>
-    /// <returns>反序列化的 <see cref="Record"/> 实例。</returns>
-    public static Record FromStream(Stream stream)
+    /// <returns>反序列化的 <see cref="Frame"/> 实例。</returns>
+    public static Frame FromStream(Stream stream)
     {
-        var record = new Record();
+        var record = new Frame();
         record.ReadFrom(stream);
         return record;
     }
@@ -143,8 +143,8 @@ public partial class Record
     /// 从字节数组反序列化。
     /// </summary>
     /// <param name="data">二进制数据。</param>
-    /// <returns>反序列化的 <see cref="Record"/> 实例。</returns>
-    public static Record FromBytes(byte[] data)
+    /// <returns>反序列化的 <see cref="Frame"/> 实例。</returns>
+    public static Frame FromBytes(byte[] data)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         using var ms = new MemoryStream(data, writable: false);
@@ -152,22 +152,22 @@ public partial class Record
     }
 
     /// <summary>
-    /// 检测二进制数据是否为带类型头的 <see cref="Record"/>。
+    /// 检测二进制数据是否为带类型头的 <see cref="Frame"/>。
     /// </summary>
     /// <param name="data">二进制数据。</param>
-    /// <returns>当数据包含 <see cref="Record"/> 类型头时返回 true；否则返回 false。</returns>
+    /// <returns>当数据包含 <see cref="Frame"/> 类型头时返回 true；否则返回 false。</returns>
     public static bool IsBinaryPayload(byte[] data)
     {
         if (data == null) return false;
         return BinaryPayloadHeader.TryGetPayloadType(data, out var payloadType)
-            && payloadType == BinaryPayloadType.Record;
+            && payloadType == BinaryPayloadType.Frame;
     }
 
     #region 列数据序列化
 
-    private static void WriteColumnData(BinaryWriter writer, RecordColumn col, int rowCount)
+    private static void WriteColumnData(BinaryWriter writer, FrameColumn col, int rowCount)
     {
-        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray;
+        bool needsNullCheck = col.IsNullable || col.ColumnType == FrameColumnType.String || col.ColumnType == FrameColumnType.ByteArray;
 
         for (int r = 0; r < rowCount; r++)
         {
@@ -185,9 +185,9 @@ public partial class Record
         }
     }
 
-    private static void ReadColumnData(BinaryReader reader, RecordColumn col, int rowCount)
+    private static void ReadColumnData(BinaryReader reader, FrameColumn col, int rowCount)
     {
-        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray;
+        bool needsNullCheck = col.IsNullable || col.ColumnType == FrameColumnType.String || col.ColumnType == FrameColumnType.ByteArray;
 
         for (int r = 0; r < rowCount; r++)
         {
@@ -201,7 +201,7 @@ public partial class Record
         }
     }
 
-    private static void WritePrimitiveValue(BinaryWriter writer, object value, RecordColumnType columnType)
+    private static void WritePrimitiveValue(BinaryWriter writer, object value, FrameColumnType columnType)
     {
         if (value.GetType().IsEnum)
         {
@@ -210,29 +210,29 @@ public partial class Record
 
         switch (columnType)
         {
-            case RecordColumnType.Boolean: writer.Write((bool)value); break;
-            case RecordColumnType.SByte: writer.Write((sbyte)value); break;
-            case RecordColumnType.Int16: writer.Write((short)value); break;
-            case RecordColumnType.Int32: writer.Write((int)value); break;
-            case RecordColumnType.Int64: writer.Write((long)value); break;
-            case RecordColumnType.Byte: writer.Write((byte)value); break;
-            case RecordColumnType.UInt16: writer.Write((ushort)value); break;
-            case RecordColumnType.UInt32: writer.Write((uint)value); break;
-            case RecordColumnType.UInt64: writer.Write((ulong)value); break;
-            case RecordColumnType.Single: writer.Write((float)value); break;
-            case RecordColumnType.Double: writer.Write((double)value); break;
-            case RecordColumnType.Decimal: writer.Write((decimal)value); break;
-            case RecordColumnType.Char: writer.Write((char)value); break;
-            case RecordColumnType.String: writer.Write((string)value); break;
-            case RecordColumnType.DateTime: writer.Write(((DateTime)value).ToBinary()); break;
-            case RecordColumnType.DateTimeOffset:
+            case FrameColumnType.Boolean: writer.Write((bool)value); break;
+            case FrameColumnType.SByte: writer.Write((sbyte)value); break;
+            case FrameColumnType.Int16: writer.Write((short)value); break;
+            case FrameColumnType.Int32: writer.Write((int)value); break;
+            case FrameColumnType.Int64: writer.Write((long)value); break;
+            case FrameColumnType.Byte: writer.Write((byte)value); break;
+            case FrameColumnType.UInt16: writer.Write((ushort)value); break;
+            case FrameColumnType.UInt32: writer.Write((uint)value); break;
+            case FrameColumnType.UInt64: writer.Write((ulong)value); break;
+            case FrameColumnType.Single: writer.Write((float)value); break;
+            case FrameColumnType.Double: writer.Write((double)value); break;
+            case FrameColumnType.Decimal: writer.Write((decimal)value); break;
+            case FrameColumnType.Char: writer.Write((char)value); break;
+            case FrameColumnType.String: writer.Write((string)value); break;
+            case FrameColumnType.DateTime: writer.Write(((DateTime)value).ToBinary()); break;
+            case FrameColumnType.DateTimeOffset:
                 var dto = (DateTimeOffset)value;
                 writer.Write(dto.Ticks);
                 writer.Write((short)dto.Offset.TotalMinutes);
                 break;
-            case RecordColumnType.TimeSpan: writer.Write(((TimeSpan)value).Ticks); break;
-            case RecordColumnType.Guid: writer.Write(((Guid)value).ToByteArray()); break;
-            case RecordColumnType.ByteArray:
+            case FrameColumnType.TimeSpan: writer.Write(((TimeSpan)value).Ticks); break;
+            case FrameColumnType.Guid: writer.Write(((Guid)value).ToByteArray()); break;
+            case FrameColumnType.ByteArray:
                 var bytes = (byte[])value;
                 writer.Write(bytes.Length);
                 writer.Write(bytes);
@@ -242,32 +242,32 @@ public partial class Record
         }
     }
 
-    private static object ReadPrimitiveValue(BinaryReader reader, RecordColumnType columnType)
+    private static object ReadPrimitiveValue(BinaryReader reader, FrameColumnType columnType)
     {
         switch (columnType)
         {
-            case RecordColumnType.Boolean: return reader.ReadBoolean();
-            case RecordColumnType.SByte: return reader.ReadSByte();
-            case RecordColumnType.Int16: return reader.ReadInt16();
-            case RecordColumnType.Int32: return reader.ReadInt32();
-            case RecordColumnType.Int64: return reader.ReadInt64();
-            case RecordColumnType.Byte: return reader.ReadByte();
-            case RecordColumnType.UInt16: return reader.ReadUInt16();
-            case RecordColumnType.UInt32: return reader.ReadUInt32();
-            case RecordColumnType.UInt64: return reader.ReadUInt64();
-            case RecordColumnType.Single: return reader.ReadSingle();
-            case RecordColumnType.Double: return reader.ReadDouble();
-            case RecordColumnType.Decimal: return reader.ReadDecimal();
-            case RecordColumnType.Char: return reader.ReadChar();
-            case RecordColumnType.String: return reader.ReadString();
-            case RecordColumnType.DateTime: return DateTime.FromBinary(reader.ReadInt64());
-            case RecordColumnType.DateTimeOffset:
+            case FrameColumnType.Boolean: return reader.ReadBoolean();
+            case FrameColumnType.SByte: return reader.ReadSByte();
+            case FrameColumnType.Int16: return reader.ReadInt16();
+            case FrameColumnType.Int32: return reader.ReadInt32();
+            case FrameColumnType.Int64: return reader.ReadInt64();
+            case FrameColumnType.Byte: return reader.ReadByte();
+            case FrameColumnType.UInt16: return reader.ReadUInt16();
+            case FrameColumnType.UInt32: return reader.ReadUInt32();
+            case FrameColumnType.UInt64: return reader.ReadUInt64();
+            case FrameColumnType.Single: return reader.ReadSingle();
+            case FrameColumnType.Double: return reader.ReadDouble();
+            case FrameColumnType.Decimal: return reader.ReadDecimal();
+            case FrameColumnType.Char: return reader.ReadChar();
+            case FrameColumnType.String: return reader.ReadString();
+            case FrameColumnType.DateTime: return DateTime.FromBinary(reader.ReadInt64());
+            case FrameColumnType.DateTimeOffset:
                 long ticks = reader.ReadInt64();
                 short offsetMinutes = reader.ReadInt16();
                 return new DateTimeOffset(ticks, TimeSpan.FromMinutes(offsetMinutes));
-            case RecordColumnType.TimeSpan: return new TimeSpan(reader.ReadInt64());
-            case RecordColumnType.Guid: return new Guid(reader.ReadBytes(16));
-            case RecordColumnType.ByteArray:
+            case FrameColumnType.TimeSpan: return new TimeSpan(reader.ReadInt64());
+            case FrameColumnType.Guid: return new Guid(reader.ReadBytes(16));
+            case FrameColumnType.ByteArray:
                 int len = reader.ReadInt32();
                 return reader.ReadBytes(len);
             default:
