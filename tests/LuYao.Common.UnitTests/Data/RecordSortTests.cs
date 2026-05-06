@@ -389,7 +389,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_UnknownColumn_EmptyRecord_Throws()
     {
-        // 即使表为空，未知列名也应立即抛出 KeyNotFoundException（不应被 Count<=1 跳过）
+        // 即使表为空，未知列名也应立即抛出 KeyNotFoundException（不应被 Count <= 1 跳过）
         var rec = new Record("T");
         rec.Columns.Add("Value", typeof(int));
         Assert.Throws<KeyNotFoundException>(() => rec.Sort("NoSuchColumn ASC"));
@@ -398,7 +398,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_UnknownColumn_SingleRow_Throws()
     {
-        // 即使只有一行，未知列名也应立即抛出 KeyNotFoundException（不应被 Count<=1 跳过）
+        // 即使只有一行，未知列名也应立即抛出 KeyNotFoundException（不应被 Count <= 1 跳过）
         var rec = BuildIntRecord(42);
         Assert.Throws<KeyNotFoundException>(() => rec.Sort("NoSuchColumn ASC"));
     }
@@ -422,7 +422,7 @@ public class RecordSortTests
         rec.Columns.Add("Data", typeof(byte[]));
         var b1 = new byte[] { 2, 0 };
         var b2 = new byte[] { 1, 0 };
-        var b3 = new byte[] { 1, 0, 0 }; // 字节相同但更长
+        var b3 = new byte[] { 1, 0, 0 }; // 前两字节与 b2 相同但更长
         foreach (var b in new[] { b1, b2, b3 })
         {
             var row = rec.AddRow();

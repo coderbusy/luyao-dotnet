@@ -388,6 +388,14 @@ NULL 值视为最小值（与 SQLite 默认行为相同）：
 - 升序（ASC）：NULL 排在最前
 - 降序（DESC）：NULL 排在最后
 
+#### 值比较规则
+
+非 NULL 值的比较规则与 SQLite 默认行为一致：
+
+- `string` 列：使用 **Ordinal（二进制）** 比较，大小写敏感，与区域性无关（`A` < `B` < `a` < `b`）
+- `byte[]` 列：逐字节比较，长度不同时较短者排在前面
+- 其他类型：使用系统默认的 `IComparable` 比较
+
 #### 稳定性
 
 当所有键均相等时，保持行的原始相对顺序（通过把原始行索引作为最终 tie-breaker 实现）。
@@ -420,8 +428,8 @@ record.Sort(("dept", false), ("salary", true));
 | `keys` 为 null / 空数组 | 直接返回，不修改数据 |
 | 段内 token 数超过 2 | 抛 `FormatException` |
 | 方向关键字不是 ASC / DESC | 抛 `FormatException` |
-| 列名不存在 | 抛 `KeyNotFoundException` |
-| 同一列名出现多次 | 抛 `ArgumentException` |
+| 列名不存在 | 抛 `KeyNotFoundException`（即使表为空或只有一行） |
+| 同一列名出现多次 | 抛 `ArgumentException`（即使表为空或只有一行） |
 
 #### 约束
 
