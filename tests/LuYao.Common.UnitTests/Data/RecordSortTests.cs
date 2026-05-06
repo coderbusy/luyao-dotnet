@@ -385,4 +385,66 @@ public class RecordSortTests
         var rec = BuildIntRecord(1, 2);
         Assert.Throws<FormatException>(() => rec.Sort("Value ASC Extra"));
     }
+
+    [TestMethod]
+    public void Sort_UnknownColumn_EmptyRecord_Throws()
+    {
+        // 即使表为空，未知列名也应立即抛出 KeyNotFoundException（不应被 Count<=1 跳过）
+        var rec = new Record("T");
+        rec.Columns.Add("Value", typeof(int));
+        Assert.Throws<KeyNotFoundException>(() => rec.Sort("NoSuchColumn ASC"));
+    }
+
+    [TestMethod]
+    public void Sort_UnknownColumn_SingleRow_Throws()
+    {
+        // 即使只有一行，未知列名也应立即抛出 KeyNotFoundException（不应被 Count<=1 跳过）
+        var rec = BuildIntRecord(42);
+        Assert.Throws<KeyNotFoundException>(() => rec.Sort("NoSuchColumn ASC"));
+    }
+
+    [TestMethod]
+    public void Sort_DuplicateColumn_EmptyRecord_Throws()
+    {
+        // 即使表为空，重复列名也应立即抛出 ArgumentException
+        var rec = new Record("T");
+        rec.Columns.Add("Value", typeof(int));
+        Assert.Throws<ArgumentException>(() =>
+            rec.Sort(new RecordSortKey("Value", false), new RecordSortKey("Value", true)));
+    }
+
+    // ── byte[] 列排序 ────────────────────────────────────────────────────────
+
+    [TestMethod]
+    public void Sort_ByteArray_Ascending()
+    {
+        var rec = new Record("T");
+        rec.Columns.Add("Data", typeof(byte[]));
+        var b1 = new byte[] { 2, 0 };
+        var b2 = new byte[] { 1, 0 };
+        var b3 = new byte[] { 1, 0, 0 }; // 字节相同但更长
+        foreach (var b in new[] { b1, b2, b3 })
+        {
+            var row = rec.AddRow();
+            rec.Columns["Data"].Set(row, b);
+        }
+        rec.Sort("Data ASC");
+        Assert.AreSame(b2, rec.Columns["Data"].Get(0));
+        Assert.AreSame(b3, rec.Columns["Data"].Get(1));
+        Assert.AreSame(b1, rec.Columns["Data"].Get(2));
+    }
+
+    // ── 字符串 Ordinal 比较 ──────────────────────────────────────────────────
+
+    [TestMethod]
+    public void Sort_String_UsesOrdinalComparison()
+    {
+        // "b" < "a" in culture-sensitive (some locales), but "a" < "b" in Ordinal
+        // More critically: lowercase letters sort after uppercase in Ordinal
+        var rec = BuildStringRecord("b", "A", "a", "B");
+        rec.Sort("Value ASC");
+        var result = GetStringColumn(rec, "Value");
+        // Ordinal: 'A'=65, 'B'=66, 'a'=97, 'b'=98 → A, B, a, b
+        CollectionAssert.AreEqual(new[] { "A", "B", "a", "b" }, result);
+    }
 }

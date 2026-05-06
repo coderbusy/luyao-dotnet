@@ -13,16 +13,18 @@ public partial class Record
     /// <para>多个键相等时保持原有行的相对顺序（稳定排序）。</para>
     /// </summary>
     /// <param name="keys">排序键数组，按优先级从高到低排列，每个键包含列名和排序方向。</param>
-    /// <exception cref="ArgumentException">
-    /// 当 <paramref name="keys"/> 为空、包含未知列名或存在重复列名时抛出。
-    /// </exception>
+    /// <remarks>
+    /// 当 <paramref name="keys"/> 为 null 或空数组时直接返回，不修改数据。
+    /// </remarks>
+    /// <exception cref="KeyNotFoundException">当 <paramref name="keys"/> 中包含不存在的列名时抛出。</exception>
+    /// <exception cref="ArgumentException">当 <paramref name="keys"/> 中同一列名出现多次时抛出。</exception>
     public void Sort(params RecordSortKey[] keys)
     {
         if (keys == null || keys.Length == 0) return;
 
-        if (this.Count <= 1) return;
-
         var resolved = ResolveKeys(keys);
+
+        if (this.Count <= 1) return;
 
         // 构造行索引数组并排序
         int count = this.Count;
@@ -53,7 +55,7 @@ public partial class Record
     /// <para>示例：<c>"name ASC, age DESC"</c>、<c>"salary"</c>。</para>
     /// </summary>
     /// <param name="orderBy">排序子句字符串，格式与 SQL ORDER BY 相同（不含 ORDER BY 关键字本身）。</param>
-    /// <exception cref="ArgumentException">当 <paramref name="orderBy"/> 为 null 或空白字符串时抛出。</exception>
+    /// <remarks>当 <paramref name="orderBy"/> 为 null 或空白字符串时直接返回，不修改数据。</remarks>
     /// <exception cref="FormatException">当 <paramref name="orderBy"/> 格式无法解析时抛出。</exception>
     public void Sort(string orderBy)
     {
@@ -152,7 +154,27 @@ public partial class Record
                 }
                 else
                 {
-                    cmp = Comparer<object>.Default.Compare(va, vb);
+                    if (va is string sa && vb is string sb)
+                    {
+                        // SQLite 默认使用二进制（Ordinal）比较
+                        cmp = string.Compare(sa, sb, StringComparison.Ordinal);
+                    }
+                    else if (va is byte[] ba && vb is byte[] bb)
+                    {
+                        // BLOB：逐字节比较（与 SQLite BLOB 排序行为一致）
+                        int len = Math.Min(ba.Length, bb.Length);
+                        cmp = 0;
+                        for (int j = 0; j < len; j++)
+                        {
+                            cmp = ba[j].CompareTo(bb[j]);
+                            if (cmp != 0) break;
+                        }
+                        if (cmp == 0) cmp = ba.Length.CompareTo(bb.Length);
+                    }
+                    else
+                    {
+                        cmp = Comparer<object>.Default.Compare(va, vb);
+                    }
                 }
 
                 if (cmp != 0)
