@@ -103,6 +103,17 @@ public class RecordColumn<T> : RecordColumn
         Array.Copy(src, _data, len);
     }
 
+    internal override void Reorder(int[] indices)
+    {
+        int count = indices.Length;
+        T[] tmp = new T[_data.Length];
+        for (int i = 0; i < count; i++)
+        {
+            tmp[i] = _data[indices[i]];
+        }
+        _data = tmp;
+    }
+
     #region Accessor
 
     ///<inheritdoc/>

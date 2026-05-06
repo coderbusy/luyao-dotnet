@@ -97,6 +97,12 @@ public abstract class RecordColumn : IXProp
     /// </summary>
     internal abstract void SetDataArray(Array data, int count);
 
+    /// <summary>
+    /// 按给定的行索引置换重排列内部数据，实现原地排序。
+    /// <paramref name="indices"/> 的长度等于当前记录行数，<c>indices[newRow] = oldRow</c>。
+    /// </summary>
+    internal abstract void Reorder(int[] indices);
+
     ///  <inheritdoc/>
     public override string ToString()
     {
