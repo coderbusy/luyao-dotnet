@@ -17,7 +17,6 @@ public partial class Record
     /// 当 <paramref name="keys"/> 为 null 或空数组时直接返回，不修改数据。
     /// </remarks>
     /// <exception cref="KeyNotFoundException">当 <paramref name="keys"/> 中包含不存在的列名时抛出。</exception>
-    /// <exception cref="ArgumentException">当 <paramref name="keys"/> 中同一列名出现多次时抛出。</exception>
     public void Sort(params RecordSortKey[] keys)
     {
         if (keys == null || keys.Length == 0) return;
@@ -111,7 +110,7 @@ public partial class Record
 
     private ResolvedSortKey[] ResolveKeys(RecordSortKey[] keys)
     {
-        var result = new ResolvedSortKey[keys.Length];
+        var result = new List<ResolvedSortKey>(keys.Length);
         var seen = new HashSet<string>(StringComparer.Ordinal);
         for (int i = 0; i < keys.Length; i++)
         {
@@ -119,11 +118,11 @@ public partial class Record
             if (string.IsNullOrWhiteSpace(colName))
                 throw new ArgumentException($"第 {i + 1} 个排序键的列名不能为空。");
             if (!seen.Add(colName))
-                throw new ArgumentException($"排序键中列名 '{colName}' 重复。");
+                continue;   // 与 SQLite 行为一致：重复列名直接忽略
             RecordColumn col = this.Columns.Get(colName);   // 列不存在时抛 KeyNotFoundException
-            result[i] = new ResolvedSortKey(col, keys[i].Descending);
+            result.Add(new ResolvedSortKey(col, keys[i].Descending));
         }
-        return result;
+        return result.ToArray();
     }
 
     private static Comparison<int> BuildComparer(ResolvedSortKey[] resolved)

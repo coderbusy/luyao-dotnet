@@ -429,7 +429,7 @@ record.Sort(("dept", false), ("salary", true));
 | 段内 token 数超过 2 | 抛 `FormatException` |
 | 方向关键字不是 ASC / DESC | 抛 `FormatException` |
 | 列名不存在 | 抛 `KeyNotFoundException`（即使表为空或只有一行） |
-| 同一列名出现多次 | 抛 `ArgumentException`（即使表为空或只有一行） |
+| 同一列名出现多次 | 忽略后续重复项，仅以首次出现的方向进行排序（与 SQLite ORDER BY 行为一致） |
 
 #### 约束
 
@@ -728,7 +728,7 @@ RecordSet copy = RecordSet.FromBytes(bytes);
 | `Sort("col token1 token2")` 段内 token 过多 | 抛 `FormatException` |
 | `Sort("missing ASC")` 列不存在 | 抛 `KeyNotFoundException` |
 | `Sort(Array.Empty<RecordSortKey>())` | 直接返回，不修改数据 |
-| `Sort(new RecordSortKey("col"), new RecordSortKey("col"))` 列名重复 | 抛 `ArgumentException` |
+| `Sort(new RecordSortKey("col"), new RecordSortKey("col"))` 列名重复 | 忽略重复列名，仅以首次出现的方向进行排序（与 SQLite 行为一致） |
 | `row["Missing"]` | 返回 `null` |
 | `row.To<T>("Missing")` | 返回 `default` |
 | `row["New"] = null` | 不建列，直接忽略 |
