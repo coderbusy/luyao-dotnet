@@ -32,6 +32,7 @@
 - 行管理：新增、删除、批量删除、清空、按索引访问
 - 行枚举：实现 `IEnumerable<RecordRow>`
 - 查询：按列值、Lambda、`dynamic` 条件查找
+- 排序：原地多列排序，行为对齐 SQLite ORDER BY
 - 分组：单字段、多字段字符串分组，以及 2/3 字段元组分组
 - 对象映射：对象/对象集合与 `Record` 之间转换
 - ADO.NET 互操作：`IDataReader`、`DataTable`、`DataSet`
@@ -341,7 +342,104 @@ var largeOrders = record.FindAll(r => r.To<decimal>("Amount") > 1000m);
 var active = record.FindByDynamic(d => d.Status == "Active");
 ```
 
-### 5.5 分组
+### 5.5 原地排序
+
+`Record.Sort` 对当前记录进行**原地多列排序**，行为与 SQLite 的 `ORDER BY` 子句相同。
+
+**核心设计**：利用列存储的天然优势——先对一个行索引数组排序，再以该置换一次性重排各列底层数据数组，避免逐行搬移对象的开销。
+
+#### 两个重载
+
+**字符串重载**（与 SQL ORDER BY 子句同构）：
+
+```csharp
+void Sort(string orderBy)
+```
+
+**键集合重载**（避免字符串解析，适合程序化构造）：
+
+```csharp
+void Sort(params RecordSortKey[] keys)
+```
+
+`RecordSortKey` 是不可变 `readonly struct`，在 `.NET Standard 2.0+` / `.NET 6+` 目标下支持从 `(string column, bool descending)` 元组隐式转换。
+
+#### 排序语法（字符串重载）
+
+格式：`列名 [ASC|DESC]`，多个键以英文逗号分隔：
+
+```
+"name"                      // 单列升序（默认）
+"name DESC"                 // 单列降序
+"dept ASC, salary DESC"     // 多列混合方向
+"dept, salary DESC"         // 第一列升序，第二列降序
+```
+
+语法约定：
+
+- 列名区分大小写（Ordinal 比较），与 `Columns.Get(name)` 一致
+- 方向关键字 `ASC` / `DESC` 不区分大小写
+- 列名中不能含空格或引号（不支持引号标识符）
+
+#### NULL 排序
+
+NULL 值视为最小值（与 SQLite 默认行为相同）：
+
+- 升序（ASC）：NULL 排在最前
+- 降序（DESC）：NULL 排在最后
+
+#### 值比较规则
+
+非 NULL 值的比较规则与 SQLite 默认行为一致：
+
+- `string` 列：使用 **Ordinal（二进制）** 比较，大小写敏感，与区域性无关（`A` < `B` < `a` < `b`）
+- `byte[]` 列：逐字节比较，长度不同时较短者排在前面
+- 其他类型：使用系统默认的 `IComparable` 比较
+
+#### 稳定性
+
+当所有键均相等时，保持行的原始相对顺序（通过把原始行索引作为最终 tie-breaker 实现）。
+
+#### 示例
+
+```csharp
+// 字符串重载
+record.Sort("salary DESC");
+record.Sort("dept ASC, salary DESC");
+
+// 键集合重载（显式构造）
+record.Sort(new RecordSortKey("dept"), new RecordSortKey("salary", true));
+
+// 元组隐式转换（.NET Standard 2.0+ / .NET 6+）
+record.Sort(("dept", false), ("salary", true));
+```
+
+#### 复杂度
+
+- 比较阶段：O(N log N)，其中每次比较最多遍历所有排序键
+- 重排阶段：O(列数 × N)，各列独立重排底层数组
+- 额外内存：O(N)（行索引数组 + 各列临时重排缓冲区）
+
+#### 异常
+
+| 场景 | 行为 |
+|------|------|
+| `orderBy` 为 null / 空白 | 直接返回，不修改数据 |
+| `keys` 为 null / 空数组 | 直接返回，不修改数据 |
+| 段内 token 数超过 2 | 抛 `FormatException` |
+| 方向关键字不是 ASC / DESC | 抛 `FormatException` |
+| 列名不存在 | 抛 `KeyNotFoundException`（即使表为空或只有一行） |
+| 同一列名出现多次 | 抛 `ArgumentException`（即使表为空或只有一行） |
+
+#### 约束
+
+- 不产生新 `Record`，直接修改当前实例
+- `Count`、`Capacity`、列对象引用均保持不变
+- 不支持表达式排序、`COLLATE`、`NULLS FIRST/LAST` 显式语法或引号标识符
+
+---
+
+### 5.6 分组
 
 当前实现提供：
 
@@ -397,7 +495,7 @@ var groups = record.Group<int, int>("Year", "Month");
   - `Group(string fld)`：缺失列键为 `string.Empty`
   - 元组分组：缺失列对应分量为 `default`
 
-### 5.6 Schema 操作
+### 5.7 Schema 操作
 
 当前实现提供：
 
@@ -416,7 +514,7 @@ var groups = record.Group<int, int>("Year", "Month");
 - `CloneSchema()` 复制表名和列结构，不复制数据，也不复制分页元数据
 - `Clone()` 复制表名、结构、全部行数据和分页元数据
 
-### 5.7 `ToString()`
+### 5.8 `ToString()`
 
 会输出调试友好的文本内容：
 
@@ -625,6 +723,12 @@ RecordSet copy = RecordSet.FromBytes(bytes);
 | `DeleteRows(null)` | 抛 `ArgumentNullException` |
 | `Find(null)` / `FindAll(null)` | 抛 `ArgumentNullException` |
 | `FindByDynamic(null)` / `FindAllByDynamic(null)` | 抛 `ArgumentNullException` |
+| `Sort("")` / `Sort("  ")` | 直接返回，不修改数据 |
+| `Sort("col UPWARD")` 等非法方向 | 抛 `FormatException` |
+| `Sort("col token1 token2")` 段内 token 过多 | 抛 `FormatException` |
+| `Sort("missing ASC")` 列不存在 | 抛 `KeyNotFoundException` |
+| `Sort(Array.Empty<RecordSortKey>())` | 直接返回，不修改数据 |
+| `Sort(new RecordSortKey("col"), new RecordSortKey("col"))` 列名重复 | 抛 `ArgumentException` |
 | `row["Missing"]` | 返回 `null` |
 | `row.To<T>("Missing")` | 返回 `default` |
 | `row["New"] = null` | 不建列，直接忽略 |
