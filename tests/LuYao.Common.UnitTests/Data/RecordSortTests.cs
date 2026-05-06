@@ -364,11 +364,12 @@ public class RecordSortTests
     }
 
     [TestMethod]
-    public void Sort_DuplicateColumn_Throws()
+    public void Sort_DuplicateColumn_IsIgnored()
     {
-        var rec = BuildIntRecord(1, 2);
-        Assert.Throws<ArgumentException>(() =>
-            rec.Sort(new RecordSortKey("Value", false), new RecordSortKey("Value", true)));
+        // 与 SQLite 行为一致：重复列名应被忽略，不抛异常，排序正常进行
+        var rec = BuildIntRecord(3, 1, 2);
+        rec.Sort(new RecordSortKey("Value", false), new RecordSortKey("Value", true));
+        CollectionAssert.AreEqual(new[] { 1, 2, 3 }, GetIntColumn(rec, "Value"));
     }
 
     [TestMethod]
@@ -404,13 +405,13 @@ public class RecordSortTests
     }
 
     [TestMethod]
-    public void Sort_DuplicateColumn_EmptyRecord_Throws()
+    public void Sort_DuplicateColumn_EmptyRecord_IsIgnored()
     {
-        // 即使表为空，重复列名也应立即抛出 ArgumentException
+        // 与 SQLite 行为一致：即使表为空，重复列名也应被忽略，不抛异常
         var rec = new Record("T");
         rec.Columns.Add("Value", typeof(int));
-        Assert.Throws<ArgumentException>(() =>
-            rec.Sort(new RecordSortKey("Value", false), new RecordSortKey("Value", true)));
+        rec.Sort(new RecordSortKey("Value", false), new RecordSortKey("Value", true));
+        Assert.AreEqual(0, rec.Count);
     }
 
     // ── byte[] 列排序 ────────────────────────────────────────────────────────
