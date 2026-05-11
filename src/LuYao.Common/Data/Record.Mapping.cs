@@ -97,7 +97,9 @@ partial class Record
     /// <typeparam name="TKey">键类型，对应第一列的值类型。</typeparam>
     /// <typeparam name="T">值类型，必须有无参构造函数。</typeparam>
     /// <returns>以第一列值为键、行对象为值的字典。</returns>
-    public Dictionary<TKey, T> ToDictionary<TKey, T>() where T : class, new()
+    public Dictionary<TKey, T> ToDictionary<TKey, T>()
+        where TKey : notnull
+        where T : class, new()
     {
         var dict = new Dictionary<TKey, T>();
         if (this.Count == 0 || this.Columns.Count == 0) return dict;
