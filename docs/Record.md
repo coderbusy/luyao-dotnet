@@ -574,6 +574,7 @@ var groups = record.Group<int, int>("Year", "Month");
 - `record.AddRowsFromList<T>(IEnumerable<T> items)`
 - `record.ToList<T>()`
 - `record.To<T>()`
+- `record.ToDictionary<TKey, T>()`
 
 示例：
 
@@ -586,7 +587,10 @@ var record = Record.From(new OrderDto
 
 List<OrderDto> list = record.ToList<OrderDto>();
 OrderDto first = record.To<OrderDto>();
+Dictionary<int, OrderDto> dict = record.ToDictionary<int, OrderDto>();
 ```
+
+`ToDictionary<TKey, T>` 使用第一列的值作为字典键；若存在重复键，则后者覆盖前者。若无行或无列，返回空字典。
 
 ### 6.2 `RecordRow` 级别映射
 

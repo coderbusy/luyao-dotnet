@@ -142,4 +142,60 @@ public class RecordMappingTests
 
         Assert.AreEqual(0, result.Count);
     }
+
+    // ── ToDictionary<TKey, T> ─────────────────────────────────────────────────
+
+    [TestMethod]
+    public void ToDictionary_ShouldMapFirstColumnAsKey()
+    {
+        var list = new List<TestModel>
+        {
+            new TestModel { Id = 1, Name = "Alice" },
+            new TestModel { Id = 2, Name = "Bob" }
+        };
+        var record = Record.FromList(list);
+
+        var dict = record.ToDictionary<int, TestModel>();
+
+        Assert.AreEqual(2,       dict.Count);
+        Assert.AreEqual("Alice", dict[1].Name);
+        Assert.AreEqual("Bob",   dict[2].Name);
+    }
+
+    [TestMethod]
+    public void ToDictionary_WithDuplicateKeys_ShouldUseLastValue()
+    {
+        var list = new List<TestModel>
+        {
+            new TestModel { Id = 1, Name = "First" },
+            new TestModel { Id = 1, Name = "Second" }
+        };
+        var record = Record.FromList(list);
+
+        var dict = record.ToDictionary<int, TestModel>();
+
+        Assert.AreEqual(1,        dict.Count);
+        Assert.AreEqual("Second", dict[1].Name);
+    }
+
+    [TestMethod]
+    public void ToDictionary_WithNoRows_ShouldReturnEmptyDictionary()
+    {
+        var record = new Record();
+        record.Columns.AddFrom<TestModel>();
+
+        var dict = record.ToDictionary<int, TestModel>();
+
+        Assert.AreEqual(0, dict.Count);
+    }
+
+    [TestMethod]
+    public void ToDictionary_WithNoColumns_ShouldReturnEmptyDictionary()
+    {
+        var record = new Record();
+
+        var dict = record.ToDictionary<int, TestModel>();
+
+        Assert.AreEqual(0, dict.Count);
+    }
 }
