@@ -136,6 +136,7 @@
 - `Capacity`
 - `Get(int row)` / `Set(int row, object? value)`
 - `To<T>(int row)`
+- `ToList<T>()`：将整列数据转为 `List<T?>`，长度等于 `Record.Count`；`null` 值对应 `default(T)`
 - `ToString(int row)`：获取指定行列值的字符串表示；`null` 值返回空字符串
 - `Delete(int row)` / `Clear()`
 - `GetValue(int row)` / `SetValue(int row, T value)`（泛型列）
@@ -324,6 +325,7 @@ record.AddRowFromValues(2, "B", "Ignored");
 - `FindAll(Func<RecordRow, bool> filter)`
 - `FindByDynamic(Func<dynamic, bool> filter)`
 - `FindAllByDynamic(Func<dynamic, bool> filter)`
+- `GetList<T>(string colName)`：将指定列的所有值提取为 `List<T?>`，长度等于 `Count`；列不存在时抛 `KeyNotFoundException`，列名为空时抛 `ArgumentException`
 
 行为说明：
 

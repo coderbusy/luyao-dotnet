@@ -147,4 +147,20 @@ public partial class Record
             if (filter(row)) yield return row;
         }
     }
+
+    /// <summary>
+    /// 将指定列的所有数据转换为 <see cref="List{T}"/>，顺序与行索引一致。
+    /// 原值为 null 时对应元素为 <typeparamref name="T"/> 的默认值。
+    /// </summary>
+    /// <typeparam name="T">目标类型。</typeparam>
+    /// <param name="colName">列名称。</param>
+    /// <returns>包含整列数据的列表，长度等于 <see cref="Count"/>。</returns>
+    /// <exception cref="ArgumentException">当 <paramref name="colName"/> 为 null 或空白时抛出。</exception>
+    /// <exception cref="KeyNotFoundException">当指定列名不存在时抛出。</exception>
+    /// <exception cref="InvalidCastException">当某行值无法转换为目标类型时抛出。</exception>
+    public List<T?> GetList<T>(string colName)
+    {
+        if (string.IsNullOrWhiteSpace(colName)) throw new ArgumentException("列名不能为空。", nameof(colName));
+        return this.Columns.Get(colName).ToList<T>();
+    }
 }
