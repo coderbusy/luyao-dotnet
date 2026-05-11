@@ -3,16 +3,16 @@ using System.Diagnostics;
 
 namespace LuYao.Data;
 
-internal class RecordDebuggerTypeProxy
+internal class RecordTableDebuggerTypeProxy
 {
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly Record _record;
+    private readonly RecordTable _table;
 
-    public RecordDebuggerTypeProxy(Record record)
+    public RecordTableDebuggerTypeProxy(RecordTable table)
     {
-        _record = record ?? throw new ArgumentNullException(nameof(record));
+        _table = table ?? throw new ArgumentNullException(nameof(table));
     }
-    public string Name => string.IsNullOrWhiteSpace(_record.Name) ? "None" : _record.Name;
-    public int Count => _record.Count;
-    public string Data => _record.ToString();
+    public string Name => string.IsNullOrWhiteSpace(_table.Name) ? "None" : _table.Name;
+    public int Count => _table.Count;
+    public string Data => _table.ToString();
 }

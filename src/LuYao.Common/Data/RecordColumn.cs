@@ -12,20 +12,20 @@ public abstract class RecordColumn : IXProp
     /// <summary>
     /// 获取关联的记录实例。
     /// </summary>
-    /// <value>包含此列的 <see cref="Record"/> 对象。</value>
-    public Record Record { get; }
+    /// <value>包含此列的 <see cref="RecordTable"/> 对象。</value>
+    public RecordTable Table { get; }
 
     /// <summary>
     /// 创建一个数据列实例。
     /// </summary>
-    /// <param name="record">关联的记录实例。</param>
+    /// <param name="table">关联的记录实例。</param>
     /// <param name="name">列的名称。</param>
     /// <param name="type">列的实际数据类型。</param>
     /// 
-    /// <exception cref="ArgumentNullException">当 <paramref name="record"/>、<paramref name="name"/> 或 <paramref name="type"/> 为 null 时抛出。</exception>
-    internal RecordColumn(Record record, string name, Type type)
+    /// <exception cref="ArgumentNullException">当 <paramref name="table"/>、<paramref name="name"/> 或 <paramref name="type"/> 为 null 时抛出。</exception>
+    internal RecordColumn(RecordTable table, string name, Type type)
     {
-        this.Record = record ?? throw new ArgumentNullException(nameof(record));
+        this.Table = table ?? throw new ArgumentNullException(nameof(table));
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
         this._type = type ?? throw new ArgumentNullException(nameof(type));
         this.ColumnType = Helpers.GetColumnType(type);
@@ -112,11 +112,11 @@ public abstract class RecordColumn : IXProp
 
     internal void OnSet(int row)
     {
-        if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
+        if (row < 0 || row >= this.Table.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Table.Count - 1}]");
     }
     internal void OnGet(int row)
     {
-        if (row < 0 || row >= this.Record.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Record.Count - 1}]");
+        if (row < 0 || row >= this.Table.Count) throw new ArgumentOutOfRangeException(nameof(row), $"行索引 {row} 超出有效范围 [0, {Table.Count - 1}]");
     }
 
     #region To 
@@ -150,11 +150,11 @@ public abstract class RecordColumn : IXProp
     /// 原值为 null 时对应元素为 <typeparamref name="T"/> 的默认值。
     /// </summary>
     /// <typeparam name="T">目标类型。</typeparam>
-    /// <returns>包含整列数据的列表，长度等于 <see cref="Record.Count"/>。</returns>
+    /// <returns>包含整列数据的列表，长度等于 <see cref="RecordTable.Count"/>。</returns>
     /// <exception cref="InvalidCastException">当某行值无法转换为目标类型时抛出。</exception>
     public List<T?> ToList<T>()
     {
-        int count = this.Record.Count;
+        int count = this.Table.Count;
         var list = new List<T?>(count);
         for (int i = 0; i < count; i++)
             list.Add(To<T>(i));

@@ -19,12 +19,12 @@ public class RecordRowMergeTests
     public void Merge_Row_OverwritesExistingColumn()
     {
         // Arrange
-        var r1 = new Record();
+        var r1 = new RecordTable();
         r1.Columns.Add<string>("Name");
         var row1 = r1.AddRow();
         row1["Name"] = "Alice";
 
-        var r2 = new Record();
+        var r2 = new RecordTable();
         r2.Columns.Add<string>("Name");
         var row2 = r2.AddRow();
         row2["Name"] = "Bob";
@@ -43,12 +43,12 @@ public class RecordRowMergeTests
     public void Merge_Row_AppendsNewColumn()
     {
         // Arrange
-        var r1 = new Record();
+        var r1 = new RecordTable();
         r1.Columns.Add<string>("Name");
         var row1 = r1.AddRow();
         row1["Name"] = "Alice";
 
-        var r2 = new Record();
+        var r2 = new RecordTable();
         r2.Columns.Add<int>("Age");
         var row2 = r2.AddRow();
         row2["Age"] = 30;
@@ -68,14 +68,14 @@ public class RecordRowMergeTests
     public void Merge_Row_OverwritesAndAppends()
     {
         // Arrange
-        var r1 = new Record();
+        var r1 = new RecordTable();
         r1.Columns.Add<string>("Name");
         r1.Columns.Add<int>("Score");
         var row1 = r1.AddRow();
         row1["Name"] = "Alice";
         row1["Score"] = 80;
 
-        var r2 = new Record();
+        var r2 = new RecordTable();
         r2.Columns.Add<string>("Name");
         r2.Columns.Add<string>("City");
         var row2 = r2.AddRow();
@@ -98,12 +98,12 @@ public class RecordRowMergeTests
     public void Merge_Row_EmptySource_NoChange()
     {
         // Arrange
-        var r1 = new Record();
+        var r1 = new RecordTable();
         r1.Columns.Add<string>("Name");
         var row1 = r1.AddRow();
         row1["Name"] = "Alice";
 
-        var r2 = new Record();
+        var r2 = new RecordTable();
         var row2 = r2.AddRow();
 
         // Act
@@ -131,7 +131,7 @@ public class RecordRowMergeTests
     public void Merge_Model_OverwritesExistingColumn()
     {
         // Arrange
-        var r1 = new Record();
+        var r1 = new RecordTable();
         r1.Columns.Add<string>("Name");
         var row1 = r1.AddRow();
         row1["Name"] = "Alice";
@@ -150,7 +150,7 @@ public class RecordRowMergeTests
     public void Merge_Model_AppendsNewColumn()
     {
         // Arrange
-        var r1 = new Record();
+        var r1 = new RecordTable();
         r1.Columns.Add<string>("Name");
         var row1 = r1.AddRow();
         row1["Name"] = "Alice";
@@ -169,7 +169,7 @@ public class RecordRowMergeTests
     public void Merge_Model_NullModel_Throws()
     {
         // Arrange
-        var r1 = new Record();
+        var r1 = new RecordTable();
         var row1 = r1.AddRow();
 
         // Act & Assert

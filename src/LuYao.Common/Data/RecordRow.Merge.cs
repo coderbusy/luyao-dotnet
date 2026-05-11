@@ -8,16 +8,16 @@ partial struct RecordRow
     /// <summary>
     /// 将另一行 <paramref name="other"/> 的数据合并到当前行：同名列直接覆盖，当前行不存在的列则追加。
     /// </summary>
-    /// <param name="other">数据来源行，可来自不同的 <see cref="Record"/>。</param>
+    /// <param name="other">数据来源行，可来自不同的 <see cref="RecordTable"/>。</param>
     public void Merge(RecordRow other)
     {
-        foreach (var srcCol in other.Record.Columns)
+        foreach (var srcCol in other.Table.Columns)
         {
             var value = srcCol.Get(other);
-            var dstCol = this.Record.Columns.Find(srcCol.Name);
+            var dstCol = this.Table.Columns.Find(srcCol.Name);
             if (dstCol == null)
             {
-                dstCol = this.Record.Columns.Add(srcCol.Name, srcCol.Type);
+                dstCol = this.Table.Columns.Add(srcCol.Name, srcCol.Type);
             }
             dstCol.Set(this, value);
         }
@@ -38,10 +38,10 @@ partial struct RecordRow
             if (!prop.CanRead) continue;
             if (!Helpers.IsSupportedForReading(prop)) continue;
             var value = prop.GetValue(model);
-            var col = this.Record.Columns.Find(prop.Name);
+            var col = this.Table.Columns.Find(prop.Name);
             if (col == null)
             {
-                col = this.Record.Columns.Add(prop.Name, prop.Type);
+                col = this.Table.Columns.Add(prop.Name, prop.Type);
             }
             col.Set(this, value);
         }

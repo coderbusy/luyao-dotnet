@@ -4,25 +4,25 @@ using System.Collections.Generic;
 
 namespace LuYao.Data;
 
-partial class Record
+partial class RecordTable
 {
     /// <summary>
-    /// 根据单个对象创建一个 <see cref="Record"/>，自动推断列结构并写入一行数据。
+    /// 根据单个对象创建一个 <see cref="RecordTable"/>，自动推断列结构并写入一行数据。
     /// </summary>
     /// <typeparam name="T">数据来源的对象类型。</typeparam>
     /// <param name="data">用于初始化列结构和行数据的对象实例。</param>
-    /// <returns>包含一行数据的新 <see cref="Record"/>。</returns>
-    public static Record From<T>(T data) where T : class
+    /// <returns>包含一行数据的新 <see cref="RecordTable"/>。</returns>
+    public static RecordTable From<T>(T data) where T : class
     {
-        var re = new Record();
+        var re = new RecordTable();
         re.Columns.AddFrom<T>();
         re.AddRowFrom(data);
         return re;
     }
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 的第一行转换为 <typeparamref name="T"/> 对象。
-    /// 如果 <see cref="Record"/> 没有任何行，则返回一个使用无参构造函数创建的默认实例。
+    /// 将当前 <see cref="RecordTable"/> 的第一行转换为 <typeparamref name="T"/> 对象。
+    /// 如果 <see cref="RecordTable"/> 没有任何行，则返回一个使用无参构造函数创建的默认实例。
     /// </summary>
     /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
     /// <returns>转换后的对象实例。</returns>
@@ -37,21 +37,21 @@ partial class Record
     }
 
     /// <summary>
-    /// 根据对象集合创建一个 <see cref="Record"/>，自动推断列结构并将每个对象写入一行。
+    /// 根据对象集合创建一个 <see cref="RecordTable"/>，自动推断列结构并将每个对象写入一行。
     /// </summary>
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
     /// <param name="items">用于填充行数据的对象集合。</param>
-    /// <returns>包含与集合等量行数据的新 <see cref="Record"/>。</returns>
-    public static Record FromList<T>(IEnumerable<T> items) where T : class
+    /// <returns>包含与集合等量行数据的新 <see cref="RecordTable"/>。</returns>
+    public static RecordTable FromList<T>(IEnumerable<T> items) where T : class
     {
-        var re = new Record();
+        var re = new RecordTable();
         re.Columns.AddFrom<T>();
         re.AddRowsFromList(items);
         return re;
     }
 
     /// <summary>
-    /// 向当前 <see cref="Record"/> 追加一行，并将 <paramref name="item"/> 的属性值写入该行。
+    /// 向当前 <see cref="RecordTable"/> 追加一行，并将 <paramref name="item"/> 的属性值写入该行。
     /// </summary>
     /// <typeparam name="T">数据来源的对象类型。</typeparam>
     /// <param name="item">要追加的对象实例，不能为 <see langword="null"/>。</param>
@@ -65,7 +65,7 @@ partial class Record
     }
 
     /// <summary>
-    /// 向当前 <see cref="Record"/> 批量追加行，每个 <paramref name="items"/> 元素对应一行。
+    /// 向当前 <see cref="RecordTable"/> 批量追加行，每个 <paramref name="items"/> 元素对应一行。
     /// </summary>
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
     /// <param name="items">要批量追加的对象集合。</param>
@@ -75,7 +75,7 @@ partial class Record
     }
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 的所有行转换为 <typeparamref name="T"/> 对象列表。
+    /// 将当前 <see cref="RecordTable"/> 的所有行转换为 <typeparamref name="T"/> 对象列表。
     /// </summary>
     /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
     /// <returns>与行数等量的对象列表。</returns>
@@ -91,7 +91,7 @@ partial class Record
     }
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 转换为以第一列为键的字典。
+    /// 将当前 <see cref="RecordTable"/> 转换为以第一列为键的字典。
     /// 如果没有行或没有列，则返回空字典；键重复时后者覆盖前者。
     /// </summary>
     /// <typeparam name="TKey">键类型，对应第一列的值类型。</typeparam>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +18,7 @@ public class HelperTests
     public void MakeRecordColumn_ShouldCreateRecordColumnOfType()
     {
         // Arrange
-        var record = new Record();
+        var record = new RecordTable();
         string name = "TestColumn";
         Type type = typeof(int);
         // Act
@@ -33,7 +33,7 @@ public class HelperTests
     [TestMethod]
     public void MakeRecordColumn_UnsupportedType_ShouldThrow()
     {
-        var record = new Record();
+        var record = new RecordTable();
         Assert.Throws<NotSupportedException>(() => Helpers.MakeRecordColumn(record, "Test", typeof(Foo)));
     }
 }

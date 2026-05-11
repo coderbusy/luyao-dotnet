@@ -9,20 +9,20 @@ namespace LuYao.Data;
 /// 测试 <see cref="RecordRow"/> 的构造、字段访问、赋值与 dynamic 行为。
 /// </summary>
 [TestClass]
-public class RecordRowTests
+public class RecordTableRowTests
 {
     /// <summary>
     /// 创建包含整型、字符串和布尔列的测试记录。
     /// </summary>
-    private (Record record, RecordColumn<int> intColumn, RecordColumn<string> stringColumn, RecordColumn<bool> boolColumn) CreateTestRecord()
+    private (RecordTable table, RecordColumn<int> intColumn, RecordColumn<string> stringColumn, RecordColumn<bool> boolColumn) CreateTestRecord()
     {
-        var record = new Record("TestTable", 5);
-        var intColumn = record.Columns.Add<int>("IntColumn");
-        var stringColumn = record.Columns.Add<string>("StringColumn");
-        var boolColumn = record.Columns.Add<bool>("BoolColumn");
+        var table = new RecordTable("TestTable", 5);
+        var intColumn = table.Columns.Add<int>("IntColumn");
+        var stringColumn = table.Columns.Add<string>("StringColumn");
+        var boolColumn = table.Columns.Add<bool>("BoolColumn");
 
-        var row1 = record.AddRow();
-        var row2 = record.AddRow();
+        var row1 = table.AddRow();
+        var row2 = table.AddRow();
 
         intColumn.SetValue(0, 100);
         intColumn.SetValue(1, 200);
@@ -31,7 +31,7 @@ public class RecordRowTests
         boolColumn.SetValue(0, true);
         boolColumn.SetValue(1, false);
 
-        return (record, intColumn, stringColumn, boolColumn);
+        return (table, intColumn, stringColumn, boolColumn);
     }
 
 
@@ -42,13 +42,13 @@ public class RecordRowTests
     public void Constructor_ValidParameters_ShouldInitializeCorrectly()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
+        var (table, _, _, _) = CreateTestRecord();
 
         // Act
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Assert
-        Assert.AreEqual(record, recordRow.Record);
+        Assert.AreEqual(table, recordRow.Table);
         Assert.AreEqual(0, recordRow.Row);
     }
 
@@ -69,10 +69,10 @@ public class RecordRowTests
     public void Constructor_NegativeRowIndex_ShouldThrowArgumentOutOfRangeException()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
+        var (table, _, _, _) = CreateTestRecord();
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(table, -1));
     }
 
     /// <summary>
@@ -82,11 +82,11 @@ public class RecordRowTests
     public void Constructor_RowIndexOutOfRange_ShouldThrowArgumentOutOfRangeException()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
+        var (table, _, _, _) = CreateTestRecord();
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count));
-        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count + 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(table, table.Count));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(table, table.Count + 1));
     }
 
 
@@ -98,14 +98,14 @@ public class RecordRowTests
     public void Record_Property_ShouldReturnCorrectRecord()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
-        var result = recordRow.Record;
+        var result = recordRow.Table;
 
         // Assert
-        Assert.AreEqual(record, result);
+        Assert.AreEqual(table, result);
     }
 
     /// <summary>
@@ -115,8 +115,8 @@ public class RecordRowTests
     public void Row_Property_ShouldReturnCorrectRowIndex()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.Row;
@@ -134,8 +134,8 @@ public class RecordRowTests
     public void ImplicitConversion_ToInt_ShouldReturnRowIndex()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         int rowIndex = recordRow;
@@ -153,8 +153,8 @@ public class RecordRowTests
     public void GetBoolean_ByName_ColumnExists_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, _, _, boolColumn) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, boolColumn) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<bool>("BoolColumn");
@@ -170,8 +170,8 @@ public class RecordRowTests
     public void GetBoolean_ByName_ColumnNotExists_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<bool>("NonExistentColumn");
@@ -187,8 +187,8 @@ public class RecordRowTests
     public void GetString_ByName_ColumnExists_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.To<string>("StringColumn");
@@ -204,8 +204,8 @@ public class RecordRowTests
     public void GetString_ByName_ColumnNotExists_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<string>("NonExistentColumn");
@@ -221,8 +221,8 @@ public class RecordRowTests
     public void GetInt32_ByName_ColumnExists_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.To<int>("IntColumn");
@@ -238,8 +238,8 @@ public class RecordRowTests
     public void GetInt32_ByName_ColumnNotExists_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<int>("NonExistentColumn");
@@ -255,8 +255,8 @@ public class RecordRowTests
     public void GetGeneric_ByName_ColumnExists_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<int>("IntColumn");
@@ -272,8 +272,8 @@ public class RecordRowTests
     public void GetGeneric_ByName_ColumnNotExists_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<int>("NonExistentColumn");
@@ -289,11 +289,11 @@ public class RecordRowTests
     public void GetByte_ByName_ShouldWork()
     {
         // Arrange
-        var record = new Record("TestTable", 1);
-        var byteColumn = record.Columns.Add<byte>("ByteColumn");
-        var row = record.AddRow();
+        var table = new RecordTable("TestTable", 1);
+        var byteColumn = table.Columns.Add<byte>("ByteColumn");
+        var row = table.AddRow();
         byteColumn.Set(row.Row, 255);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<byte>("ByteColumn");
@@ -309,11 +309,11 @@ public class RecordRowTests
     public void GetDouble_ByName_ShouldWork()
     {
         // Arrange
-        var record = new Record("TestTable", 1);
-        var doubleColumn = record.Columns.Add<double>("DoubleColumn");
-        var row = record.AddRow();
+        var table = new RecordTable("TestTable", 1);
+        var doubleColumn = table.Columns.Add<double>("DoubleColumn");
+        var row = table.AddRow();
         doubleColumn.Set(row.Row, 3.14159);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<double>("DoubleColumn");
@@ -329,12 +329,12 @@ public class RecordRowTests
     public void GetDateTime_ByName_ShouldWork()
     {
         // Arrange
-        var record = new Record("TestTable", 1);
-        var dateTimeColumn = record.Columns.Add<DateTime>("DateTimeColumn");
+        var table = new RecordTable("TestTable", 1);
+        var dateTimeColumn = table.Columns.Add<DateTime>("DateTimeColumn");
         var testDate = new DateTime(2023, 8, 15, 14, 30, 0);
-        var row = record.AddRow();
+        var row = table.AddRow();
         dateTimeColumn.Set(row.Row, testDate);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<DateTime>("DateTimeColumn");
@@ -352,8 +352,8 @@ public class RecordRowTests
     public void GetMethods_EmptyColumnName_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act & Assert
         Assert.AreEqual(default(int), recordRow.To<int>(""));
@@ -368,16 +368,16 @@ public class RecordRowTests
     public void GetMethods_MultipleRows_ShouldReturnCorrectValues()
     {
         // Arrange
-        var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
+        var (table, intColumn, stringColumn, boolColumn) = CreateTestRecord();
 
-        var row3 = record.AddRow();
+        var row3 = table.AddRow();
         intColumn.Set(row3.Row, 300);
         stringColumn.Set(row3.Row, "Test3");
         boolColumn.Set(row3.Row, true);
 
-        var recordRow0 = new RecordRow(record, 0);
-        var recordRow1 = new RecordRow(record, 1);
-        var recordRow2 = new RecordRow(record, 2);
+        var recordRow0 = new RecordRow(table, 0);
+        var recordRow1 = new RecordRow(table, 1);
+        var recordRow2 = new RecordRow(table, 2);
 
         // Act & Assert
         Assert.AreEqual(100, recordRow0.To<int>("IntColumn"));
@@ -402,8 +402,8 @@ public class RecordRowTests
     public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result1 = recordRow.To<int>("IntColumn");
@@ -423,8 +423,8 @@ public class RecordRowTests
     public void Set_TypedColumn_ShouldUpdateValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         recordRow["IntColumn"] = 999;
@@ -440,8 +440,8 @@ public class RecordRowTests
     public void Set_StringColumn_ShouldUpdateValue()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         recordRow["StringColumn"] = "NewValue";
@@ -457,16 +457,16 @@ public class RecordRowTests
     public void Set_ColumnNotExists_ShouldAutoCreateColumn()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-        int beforeCount = record.Columns.Count;
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
+        int beforeCount = table.Columns.Count;
 
         // Act
         recordRow["NewColumn"] = 12345;
 
         // Assert
-        Assert.AreEqual(beforeCount + 1, record.Columns.Count);
-        var col = record.Columns.Find("NewColumn");
+        Assert.AreEqual(beforeCount + 1, table.Columns.Count);
+        var col = table.Columns.Find("NewColumn");
         Assert.IsNotNull(col);
         Assert.AreEqual(typeof(int), col.Type);
         Assert.AreEqual(12345, recordRow.To<int>("NewColumn"));
@@ -479,8 +479,8 @@ public class RecordRowTests
     public void Set_ThenReadViaIndexer_ShouldBeConsistent()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         recordRow["IntColumn"] = 42;
@@ -498,8 +498,8 @@ public class RecordRowTests
     public void Dynamic_GetMember_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act
         var result = row.StringColumn;
@@ -515,14 +515,14 @@ public class RecordRowTests
     public void Dynamic_SetMember_ShouldUpdateValue()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act
         row.StringColumn = "DynValue";
 
         // Assert
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
         Assert.AreEqual("DynValue", recordRow.To<string>("StringColumn"));
     }
 
@@ -533,8 +533,8 @@ public class RecordRowTests
     public void Dynamic_GetIndex_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 1);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 1);
 
         // Act - dynamic 索引读取
         var result = row["IntColumn"];
@@ -550,14 +550,14 @@ public class RecordRowTests
     public void Dynamic_SetIndex_ShouldUpdateValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act - dynamic 索引写入
         row["IntColumn"] = 777;
 
         // Assert
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
         Assert.AreEqual(777, recordRow.To<int>("IntColumn"));
     }
 
@@ -568,8 +568,8 @@ public class RecordRowTests
     public void Dynamic_GetMember_ColumnNotExists_ShouldReturnNull()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act
         var result = row.NoSuchColumn;
@@ -585,8 +585,8 @@ public class RecordRowTests
     public void Dynamic_SetMember_ColumnNotExists_ShouldNotThrow()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act & Assert
         row.NoSuchColumn = "ignored"; // should not throw
@@ -599,9 +599,9 @@ public class RecordRowTests
     public void Dynamic_GetMember_ShouldBeConsistentWithGetMethod()
     {
         // Arrange
-        var (record, intColumn, _, boolColumn) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
-        var recordRow = new RecordRow(record, 0);
+        var (table, intColumn, _, boolColumn) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act & Assert
         Assert.AreEqual(recordRow.To<int>("IntColumn"), (int)row.IntColumn!);
@@ -615,8 +615,8 @@ public class RecordRowTests
     public void FieldObject_ByName_ColumnExists_ShouldReturnValue()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow["IntColumn"];
@@ -633,8 +633,8 @@ public class RecordRowTests
     public void FieldObject_ByName_ColumnNotExists_ShouldReturnNull()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow["NonExistentColumn"];
@@ -650,8 +650,8 @@ public class RecordRowTests
     public void ToDictionary_ShouldReturnAllColumnsWithCurrentRowValues()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.ToDictionary();
@@ -670,11 +670,11 @@ public class RecordRowTests
     public void ToDictionary_WhenColumnValueIsNull_ShouldKeepNullValue()
     {
         // Arrange
-        var record = new Record("TestTable", 2);
-        var nullableColumn = record.Columns.Add<string>("NullableColumn");
-        record.AddRow();
+        var table = new RecordTable("TestTable", 2);
+        var nullableColumn = table.Columns.Add<string>("NullableColumn");
+        table.AddRow();
         nullableColumn.SetValue(0, null!);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToDictionary();
@@ -692,8 +692,8 @@ public class RecordRowTests
     public void ToString_ShouldContainRowAndDictionaryLikeValues()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.ToString();
@@ -709,11 +709,11 @@ public class RecordRowTests
     public void ToString_WhenValueIsNull_ShouldRenderEmptyValue()
     {
         // Arrange
-        var record = new Record("TestTable", 2);
-        var nullableColumn = record.Columns.Add<string>("NullableColumn");
-        record.AddRow();
+        var table = new RecordTable("TestTable", 2);
+        var nullableColumn = table.Columns.Add<string>("NullableColumn");
+        table.AddRow();
         nullableColumn.SetValue(0, null!);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString();
@@ -729,8 +729,8 @@ public class RecordRowTests
     public void ToString_ByName_ColumnExistsWithValue_ShouldReturnStringRepresentation()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("StringColumn");
@@ -746,8 +746,8 @@ public class RecordRowTests
     public void ToString_ByName_NullColumnName_ShouldReturnEmptyString()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString(null!);
@@ -763,8 +763,8 @@ public class RecordRowTests
     public void ToString_ByName_EmptyColumnName_ShouldReturnEmptyString()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("");
@@ -780,8 +780,8 @@ public class RecordRowTests
     public void ToString_ByName_WhitespaceColumnName_ShouldReturnEmptyString()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("   ");
@@ -797,8 +797,8 @@ public class RecordRowTests
     public void ToString_ByName_ColumnNotExists_ShouldReturnEmptyString()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("NonExistentColumn");
@@ -814,11 +814,11 @@ public class RecordRowTests
     public void ToString_ByName_ColumnExistsWithNullValue_ShouldReturnEmptyString()
     {
         // Arrange
-        var record = new Record("TestTable", 1);
-        var nullableColumn = record.Columns.Add<string>("NullableColumn");
-        record.AddRow();
+        var table = new RecordTable("TestTable", 1);
+        var nullableColumn = table.Columns.Add<string>("NullableColumn");
+        table.AddRow();
         nullableColumn.SetValue(0, null!);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("NullableColumn");
@@ -834,8 +834,8 @@ public class RecordRowTests
     public void ToString_ByName_IntColumnExists_ShouldReturnStringRepresentation()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.ToString("IntColumn");
@@ -851,8 +851,8 @@ public class RecordRowTests
     public void ToString_ByName_BoolColumnExists_ShouldReturnStringRepresentation()
     {
         // Arrange
-        var (record, _, _, boolColumn) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, boolColumn) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("BoolColumn");

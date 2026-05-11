@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LuYao.Data;
 
-public partial class Record
+public partial class RecordTable
 {
     /// <summary>
     /// 用 <paramref name="source"/> 的数据补全当前记录：对每一行，在 <paramref name="source"/> 中查找与
@@ -14,7 +14,7 @@ public partial class Record
     /// <param name="sharedColumn">两个记录中同名的关联列名。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="source"/> 或 <paramref name="sharedColumn"/> 为 null 时抛出。</exception>
     /// <exception cref="ArgumentException">当 <paramref name="sharedColumn"/> 在当前记录或 <paramref name="source"/> 中不存在时抛出。</exception>
-    public void Enrich(Record source, string sharedColumn)
+    public void Enrich(RecordTable source, string sharedColumn)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (sharedColumn == null) throw new ArgumentNullException(nameof(sharedColumn));
@@ -32,7 +32,7 @@ public partial class Record
     /// <param name="sourceColumn"><paramref name="source"/> 中用于匹配的列名。</param>
     /// <exception cref="ArgumentNullException">当任意参数为 null 时抛出。</exception>
     /// <exception cref="ArgumentException">当关联列在对应记录中不存在时抛出。</exception>
-    public void Enrich(Record source, string selfColumn, string sourceColumn)
+    public void Enrich(RecordTable source, string selfColumn, string sourceColumn)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (selfColumn == null) throw new ArgumentNullException(nameof(selfColumn));
@@ -54,7 +54,7 @@ public partial class Record
     /// <param name="columnsToEnrich">需要从 <paramref name="source"/> 补充的列名集合；为 null 时补充全部不存在的列。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="source"/>、<paramref name="selfColumn"/> 或 <paramref name="sourceColumn"/> 为 null 时抛出。</exception>
     /// <exception cref="ArgumentException">当关联列在对应记录中不存在时抛出。</exception>
-    public void Enrich(Record source, string selfColumn, string sourceColumn, IReadOnlyList<string>? columnsToEnrich)
+    public void Enrich(RecordTable source, string selfColumn, string sourceColumn, IReadOnlyList<string>? columnsToEnrich)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (selfColumn == null) throw new ArgumentNullException(nameof(selfColumn));
@@ -90,7 +90,7 @@ public partial class Record
 
     // 收集来源记录中需要补充的列（已存在于当前记录的列跳过；受 columnsToEnrich 过滤）
     private List<RecordColumn> BuildEnrichColumns(
-        Record source, string sourceKeyColumn, IReadOnlyList<string>? columnsToEnrich)
+        RecordTable source, string sourceKeyColumn, IReadOnlyList<string>? columnsToEnrich)
     {
         var result = new List<RecordColumn>();
         foreach (var col in source.Columns)
