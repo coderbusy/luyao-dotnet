@@ -4,13 +4,13 @@ using System.Text;
 
 namespace LuYao.Data;
 
-public partial class Record
+public partial class RecordTable
 {
     // 二进制格式版本号，用于未来兼容性检查
     private const byte BinaryFormatVersion = 1;
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 写入二进制流。
+    /// 将当前 <see cref="RecordTable"/> 写入二进制流。
     /// </summary>
     /// <param name="stream">目标流。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="stream"/> 为 null 时抛出。</exception>
@@ -22,7 +22,7 @@ public partial class Record
     }
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 写入 <see cref="BinaryWriter"/>。
+    /// 将当前 <see cref="RecordTable"/> 写入 <see cref="BinaryWriter"/>。
     /// </summary>
     /// <param name="writer">目标写入器。</param>
     public void WriteTo(BinaryWriter writer)
@@ -30,7 +30,7 @@ public partial class Record
         if (writer == null) throw new ArgumentNullException(nameof(writer));
 
         // Header
-        BinaryPayloadHeader.Write(writer, BinaryPayloadType.Record);
+        BinaryPayloadHeader.Write(writer, BinaryPayloadType.RecordTable);
         writer.Write(BinaryFormatVersion);
         writer.Write(this.Name ?? string.Empty);
         writer.Write(this.Page);
@@ -59,7 +59,7 @@ public partial class Record
     }
 
     /// <summary>
-    /// 从二进制流读取并填充当前 <see cref="Record"/> 实例。
+    /// 从二进制流读取并填充当前 <see cref="RecordTable"/> 实例。
     /// </summary>
     /// <param name="stream">源流。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="stream"/> 为 null 时抛出。</exception>
@@ -71,7 +71,7 @@ public partial class Record
     }
 
     /// <summary>
-    /// 从 <see cref="BinaryReader"/> 读取并填充当前 <see cref="Record"/> 实例。
+    /// 从 <see cref="BinaryReader"/> 读取并填充当前 <see cref="RecordTable"/> 实例。
     /// </summary>
     /// <param name="reader">源读取器。</param>
     public void ReadFrom(BinaryReader reader)
@@ -79,7 +79,7 @@ public partial class Record
         if (reader == null) throw new ArgumentNullException(nameof(reader));
 
         // Header
-        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.Record);
+        byte version = BinaryPayloadHeader.ReadHeaderAndVersion(reader, BinaryPayloadType.RecordTable);
         if (version != BinaryFormatVersion)
             throw new InvalidOperationException($"不支持的二进制格式版本: {version}");
 
@@ -117,15 +117,15 @@ public partial class Record
     }
 
     /// <summary>
-    /// 从二进制流创建新的 <see cref="Record"/> 实例。
+    /// 从二进制流创建新的 <see cref="RecordTable"/> 实例。
     /// </summary>
     /// <param name="stream">源流。</param>
-    /// <returns>反序列化的 <see cref="Record"/> 实例。</returns>
-    public static Record FromStream(Stream stream)
+    /// <returns>反序列化的 <see cref="RecordTable"/> 实例。</returns>
+    public static RecordTable FromStream(Stream stream)
     {
-        var record = new Record();
-        record.ReadFrom(stream);
-        return record;
+        var table = new RecordTable();
+        table.ReadFrom(stream);
+        return table;
     }
 
     /// <summary>
@@ -143,8 +143,8 @@ public partial class Record
     /// 从字节数组反序列化。
     /// </summary>
     /// <param name="data">二进制数据。</param>
-    /// <returns>反序列化的 <see cref="Record"/> 实例。</returns>
-    public static Record FromBytes(byte[] data)
+    /// <returns>反序列化的 <see cref="RecordTable"/> 实例。</returns>
+    public static RecordTable FromBytes(byte[] data)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         using var ms = new MemoryStream(data, writable: false);
@@ -152,15 +152,15 @@ public partial class Record
     }
 
     /// <summary>
-    /// 检测二进制数据是否为带类型头的 <see cref="Record"/>。
+    /// 检测二进制数据是否为带类型头的 <see cref="RecordTable"/>。
     /// </summary>
     /// <param name="data">二进制数据。</param>
-    /// <returns>当数据包含 <see cref="Record"/> 类型头时返回 true；否则返回 false。</returns>
+    /// <returns>当数据包含 <see cref="RecordTable"/> 类型头时返回 true；否则返回 false。</returns>
     public static bool IsBinaryPayload(byte[] data)
     {
         if (data == null) return false;
         return BinaryPayloadHeader.TryGetPayloadType(data, out var payloadType)
-            && payloadType == BinaryPayloadType.Record;
+            && payloadType == BinaryPayloadType.RecordTable;
     }
 
     #region 列数据序列化

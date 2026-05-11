@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 namespace LuYao.Data;
@@ -11,17 +11,17 @@ public class RecordBoundaryTests
     [TestMethod]
     public void WhenAddingManyRowsThenCapacityGrowsEfficiently()
     {
-        var record = new Record("Big", 0);
-        var col = record.Columns.Add<int>("Id");
+        var table = new RecordTable("Big", 0);
+        var col = table.Columns.Add<int>("Id");
 
         const int rowCount = 10000;
         for (int i = 0; i < rowCount; i++)
         {
-            var row = record.AddRow();
+            var row = table.AddRow();
             col.SetValue(row.Row, i);
         }
 
-        Assert.AreEqual(rowCount, record.Count);
+        Assert.AreEqual(rowCount, table.Count);
         // Verify data integrity at boundaries
         Assert.AreEqual(0, col.To<int>(0));
         Assert.AreEqual(rowCount - 1, col.To<int>(rowCount - 1));
@@ -35,47 +35,47 @@ public class RecordBoundaryTests
     [TestMethod]
     public void WhenDeleteThenEnumerationIsConsistent()
     {
-        var record = new Record("Test", 5);
-        var idCol = record.Columns.Add<int>("Id");
+        var table = new RecordTable("Test", 5);
+        var idCol = table.Columns.Add<int>("Id");
 
         for (int i = 0; i < 5; i++)
         {
-            var row = record.AddRow();
+            var row = table.AddRow();
             idCol.Set(row.Row, i * 10);
         }
 
         // Delete middle row (index 2, value 20)
-        record.Delete(2);
+        table.Delete(2);
 
-        Assert.AreEqual(4, record.Count);
-        var values = record.Select(r => r.To<int>("Id")).ToArray();
+        Assert.AreEqual(4, table.Count);
+        var values = table.Select(r => r.To<int>("Id")).ToArray();
         CollectionAssert.AreEqual(new[] { 0, 10, 30, 40 }, values);
     }
 
     [TestMethod]
     public void WhenDeleteThenAddRowThenDataIsCorrect()
     {
-        var record = new Record("Test", 3);
-        var idCol = record.Columns.Add<int>("Id");
-        var nameCol = record.Columns.Add<string>("Name");
+        var table = new RecordTable("Test", 3);
+        var idCol = table.Columns.Add<int>("Id");
+        var nameCol = table.Columns.Add<string>("Name");
 
         for (int i = 0; i < 3; i++)
         {
-            var row = record.AddRow();
+            var row = table.AddRow();
             idCol.SetValue(row.Row, i);
             nameCol.SetValue(row.Row, $"Item{i}");
         }
 
         // Delete row 1
-        record.Delete(1);
-        Assert.AreEqual(2, record.Count);
+        table.Delete(1);
+        Assert.AreEqual(2, table.Count);
 
         // Add a new row
-        var newRow = record.AddRow();
+        var newRow = table.AddRow();
         idCol.SetValue(newRow.Row, 99);
         nameCol.SetValue(newRow.Row, "New");
 
-        Assert.AreEqual(3, record.Count);
+        Assert.AreEqual(3, table.Count);
         Assert.AreEqual(99, idCol.To<int>(2));
         Assert.AreEqual("New", nameCol.To<string>(2));
     }
@@ -87,77 +87,77 @@ public class RecordBoundaryTests
     [TestMethod]
     public void WhenDeleteWhereThenMatchingRowsRemoved()
     {
-        var record = new Record("Test", 5);
-        var idCol = record.Columns.Add<int>("Id");
+        var table = new RecordTable("Test", 5);
+        var idCol = table.Columns.Add<int>("Id");
 
         for (int i = 0; i < 5; i++)
         {
-            var row = record.AddRow();
+            var row = table.AddRow();
             idCol.Set(row.Row, i);
         }
 
-        int deleted = record.DeleteWhere(r => r.To<int>("Id") % 2 == 0);
+        int deleted = table.DeleteWhere(r => r.To<int>("Id") % 2 == 0);
 
         Assert.AreEqual(3, deleted);
-        Assert.AreEqual(2, record.Count);
-        var remaining = record.Select(r => r.To<int>("Id")).ToArray();
+        Assert.AreEqual(2, table.Count);
+        var remaining = table.Select(r => r.To<int>("Id")).ToArray();
         CollectionAssert.AreEqual(new[] { 1, 3 }, remaining);
     }
 
     [TestMethod]
     public void WhenDeleteRowsWithIndicesThenCorrectRowsRemoved()
     {
-        var record = new Record("Test", 5);
-        var idCol = record.Columns.Add<int>("Id");
+        var table = new RecordTable("Test", 5);
+        var idCol = table.Columns.Add<int>("Id");
 
         for (int i = 0; i < 5; i++)
         {
-            var row = record.AddRow();
+            var row = table.AddRow();
             idCol.Set(row.Row, i * 10);
         }
 
-        int deleted = record.DeleteRows(new[] { 0, 2, 4 });
+        int deleted = table.DeleteRows(new[] { 0, 2, 4 });
 
         Assert.AreEqual(3, deleted);
-        Assert.AreEqual(2, record.Count);
-        var remaining = record.Select(r => r.To<int>("Id")).ToArray();
+        Assert.AreEqual(2, table.Count);
+        var remaining = table.Select(r => r.To<int>("Id")).ToArray();
         CollectionAssert.AreEqual(new[] { 10, 30 }, remaining);
     }
 
     [TestMethod]
     public void WhenDeleteRowsWithDuplicateIndicesThenDeduplicates()
     {
-        var record = new Record("Test", 3);
-        var idCol = record.Columns.Add<int>("Id");
+        var table = new RecordTable("Test", 3);
+        var idCol = table.Columns.Add<int>("Id");
 
         for (int i = 0; i < 3; i++)
         {
-            var row = record.AddRow();
+            var row = table.AddRow();
             idCol.SetValue(row.Row, i);
         }
 
-        int deleted = record.DeleteRows(new[] { 1, 1, 1 });
+        int deleted = table.DeleteRows(new[] { 1, 1, 1 });
 
         Assert.AreEqual(1, deleted);
-        Assert.AreEqual(2, record.Count);
+        Assert.AreEqual(2, table.Count);
     }
 
     [TestMethod]
     public void WhenDeleteWhereNoMatchThenNothingDeleted()
     {
-        var record = new Record("Test", 3);
-        var idCol = record.Columns.Add<int>("Id");
+        var table = new RecordTable("Test", 3);
+        var idCol = table.Columns.Add<int>("Id");
 
         for (int i = 0; i < 3; i++)
         {
-            var row = record.AddRow();
+            var row = table.AddRow();
             idCol.Set(row.Row, i);
         }
 
-        int deleted = record.DeleteWhere(r => r.To<int>("Id") > 100);
+        int deleted = table.DeleteWhere(r => r.To<int>("Id") > 100);
 
         Assert.AreEqual(0, deleted);
-        Assert.AreEqual(3, record.Count);
+        Assert.AreEqual(3, table.Count);
     }
 
     #endregion
@@ -167,11 +167,11 @@ public class RecordBoundaryTests
     [TestMethod]
     public void WhenRecordRowSetGenericThenValueSetCorrectly()
     {
-        var record = new Record("Test", 1);
-        record.Columns.Add<int>("Id");
-        record.Columns.Add<string>("Name");
+        var table = new RecordTable("Test", 1);
+        table.Columns.Add<int>("Id");
+        table.Columns.Add<string>("Name");
 
-        var row = record.AddRow();
+        var row = table.AddRow();
         row["Id"] = 42;
         row["Name"] = "Test";
 

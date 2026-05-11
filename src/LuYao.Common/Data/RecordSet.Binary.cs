@@ -63,9 +63,9 @@ public partial class RecordSet
         int count = reader.ReadInt32();
         for (int i = 0; i < count; i++)
         {
-            var record = new Record();
-            record.ReadFrom(reader);
-            this.Add(record.Name, record);
+            var table = new RecordTable();
+            table.ReadFrom(reader);
+            this.Add(table.Name, table);
         }
     }
 

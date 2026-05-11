@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LuYao.Data;
 
-public partial class Record
+public partial class RecordTable
 {
     /// <summary>
     /// 在当前记录的所有数据行中，查找指定列与目标值匹配的第一行数据。

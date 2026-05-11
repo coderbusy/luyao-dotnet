@@ -11,32 +11,32 @@ namespace LuYao.Data;
 /// <summary>
 /// 列存储数据集合
 /// </summary>
-[DebuggerTypeProxy(typeof(RecordDebuggerTypeProxy))]
-public partial class Record : IEnumerable<RecordRow>
+[DebuggerTypeProxy(typeof(RecordTableDebuggerTypeProxy))]
+public partial class RecordTable : IEnumerable<RecordRow>
 {
     /// <summary>
-    /// 初始化 <see cref="Record"/> 类的新实例。
+    /// 初始化 <see cref="RecordTable"/> 类的新实例。
     /// </summary>
-    public Record() : this(null, 0)
+    public RecordTable() : this(null, 0)
     {
 
     }
 
     /// <summary>
-    /// 初始化 <see cref="Record"/> 类的新实例。
+    /// 初始化 <see cref="RecordTable"/> 类的新实例。
     /// </summary>
     /// <param name="name">表名称。</param>
-    public Record(string name) : this(name, 0)
+    public RecordTable(string name) : this(name, 0)
     {
 
     }
 
     /// <summary>
-    /// 使用指定的表名和行数初始化 <see cref="Record"/> 类的新实例。
+    /// 使用指定的表名和行数初始化 <see cref="RecordTable"/> 类的新实例。
     /// </summary>
     /// <param name="name">表名称。</param>
     /// <param name="rows">初始行数。</param>
-    public Record(string? name, int rows)
+    public RecordTable(string? name, int rows)
     {
         if (!string.IsNullOrWhiteSpace(name)) this.Name = name!;
         int c = rows;
@@ -238,7 +238,7 @@ public partial class Record : IEnumerable<RecordRow>
 
     #region IDataReader
     /// <summary>
-    /// 从指定的 <see cref="IDataReader"/> 读取数据并填充到当前 <see cref="Record"/> 实例。
+    /// 从指定的 <see cref="IDataReader"/> 读取数据并填充到当前 <see cref="RecordTable"/> 实例。
     /// </summary>
     /// <param name="dr">用于读取数据的 <see cref="IDataReader"/> 实例。</param>
     public void Read(IDataReader dr)
@@ -440,7 +440,7 @@ public partial class Record : IEnumerable<RecordRow>
     #region DataTable
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 实例的数据写入指定的 <see cref="DataTable"/>。
+    /// 将当前 <see cref="RecordTable"/> 实例的数据写入指定的 <see cref="DataTable"/>。
     /// </summary>
     /// <param name="dt">用于接收数据的 <see cref="DataTable"/> 实例。</param>
     /// <remarks>
@@ -466,13 +466,13 @@ public partial class Record : IEnumerable<RecordRow>
     }
 
     /// <summary>
-    /// 从指定的 <see cref="DataTable"/> 读取数据并返回一个新的 <see cref="Record"/> 实例。
+    /// 从指定的 <see cref="DataTable"/> 读取数据并返回一个新的 <see cref="RecordTable"/> 实例。
     /// </summary>
     /// <param name="dt">用于读取数据的 <see cref="DataTable"/> 实例。</param>
-    /// <returns>读取到的 <see cref="Record"/> 实例。</returns>
-    public static Record Read(DataTable dt)
+    /// <returns>读取到的 <see cref="RecordTable"/> 实例。</returns>
+    public static RecordTable Read(DataTable dt)
     {
-        var ret = new Record(dt.TableName, dt.Rows.Count);
+        var ret = new RecordTable(dt.TableName, dt.Rows.Count);
         foreach (DataColumn col in dt.Columns)
         {
             ret.Columns.Add(col.ColumnName, col.DataType);
@@ -491,7 +491,7 @@ public partial class Record : IEnumerable<RecordRow>
     }
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 实例转换为 <see cref="DataTable"/>。
+    /// 将当前 <see cref="RecordTable"/> 实例转换为 <see cref="DataTable"/>。
     /// </summary>
     /// <returns>包含当前记录所有数据的 <see cref="DataTable"/> 实例。</returns>
     /// <remarks>
@@ -547,12 +547,12 @@ public partial class Record : IEnumerable<RecordRow>
     }
 
     /// <summary>
-    /// 仅复制列结构（零行），返回新 <see cref="Record"/>。
+    /// 仅复制列结构（零行），返回新 <see cref="RecordTable"/>。
     /// </summary>
-    /// <returns>具有相同列结构但零行的新 <see cref="Record"/> 实例。</returns>
-    public Record CloneSchema()
+    /// <returns>具有相同列结构但零行的新 <see cref="RecordTable"/> 实例。</returns>
+    public RecordTable CloneSchema()
     {
-        var clone = new Record(this.Name, 0);
+        var clone = new RecordTable(this.Name, 0);
         foreach (RecordColumn col in this.Columns)
         {
             clone.Columns.Add(col.Name, col.Type);
@@ -561,12 +561,12 @@ public partial class Record : IEnumerable<RecordRow>
     }
 
     /// <summary>
-    /// 复制列结构与全部行数据，返回新 <see cref="Record"/>。
+    /// 复制列结构与全部行数据，返回新 <see cref="RecordTable"/>。
     /// </summary>
-    /// <returns>包含相同列结构和全部数据的新 <see cref="Record"/> 实例。</returns>
-    public Record Clone()
+    /// <returns>包含相同列结构和全部数据的新 <see cref="RecordTable"/> 实例。</returns>
+    public RecordTable Clone()
     {
-        var clone = new Record(this.Name, this.Count);
+        var clone = new RecordTable(this.Name, this.Count);
         clone.Page = this.Page;
         clone._maxCount = this._maxCount;
         clone._pageSize = this._pageSize;

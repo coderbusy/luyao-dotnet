@@ -31,16 +31,16 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <summary>
     /// 关联的记录。
     /// </summary>
-    public Record Record { get; }
+    public RecordTable Table { get; }
 
     /// <summary>
     /// 初始化 <see cref="RecordColumnCollection"/> 类的新实例。
     /// </summary>
-    /// <param name="record">关联的记录实例。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出。</exception>
-    internal RecordColumnCollection(Record record)
+    /// <param name="table">关联的记录实例。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="table"/> 为 null 时抛出。</exception>
+    internal RecordColumnCollection(RecordTable table)
     {
-        this.Record = record ?? throw new ArgumentNullException(nameof(record));
+        this.Table = table ?? throw new ArgumentNullException(nameof(table));
     }
 
     /// <summary>
@@ -73,13 +73,13 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     internal void OnAddRow()
     {
         if (_items.Count == 0) return;
-        int num = this.Record.Count;
+        int num = this.Table.Count;
         foreach (RecordColumn col in _items)
         {
             if (col.Capacity >= num) continue;
             col.Extend(num);
         }
-        this.Record.Capacity = _items.Min(f => f.Capacity);
+        this.Table.Capacity = _items.Min(f => f.Capacity);
     }
 
     /// <summary>
@@ -166,7 +166,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     public void Clear()
     {
         _items.Clear();
-        this.Record.OnClear();
+        this.Table.OnClear();
     }
 
     #region Add
@@ -191,7 +191,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
                     $"列 '{name}' 已存在且类型为 {existing.Type.Name}，无法以类型 {type.Name} 重新添加。");
             return existing;
         }
-        RecordColumn col = Helpers.MakeRecordColumn(this.Record, name, type);
+        RecordColumn col = Helpers.MakeRecordColumn(this.Table, name, type);
         _items.Add(col);
         return col;
     }
@@ -216,7 +216,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
             return (RecordColumn<T>)existing;
         }
         Helpers.ValidateColumnType(typeof(T));
-        var col = new RecordColumn<T>(this.Record, name, typeof(T));
+        var col = new RecordColumn<T>(this.Table, name, typeof(T));
         _items.Add(col);
         return col;
     }

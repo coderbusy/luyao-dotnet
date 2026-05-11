@@ -1,4 +1,4 @@
-﻿namespace LuYao.Data;
+namespace LuYao.Data;
 
 [TestClass]
 public class RecordMappingTests
@@ -20,15 +20,15 @@ public class RecordMappingTests
             new TestModel { Id = 2, Name = "Name2" }
         };
 
-        var record = new Record();
-        record.Columns.AddFrom<TestModel>();
-        record.AddRowsFromList(list);
+        var table = new RecordTable();
+        table.Columns.AddFrom<TestModel>();
+        table.AddRowsFromList(list);
 
-        Assert.AreEqual(2, record.Count);
-        Assert.AreEqual(1,       record[0]["Id"]);
-        Assert.AreEqual("Name1", record[0]["Name"]);
-        Assert.AreEqual(2,       record[1]["Id"]);
-        Assert.AreEqual("Name2", record[1]["Name"]);
+        Assert.AreEqual(2, table.Count);
+        Assert.AreEqual(1,       table[0]["Id"]);
+        Assert.AreEqual("Name1", table[0]["Name"]);
+        Assert.AreEqual(2,       table[1]["Id"]);
+        Assert.AreEqual("Name2", table[1]["Name"]);
     }
 
     // ── From<T> ──────────────────────────────────────────────────────────────
@@ -38,11 +38,11 @@ public class RecordMappingTests
     {
         var model = new TestModel { Id = 42, Name = "Alice" };
 
-        var record = Record.From(model);
+        var table = RecordTable.From(model);
 
-        Assert.AreEqual(1,       record.Count);
-        Assert.AreEqual(42,      record[0]["Id"]);
-        Assert.AreEqual("Alice", record[0]["Name"]);
+        Assert.AreEqual(1,       table.Count);
+        Assert.AreEqual(42,      table[0]["Id"]);
+        Assert.AreEqual("Alice", table[0]["Name"]);
     }
 
     // ── FromList<T> ───────────────────────────────────────────────────────────
@@ -57,21 +57,21 @@ public class RecordMappingTests
             new TestModel { Id = 3, Name = "Carol" }
         };
 
-        var record = Record.FromList(list);
+        var table = RecordTable.FromList(list);
 
-        Assert.AreEqual(3,       record.Count);
-        Assert.AreEqual(1,       record[0]["Id"]);
-        Assert.AreEqual("Alice", record[0]["Name"]);
-        Assert.AreEqual(3,       record[2]["Id"]);
-        Assert.AreEqual("Carol", record[2]["Name"]);
+        Assert.AreEqual(3,       table.Count);
+        Assert.AreEqual(1,       table[0]["Id"]);
+        Assert.AreEqual("Alice", table[0]["Name"]);
+        Assert.AreEqual(3,       table[2]["Id"]);
+        Assert.AreEqual("Carol", table[2]["Name"]);
     }
 
     [TestMethod]
     public void FromList_WithEmptyCollection_ShouldCreateRecordWithNoRows()
     {
-        var record = Record.FromList(new List<TestModel>());
+        var table = RecordTable.FromList(new List<TestModel>());
 
-        Assert.AreEqual(0, record.Count);
+        Assert.AreEqual(0, table.Count);
     }
 
     // ── To<T> ─────────────────────────────────────────────────────────────────
@@ -79,19 +79,19 @@ public class RecordMappingTests
     [TestMethod]
     public void To_WithRows_ShouldMapFirstRowToModel()
     {
-        var record = new Record("Users", 2);
-        var idCol   = record.Columns.Add<int>("Id");
-        var nameCol = record.Columns.Add<string>("Name");
+        var table = new RecordTable("Users", 2);
+        var idCol   = table.Columns.Add<int>("Id");
+        var nameCol = table.Columns.Add<string>("Name");
 
-        var row1 = record.AddRow();
+        var row1 = table.AddRow();
         idCol.SetValue(row1.Row, 1);
         nameCol.SetValue(row1.Row, "Alice");
 
-        var row2 = record.AddRow();
+        var row2 = table.AddRow();
         idCol.SetValue(row2.Row, 2);
         nameCol.SetValue(row2.Row, "Bob");
 
-        var model = record.To<TestModel>();
+        var model = table.To<TestModel>();
 
         Assert.AreEqual(1,       model.Id);
         Assert.AreEqual("Alice", model.Name);
@@ -100,11 +100,11 @@ public class RecordMappingTests
     [TestMethod]
     public void To_WithNoRows_ShouldReturnDefaultInstance()
     {
-        var record = new Record("Users", 0);
-        record.Columns.Add<int>("Id");
-        record.Columns.Add<string>("Name");
+        var table = new RecordTable("Users", 0);
+        table.Columns.Add<int>("Id");
+        table.Columns.Add<string>("Name");
 
-        var model = record.To<TestModel>();
+        var model = table.To<TestModel>();
 
         Assert.IsNotNull(model);
         Assert.AreEqual(0,    model.Id);
@@ -121,9 +121,9 @@ public class RecordMappingTests
             new TestModel { Id = 1, Name = "Alice" },
             new TestModel { Id = 2, Name = "Bob" }
         };
-        var record = Record.FromList(source);
+        var table = RecordTable.FromList(source);
 
-        var result = record.ToList<TestModel>();
+        var result = table.ToList<TestModel>();
 
         Assert.AreEqual(2,       result.Count);
         Assert.AreEqual(1,       result[0].Id);
@@ -135,10 +135,10 @@ public class RecordMappingTests
     [TestMethod]
     public void ToList_WithNoRows_ShouldReturnEmptyList()
     {
-        var record = new Record();
-        record.Columns.AddFrom<TestModel>();
+        var table = new RecordTable();
+        table.Columns.AddFrom<TestModel>();
 
-        var result = record.ToList<TestModel>();
+        var result = table.ToList<TestModel>();
 
         Assert.AreEqual(0, result.Count);
     }
@@ -153,9 +153,9 @@ public class RecordMappingTests
             new TestModel { Id = 1, Name = "Alice" },
             new TestModel { Id = 2, Name = "Bob" }
         };
-        var record = Record.FromList(list);
+        var table = RecordTable.FromList(list);
 
-        var dict = record.ToDictionary<int, TestModel>();
+        var dict = table.ToDictionary<int, TestModel>();
 
         Assert.AreEqual(2,       dict.Count);
         Assert.AreEqual("Alice", dict[1].Name);
@@ -170,9 +170,9 @@ public class RecordMappingTests
             new TestModel { Id = 1, Name = "First" },
             new TestModel { Id = 1, Name = "Second" }
         };
-        var record = Record.FromList(list);
+        var table = RecordTable.FromList(list);
 
-        var dict = record.ToDictionary<int, TestModel>();
+        var dict = table.ToDictionary<int, TestModel>();
 
         Assert.AreEqual(1,        dict.Count);
         Assert.AreEqual("Second", dict[1].Name);
@@ -181,10 +181,10 @@ public class RecordMappingTests
     [TestMethod]
     public void ToDictionary_WithNoRows_ShouldReturnEmptyDictionary()
     {
-        var record = new Record();
-        record.Columns.AddFrom<TestModel>();
+        var table = new RecordTable();
+        table.Columns.AddFrom<TestModel>();
 
-        var dict = record.ToDictionary<int, TestModel>();
+        var dict = table.ToDictionary<int, TestModel>();
 
         Assert.AreEqual(0, dict.Count);
     }
@@ -192,9 +192,9 @@ public class RecordMappingTests
     [TestMethod]
     public void ToDictionary_WithNoColumns_ShouldReturnEmptyDictionary()
     {
-        var record = new Record();
+        var table = new RecordTable();
 
-        var dict = record.ToDictionary<int, TestModel>();
+        var dict = table.ToDictionary<int, TestModel>();
 
         Assert.AreEqual(0, dict.Count);
     }

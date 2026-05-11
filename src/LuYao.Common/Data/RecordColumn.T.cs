@@ -16,10 +16,10 @@ public class RecordColumn<T> : RecordColumn
     /// <summary>
     /// 创建一个泛型列
     /// </summary>
-    public RecordColumn(Record record, string name, Type type)
-        : base(record, name, type)
+    public RecordColumn(RecordTable table, string name, Type type)
+        : base(table, name, type)
     {
-        var capacity = record.Capacity;
+        var capacity = table.Capacity;
         if (capacity <= 0) capacity = 5;
         _data = new T[capacity];
     }
@@ -37,7 +37,7 @@ public class RecordColumn<T> : RecordColumn
     public override void Delete(int row)
     {
         OnGet(row);
-        var count = this.Record.Count;
+        var count = this.Table.Count;
         for (int i = row; i < count - 1; i++)
         {
             this._data[i] = this._data[i + 1];

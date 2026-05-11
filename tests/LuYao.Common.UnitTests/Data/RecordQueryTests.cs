@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,39 +7,39 @@ namespace LuYao.Data;
 [TestClass]
 public class RecordQueryTests
 {
-    private Record CreateTestRecord()
+    private RecordTable CreateTestRecord()
     {
-        var record = new Record("TestRecord");
-        record.Columns.Add("Id", typeof(int));
-        record.Columns.Add("Name", typeof(string));
-        record.Columns.Add("IsActive", typeof(bool));
+        var table = new RecordTable("TestRecord");
+        table.Columns.Add("Id", typeof(int));
+        table.Columns.Add("Name", typeof(string));
+        table.Columns.Add("IsActive", typeof(bool));
 
-        var row1 = record.AddRow();
-        record.Columns["Id"].Set(row1, 1);
-        record.Columns["Name"].Set(row1, "Alice");
-        record.Columns["IsActive"].Set(row1, true);
+        var row1 = table.AddRow();
+        table.Columns["Id"].Set(row1, 1);
+        table.Columns["Name"].Set(row1, "Alice");
+        table.Columns["IsActive"].Set(row1, true);
 
-        var row2 = record.AddRow();
-        record.Columns["Id"].Set(row2, 2);
-        record.Columns["Name"].Set(row2, "Bob");
-        record.Columns["IsActive"].Set(row2, false);
+        var row2 = table.AddRow();
+        table.Columns["Id"].Set(row2, 2);
+        table.Columns["Name"].Set(row2, "Bob");
+        table.Columns["IsActive"].Set(row2, false);
 
-        var row3 = record.AddRow();
-        record.Columns["Id"].Set(row3, 3);
-        record.Columns["Name"].Set(row3, "Charlie");
-        record.Columns["IsActive"].Set(row3, true);
+        var row3 = table.AddRow();
+        table.Columns["Id"].Set(row3, 3);
+        table.Columns["Name"].Set(row3, "Charlie");
+        table.Columns["IsActive"].Set(row3, true);
 
-        return record;
+        return table;
     }
 
     [TestMethod]
     public void FindT_WithExistingValue_ReturnsFirstMatch()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.Find<bool>("IsActive", true);
+        var result = table.Find<bool>("IsActive", true);
 
         // Assert
         Assert.IsNotNull(result);
@@ -50,10 +50,10 @@ public class RecordQueryTests
     public void FindT_WithNonExistingValue_ReturnsNull()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.Find<int>("Id", 99);
+        var result = table.Find<int>("Id", 99);
 
         // Assert
         Assert.IsNull(result);
@@ -63,10 +63,10 @@ public class RecordQueryTests
     public void FindT_WithNonExistingColumn_ReturnsNull()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.Find<string>("NonExisting", "Alice");
+        var result = table.Find<string>("NonExisting", "Alice");
 
         // Assert
         Assert.IsNull(result);
@@ -76,10 +76,10 @@ public class RecordQueryTests
     public void FindAllT_WithExistingValue_ReturnsAllMatches()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var results = record.FindAll<bool>("IsActive", true).ToList();
+        var results = table.FindAll<bool>("IsActive", true).ToList();
 
         // Assert
         Assert.AreEqual(2, results.Count);
@@ -91,10 +91,10 @@ public class RecordQueryTests
     public void Find_WithValidPredicate_ReturnsFirstMatch()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.Find(r => r.To<string>("Name") == "Bob");
+        var result = table.Find(r => r.To<string>("Name") == "Bob");
 
         // Assert
         Assert.IsNotNull(result);
@@ -105,10 +105,10 @@ public class RecordQueryTests
     public void Find_WithInvalidPredicate_ReturnsNull()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.Find(r => r.To<int>("Id") > 10);
+        var result = table.Find(r => r.To<int>("Id") > 10);
 
         // Assert
         Assert.IsNull(result);
@@ -118,10 +118,10 @@ public class RecordQueryTests
     public void FindAll_WithValidPredicate_ReturnsAllMatches()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var results = record.FindAll(r => r.To<bool>("IsActive")).ToList();
+        var results = table.FindAll(r => r.To<bool>("IsActive")).ToList();
 
         // Assert
         Assert.AreEqual(2, results.Count);
@@ -133,10 +133,10 @@ public class RecordQueryTests
     public void FindByDynamic_WithValidPredicate_ReturnsFirstMatch()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.FindByDynamic(d => d.Name == "Charlie");
+        var result = table.FindByDynamic(d => d.Name == "Charlie");
 
         // Assert
         Assert.IsNotNull(result);
@@ -147,10 +147,10 @@ public class RecordQueryTests
     public void FindByDynamic_WithInvalidPredicate_ReturnsNull()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.FindByDynamic(d => d.Id == 99);
+        var result = table.FindByDynamic(d => d.Id == 99);
 
         // Assert
         Assert.IsNull(result);
@@ -160,10 +160,10 @@ public class RecordQueryTests
     public void FindAllByDynamic_WithValidPredicate_ReturnsAllMatches()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var results = record.FindAllByDynamic(d => d.IsActive == true).ToList();
+        var results = table.FindAllByDynamic(d => d.IsActive == true).ToList();
 
         // Assert
         Assert.AreEqual(2, results.Count);
@@ -175,10 +175,10 @@ public class RecordQueryTests
     public void Find_ObjectOverload_ReturnsFirstMatchingRow()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.Find("Name", (object)"Bob");
+        var result = table.Find("Name", (object)"Bob");
 
         // Assert
         Assert.IsNotNull(result);
@@ -189,10 +189,10 @@ public class RecordQueryTests
     public void Find_ObjectOverload_ReturnsNullWhenColumnNotFound()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.Find("NotExist", (object)1);
+        var result = table.Find("NotExist", (object)1);
 
         // Assert
         Assert.IsNull(result);
@@ -202,10 +202,10 @@ public class RecordQueryTests
     public void Find_ObjectOverload_ReturnsNullWhenNoMatch()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var result = record.Find("Id", (object)99);
+        var result = table.Find("Id", (object)99);
 
         // Assert
         Assert.IsNull(result);
@@ -215,15 +215,15 @@ public class RecordQueryTests
     public void Find_ObjectOverload_SupportsNullValue()
     {
         // Arrange
-        var record = new Record();
-        var colName = record.Columns.Add<string>("Name");
-        var r1 = record.AddRow();
+        var table = new RecordTable();
+        var colName = table.Columns.Add<string>("Name");
+        var r1 = table.AddRow();
         colName.SetValue(r1.Row, "Alice");
-        var r2 = record.AddRow();
+        var r2 = table.AddRow();
         colName.SetValue(r2.Row, null);
 
         // Act
-        var result = record.Find("Name", (object?)null);
+        var result = table.Find("Name", (object?)null);
 
         // Assert
         Assert.IsNotNull(result);
@@ -234,10 +234,10 @@ public class RecordQueryTests
     public void FindAll_ObjectOverload_ReturnsAllMatchingRows()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var results = record.FindAll("IsActive", (object)true).ToList();
+        var results = table.FindAll("IsActive", (object)true).ToList();
 
         // Assert
         Assert.AreEqual(2, results.Count);
@@ -249,10 +249,10 @@ public class RecordQueryTests
     public void FindAll_ObjectOverload_ReturnsEmptyWhenColumnNotFound()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var results = record.FindAll("NotExist", (object)1).ToList();
+        var results = table.FindAll("NotExist", (object)1).ToList();
 
         // Assert
         Assert.AreEqual(0, results.Count);
@@ -262,10 +262,10 @@ public class RecordQueryTests
     public void FindAll_ObjectOverload_ReturnsEmptyWhenNoMatch()
     {
         // Arrange
-        var record = CreateTestRecord();
+        var table = CreateTestRecord();
 
         // Act
-        var results = record.FindAll("Id", (object)99).ToList();
+        var results = table.FindAll("Id", (object)99).ToList();
 
         // Assert
         Assert.AreEqual(0, results.Count);
@@ -275,17 +275,17 @@ public class RecordQueryTests
     public void FindAll_ObjectOverload_SupportsNullValue()
     {
         // Arrange
-        var record = new Record();
-        var colName = record.Columns.Add<string>("Name");
-        var r1 = record.AddRow();
+        var table = new RecordTable();
+        var colName = table.Columns.Add<string>("Name");
+        var r1 = table.AddRow();
         colName.SetValue(r1.Row, "Alice");
-        var r2 = record.AddRow();
+        var r2 = table.AddRow();
         colName.SetValue(r2.Row, null);
-        var r3 = record.AddRow();
+        var r3 = table.AddRow();
         colName.SetValue(r3.Row, null);
 
         // Act
-        var results = record.FindAll("Name", (object?)null).ToList();
+        var results = table.FindAll("Name", (object?)null).ToList();
 
         // Assert
         Assert.AreEqual(2, results.Count);

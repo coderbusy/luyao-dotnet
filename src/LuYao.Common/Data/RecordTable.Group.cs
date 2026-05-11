@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace LuYao.Data;
 
-partial class Record
+partial class RecordTable
 {
     /// <summary>
     /// 按指定列的值对记录进行分组。

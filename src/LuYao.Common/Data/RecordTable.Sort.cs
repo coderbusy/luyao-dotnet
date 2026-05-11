@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LuYao.Data;
 
-public partial class Record
+public partial class RecordTable
 {
     #region Sort
 

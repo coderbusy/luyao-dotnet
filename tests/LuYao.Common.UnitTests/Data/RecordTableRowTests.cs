@@ -6,23 +6,23 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LuYao.Data;
 
 /// <summary>
-/// 测试 <see cref="RecordRow"/> 的构造、字段访问、赋值与 dynamic 行为。
+/// ���� <see cref="RecordRow"/> �Ĺ��졢�ֶη��ʡ���ֵ�� dynamic ��Ϊ��
 /// </summary>
 [TestClass]
-public class RecordRowTests
+public class RecordTableRowTests
 {
     /// <summary>
-    /// 创建包含整型、字符串和布尔列的测试记录。
+    /// �����������͡��ַ����Ͳ����еĲ��Լ�¼��
     /// </summary>
-    private (Record record, RecordColumn<int> intColumn, RecordColumn<string> stringColumn, RecordColumn<bool> boolColumn) CreateTestRecord()
+    private (RecordTable table, RecordColumn<int> intColumn, RecordColumn<string> stringColumn, RecordColumn<bool> boolColumn) CreateTestRecord()
     {
-        var record = new Record("TestTable", 5);
-        var intColumn = record.Columns.Add<int>("IntColumn");
-        var stringColumn = record.Columns.Add<string>("StringColumn");
-        var boolColumn = record.Columns.Add<bool>("BoolColumn");
+        var table = new RecordTable("TestTable", 5);
+        var intColumn = table.Columns.Add<int>("IntColumn");
+        var stringColumn = table.Columns.Add<string>("StringColumn");
+        var boolColumn = table.Columns.Add<bool>("BoolColumn");
 
-        var row1 = record.AddRow();
-        var row2 = record.AddRow();
+        var row1 = table.AddRow();
+        var row2 = table.AddRow();
 
         intColumn.SetValue(0, 100);
         intColumn.SetValue(1, 200);
@@ -31,29 +31,29 @@ public class RecordRowTests
         boolColumn.SetValue(0, true);
         boolColumn.SetValue(1, false);
 
-        return (record, intColumn, stringColumn, boolColumn);
+        return (table, intColumn, stringColumn, boolColumn);
     }
 
 
     /// <summary>
-    /// 使用有效参数构造时，应正确初始化记录与行号。
+    /// ʹ����Ч��������ʱ��Ӧ��ȷ��ʼ����¼���кš�
     /// </summary>
     [TestMethod]
     public void Constructor_ValidParameters_ShouldInitializeCorrectly()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
+        var (table, _, _, _) = CreateTestRecord();
 
         // Act
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Assert
-        Assert.AreEqual(record, recordRow.Record);
+        Assert.AreEqual(table, recordRow.Table);
         Assert.AreEqual(0, recordRow.Row);
     }
 
     /// <summary>
-    /// 当记录为 null 时，应抛出 <see cref="ArgumentNullException"/>。
+    /// ����¼Ϊ null ʱ��Ӧ�׳� <see cref="ArgumentNullException"/>��
     /// </summary>
     [TestMethod]
     public void Constructor_NullRecord_ShouldThrowArgumentNullException()
@@ -63,60 +63,60 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 当行索引为负数时，应抛出 <see cref="ArgumentOutOfRangeException"/>。
+    /// ��������Ϊ����ʱ��Ӧ�׳� <see cref="ArgumentOutOfRangeException"/>��
     /// </summary>
     [TestMethod]
     public void Constructor_NegativeRowIndex_ShouldThrowArgumentOutOfRangeException()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
+        var (table, _, _, _) = CreateTestRecord();
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(table, -1));
     }
 
     /// <summary>
-    /// 当行索引超出记录范围时，应抛出 <see cref="ArgumentOutOfRangeException"/>。
+    /// ��������������¼��Χʱ��Ӧ�׳� <see cref="ArgumentOutOfRangeException"/>��
     /// </summary>
     [TestMethod]
     public void Constructor_RowIndexOutOfRange_ShouldThrowArgumentOutOfRangeException()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
+        var (table, _, _, _) = CreateTestRecord();
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count));
-        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(record, record.Count + 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(table, table.Count));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new RecordRow(table, table.Count + 1));
     }
 
 
 
     /// <summary>
-    /// <see cref="RecordRow.Record"/> 应返回所属的 <see cref="Record"/>。
+    /// <see cref="RecordRow.Table"/> Ӧ��������� <see cref="Record"/>��
     /// </summary>
     [TestMethod]
     public void Record_Property_ShouldReturnCorrectRecord()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
-        var result = recordRow.Record;
+        var result = recordRow.Table;
 
         // Assert
-        Assert.AreEqual(record, result);
+        Assert.AreEqual(table, result);
     }
 
     /// <summary>
-    /// <see cref="RecordRow.Row"/> 应返回当前行号。
+    /// <see cref="RecordRow.Row"/> Ӧ���ص�ǰ�кš�
     /// </summary>
     [TestMethod]
     public void Row_Property_ShouldReturnCorrectRowIndex()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.Row;
@@ -128,14 +128,14 @@ public class RecordRowTests
 
 
     /// <summary>
-    /// 隐式转换为 <see cref="int"/> 时，应返回当前行号。
+    /// ��ʽת��Ϊ <see cref="int"/> ʱ��Ӧ���ص�ǰ�кš�
     /// </summary>
     [TestMethod]
     public void ImplicitConversion_ToInt_ShouldReturnRowIndex()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         int rowIndex = recordRow;
@@ -147,14 +147,14 @@ public class RecordRowTests
 
 
     /// <summary>
-    /// 按列名读取已存在的布尔列时，应返回正确值。
+    /// ��������ȡ�Ѵ��ڵĲ�����ʱ��Ӧ������ȷֵ��
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnExists_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, _, _, boolColumn) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, boolColumn) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<bool>("BoolColumn");
@@ -164,14 +164,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名读取不存在的布尔列时，应返回默认值。
+    /// ��������ȡ�����ڵĲ�����ʱ��Ӧ����Ĭ��ֵ��
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnNotExists_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<bool>("NonExistentColumn");
@@ -181,14 +181,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名读取已存在的字符串列时，应返回正确值。
+    /// ��������ȡ�Ѵ��ڵ��ַ�����ʱ��Ӧ������ȷֵ��
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnExists_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.To<string>("StringColumn");
@@ -198,14 +198,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名读取不存在的字符串列时，应返回默认值。
+    /// ��������ȡ�����ڵ��ַ�����ʱ��Ӧ����Ĭ��ֵ��
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnNotExists_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<string>("NonExistentColumn");
@@ -215,14 +215,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名读取已存在的整型列时，应返回正确值。
+    /// ��������ȡ�Ѵ��ڵ�������ʱ��Ӧ������ȷֵ��
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnExists_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.To<int>("IntColumn");
@@ -232,14 +232,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名读取不存在的整型列时，应返回默认值。
+    /// ��������ȡ�����ڵ�������ʱ��Ӧ����Ĭ��ֵ��
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnNotExists_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<int>("NonExistentColumn");
@@ -249,14 +249,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 泛型按列名读取已存在列时，应返回正确值。
+    /// ���Ͱ�������ȡ�Ѵ�����ʱ��Ӧ������ȷֵ��
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnExists_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<int>("IntColumn");
@@ -266,14 +266,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 泛型按列名读取不存在列时，应返回默认值。
+    /// ���Ͱ�������ȡ��������ʱ��Ӧ����Ĭ��ֵ��
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnNotExists_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<int>("NonExistentColumn");
@@ -283,17 +283,17 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 应支持按列名读取字节值。
+    /// Ӧ֧�ְ�������ȡ�ֽ�ֵ��
     /// </summary>
     [TestMethod]
     public void GetByte_ByName_ShouldWork()
     {
         // Arrange
-        var record = new Record("TestTable", 1);
-        var byteColumn = record.Columns.Add<byte>("ByteColumn");
-        var row = record.AddRow();
+        var table = new RecordTable("TestTable", 1);
+        var byteColumn = table.Columns.Add<byte>("ByteColumn");
+        var row = table.AddRow();
         byteColumn.Set(row.Row, 255);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<byte>("ByteColumn");
@@ -303,17 +303,17 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 应支持按列名读取双精度浮点值。
+    /// Ӧ֧�ְ�������ȡ˫���ȸ���ֵ��
     /// </summary>
     [TestMethod]
     public void GetDouble_ByName_ShouldWork()
     {
         // Arrange
-        var record = new Record("TestTable", 1);
-        var doubleColumn = record.Columns.Add<double>("DoubleColumn");
-        var row = record.AddRow();
+        var table = new RecordTable("TestTable", 1);
+        var doubleColumn = table.Columns.Add<double>("DoubleColumn");
+        var row = table.AddRow();
         doubleColumn.Set(row.Row, 3.14159);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<double>("DoubleColumn");
@@ -323,18 +323,18 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 应支持按列名读取日期时间值。
+    /// Ӧ֧�ְ�������ȡ����ʱ��ֵ��
     /// </summary>
     [TestMethod]
     public void GetDateTime_ByName_ShouldWork()
     {
         // Arrange
-        var record = new Record("TestTable", 1);
-        var dateTimeColumn = record.Columns.Add<DateTime>("DateTimeColumn");
+        var table = new RecordTable("TestTable", 1);
+        var dateTimeColumn = table.Columns.Add<DateTime>("DateTimeColumn");
         var testDate = new DateTime(2023, 8, 15, 14, 30, 0);
-        var row = record.AddRow();
+        var row = table.AddRow();
         dateTimeColumn.Set(row.Row, testDate);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.To<DateTime>("DateTimeColumn");
@@ -346,14 +346,14 @@ public class RecordRowTests
 
 
     /// <summary>
-    /// 当列名为空时，各类型读取方法应返回默认值。
+    /// ������Ϊ��ʱ�������Ͷ�ȡ����Ӧ����Ĭ��ֵ��
     /// </summary>
     [TestMethod]
     public void GetMethods_EmptyColumnName_ShouldReturnDefault()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act & Assert
         Assert.AreEqual(default(int), recordRow.To<int>(""));
@@ -362,22 +362,22 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 在多行数据场景下，应能读取到各行的正确值。
+    /// �ڶ������ݳ����£�Ӧ�ܶ�ȡ�����е���ȷֵ��
     /// </summary>
     [TestMethod]
     public void GetMethods_MultipleRows_ShouldReturnCorrectValues()
     {
         // Arrange
-        var (record, intColumn, stringColumn, boolColumn) = CreateTestRecord();
+        var (table, intColumn, stringColumn, boolColumn) = CreateTestRecord();
 
-        var row3 = record.AddRow();
+        var row3 = table.AddRow();
         intColumn.Set(row3.Row, 300);
         stringColumn.Set(row3.Row, "Test3");
         boolColumn.Set(row3.Row, true);
 
-        var recordRow0 = new RecordRow(record, 0);
-        var recordRow1 = new RecordRow(record, 1);
-        var recordRow2 = new RecordRow(record, 2);
+        var recordRow0 = new RecordRow(table, 0);
+        var recordRow1 = new RecordRow(table, 1);
+        var recordRow2 = new RecordRow(table, 2);
 
         // Act & Assert
         Assert.AreEqual(100, recordRow0.To<int>("IntColumn"));
@@ -396,14 +396,14 @@ public class RecordRowTests
 
 
     /// <summary>
-    /// 多次访问同一字段时，应保持结果一致。
+    /// ��η���ͬһ�ֶ�ʱ��Ӧ���ֽ��һ�¡�
     /// </summary>
     [TestMethod]
     public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result1 = recordRow.To<int>("IntColumn");
@@ -417,14 +417,14 @@ public class RecordRowTests
 
 
     /// <summary>
-    /// 使用索引器更新已存在的整型列时，应写入成功。
+    /// ʹ�������������Ѵ��ڵ�������ʱ��Ӧд��ɹ���
     /// </summary>
     [TestMethod]
     public void Set_TypedColumn_ShouldUpdateValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         recordRow["IntColumn"] = 999;
@@ -434,14 +434,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 使用索引器更新已存在的字符串列时，应写入成功。
+    /// ʹ�������������Ѵ��ڵ��ַ�����ʱ��Ӧд��ɹ���
     /// </summary>
     [TestMethod]
     public void Set_StringColumn_ShouldUpdateValue()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         recordRow["StringColumn"] = "NewValue";
@@ -451,36 +451,36 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 当列不存在时，<see cref="RecordRow.Set{T}(string, T)"/> 应自动创建对应列。
+    /// ���в�����ʱ��<see cref="RecordRow.Set{T}(string, T)"/> Ӧ�Զ�������Ӧ�С�
     /// </summary>
     [TestMethod]
     public void Set_ColumnNotExists_ShouldAutoCreateColumn()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
-        int beforeCount = record.Columns.Count;
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
+        int beforeCount = table.Columns.Count;
 
         // Act
         recordRow["NewColumn"] = 12345;
 
         // Assert
-        Assert.AreEqual(beforeCount + 1, record.Columns.Count);
-        var col = record.Columns.Find("NewColumn");
+        Assert.AreEqual(beforeCount + 1, table.Columns.Count);
+        var col = table.Columns.Find("NewColumn");
         Assert.IsNotNull(col);
         Assert.AreEqual(typeof(int), col.Type);
         Assert.AreEqual(12345, recordRow.To<int>("NewColumn"));
     }
 
     /// <summary>
-    /// 写入后再读取时，应得到与写入一致的值。
+    /// д����ٶ�ȡʱ��Ӧ�õ���д��һ�µ�ֵ��
     /// </summary>
     [TestMethod]
     public void Set_ThenReadViaIndexer_ShouldBeConsistent()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         recordRow["IntColumn"] = 42;
@@ -492,14 +492,14 @@ public class RecordRowTests
 
 
     /// <summary>
-    /// dynamic 按成员名读取时，应返回正确值。
+    /// dynamic ����Ա����ȡʱ��Ӧ������ȷֵ��
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act
         var result = row.StringColumn;
@@ -509,34 +509,34 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic 按成员名写入时，应更新底层记录值。
+    /// dynamic ����Ա��д��ʱ��Ӧ���µײ��¼ֵ��
     /// </summary>
     [TestMethod]
     public void Dynamic_SetMember_ShouldUpdateValue()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act
         row.StringColumn = "DynValue";
 
         // Assert
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
         Assert.AreEqual("DynValue", recordRow.To<string>("StringColumn"));
     }
 
     /// <summary>
-    /// dynamic 按索引器读取时，应返回正确值。
+    /// dynamic ����������ȡʱ��Ӧ������ȷֵ��
     /// </summary>
     [TestMethod]
     public void Dynamic_GetIndex_ShouldReturnCorrectValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 1);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 1);
 
-        // Act - dynamic 索引读取
+        // Act - dynamic ������ȡ
         var result = row["IntColumn"];
 
         // Assert
@@ -544,32 +544,32 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic 按索引器写入时，应更新底层记录值。
+    /// dynamic ��������д��ʱ��Ӧ���µײ��¼ֵ��
     /// </summary>
     [TestMethod]
     public void Dynamic_SetIndex_ShouldUpdateValue()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
-        // Act - dynamic 索引写入
+        // Act - dynamic ����д��
         row["IntColumn"] = 777;
 
         // Assert
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
         Assert.AreEqual(777, recordRow.To<int>("IntColumn"));
     }
 
     /// <summary>
-    /// dynamic 读取不存在的成员时，应返回 null。
+    /// dynamic ��ȡ�����ڵĳ�Աʱ��Ӧ���� null��
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ColumnNotExists_ShouldReturnNull()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act
         var result = row.NoSuchColumn;
@@ -579,29 +579,29 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// dynamic 写入不存在的成员时，不应抛出异常。
+    /// dynamic д�벻���ڵĳ�Աʱ����Ӧ�׳��쳣��
     /// </summary>
     [TestMethod]
     public void Dynamic_SetMember_ColumnNotExists_ShouldNotThrow()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
 
         // Act & Assert
         row.NoSuchColumn = "ignored"; // should not throw
     }
 
     /// <summary>
-    /// dynamic 成员读取结果应与显式调用字段读取方法一致。
+    /// dynamic ��Ա��ȡ���Ӧ����ʽ�����ֶζ�ȡ����һ�¡�
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ShouldBeConsistentWithGetMethod()
     {
         // Arrange
-        var (record, intColumn, _, boolColumn) = CreateTestRecord();
-        dynamic row = new RecordRow(record, 0);
-        var recordRow = new RecordRow(record, 0);
+        var (table, intColumn, _, boolColumn) = CreateTestRecord();
+        dynamic row = new RecordRow(table, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act & Assert
         Assert.AreEqual(recordRow.To<int>("IntColumn"), (int)row.IntColumn!);
@@ -609,14 +609,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 索引器按列名读取已存在列时，应返回对应对象值。
+    /// ��������������ȡ�Ѵ�����ʱ��Ӧ���ض�Ӧ����ֵ��
     /// </summary>
     [TestMethod]
     public void FieldObject_ByName_ColumnExists_ShouldReturnValue()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow["IntColumn"];
@@ -627,14 +627,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名读取不存在列时，索引器应返回 null。
+    /// ��������ȡ��������ʱ��������Ӧ���� null��
     /// </summary>
     [TestMethod]
     public void FieldObject_ByName_ColumnNotExists_ShouldReturnNull()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow["NonExistentColumn"];
@@ -644,14 +644,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.ToDictionary"/> 应返回当前行的全部列与对应值。
+    /// <see cref="RecordRow.ToDictionary"/> Ӧ���ص�ǰ�е�ȫ�������Ӧֵ��
     /// </summary>
     [TestMethod]
     public void ToDictionary_ShouldReturnAllColumnsWithCurrentRowValues()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.ToDictionary();
@@ -664,17 +664,17 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.ToDictionary"/> 对于 null 列值应保留 null。
+    /// <see cref="RecordRow.ToDictionary"/> ���� null ��ֵӦ���� null��
     /// </summary>
     [TestMethod]
     public void ToDictionary_WhenColumnValueIsNull_ShouldKeepNullValue()
     {
         // Arrange
-        var record = new Record("TestTable", 2);
-        var nullableColumn = record.Columns.Add<string>("NullableColumn");
-        record.AddRow();
+        var table = new RecordTable("TestTable", 2);
+        var nullableColumn = table.Columns.Add<string>("NullableColumn");
+        table.AddRow();
         nullableColumn.SetValue(0, null!);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToDictionary();
@@ -686,14 +686,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.ToString"/> 应输出行号以及字典风格的列值信息。
+    /// <see cref="RecordRow.ToString"/> Ӧ����к��Լ��ֵ������ֵ��Ϣ��
     /// </summary>
     [TestMethod]
     public void ToString_ShouldContainRowAndDictionaryLikeValues()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.ToString();
@@ -703,17 +703,17 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.ToString"/> 对于 null 值应按匿名类型风格输出空值。
+    /// <see cref="RecordRow.ToString"/> ���� null ֵӦ���������ͷ�������ֵ��
     /// </summary>
     [TestMethod]
     public void ToString_WhenValueIsNull_ShouldRenderEmptyValue()
     {
         // Arrange
-        var record = new Record("TestTable", 2);
-        var nullableColumn = record.Columns.Add<string>("NullableColumn");
-        record.AddRow();
+        var table = new RecordTable("TestTable", 2);
+        var nullableColumn = table.Columns.Add<string>("NullableColumn");
+        table.AddRow();
         nullableColumn.SetValue(0, null!);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString();
@@ -723,14 +723,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名转换为字符串时，若列存在且有值，应返回该值的字符串表示。
+    /// ������ת��Ϊ�ַ���ʱ�����д�������ֵ��Ӧ���ظ�ֵ���ַ�����ʾ��
     /// </summary>
     [TestMethod]
     public void ToString_ByName_ColumnExistsWithValue_ShouldReturnStringRepresentation()
     {
         // Arrange
-        var (record, _, stringColumn, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, stringColumn, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("StringColumn");
@@ -740,14 +740,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名转换为字符串时，若列名为 null，应返回空字符串。
+    /// ������ת��Ϊ�ַ���ʱ��������Ϊ null��Ӧ���ؿ��ַ�����
     /// </summary>
     [TestMethod]
     public void ToString_ByName_NullColumnName_ShouldReturnEmptyString()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString(null!);
@@ -757,14 +757,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名转换为字符串时，若列名为空字符串，应返回空字符串。
+    /// ������ת��Ϊ�ַ���ʱ��������Ϊ���ַ�����Ӧ���ؿ��ַ�����
     /// </summary>
     [TestMethod]
     public void ToString_ByName_EmptyColumnName_ShouldReturnEmptyString()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("");
@@ -774,14 +774,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名转换为字符串时，若列名仅包含空白字符，应返回空字符串。
+    /// ������ת��Ϊ�ַ���ʱ���������������հ��ַ���Ӧ���ؿ��ַ�����
     /// </summary>
     [TestMethod]
     public void ToString_ByName_WhitespaceColumnName_ShouldReturnEmptyString()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("   ");
@@ -791,14 +791,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名转换为字符串时，若列不存在，应返回空字符串。
+    /// ������ת��Ϊ�ַ���ʱ�����в����ڣ�Ӧ���ؿ��ַ�����
     /// </summary>
     [TestMethod]
     public void ToString_ByName_ColumnNotExists_ShouldReturnEmptyString()
     {
         // Arrange
-        var (record, _, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("NonExistentColumn");
@@ -808,17 +808,17 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名转换为字符串时，若列存在但值为 null，应返回空字符串。
+    /// ������ת��Ϊ�ַ���ʱ�����д��ڵ�ֵΪ null��Ӧ���ؿ��ַ�����
     /// </summary>
     [TestMethod]
     public void ToString_ByName_ColumnExistsWithNullValue_ShouldReturnEmptyString()
     {
         // Arrange
-        var record = new Record("TestTable", 1);
-        var nullableColumn = record.Columns.Add<string>("NullableColumn");
-        record.AddRow();
+        var table = new RecordTable("TestTable", 1);
+        var nullableColumn = table.Columns.Add<string>("NullableColumn");
+        table.AddRow();
         nullableColumn.SetValue(0, null!);
-        var recordRow = new RecordRow(record, 0);
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("NullableColumn");
@@ -828,14 +828,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名转换为字符串时，若列存在且为整型值，应返回整型值的字符串表示。
+    /// ������ת��Ϊ�ַ���ʱ�����д�����Ϊ����ֵ��Ӧ��������ֵ���ַ�����ʾ��
     /// </summary>
     [TestMethod]
     public void ToString_ByName_IntColumnExists_ShouldReturnStringRepresentation()
     {
         // Arrange
-        var (record, intColumn, _, _) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 1);
+        var (table, intColumn, _, _) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 1);
 
         // Act
         var result = recordRow.ToString("IntColumn");
@@ -845,14 +845,14 @@ public class RecordRowTests
     }
 
     /// <summary>
-    /// 按列名转换为字符串时，若列存在且为布尔值，应返回布尔值的字符串表示。
+    /// ������ת��Ϊ�ַ���ʱ�����д�����Ϊ����ֵ��Ӧ���ز���ֵ���ַ�����ʾ��
     /// </summary>
     [TestMethod]
     public void ToString_ByName_BoolColumnExists_ShouldReturnStringRepresentation()
     {
         // Arrange
-        var (record, _, _, boolColumn) = CreateTestRecord();
-        var recordRow = new RecordRow(record, 0);
+        var (table, _, _, boolColumn) = CreateTestRecord();
+        var recordRow = new RecordRow(table, 0);
 
         // Act
         var result = recordRow.ToString("BoolColumn");

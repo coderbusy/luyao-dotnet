@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 namespace LuYao.Data;
@@ -10,10 +10,10 @@ public class RecordToStringTests
     public void WhenEmptyRecordThenContainsCountAndColumnInfo()
     {
         // Arrange
-        var record = new Record();
+        var table = new RecordTable();
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert
         StringAssert.Contains(result, "count 0 column 0");
@@ -23,10 +23,10 @@ public class RecordToStringTests
     public void WhenNoNameThenShowsNone()
     {
         // Arrange
-        var record = new Record();
+        var table = new RecordTable();
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert
         Assert.IsTrue(result.StartsWith("None "));
@@ -36,10 +36,10 @@ public class RecordToStringTests
     public void WhenHasNameThenShowsName()
     {
         // Arrange
-        var record = new Record("Users");
+        var table = new RecordTable("Users");
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert
         Assert.IsTrue(result.StartsWith("Users "));
@@ -49,10 +49,10 @@ public class RecordToStringTests
     public void WhenZeroColumnsAndZeroRowsThenDoesNotThrow()
     {
         // Arrange
-        var record = new Record();
+        var table = new RecordTable();
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert
         Assert.IsNotNull(result);
@@ -62,12 +62,12 @@ public class RecordToStringTests
     public void WhenColumnsButZeroRowsThenDoesNotThrow()
     {
         // Arrange
-        var record = new Record();
-        record.Columns.Add<int>("Id");
-        record.Columns.Add<string>("Name");
+        var table = new RecordTable();
+        table.Columns.Add<int>("Id");
+        table.Columns.Add<string>("Name");
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert
         StringAssert.Contains(result, "count 0 column 2");
@@ -77,11 +77,11 @@ public class RecordToStringTests
     public void WhenOneRowAndZeroColumnsThenDoesNotThrow()
     {
         // Arrange — 通过 DataTable 构造一个有行但无列的情况不可行，直接 AddRow
-        var record = new Record();
-        record.AddRow();
+        var table = new RecordTable();
+        table.AddRow();
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert
         StringAssert.Contains(result, "count 1 column 0");
@@ -91,15 +91,15 @@ public class RecordToStringTests
     public void WhenOneRowThenOutputsVerticalLayout()
     {
         // Arrange
-        var record = new Record("Test");
-        record.Columns.Add<int>("Id");
-        record.Columns.Add<string>("Name");
-        var row = record.AddRow();
-        record.Columns[0].Set(row, 1);
-        record.Columns[1].Set(row, "Alice");
+        var table = new RecordTable("Test");
+        table.Columns.Add<int>("Id");
+        table.Columns.Add<string>("Name");
+        var row = table.AddRow();
+        table.Columns[0].Set(row, 1);
+        table.Columns[1].Set(row, "Alice");
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert — 单行模式每列一行，格式为 "ColName | Value"
         StringAssert.Contains(result, "| 1");
@@ -110,18 +110,18 @@ public class RecordToStringTests
     public void WhenMultipleRowsThenOutputsTableWithSeparator()
     {
         // Arrange
-        var record = new Record("Test");
-        record.Columns.Add<int>("Id");
-        record.Columns.Add<string>("Name");
+        var table = new RecordTable("Test");
+        table.Columns.Add<int>("Id");
+        table.Columns.Add<string>("Name");
         for (int i = 0; i < 2; i++)
         {
-            var row = record.AddRow();
-            record.Columns[0].Set(row, i);
-            record.Columns[1].Set(row, "R" + i);
+            var row = table.AddRow();
+            table.Columns[0].Set(row, i);
+            table.Columns[1].Set(row, "R" + i);
         }
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
         var lines = result.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
         // Assert — 应包含表头、分隔线、数据行
@@ -133,15 +133,15 @@ public class RecordToStringTests
     public void WhenNullValueThenOutputsEmptyString()
     {
         // Arrange
-        var record = new Record();
-        record.Columns.Add<string>("Val");
-        var r1 = record.AddRow();
-        var r2 = record.AddRow();
-        record.Columns[0].Set(r1, "A");
+        var table = new RecordTable();
+        table.Columns.Add<string>("Val");
+        var r1 = table.AddRow();
+        var r2 = table.AddRow();
+        table.Columns[0].Set(r1, "A");
         // r2 不设置值，保持 null
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert — 不应抛出异常
         Assert.IsNotNull(result);
@@ -152,15 +152,15 @@ public class RecordToStringTests
     public void WhenSingleColumnThenNoSeparatorPrefix()
     {
         // Arrange
-        var record = new Record();
-        record.Columns.Add<int>("X");
-        var r1 = record.AddRow();
-        var r2 = record.AddRow();
-        record.Columns[0].Set(r1, 1);
-        record.Columns[0].Set(r2, 2);
+        var table = new RecordTable();
+        table.Columns.Add<int>("X");
+        var r1 = table.AddRow();
+        var r2 = table.AddRow();
+        table.Columns[0].Set(r1, 1);
+        table.Columns[0].Set(r2, 2);
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
         var lines = result.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
         // Assert — 数据行不应以 " | " 开头
@@ -174,15 +174,15 @@ public class RecordToStringTests
     public void WhenLongValueThenTruncatedWithDots()
     {
         // Arrange
-        var record = new Record();
-        record.Columns.Add<string>("Data");
-        var r1 = record.AddRow();
-        var r2 = record.AddRow();
-        record.Columns[0].Set(r1, new string('A', 100));
-        record.Columns[0].Set(r2, "short");
+        var table = new RecordTable();
+        table.Columns.Add<string>("Data");
+        var r1 = table.AddRow();
+        var r2 = table.AddRow();
+        table.Columns[0].Set(r1, new string('A', 100));
+        table.Columns[0].Set(r2, "short");
 
         // Act
-        var result = record.ToString();
+        var result = table.ToString();
 
         // Assert — 过长的值应被截断并以 ".." 结尾
         StringAssert.Contains(result, "..");

@@ -1,4 +1,4 @@
-Ôªøusing System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace LuYao.Data;
 
 [TestClass]
-public class RecordTests
+public class RecordTableTests
 {
     [TestMethod]
     public void Constructor_ValidParameters_InitializesCorrectly()
     {
         // Arrange
-        var dt = new Record();
+        var dt = new RecordTable();
 
         // Assert
         Assert.AreEqual(0, dt.Count);
@@ -26,9 +26,9 @@ public class RecordTests
     public void AddRowAndSetColumnValue_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
-        var colId = table.Columns.Add<int>("Id"); // ÊõøÊç¢ Add<Int32> ‰∏∫ Add<int>
-        var colName = table.Columns.Add<string>("Name"); // ÊõøÊç¢ Add<String> ‰∏∫ Add<string>
+        var table = new RecordTable();
+        var colId = table.Columns.Add<int>("Id"); // ÃÊªª Add<Int32> Œ™ Add<int>
+        var colName = table.Columns.Add<string>("Name"); // ÃÊªª Add<String> Œ™ Add<string>
 
         // Act
         var row = table.AddRow();
@@ -38,15 +38,15 @@ public class RecordTests
         // Assert
         Assert.AreEqual(1, table.Count);
         Assert.AreEqual(2, table.Columns.Count);
-        Assert.AreEqual(1, colId.To<int>(row.Row)); // ÊõøÊç¢ GetValue ‰∏∫ Get<T>
-        Assert.AreEqual("Test", colName.To<string>(row.Row)); // ÊõøÊç¢ GetValue ‰∏∫ Get<T>
+        Assert.AreEqual(1, colId.To<int>(row.Row)); // ÃÊªª GetValue Œ™ Get<T>
+        Assert.AreEqual("Test", colName.To<string>(row.Row)); // ÃÊªª GetValue Œ™ Get<T>
     }
 
     [TestMethod]
     public void Constructor_WithNameAndRows_InitializesCorrectly()
     {
         // Arrange & Act
-        var table = new Record("TestTable", 10);
+        var table = new RecordTable("TestTable", 10);
 
         // Assert
         Assert.AreEqual("TestTable", table.Name);
@@ -59,10 +59,10 @@ public class RecordTests
     public void AddMultipleRowsAndColumns_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
-        var colId = table.Columns.Add<int>("Id"); // ÊõøÊç¢ Add<Int32> ‰∏∫ Add<int>
-        var colName = table.Columns.Add<string>("Name"); // ÊõøÊç¢ Add<String> ‰∏∫ Add<string>
-        var colAge = table.Columns.Add<int>("Age"); // ÊõøÊç¢ Add<Int32> ‰∏∫ Add<int>
+        var table = new RecordTable();
+        var colId = table.Columns.Add<int>("Id"); // ÃÊªª Add<Int32> Œ™ Add<int>
+        var colName = table.Columns.Add<string>("Name"); // ÃÊªª Add<String> Œ™ Add<string>
+        var colAge = table.Columns.Add<int>("Age"); // ÃÊªª Add<Int32> Œ™ Add<int>
 
         // Act
         var row1 = table.AddRow();
@@ -79,20 +79,20 @@ public class RecordTests
         Assert.AreEqual(2, table.Count);
         Assert.AreEqual(3, table.Columns.Count);
 
-        Assert.AreEqual(1, colId.To<int>(row1.Row)); // ÊõøÊç¢ GetValue ‰∏∫ Get<T>
-        Assert.AreEqual("Alice", colName.To<string>(row1.Row)); // ÊõøÊç¢ GetValue ‰∏∫ Get<T>
-        Assert.AreEqual(25, colAge.To<int>(row1.Row)); // ÊõøÊç¢ GetValue ‰∏∫ Get<T>
+        Assert.AreEqual(1, colId.To<int>(row1.Row)); // ÃÊªª GetValue Œ™ Get<T>
+        Assert.AreEqual("Alice", colName.To<string>(row1.Row)); // ÃÊªª GetValue Œ™ Get<T>
+        Assert.AreEqual(25, colAge.To<int>(row1.Row)); // ÃÊªª GetValue Œ™ Get<T>
 
-        Assert.AreEqual(2, colId.To<int>(row2.Row)); // ÊõøÊç¢ GetValue ‰∏∫ Get<T>
-        Assert.AreEqual("Bob", colName.To<string>(row2.Row)); // ÊõøÊç¢ GetValue ‰∏∫ Get<T>
-        Assert.AreEqual(30, colAge.To<int>(row2.Row)); // ÊõøÊç¢ GetValue ‰∏∫ Get<T>
+        Assert.AreEqual(2, colId.To<int>(row2.Row)); // ÃÊªª GetValue Œ™ Get<T>
+        Assert.AreEqual("Bob", colName.To<string>(row2.Row)); // ÃÊªª GetValue Œ™ Get<T>
+        Assert.AreEqual(30, colAge.To<int>(row2.Row)); // ÃÊªª GetValue Œ™ Get<T>
     }
 
     [TestMethod]
     public void SetValue_ByColumnName_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var idCol = table.Columns.Add<int>("Id");
         var nameCol = table.Columns.Add<string>("Name");
         table.AddRow();
@@ -110,7 +110,7 @@ public class RecordTests
     public void GetValue_ByColumnName_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<int>("Id");
         var colName = table.Columns.Add<string>("Name");
         var row = table.AddRow();
@@ -126,7 +126,7 @@ public class RecordTests
     public void Contains_ExistingColumn_ReturnsTrue()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.Columns.Add<int>("Id");
         table.Columns.Add<string>("Name");
 
@@ -140,7 +140,7 @@ public class RecordTests
     public void GetValue_NonExistentColumn_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.AddRow();
 
         // Act & Assert
@@ -152,7 +152,7 @@ public class RecordTests
     public void SetValue_NonExistentColumn_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.AddRow();
 
         // Act & Assert
@@ -164,7 +164,7 @@ public class RecordTests
     public void GetRow_ValidIndex_ReturnsCorrectRow()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<int>("Id");
         table.AddRow();
         table.AddRow();
@@ -187,7 +187,7 @@ public class RecordTests
     public void GetRow_InvalidIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.AddRow();
 
         // Act & Assert
@@ -199,7 +199,7 @@ public class RecordTests
     public void Enumeration_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<int>("Id");
         table.AddRow();
         table.AddRow();
@@ -229,7 +229,7 @@ public class RecordTests
     public void DifferentDataTypes_WorkCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colBool = table.Columns.Add<Boolean>("Bool");
         var colByte = table.Columns.Add<Byte>("Byte");
         var colDateTime = table.Columns.Add<DateTime>("DateTime");
@@ -270,14 +270,14 @@ public class RecordTests
     public void RowImplicitConversion_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.AddRow();
         table.AddRow();
         var rows = table.ToArray();
         var row = rows[1];
 
         // Act
-        int rowIndex = row; // ÈöêÂºèËΩ¨Êç¢
+        int rowIndex = row; // “˛ Ω◊™ªª
 
         // Assert
         Assert.AreEqual(1, rowIndex);
@@ -287,7 +287,7 @@ public class RecordTests
     public void TypedSetAndGet_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colInt = table.Columns.Add<Int32>("Int");
         var colString = table.Columns.Add<String>("String");
         var colBool = table.Columns.Add<Boolean>("Bool");
@@ -308,7 +308,7 @@ public class RecordTests
     public void AddRow_MultipleRows_CountIncreases()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
 
         // Act & Assert
         Assert.AreEqual(0, table.Count);
@@ -327,7 +327,7 @@ public class RecordTests
     public void Columns_Find_ExistingColumn_ReturnsColumn()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var originalCol = table.Columns.Add<Int32>("TestColumn");
 
         // Act
@@ -342,7 +342,7 @@ public class RecordTests
     public void Columns_Find_NonExistentColumn_ReturnsNull()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.Columns.Add<Int32>("TestColumn");
 
         // Act
@@ -356,7 +356,7 @@ public class RecordTests
     public void RecordColumn_Clear_DataIsEmpty()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         var row = table.AddRow();
         col.SetValue(row.Row, "TestValue");
@@ -376,7 +376,7 @@ public class RecordTests
     public void RecordColumn_SetValue_WithRecordRowIndex_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<Int32>("TestCol");
         var row1 = table.AddRow();
         var row2 = table.AddRow();
@@ -394,7 +394,7 @@ public class RecordTests
     public void Constructor_DefaultName_IsEmpty()
     {
         // Arrange & Act
-        var table = new Record();
+        var table = new RecordTable();
 
         // Assert
         Assert.AreEqual(string.Empty, table.Name);
@@ -404,7 +404,7 @@ public class RecordTests
     public void RecordRow_AllTypedMethods_WorkCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colChar = table.Columns.Add<Char>("Char");
         var colSByte = table.Columns.Add<SByte>("SByte");
         var colSingle = table.Columns.Add<Single>("Single");
@@ -438,7 +438,7 @@ public class RecordTests
     public void RecordColumnCollection_IndexOf_ReturnsCorrectIndex()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.Columns.Add<String>("First");
         table.Columns.Add<Int32>("Second");
         table.Columns.Add<Boolean>("Third");
@@ -454,7 +454,7 @@ public class RecordTests
     public void RecordColumnCollection_Remove_RemovesColumn()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col1 = table.Columns.Add<String>("Col1");
         var col2 = table.Columns.Add<Int32>("Col2");
 
@@ -471,7 +471,7 @@ public class RecordTests
     public void RecordColumnCollection_Clear_RemovesAllColumns()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.Columns.Add<String>("Col1");
         table.Columns.Add<Int32>("Col2");
         table.Columns.Add<Boolean>("Col3");
@@ -487,7 +487,7 @@ public class RecordTests
     public void NullAndDbNullValues_HandledCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         var row = table.AddRow();
 
@@ -500,7 +500,7 @@ public class RecordTests
     public void RecordColumn_Name_ReturnsCorrectName()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestColumnName");
 
         // Act & Assert
@@ -511,7 +511,7 @@ public class RecordTests
     public void RecordColumn_Type_ReturnsCorrectType()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var stringCol = table.Columns.Add<String>("StringCol");
         var intCol = table.Columns.Add<Int32>("IntCol");
         var boolCol = table.Columns.Add<Boolean>("BoolCol");
@@ -526,7 +526,7 @@ public class RecordTests
     public void Record_Name_CanBeSetAndRetrieved()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
 
         // Act
         table.Name = "ModifiedName";
@@ -539,7 +539,7 @@ public class RecordTests
     public void RecordColumnCollection_Indexer_ReturnsCorrectColumn()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col1 = table.Columns.Add<String>("First");
         var col2 = table.Columns.Add<Int32>("Second");
 
@@ -552,9 +552,9 @@ public class RecordTests
     public void RecordColumnCollection_Capacity_InitializedCorrectly()
     {
         // Arrange & Act
-        var table1 = new Record();
-        var table2 = new Record("Test", 50);
-        var table3 = new Record("Test", 5); // Should be set to minimum 20
+        var table1 = new RecordTable();
+        var table2 = new RecordTable("Test", 50);
+        var table3 = new RecordTable("Test", 5); // Should be set to minimum 20
 
         // Assert
         Assert.AreEqual(20, table1.Capacity); // Default minimum
@@ -565,37 +565,37 @@ public class RecordTests
     [TestMethod]
     public void Delete_RowIndexLessThanZero_ReturnsFalse()
     {
-        var record = new Record("Test", 2);
-        var result = record.Delete(-1);
+        var RecordTable = new RecordTable("Test", 2);
+        var result = RecordTable.Delete(-1);
         Assert.IsFalse(result);
     }
 
     [TestMethod]
     public void Delete_RowIndexGreaterThanOrEqualCount_ReturnsFalse()
     {
-        var record = new Record("Test", 2);
-        record.AddRow();
-        var result = record.Delete(1); // Only 1 row, index 1 is out of range
+        var RecordTable = new RecordTable("Test", 2);
+        RecordTable.AddRow();
+        var result = RecordTable.Delete(1); // Only 1 row, index 1 is out of range
         Assert.IsFalse(result);
     }
 
     [TestMethod]
     public void Delete_ValidRowIndex_RowIsDeleted()
     {
-        var record = new Record("Test", 0);
-        var idCol = record.Columns.Add<Int32>("Id");
-        var nameCol = record.Columns.Add<String>("Name");
-        record.AddRow();
+        var RecordTable = new RecordTable("Test", 0);
+        var idCol = RecordTable.Columns.Add<Int32>("Id");
+        var nameCol = RecordTable.Columns.Add<String>("Name");
+        RecordTable.AddRow();
         idCol.SetValue(0, 1);
         nameCol.SetValue(0, "A");
-        record.AddRow();
+        RecordTable.AddRow();
         idCol.SetValue(1, 2);
         nameCol.SetValue(1, "B");
 
-        var result = record.Delete(0);
+        var result = RecordTable.Delete(0);
 
         Assert.IsTrue(result);
-        Assert.AreEqual(1, record.Count);
+        Assert.AreEqual(1, RecordTable.Count);
         Assert.AreEqual(2, (object?)idCol.Get(0));
         Assert.AreEqual("B", (object?)nameCol.Get(0));
     }
@@ -603,39 +603,39 @@ public class RecordTests
     [TestMethod]
     public void Delete_LastRow_RowIsDeleted()
     {
-        var record = new Record("Test", 0);
-        var idCol = record.Columns.Add<Int32>("Id");
-        record.AddRow();
+        var RecordTable = new RecordTable("Test", 0);
+        var idCol = RecordTable.Columns.Add<Int32>("Id");
+        RecordTable.AddRow();
         idCol.SetValue(0, 1);
-        record.AddRow();
+        RecordTable.AddRow();
         idCol.SetValue(1, 2);
 
-        var result = record.Delete(1);
+        var result = RecordTable.Delete(1);
 
         Assert.IsTrue(result);
-        Assert.AreEqual(1, record.Count);
+        Assert.AreEqual(1, RecordTable.Count);
         Assert.AreEqual(1, (object?)idCol.Get(0));
     }
 
     [TestMethod]
     public void ToString_EmptyRecord_ReturnsDefaultString()
     {
-        var record = new Record();
-        var result = record.ToString();
+        var RecordTable = new RecordTable();
+        var result = RecordTable.ToString();
         Assert.IsTrue(result.Contains("None") || result.Contains("count 0"));
     }
 
     [TestMethod]
     public void ToString_OneRowMultipleColumns_ReturnsColumnValues()
     {
-        var record = new Record("TestTable", 1);
-        var nameCol = record.Columns.Add<String>("Name");
-        var ageCol = record.Columns.Add<Int32>("Age");
-        record.AddRow();
+        var RecordTable = new RecordTable("TestTable", 1);
+        var nameCol = RecordTable.Columns.Add<String>("Name");
+        var ageCol = RecordTable.Columns.Add<Int32>("Age");
+        RecordTable.AddRow();
         nameCol.SetValue(0, "Alice");
         ageCol.SetValue(0, 30);
 
-        var result = record.ToString();
+        var result = RecordTable.ToString();
         Assert.IsTrue(result.Contains("TestTable"));
         Assert.IsTrue(result.Contains("Name"));
         Assert.IsTrue(result.Contains("Alice"));
@@ -646,17 +646,17 @@ public class RecordTests
     [TestMethod]
     public void ToString_MultipleRowsMultipleColumns_ReturnsTableFormat()
     {
-        var record = new Record("People", 2);
-        var nameCol = record.Columns.Add<String>("Name");
-        var ageCol = record.Columns.Add<Int32>("Age");
-        record.AddRow();
-        record.AddRow();
+        var RecordTable = new RecordTable("People", 2);
+        var nameCol = RecordTable.Columns.Add<String>("Name");
+        var ageCol = RecordTable.Columns.Add<Int32>("Age");
+        RecordTable.AddRow();
+        RecordTable.AddRow();
         nameCol.SetValue(0, "Bob");
         ageCol.SetValue(0, 25);
         nameCol.SetValue(1, "Carol");
         ageCol.SetValue(1, 28);
 
-        var result = record.ToString();
+        var result = RecordTable.ToString();
         Assert.IsTrue(result.Contains("People"));
         Assert.IsTrue(result.Contains("Name"));
         Assert.IsTrue(result.Contains("Age"));
@@ -669,181 +669,181 @@ public class RecordTests
     [TestMethod]
     public void ToString_LongStringValue_TruncatesWithEllipsis()
     {
-        var record = new Record("LongStringTest", 1);
-        var nameCol = record.Columns.Add<String>("Name");
-        var descCol = record.Columns.Add<String>("Description");
-        record.AddRow();
-        record.AddRow();
+        var RecordTable = new RecordTable("LongStringTest", 1);
+        var nameCol = RecordTable.Columns.Add<String>("Name");
+        var descCol = RecordTable.Columns.Add<String>("Description");
+        RecordTable.AddRow();
+        RecordTable.AddRow();
         string longValue = new string('A', 100);
         descCol.SetValue(0, longValue);
 
-        var result = record.ToString();
+        var result = RecordTable.ToString();
         Assert.IsTrue(result.Contains("..") || result.Contains("LongStringTest"));
     }
 
-    // Êñ∞Â¢ûÁöÑËæπÁïåÊ£ÄÊü•ÊµãËØïÊñπÊ≥ï
+    // –¬‘ˆµƒ±ﬂΩÁºÏ≤È≤‚ ‘∑Ω∑®
 
     [TestMethod]
     public void GetValue_NegativeRowIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(-1));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï -1 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ -1 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void GetValue_RowIndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(1));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï 1 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ 1 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void GetValue_RowIndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(5));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï 5 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ 5 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void SetValue_NegativeRowIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(-1, (object)"test"));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï -1 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ -1 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void SetValue_RowIndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(1, (object)"test"));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï 1 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ 1 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void SetValue_RowIndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(5, (object)"test"));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï 5 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ 5 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void SetBoolean_NegativeIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<Boolean>("BoolCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(-1, true));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï -1 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ -1 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void SetBoolean_IndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<Boolean>("BoolCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(1, true));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï 1 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ 1 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void SetInt32_IndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<Int32>("IntCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(5, 42));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï 5 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ 5 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void ToBoolean_NegativeIndex_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<Boolean>("BoolCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<Boolean>(-1));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï -1 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ -1 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void ToInt32_IndexEqualToCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<Int32>("IntCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<Int32>(1));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï 1 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ 1 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void ToString_IndexGreaterThanCount_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("StringCol");
         table.AddRow();
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<String>(10));
-        Assert.IsTrue(exception.Message.Contains("Ë°åÁ¥¢Âºï 10 Ë∂ÖÂá∫ÊúâÊïàËåÉÂõ¥"));
+        Assert.IsTrue(exception.Message.Contains("––À˜“˝ 10 ≥¨≥ˆ”––ß∑∂Œß"));
     }
 
     [TestMethod]
     public void BoundaryCheck_ValidIndex_WorksCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         table.AddRow();
         table.AddRow();
@@ -863,7 +863,7 @@ public class RecordTests
     public void BoundaryCheck_AfterCapacityExpansion_StillEnforcesBounds()
     {
         // Arrange
-        var table = new Record("Test", 2); // Small initial capacity
+        var table = new RecordTable("Test", 2); // Small initial capacity
         var col = table.Columns.Add<String>("TestCol");
 
         // Add rows to trigger capacity expansion
@@ -889,7 +889,7 @@ public class RecordTests
     public void AllTypedSetMethods_InvalidIndex_ThrowArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var boolCol = table.Columns.Add<Boolean>("Bool");
         var byteCol = table.Columns.Add<Byte>("Byte");
         var charCol = table.Columns.Add<Char>("Char");
@@ -930,7 +930,7 @@ public class RecordTests
     public void AllTypedToMethods_InvalidIndex_ThrowArgumentOutOfRangeException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var boolCol = table.Columns.Add<Boolean>("Bool");
         var byteCol = table.Columns.Add<Byte>("Byte");
         var charCol = table.Columns.Add<Char>("Char");
@@ -971,7 +971,7 @@ public class RecordTests
     public void BoundaryCheck_EmptyTable_AnyIndexThrowsException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         // No rows added, Count = 0
 
@@ -984,7 +984,7 @@ public class RecordTests
     public void BoundaryCheck_EmptyTable_NegativeIndexStillThrowsException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         // No rows added, Count = 0
 
@@ -997,7 +997,7 @@ public class RecordTests
     public void BoundaryCheck_EmptyTable_IndexGreaterThanZeroThrowsException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("TestCol");
         // No rows added, Count = 0
 
@@ -1010,7 +1010,7 @@ public class RecordTests
     public void Columns_AddDuplicateName_ReturnsExisting()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col1 = table.Columns.Add<String>("TestColumn");
 
         // Act
@@ -1025,10 +1025,10 @@ public class RecordTests
     public void Columns_AddDuplicateNameDifferentType_ThrowsInvalidOperationException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.Columns.Add<String>("TestColumn");
 
-        // Act & Assert - ÂêåÂêç‰∏çÂêåÁ±ªÂûãÂ∫îÊäõ InvalidOperationExceptionÔºà‰∏çÂÜçÊòØ InvalidCastExceptionÔºâ
+        // Act & Assert - Õ¨√˚≤ªÕ¨¿‡–Õ”¶≈◊ InvalidOperationException£®≤ª‘Ÿ « InvalidCastException£©
         Assert.Throws<InvalidOperationException>(() => table.Columns.Add<Int32>("TestColumn"));
     }
 
@@ -1041,7 +1041,7 @@ public class RecordTests
     [TestMethod]
     public void Columns_SetObject_WorksCorrectly()
     {
-        var re = new Record();
+        var re = new RecordTable();
         var name = re.Columns.Add<string>("Name");
         var id = re.Columns.Add<Int32>("Id");
 
@@ -1058,7 +1058,7 @@ public class RecordTests
     public void Columns_SetObjectNotMatchType_ThrowsInvalidCastException()
     {
         // Arrange
-        var re = new Record();
+        var re = new RecordTable();
         var id = re.Columns.Add<Int32>("Id");
         var row = re.AddRow();
         // Act & Assert - DateTime cannot be converted to int via SetValue
@@ -1069,7 +1069,7 @@ public class RecordTests
     public void AddRowFromValues_ExactNumberOfValues_SetsAllColumns()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
         var colAge = table.Columns.Add<Int32>("Age");
@@ -1088,7 +1088,7 @@ public class RecordTests
     public void AddRowFromValues_FewerValuesThanColumns_SetsOnlyProvidedValues()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
         var colAge = table.Columns.Add<Int32>("Age");
@@ -1108,7 +1108,7 @@ public class RecordTests
     public void AddRowFromValues_MoreValuesThanColumns_IgnoresExtraValues()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
 
@@ -1126,7 +1126,7 @@ public class RecordTests
     public void AddRowFromValues_EmptyValuesArray_CreatesEmptyRow()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
 
@@ -1144,7 +1144,7 @@ public class RecordTests
     public void AddRowFromValues_NoColumns_CreatesRowWithoutErrors()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
 
         // Act
         var row = table.AddRowFromValues(1, "Test", 30);
@@ -1159,7 +1159,7 @@ public class RecordTests
     public void AddRowFromValues_DifferentDataTypes_SetsCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colBool = table.Columns.Add<Boolean>("Bool");
         var colByte = table.Columns.Add<Byte>("Byte");
         var colDateTime = table.Columns.Add<DateTime>("DateTime");
@@ -1183,7 +1183,7 @@ public class RecordTests
     public void AddRowFromValues_WithNullValues_SetsNullCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
         var colAge = table.Columns.Add<Int32>("Age");
@@ -1203,7 +1203,7 @@ public class RecordTests
     public void AddRowFromValues_MultipleRowsCalls_IncrementsCountCorrectly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
 
@@ -1229,7 +1229,7 @@ public class RecordTests
     public void AddRowFromValues_SingleValue_SetsFirstColumnOnly()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var colId = table.Columns.Add<Int32>("Id");
         var colName = table.Columns.Add<String>("Name");
         var colAge = table.Columns.Add<Int32>("Age");
@@ -1249,7 +1249,7 @@ public class RecordTests
     public void RecordColumn_ToList_ReturnsAllValues()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<Int32>("Id");
         table.AddRow(); col.SetValue(0, 1);
         table.AddRow(); col.SetValue(1, 2);
@@ -1269,7 +1269,7 @@ public class RecordTests
     public void RecordColumn_ToList_EmptyRecord_ReturnsEmptyList()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("Name");
 
         // Act
@@ -1283,7 +1283,7 @@ public class RecordTests
     public void RecordColumn_ToList_NullValues_ReturnsDefaultForNulls()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("Name");
         table.AddRow(); col.SetValue(0, "Alice");
         table.AddRow(); // null
@@ -1303,7 +1303,7 @@ public class RecordTests
     public void Record_GetList_ByColName_ReturnsCorrectValues()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<String>("Name");
         table.AddRow(); col.SetValue(0, "Alice");
         table.AddRow(); col.SetValue(1, "Bob");
@@ -1323,7 +1323,7 @@ public class RecordTests
     public void Record_GetList_ColNotFound_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         table.Columns.Add<Int32>("Id");
         table.AddRow();
 
@@ -1335,7 +1335,7 @@ public class RecordTests
     public void Record_GetList_NullOrWhitespaceColName_ThrowsArgumentException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => table.GetList<int>(null!));
@@ -1346,7 +1346,7 @@ public class RecordTests
     public void RecordColumn_ToList_TypeMismatch_ThrowsInvalidCastException()
     {
         // Arrange
-        var table = new Record();
+        var table = new RecordTable();
         var col = table.Columns.Add<DateTime>("Value");
         table.AddRow(); col.SetValue(0, DateTime.Now);
 

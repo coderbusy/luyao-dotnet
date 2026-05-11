@@ -8,9 +8,9 @@ public class RecordSortTests
 {
     // ── 辅助构建方法 ────────────────────────────────────────────────────────
 
-    private static Record BuildIntRecord(params int[] values)
+    private static RecordTable BuildIntRecord(params int[] values)
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Value", typeof(int));
         foreach (int v in values)
         {
@@ -20,9 +20,9 @@ public class RecordSortTests
         return rec;
     }
 
-    private static Record BuildStringRecord(params string?[] values)
+    private static RecordTable BuildStringRecord(params string?[] values)
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Value", typeof(string));
         foreach (string? v in values)
         {
@@ -32,7 +32,7 @@ public class RecordSortTests
         return rec;
     }
 
-    private static int[] GetIntColumn(Record rec, string col)
+    private static int[] GetIntColumn(RecordTable rec, string col)
     {
         var result = new int[rec.Count];
         for (int i = 0; i < rec.Count; i++)
@@ -40,7 +40,7 @@ public class RecordSortTests
         return result;
     }
 
-    private static string?[] GetStringColumn(Record rec, string col)
+    private static string?[] GetStringColumn(RecordTable rec, string col)
     {
         var result = new string?[rec.Count];
         for (int i = 0; i < rec.Count; i++)
@@ -98,7 +98,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_SingleColumn_DateTime_Ascending()
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Date", typeof(DateTime));
         var d1 = new DateTime(2024, 1, 1);
         var d2 = new DateTime(2023, 6, 15);
@@ -121,7 +121,7 @@ public class RecordSortTests
     public void Sort_MultiColumn_Mixed_Direction()
     {
         // dept ASC, salary DESC
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Dept", typeof(string));
         rec.Columns.Add("Salary", typeof(int));
 
@@ -174,7 +174,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_AllNull_Stable()
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("A", typeof(string));
         rec.Columns.Add("B", typeof(int));
         for (int i = 1; i <= 3; i++)
@@ -193,7 +193,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_StableWhenKeysEqual()
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Key", typeof(int));
         rec.Columns.Add("Seq", typeof(int));
         for (int i = 0; i < 5; i++)
@@ -251,7 +251,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_TupleOverload_MultiColumn()
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("A", typeof(int));
         rec.Columns.Add("B", typeof(int));
         void AddRow(int a, int b) { var r = rec.AddRow(); rec.Columns["A"].Set(r, a); rec.Columns["B"].Set(r, b); }
@@ -287,7 +287,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_NonSortedColumnsAlsoReordered()
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Key", typeof(int));
         rec.Columns.Add("Tag", typeof(string));
         void AddRow(int k, string t) { var r = rec.AddRow(); rec.Columns["Key"].Set(r, k); rec.Columns["Tag"].Set(r, t); }
@@ -308,7 +308,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_EmptyRecord_NoException()
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Value", typeof(int));
         rec.Sort("Value ASC"); // 空表不应抛异常
         Assert.AreEqual(0, rec.Count);
@@ -391,7 +391,7 @@ public class RecordSortTests
     public void Sort_UnknownColumn_EmptyRecord_Throws()
     {
         // 即使表为空，未知列名也应立即抛出 KeyNotFoundException（不应被 Count <= 1 跳过）
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Value", typeof(int));
         Assert.Throws<KeyNotFoundException>(() => rec.Sort("NoSuchColumn ASC"));
     }
@@ -408,7 +408,7 @@ public class RecordSortTests
     public void Sort_DuplicateColumn_EmptyRecord_IsIgnored()
     {
         // 与 SQLite 行为一致：即使表为空，重复列名也应被忽略，不抛异常
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Value", typeof(int));
         rec.Sort(new RecordSortKey("Value", false), new RecordSortKey("Value", true));
         Assert.AreEqual(0, rec.Count);
@@ -419,7 +419,7 @@ public class RecordSortTests
     [TestMethod]
     public void Sort_ByteArray_Ascending()
     {
-        var rec = new Record("T");
+        var rec = new RecordTable("T");
         rec.Columns.Add("Data", typeof(byte[]));
         var b1 = new byte[] { 2, 0 };
         var b2 = new byte[] { 1, 0 };

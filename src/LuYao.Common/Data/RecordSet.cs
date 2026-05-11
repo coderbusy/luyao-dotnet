@@ -8,12 +8,12 @@ using System.Linq;
 namespace LuYao.Data;
 
 /// <summary>
-/// 命名 Record 集合，用于组织和管理多个 <see cref="Record"/>。
-/// 以 <see cref="Record.Name"/> 作为管理键，支持按名称增删改查。
+/// 命名 Record 集合，用于组织和管理多个 <see cref="RecordTable"/>。
+/// 以 <see cref="RecordTable.Name"/> 作为管理键，支持按名称增删改查。
 /// </summary>
-public partial class RecordSet : IEnumerable<Record>
+public partial class RecordSet : IEnumerable<RecordTable>
 {
-    private readonly SortedDictionary<string, Record> _records;
+    private readonly SortedDictionary<string, RecordTable> _records;
     private readonly StringComparer _comparer;
 
     /// <summary>
@@ -31,7 +31,7 @@ public partial class RecordSet : IEnumerable<Record>
     public RecordSet(StringComparer comparer)
     {
         _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
-        _records = new SortedDictionary<string, Record>(_comparer);
+        _records = new SortedDictionary<string, RecordTable>(_comparer);
     }
 
     /// <summary>
@@ -48,53 +48,53 @@ public partial class RecordSet : IEnumerable<Record>
     /// 按名称获取 Record。
     /// </summary>
     /// <param name="name">Record 的名称。</param>
-    /// <returns>对应的 <see cref="Record"/> 实例。</returns>
+    /// <returns>对应的 <see cref="RecordTable"/> 实例。</returns>
     /// <exception cref="KeyNotFoundException">当名称不存在时抛出。</exception>
-    public Record this[string name] => Get(name);
+    public RecordTable this[string name] => Get(name);
 
     /// <summary>
     /// 按名称添加一个 Record。如果名称已存在则抛出异常。
     /// </summary>
     /// <param name="name">Record 的名称。</param>
-    /// <param name="record">要添加的 <see cref="Record"/> 实例。</param>
+    /// <param name="table">要添加的 <see cref="RecordTable"/> 实例。</param>
     /// <exception cref="ArgumentException">当 <paramref name="name"/> 为空或空白时抛出。</exception>
-    /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出。</exception>
+    /// <exception cref="ArgumentNullException">当 <paramref name="table"/> 为 null 时抛出。</exception>
     /// <exception cref="ArgumentException">当名称已存在时抛出。</exception>
-    public void Add(string name, Record record)
+    public void Add(string name, RecordTable table)
     {
         ValidateName(name);
-        if (record == null) throw new ArgumentNullException(nameof(record));
+        if (table == null) throw new ArgumentNullException(nameof(table));
         if (_records.ContainsKey(name)) throw new ArgumentException($"名称 '{name}' 已经存在", nameof(name));
-        record.Name = name;
-        _records.Add(name, record);
+        table.Name = name;
+        _records.Add(name, table);
     }
 
     /// <summary>
     /// 按名称设置一个 Record。如果名称已存在则覆盖，不存在则添加。
     /// </summary>
     /// <param name="name">Record 的名称。</param>
-    /// <param name="record">要设置的 <see cref="Record"/> 实例。</param>
+    /// <param name="table">要设置的 <see cref="RecordTable"/> 实例。</param>
     /// <exception cref="ArgumentException">当 <paramref name="name"/> 为空或空白时抛出。</exception>
-    /// <exception cref="ArgumentNullException">当 <paramref name="record"/> 为 null 时抛出。</exception>
-    public void Set(string name, Record record)
+    /// <exception cref="ArgumentNullException">当 <paramref name="table"/> 为 null 时抛出。</exception>
+    public void Set(string name, RecordTable table)
     {
         ValidateName(name);
-        if (record == null) throw new ArgumentNullException(nameof(record));
-        record.Name = name;
-        _records[name] = record;
+        if (table == null) throw new ArgumentNullException(nameof(table));
+        table.Name = name;
+        _records[name] = table;
     }
 
     /// <summary>
     /// 按名称获取 Record。
     /// </summary>
     /// <param name="name">Record 的名称。</param>
-    /// <returns>对应的 <see cref="Record"/> 实例。</returns>
+    /// <returns>对应的 <see cref="RecordTable"/> 实例。</returns>
     /// <exception cref="KeyNotFoundException">当名称不存在时抛出。</exception>
-    public Record Get(string name)
+    public RecordTable Get(string name)
     {
-        if (!_records.TryGetValue(name, out var record))
+        if (!_records.TryGetValue(name, out var table))
             throw new KeyNotFoundException($"名称 '{name}' 不存在");
-        return record;
+        return table;
     }
 
     /// <summary>
@@ -105,14 +105,14 @@ public partial class RecordSet : IEnumerable<Record>
     /// <returns>如果找到则返回 true，否则返回 false。</returns>
 
 #if NETCOREAPP2_0_OR_GREATER
-    public bool TryGet(string name, [MaybeNullWhen(false)] out Record record)
+    public bool TryGet(string name, [MaybeNullWhen(false)] out RecordTable table)
     {
-        return _records.TryGetValue(name, out record);
+        return _records.TryGetValue(name, out table);
     }
 #else
-    public bool TryGet(string name, out Record record)
+    public bool TryGet(string name, out RecordTable table)
     {
-        return _records.TryGetValue(name, out record);
+        return _records.TryGetValue(name, out table);
     }
 #endif
 
@@ -147,14 +147,14 @@ public partial class RecordSet : IEnumerable<Record>
     public void Rename(string oldName, string newName)
     {
         ValidateName(newName);
-        if (!_records.TryGetValue(oldName, out var record))
+        if (!_records.TryGetValue(oldName, out var table))
             throw new KeyNotFoundException($"名称 '{oldName}' 不存在");
         if (!_comparer.Equals(oldName, newName) && _records.ContainsKey(newName))
             throw new ArgumentException($"名称 '{newName}' 已经存在", nameof(newName));
 
         _records.Remove(oldName);
-        record.Name = newName;
-        _records.Add(newName, record);
+        table.Name = newName;
+        _records.Add(newName, table);
     }
 
     /// <summary>
@@ -177,8 +177,8 @@ public partial class RecordSet : IEnumerable<Record>
         var set = new RecordSet();
         foreach (DataTable dt in ds.Tables)
         {
-            var record = Record.Read(dt);
-            set.Add(dt.TableName, record);
+            var table = RecordTable.Read(dt);
+            set.Add(dt.TableName, table);
         }
         return set;
     }
@@ -211,7 +211,7 @@ public partial class RecordSet : IEnumerable<Record>
     }
 
     /// <inheritdoc/>
-    public IEnumerator<Record> GetEnumerator() => _records.Values.GetEnumerator();
+    public IEnumerator<RecordTable> GetEnumerator() => _records.Values.GetEnumerator();
 
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -25,7 +25,7 @@ partial struct RecordRow
 
         /// <inheritdoc/>
         public override System.Collections.Generic.IEnumerable<string> GetDynamicMemberNames()
-            => ((RecordRow)Value!).Record.Columns.Select(c => c.Name);
+            => ((RecordRow)Value!).Table.Columns.Select(c => c.Name);
 
         /// <inheritdoc/>
         public override DynamicMetaObject BindGetMember(GetMemberBinder binder)

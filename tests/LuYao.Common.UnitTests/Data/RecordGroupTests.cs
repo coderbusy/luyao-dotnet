@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LuYao.Data;
@@ -6,27 +6,27 @@ namespace LuYao.Data;
 [TestClass]
 public class RecordGroupTests
 {
-    private Record CreateTestRecord()
+    private RecordTable CreateTestRecord()
     {
-        var record = new Record();
-        record.Columns.Add<int>("Id");
-        record.Columns.Add<string>("Category");
-        record.Columns.Add<string>("Status");
+        var table = new RecordTable();
+        table.Columns.Add<int>("Id");
+        table.Columns.Add<string>("Category");
+        table.Columns.Add<string>("Status");
 
-        var r1 = record.AddRow(); r1["Id"] = 1; r1["Category"] = "A"; r1["Status"] = "Active";
-        var r2 = record.AddRow(); r2["Id"] = 2; r2["Category"] = "B"; r2["Status"] = "Inactive";
-        var r3 = record.AddRow(); r3["Id"] = 3; r3["Category"] = "A"; r3["Status"] = "Active";
-        var r4 = record.AddRow(); r4["Id"] = 4; r4["Category"] = "C"; r4["Status"] = "Active";
-        var r5 = record.AddRow(); r5["Id"] = 5; r5["Category"] = "B"; r5["Status"] = "Active";
+        var r1 = table.AddRow(); r1["Id"] = 1; r1["Category"] = "A"; r1["Status"] = "Active";
+        var r2 = table.AddRow(); r2["Id"] = 2; r2["Category"] = "B"; r2["Status"] = "Inactive";
+        var r3 = table.AddRow(); r3["Id"] = 3; r3["Category"] = "A"; r3["Status"] = "Active";
+        var r4 = table.AddRow(); r4["Id"] = 4; r4["Category"] = "C"; r4["Status"] = "Active";
+        var r5 = table.AddRow(); r5["Id"] = 5; r5["Category"] = "B"; r5["Status"] = "Active";
 
-        return record;
+        return table;
     }
 
     [TestMethod]
     public void Group_ByStructColumn_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
-        var groups = record.Group<int>("Id");
+        var table = CreateTestRecord();
+        var groups = table.Group<int>("Id");
 
         Assert.IsNotNull(groups);
         Assert.AreEqual(5, groups.Count);
@@ -36,8 +36,8 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByStringColumn_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
-        var groups = record.Group("Category");
+        var table = CreateTestRecord();
+        var groups = table.Group("Category");
 
         Assert.IsNotNull(groups);
         Assert.AreEqual(3, groups.Count);
@@ -52,8 +52,8 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByParamsStringColumns_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
-        var groups = record.Group("Category", "Status");
+        var table = CreateTestRecord();
+        var groups = table.Group("Category", "Status");
 
         Assert.IsNotNull(groups);
         Assert.AreEqual(4, groups.Count);
@@ -71,8 +71,8 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByTwoColumns_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
-        var groups = record.Group<string, string>("Category", "Status");
+        var table = CreateTestRecord();
+        var groups = table.Group<string, string>("Category", "Status");
 
         Assert.IsNotNull(groups);
         Assert.AreEqual(4, groups.Count);
@@ -83,8 +83,8 @@ public class RecordGroupTests
     [TestMethod]
     public void Group_ByThreeColumns_ReturnsGroupedDictionary()
     {
-        var record = CreateTestRecord();
-        var groups = record.Group<string, string, int>("Category", "Status", "Id");
+        var table = CreateTestRecord();
+        var groups = table.Group<string, string, int>("Category", "Status", "Id");
 
         Assert.IsNotNull(groups);
         Assert.AreEqual(5, groups.Count);

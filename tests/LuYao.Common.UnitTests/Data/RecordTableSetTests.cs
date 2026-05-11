@@ -5,20 +5,20 @@ using System.Linq;
 namespace LuYao.Data;
 
 [TestClass]
-public class RecordSetTests
+public class RecordTableSetTests
 {
-    private static Record CreateTestRecord(string name, int rowCount)
+    private static RecordTable CreateTestRecord(string name, int rowCount)
     {
-        var record = new Record(name, rowCount);
-        var idCol = record.Columns.Add<int>("Id");
-        var nameCol = record.Columns.Add<string>("Name");
+        var table = new RecordTable(name, rowCount);
+        var idCol = table.Columns.Add<int>("Id");
+        var nameCol = table.Columns.Add<string>("Name");
         for (int i = 0; i < rowCount; i++)
         {
-            var row = record.AddRow();
+            var row = table.AddRow();
             idCol.SetValue(row.Row, i + 1);
             nameCol.SetValue(row.Row, $"Item{i + 1}");
         }
-        return record;
+        return table;
     }
 
     #region Constructor
@@ -46,39 +46,39 @@ public class RecordSetTests
     public void WhenAddValidRecordThenCountIncreases()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("Orders", 2);
+        var table = CreateTestRecord("Orders", 2);
 
-        set.Add("Orders", record);
+        set.Add("Orders", table);
 
         Assert.AreEqual(1, set.Count);
-        Assert.AreEqual("Orders", record.Name);
+        Assert.AreEqual("Orders", table.Name);
     }
 
     [TestMethod]
     public void WhenAddNullNameThenThrowsArgumentException()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("test", 1);
+        var table = CreateTestRecord("test", 1);
 
-        Assert.Throws<ArgumentException>(() => set.Add(null!, record));
+        Assert.Throws<ArgumentException>(() => set.Add(null!, table));
     }
 
     [TestMethod]
     public void WhenAddEmptyNameThenThrowsArgumentException()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("test", 1);
+        var table = CreateTestRecord("test", 1);
 
-        Assert.Throws<ArgumentException>(() => set.Add("", record));
+        Assert.Throws<ArgumentException>(() => set.Add("", table));
     }
 
     [TestMethod]
     public void WhenAddWhitespaceNameThenThrowsArgumentException()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("test", 1);
+        var table = CreateTestRecord("test", 1);
 
-        Assert.Throws<ArgumentException>(() => set.Add("   ", record));
+        Assert.Throws<ArgumentException>(() => set.Add("   ", table));
     }
 
     [TestMethod]
@@ -125,12 +125,12 @@ public class RecordSetTests
     public void WhenSetNewNameThenAddsRecord()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("Orders", 2);
+        var table = CreateTestRecord("Orders", 2);
 
-        set.Set("Orders", record);
+        set.Set("Orders", table);
 
         Assert.AreEqual(1, set.Count);
-        Assert.AreSame(record, set.Get("Orders"));
+        Assert.AreSame(table, set.Get("Orders"));
     }
 
     [TestMethod]
@@ -171,12 +171,12 @@ public class RecordSetTests
     public void WhenGetExistingNameThenReturnsRecord()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("Orders", 2);
-        set.Add("Orders", record);
+        var table = CreateTestRecord("Orders", 2);
+        set.Add("Orders", table);
 
         var result = set.Get("Orders");
 
-        Assert.AreSame(record, result);
+        Assert.AreSame(table, result);
     }
 
     [TestMethod]
@@ -191,13 +191,13 @@ public class RecordSetTests
     public void WhenTryGetExistingNameThenReturnsTrueAndRecord()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("Orders", 2);
-        set.Add("Orders", record);
+        var table = CreateTestRecord("Orders", 2);
+        set.Add("Orders", table);
 
         var found = set.TryGet("Orders", out var result);
 
         Assert.IsTrue(found);
-        Assert.AreSame(record, result);
+        Assert.AreSame(table, result);
     }
 
     [TestMethod]
@@ -219,12 +219,12 @@ public class RecordSetTests
     public void WhenIndexerExistingNameThenReturnsRecord()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("Orders", 1);
-        set.Add("Orders", record);
+        var table = CreateTestRecord("Orders", 1);
+        set.Add("Orders", table);
 
         var result = set["Orders"];
 
-        Assert.AreSame(record, result);
+        Assert.AreSame(table, result);
     }
 
     [TestMethod]
@@ -305,15 +305,15 @@ public class RecordSetTests
     public void WhenRenameExistingThenNameChanges()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("Orders", 1);
-        set.Add("Orders", record);
+        var table = CreateTestRecord("Orders", 1);
+        set.Add("Orders", table);
 
         set.Rename("Orders", "AllOrders");
 
         Assert.IsFalse(set.Contains("Orders"));
         Assert.IsTrue(set.Contains("AllOrders"));
-        Assert.AreSame(record, set.Get("AllOrders"));
-        Assert.AreEqual("AllOrders", record.Name);
+        Assert.AreSame(table, set.Get("AllOrders"));
+        Assert.AreEqual("AllOrders", table.Name);
     }
 
     [TestMethod]
@@ -347,8 +347,8 @@ public class RecordSetTests
     public void WhenRenameToSameNameThenSucceeds()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("Orders", 1);
-        set.Add("Orders", record);
+        var table = CreateTestRecord("Orders", 1);
+        set.Add("Orders", table);
 
         set.Rename("Orders", "Orders");
 
@@ -483,8 +483,8 @@ public class RecordSetTests
     public void WhenRoundTripThroughDataSetThenDataPreserved()
     {
         var set = new RecordSet();
-        var record = CreateTestRecord("Products", 3);
-        set.Add("Products", record);
+        var table = CreateTestRecord("Products", 3);
+        set.Add("Products", table);
 
         var ds = set.ToDataSet();
         var set2 = RecordSet.FromDataSet(ds);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace LuYao.Data;
 
@@ -8,83 +8,83 @@ public class RecordPagingTests
     [TestMethod]
     public void WhenDefaultConstructorThenPageIsOne()
     {
-        var record = new Record();
-        Assert.AreEqual(1, record.Page);
+        var table = new RecordTable();
+        Assert.AreEqual(1, table.Page);
     }
 
     [TestMethod]
     public void WhenDefaultConstructorThenPageSizeIsZero()
     {
-        var record = new Record();
-        Assert.AreEqual(0, record.PageSize);
+        var table = new RecordTable();
+        Assert.AreEqual(0, table.PageSize);
     }
 
     [TestMethod]
     public void WhenMaxCountNotSetThenReturnsCount()
     {
-        var record = new Record();
-        record.Columns.Add<int>("Id");
-        record.AddRow();
-        record.AddRow();
+        var table = new RecordTable();
+        table.Columns.Add<int>("Id");
+        table.AddRow();
+        table.AddRow();
 
-        Assert.AreEqual(2, record.MaxCount);
+        Assert.AreEqual(2, table.MaxCount);
     }
 
     [TestMethod]
     public void WhenMaxCountSetThenReturnsSetValue()
     {
-        var record = new Record();
-        record.MaxCount = 100;
+        var table = new RecordTable();
+        table.MaxCount = 100;
 
-        Assert.AreEqual(100, record.MaxCount);
+        Assert.AreEqual(100, table.MaxCount);
     }
 
     [TestMethod]
     public void WhenMaxCountZeroThenMaxPageIsZero()
     {
-        var record = new Record();
+        var table = new RecordTable();
 
-        Assert.AreEqual(0, record.MaxPage);
+        Assert.AreEqual(0, table.MaxPage);
     }
 
     [TestMethod]
     public void WhenPageSizeZeroThenMaxPageUsesDefault20()
     {
-        var record = new Record();
-        record.MaxCount = 50;
+        var table = new RecordTable();
+        table.MaxCount = 50;
 
-        Assert.AreEqual(3, record.MaxPage); // (50-1)/20+1 = 3
+        Assert.AreEqual(3, table.MaxPage); // (50-1)/20+1 = 3
     }
 
     [TestMethod]
     public void WhenPageSizeSetThenMaxPageCalculatesCorrectly()
     {
-        var record = new Record();
-        record.MaxCount = 100;
-        record.PageSize = 10;
+        var table = new RecordTable();
+        table.MaxCount = 100;
+        table.PageSize = 10;
 
-        Assert.AreEqual(10, record.MaxPage);
+        Assert.AreEqual(10, table.MaxPage);
     }
 
     [TestMethod]
     public void WhenMaxCountNotExactMultipleThenMaxPageRoundsUp()
     {
-        var record = new Record();
-        record.MaxCount = 101;
-        record.PageSize = 10;
+        var table = new RecordTable();
+        table.MaxCount = 101;
+        table.PageSize = 10;
 
-        Assert.AreEqual(11, record.MaxPage);
+        Assert.AreEqual(11, table.MaxPage);
     }
 
     [TestMethod]
     public void WhenCloneThenPagingPropertiesAreCopied()
     {
-        var record = new Record("Test", 0);
-        record.Page = 3;
-        record.PageSize = 25;
-        record.MaxCount = 200;
+        var table = new RecordTable("Test", 0);
+        table.Page = 3;
+        table.PageSize = 25;
+        table.MaxCount = 200;
 
-        var clone = record.Clone();
+        var clone = table.Clone();
 
         Assert.AreEqual(3, clone.Page);
         Assert.AreEqual(25, clone.PageSize);

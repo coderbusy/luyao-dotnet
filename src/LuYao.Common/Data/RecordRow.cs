@@ -13,22 +13,22 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
     /// </summary>
-    /// <param name="record">包含此行的数据集合。</param>
+    /// <param name="table">包含此行的数据集合。</param>
     /// <param name="row">行索引，必须在有效范围内。</param>
     /// <exception cref="ArgumentOutOfRangeException">当行索引超出记录范围时抛出。</exception>
     /// <exception cref="ArgumentNullException">当记录参数为 null 时抛出。</exception>
-    internal RecordRow(Record record, int row)
+    internal RecordRow(RecordTable table, int row)
     {
-        this.Record = record ?? throw new ArgumentNullException(nameof(record));
-        if (row < 0 || row >= record.Count) throw new ArgumentOutOfRangeException(nameof(row));
+        this.Table = table ?? throw new ArgumentNullException(nameof(table));
+        if (row < 0 || row >= table.Count) throw new ArgumentOutOfRangeException(nameof(row));
         this.Row = row;
     }
 
     /// <summary>
     /// 获取包含此行的数据集合。
     /// </summary>
-    /// <value>关联的 <see cref="Record"/> 实例。</value>
-    public Record Record { get; }
+    /// <value>关联的 <see cref="RecordTable"/> 实例。</value>
+    public RecordTable Table { get; }
 
     /// <summary>
     /// 获取当前行在数据集合中的索引位置。
@@ -58,7 +58,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         var sb = new StringBuilder();
         sb.Append("{ Row = ").Append(this.Row).Append(", Data = { ");
         bool first = true;
-        foreach (var col in this.Record.Columns)
+        foreach (var col in this.Table.Columns)
         {
             if (!first) sb.Append(", ");
             var value = col.Get(this);
@@ -75,8 +75,8 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// <returns>键为列名、值为当前行对应列值的字典。</returns>
     public readonly Dictionary<string, object?> ToDictionary()
     {
-        var ret = new Dictionary<string, object?>(this.Record.Columns.Count, StringComparer.Ordinal);
-        foreach (var col in this.Record.Columns)
+        var ret = new Dictionary<string, object?>(this.Table.Columns.Count, StringComparer.Ordinal);
+        foreach (var col in this.Table.Columns)
         {
             ret[col.Name] = col.Get(this);
         }
@@ -94,7 +94,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         {
             if (!string.IsNullOrWhiteSpace(name))
             {
-                var col = this.Record.Columns.Find(name);
+                var col = this.Table.Columns.Find(name);
                 if (col != null) return col.Get(this);
             }
             return default;
@@ -102,11 +102,11 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         set
         {
             if (string.IsNullOrWhiteSpace(name)) return;
-            var col = this.Record.Columns.Find(name);
+            var col = this.Table.Columns.Find(name);
             if (col == null)
             {
                 if (value == null) return;
-                col = this.Record.Columns.Add(name, value.GetType());
+                col = this.Table.Columns.Add(name, value.GetType());
             }
             col.Set(this, value);
         }
@@ -121,7 +121,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     public readonly T? To<T>(String name)
     {
         if (string.IsNullOrWhiteSpace(name)) return default;
-        var col = this.Record.Columns.Find(name);
+        var col = this.Table.Columns.Find(name);
         if (col == null) return default;
         return col.To<T>(this);
     }
@@ -134,7 +134,7 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     public readonly String ToString(string? name)
     {
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;
-        var col = this.Record.Columns.Find(name);
+        var col = this.Table.Columns.Find(name);
         if (col == null) return string.Empty;
         return col.ToString(this.Row);
     }
