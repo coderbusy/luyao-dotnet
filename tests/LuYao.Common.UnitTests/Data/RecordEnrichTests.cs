@@ -118,6 +118,27 @@ public class RecordEnrichTests
     }
 
     [TestMethod]
+    public void Enrich_TargetHasSameNameColumn_DoesNotOverwriteExistingValues()
+    {
+        // Arrange
+        var employees = BuildEmployeesWithDept();
+        var existing = employees.Columns.Add<string>("DeptName");
+        existing.Set(0, "Self-A");
+        existing.Set(1, "Self-B");
+        existing.Set(2, "Self-C");
+        var departments = BuildDepartments();
+
+        // Act
+        employees.Enrich(departments, "DeptId", "DeptId");
+
+        // Assert
+        Assert.AreEqual("Self-A", existing.To<string>(0));
+        Assert.AreEqual("Self-B", existing.To<string>(1));
+        Assert.AreEqual("Self-C", existing.To<string>(2));
+        Assert.AreEqual("Beijing", employees.Columns.Get("Location").To<string>(0));
+    }
+
+    [TestMethod]
     public void Enrich_NoMatchingRow_RowRemainsUnchanged()
     {
         // Arrange
@@ -138,6 +159,23 @@ public class RecordEnrichTests
     {
         var r = new Record();
         Assert.Throws<ArgumentNullException>(() => r.Enrich(null!, "Id"));
+    }
+
+    [TestMethod]
+    public void Enrich_NullSharedColumn_ThrowsArgumentNullException()
+    {
+        var r = new Record();
+        Assert.Throws<ArgumentNullException>(() => r.Enrich(new Record(), null!));
+    }
+
+    [TestMethod]
+    public void Enrich_NullSelfOrSourceColumn_ThrowsArgumentNullException()
+    {
+        var r = new Record();
+        var source = new Record();
+
+        Assert.Throws<ArgumentNullException>(() => r.Enrich(source, null!, "Id"));
+        Assert.Throws<ArgumentNullException>(() => r.Enrich(source, "Id", null!));
     }
 
     [TestMethod]

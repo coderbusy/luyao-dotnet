@@ -17,6 +17,7 @@ public partial class Record
     public void Enrich(Record source, string sharedColumn)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
+        if (sharedColumn == null) throw new ArgumentNullException(nameof(sharedColumn));
         if (string.IsNullOrWhiteSpace(sharedColumn)) throw new ArgumentException("列名不能为空。", nameof(sharedColumn));
         Enrich(source, sharedColumn, sharedColumn, null);
     }
@@ -34,6 +35,8 @@ public partial class Record
     public void Enrich(Record source, string selfColumn, string sourceColumn)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
+        if (selfColumn == null) throw new ArgumentNullException(nameof(selfColumn));
+        if (sourceColumn == null) throw new ArgumentNullException(nameof(sourceColumn));
         if (string.IsNullOrWhiteSpace(selfColumn)) throw new ArgumentException("列名不能为空。", nameof(selfColumn));
         if (string.IsNullOrWhiteSpace(sourceColumn)) throw new ArgumentException("列名不能为空。", nameof(sourceColumn));
         Enrich(source, selfColumn, sourceColumn, null);
@@ -54,6 +57,8 @@ public partial class Record
     public void Enrich(Record source, string selfColumn, string sourceColumn, IReadOnlyList<string>? columnsToEnrich)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
+        if (selfColumn == null) throw new ArgumentNullException(nameof(selfColumn));
+        if (sourceColumn == null) throw new ArgumentNullException(nameof(sourceColumn));
         if (string.IsNullOrWhiteSpace(selfColumn)) throw new ArgumentException("列名不能为空。", nameof(selfColumn));
         if (string.IsNullOrWhiteSpace(sourceColumn)) throw new ArgumentException("列名不能为空。", nameof(sourceColumn));
 
@@ -67,13 +72,11 @@ public partial class Record
         if (enrichCols.Count == 0) return;
 
         // 为每一行查找匹配，按需追加列定义并填值
+        var lookup = BuildRowLookup(source, srcKeyCol);
         for (int i = 0; i < this.Count; i++)
         {
             var keyValue = selfKeyCol.Get(i);
-            var matched = FindRowByKey(source, srcKeyCol, keyValue);
-            if (matched == null) continue;
-
-            int srcRow = matched.Value.Row;
+            if (!TryFindRowByLookup(lookup, keyValue, out var srcRow)) continue;
             foreach (var srcCol in enrichCols)
             {
                 var dstCol = this.Columns.Find(srcCol.Name)
@@ -96,20 +99,50 @@ public partial class Record
             // 如果指定了列名过滤，则只处理其中的列
             if (columnsToEnrich != null && !ContainsName(columnsToEnrich, col.Name)) continue;
 
+            // 跳过当前记录中已存在的列
+            if (this.Columns.Contains(col.Name)) continue;
+
             result.Add(col);
         }
         return result;
     }
 
-    // 在 source 中按键列查找第一条匹配行
-    private static RecordRow? FindRowByKey(Record source, RecordColumn keyCol, object? keyValue)
+    private static RowLookup BuildRowLookup(Record source, RecordColumn keyCol)
     {
+        var map = new Dictionary<object, int>();
+        int nullRow = -1;
         for (int i = 0; i < source.Count; i++)
         {
             var v = keyCol.Get(i);
-            if (Equals(v, keyValue)) return new RecordRow(source, i);
+            if (v == null)
+            {
+                if (nullRow < 0) nullRow = i;
+                continue;
+            }
+
+            if (!map.ContainsKey(v))
+            {
+                map.Add(v, i);
+            }
         }
-        return null;
+        return new RowLookup(map, nullRow);
+    }
+
+    private static bool TryFindRowByLookup(RowLookup lookup, object? keyValue, out int row)
+    {
+        if (keyValue == null)
+        {
+            if (lookup.NullRow >= 0)
+            {
+                row = lookup.NullRow;
+                return true;
+            }
+
+            row = -1;
+            return false;
+        }
+
+        return lookup.Map.TryGetValue(keyValue, out row);
     }
 
     private static bool ContainsName(IReadOnlyList<string> list, string name)
@@ -119,5 +152,18 @@ public partial class Record
             if (string.Equals(list[i], name, StringComparison.Ordinal)) return true;
         }
         return false;
+    }
+
+    private readonly struct RowLookup
+    {
+        public RowLookup(Dictionary<object, int> map, int nullRow)
+        {
+            this.Map = map;
+            this.NullRow = nullRow;
+        }
+
+        public Dictionary<object, int> Map { get; }
+
+        public int NullRow { get; }
     }
 }

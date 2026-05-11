@@ -34,6 +34,7 @@
 - 查询：按列值、Lambda、`dynamic` 条件查找
 - 排序：原地多列排序，行为对齐 SQLite ORDER BY
 - 分组：单字段、多字段字符串分组，以及 2/3 字段元组分组
+- 数据补全：`Enrich` 按关联键从另一个 `Record` 追加当前不存在的列并填充值
 - 对象映射：对象/对象集合与 `Record` 之间转换
 - ADO.NET 互操作：`IDataReader`、`DataTable`、`DataSet`
 - 二进制序列化：`Record` / `RecordSet` 都支持字节流读写
@@ -88,6 +89,14 @@
 - `AddRow()` 才会真正增加 `Count`。
 - `CloneSchema()` 只复制结构，不复制分页元数据。
 - `Clone()` 会复制结构、全部数据以及分页元数据。
+
+`Enrich` 相关语义：
+
+- 重载：`Enrich(source, sharedColumn)`、`Enrich(source, selfColumn, sourceColumn)`、`Enrich(source, selfColumn, sourceColumn, columnsToEnrich)`。
+- 匹配规则：按当前记录 `selfColumn` 与来源记录 `sourceColumn` 的值匹配来源中的第一行。
+- 列处理：仅处理来源中当前记录尚不存在的列；已存在同名列不会被覆盖。
+- 列过滤：`columnsToEnrich` 非空时仅补充其中列名（仍会跳过当前记录已存在列）。
+- 参数校验：`source`、`sharedColumn`、`selfColumn`、`sourceColumn` 为 `null` 抛 `ArgumentNullException`；列名为空白抛 `ArgumentException`。
 
 ### 3.2 `RecordRow`
 
