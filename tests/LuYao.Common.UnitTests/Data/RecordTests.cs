@@ -1341,4 +1341,16 @@ public class RecordTests
         Assert.Throws<ArgumentException>(() => table.GetList<int>(null!));
         Assert.Throws<ArgumentException>(() => table.GetList<int>("   "));
     }
+
+    [TestMethod]
+    public void RecordColumn_ToList_TypeMismatch_ThrowsInvalidCastException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add<DateTime>("Value");
+        table.AddRow(); col.SetValue(0, DateTime.Now);
+
+        // Act & Assert
+        Assert.Throws<InvalidCastException>(() => col.ToList<int>());
+    }
 }

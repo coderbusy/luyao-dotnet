@@ -160,7 +160,7 @@ public partial class Record
     /// <exception cref="InvalidCastException">当某行值无法转换为目标类型时抛出。</exception>
     public List<T?> GetList<T>(string colName)
     {
-        if (string.IsNullOrWhiteSpace(colName)) throw new ArgumentException("列名不能为空。", nameof(colName));
+        if (string.IsNullOrWhiteSpace(colName)) throw new ArgumentException("列名不能为空", nameof(colName));
         return this.Columns.Get(colName).ToList<T>();
     }
 }

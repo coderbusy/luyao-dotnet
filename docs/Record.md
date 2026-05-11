@@ -325,7 +325,7 @@ record.AddRowFromValues(2, "B", "Ignored");
 - `FindAll(Func<RecordRow, bool> filter)`
 - `FindByDynamic(Func<dynamic, bool> filter)`
 - `FindAllByDynamic(Func<dynamic, bool> filter)`
-- `GetList<T>(string colName)`：将指定列的所有值提取为 `List<T?>`，长度等于 `Count`；列不存在时抛 `KeyNotFoundException`，列名为空时抛 `ArgumentException`
+- `GetList<T>(string colName)`：将指定列的所有值提取为 `List<T?>`，长度等于 `Count`；列不存在时抛 `KeyNotFoundException`，列名为空时抛 `ArgumentException`，列值无法转换为目标类型时抛 `InvalidCastException`
 
 行为说明：
 
