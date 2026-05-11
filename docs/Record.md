@@ -125,6 +125,28 @@
 - 索引器写入时，如果列不存在且值非 `null`，会调用 `Columns.Add(name, value.GetType())` 自动建列；如果运行时类型不在支持白名单内，会抛出异常。
 - `RecordRow` 的公开获取方式通常是 `record[row]` 或通过枚举 `foreach (var row in record)`。
 
+**Merge 方法语义**
+
+`Merge` 与 `CopyFrom` 的核心区别在于对"目标列不存在"的处理方式：
+
+| 方法 | 目标列不存在时 | null 值处理 |
+|------|--------------|-------------|
+| `CopyFrom<T>(T)` | 静默跳过，不建列 | 会写入 null |
+| `Merge(RecordRow)` | 自动按来源列类型建列 | 会写入 null（覆盖已有值） |
+| `Merge<T>(T)` | 自动按属性类型建列 | 会写入 null（覆盖已有值） |
+
+`Merge<T>(T model)` 的额外规则：
+
+- 仅处理**可读属性**（`CanRead == true`）。
+- 属性类型须在支持白名单内（`bool`、各整数类型、`float`/`double`/`decimal`、`char`、`string`、`DateTime`、`DateTimeOffset`、`TimeSpan`、`Guid`、`byte[]`，以及上述类型的枚举/Nullable 形式）；不在白名单内的属性会被**静默跳过**，不会建列也不会抛出异常。
+- `model` 为 `null` 时抛出 `ArgumentNullException`。
+
+`Merge(RecordRow other)` 的额外规则：
+
+- 遍历 `other` 所属 `Record` 的所有列，按列名在当前行所属 `Record` 中查找或新建同名列（类型与来源列一致），然后将来源值写入。
+- `other` 可来自不同的 `Record` 实例，不要求列结构一致。
+- 当前行与 `other` 指向同一行时，结果等同于原地覆盖（无实质变化）。
+
 ### 3.3 `RecordColumn` / `RecordColumn<T>`
 
 `RecordColumn` 是列的抽象基类，`RecordColumn<T>` 是泛型实现。
