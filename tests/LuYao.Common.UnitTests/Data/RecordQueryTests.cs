@@ -270,4 +270,26 @@ public class RecordQueryTests
         // Assert
         Assert.AreEqual(0, results.Count);
     }
+
+    [TestMethod]
+    public void FindAll_ObjectOverload_SupportsNullValue()
+    {
+        // Arrange
+        var record = new Record();
+        var colName = record.Columns.Add<string>("Name");
+        var r1 = record.AddRow();
+        colName.SetValue(r1.Row, "Alice");
+        var r2 = record.AddRow();
+        colName.SetValue(r2.Row, null);
+        var r3 = record.AddRow();
+        colName.SetValue(r3.Row, null);
+
+        // Act
+        var results = record.FindAll("Name", (object?)null).ToList();
+
+        // Assert
+        Assert.AreEqual(2, results.Count);
+        Assert.IsNull(results[0].To<string>("Name"));
+        Assert.IsNull(results[1].To<string>("Name"));
+    }
 }

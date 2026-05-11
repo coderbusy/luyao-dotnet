@@ -318,6 +318,8 @@ record.AddRowFromValues(2, "B", "Ignored");
 
 - `Find<T>(string name, T value)`
 - `FindAll<T>(string name, T value)`
+- `Find(string name, object? value)`
+- `FindAll(string name, object? value)`
 - `Find(Func<RecordRow, bool> filter)`
 - `FindAll(Func<RecordRow, bool> filter)`
 - `FindByDynamic(Func<dynamic, bool> filter)`
@@ -330,12 +332,17 @@ record.AddRowFromValues(2, "B", "Ignored");
 - `FindAll*` 使用 `yield return`，属于延迟执行枚举
 - `Find<T>(name, value)` 中列不存在时直接返回 `null`
 - `FindAll<T>(name, value)` 中列不存在时直接返回空序列
+- `Find(string, object?)` / `FindAll(string, object?)` 使用 `object.Equals` 进行匹配，支持 `null` 值比较；列不存在时分别返回 `null` 或空序列
 - 以委托过滤的 `Find` / `FindAll` 在 `filter == null` 时抛 `ArgumentNullException`
 
 示例：
 
 ```csharp
 var first = record.Find<int>("Id", 100);
+
+// 使用 object 重载（支持运行时类型与 null）
+var row = record.Find("Name", (object?)"Bob");
+var nullRows = record.FindAll("Name", (object?)null);
 
 var largeOrders = record.FindAll(r => r.To<decimal>("Amount") > 1000m);
 
