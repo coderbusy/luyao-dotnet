@@ -1244,4 +1244,113 @@ public class RecordTests
         Assert.IsNull(colName.Get(row.Row));
         Assert.AreEqual(0, colAge.To<Int32>(row.Row));
     }
+
+    [TestMethod]
+    public void RecordColumn_ToList_ReturnsAllValues()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add<Int32>("Id");
+        table.AddRow(); col.SetValue(0, 1);
+        table.AddRow(); col.SetValue(1, 2);
+        table.AddRow(); col.SetValue(2, 3);
+
+        // Act
+        var list = col.ToList<int>();
+
+        // Assert
+        Assert.AreEqual(3, list.Count);
+        Assert.AreEqual(1, list[0]);
+        Assert.AreEqual(2, list[1]);
+        Assert.AreEqual(3, list[2]);
+    }
+
+    [TestMethod]
+    public void RecordColumn_ToList_EmptyRecord_ReturnsEmptyList()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add<String>("Name");
+
+        // Act
+        var list = col.ToList<string>();
+
+        // Assert
+        Assert.AreEqual(0, list.Count);
+    }
+
+    [TestMethod]
+    public void RecordColumn_ToList_NullValues_ReturnsDefaultForNulls()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add<String>("Name");
+        table.AddRow(); col.SetValue(0, "Alice");
+        table.AddRow(); // null
+        table.AddRow(); col.SetValue(2, "Bob");
+
+        // Act
+        var list = col.ToList<string>();
+
+        // Assert
+        Assert.AreEqual(3, list.Count);
+        Assert.AreEqual("Alice", list[0]);
+        Assert.IsNull(list[1]);
+        Assert.AreEqual("Bob", list[2]);
+    }
+
+    [TestMethod]
+    public void Record_GetList_ByColName_ReturnsCorrectValues()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add<String>("Name");
+        table.AddRow(); col.SetValue(0, "Alice");
+        table.AddRow(); col.SetValue(1, "Bob");
+        table.AddRow(); col.SetValue(2, "Carol");
+
+        // Act
+        var list = table.GetList<string>("Name");
+
+        // Assert
+        Assert.AreEqual(3, list.Count);
+        Assert.AreEqual("Alice", list[0]);
+        Assert.AreEqual("Bob", list[1]);
+        Assert.AreEqual("Carol", list[2]);
+    }
+
+    [TestMethod]
+    public void Record_GetList_ColNotFound_ThrowsKeyNotFoundException()
+    {
+        // Arrange
+        var table = new Record();
+        table.Columns.Add<Int32>("Id");
+        table.AddRow();
+
+        // Act & Assert
+        Assert.Throws<KeyNotFoundException>(() => table.GetList<int>("Missing"));
+    }
+
+    [TestMethod]
+    public void Record_GetList_NullOrWhitespaceColName_ThrowsArgumentException()
+    {
+        // Arrange
+        var table = new Record();
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => table.GetList<int>(null!));
+        Assert.Throws<ArgumentException>(() => table.GetList<int>("   "));
+    }
+
+    [TestMethod]
+    public void RecordColumn_ToList_TypeMismatch_ThrowsInvalidCastException()
+    {
+        // Arrange
+        var table = new Record();
+        var col = table.Columns.Add<DateTime>("Value");
+        table.AddRow(); col.SetValue(0, DateTime.Now);
+
+        // Act & Assert
+        Assert.Throws<InvalidCastException>(() => col.ToList<int>());
+    }
 }

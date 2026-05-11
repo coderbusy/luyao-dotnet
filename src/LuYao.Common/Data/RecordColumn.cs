@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LuYao.Data.Meta;
 
 namespace LuYao.Data;
@@ -143,6 +144,22 @@ public abstract class RecordColumn : IXProp
     /// <returns>列值的字符串表示。</returns>
     /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="row"/> 超出有效范围时抛出。</exception>
     public abstract String ToString(int row);
+
+    /// <summary>
+    /// 将整列数据转换为 <see cref="List{T}"/>，顺序与行索引一致。
+    /// 原值为 null 时对应元素为 <typeparamref name="T"/> 的默认值。
+    /// </summary>
+    /// <typeparam name="T">目标类型。</typeparam>
+    /// <returns>包含整列数据的列表，长度等于 <see cref="Record.Count"/>。</returns>
+    /// <exception cref="InvalidCastException">当某行值无法转换为目标类型时抛出。</exception>
+    public List<T?> ToList<T>()
+    {
+        int count = this.Record.Count;
+        var list = new List<T?>(count);
+        for (int i = 0; i < count; i++)
+            list.Add(To<T>(i));
+        return list;
+    }
     #endregion
 
     #region IXProp 实现
