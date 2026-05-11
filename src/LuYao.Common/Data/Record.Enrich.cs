@@ -72,11 +72,13 @@ public partial class Record
         if (enrichCols.Count == 0) return;
 
         // 为每一行查找匹配，按需追加列定义并填值
-        var lookup = BuildRowLookup(source, srcKeyCol);
         for (int i = 0; i < this.Count; i++)
         {
             var keyValue = selfKeyCol.Get(i);
-            if (!TryFindRowByLookup(lookup, keyValue, out var srcRow)) continue;
+            var matched = source.Find(srcKeyCol.Name, keyValue);
+            if (matched == null) continue;
+
+            int srcRow = matched.Value.Row;
             foreach (var srcCol in enrichCols)
             {
                 var dstCol = this.Columns.Find(srcCol.Name)
@@ -107,41 +109,6 @@ public partial class Record
         return result;
     }
 
-    private static RowLookup BuildRowLookup(Record source, RecordColumn keyCol)
-    {
-        var map = new Dictionary<object, int>();
-        int nullRow = -1;
-        for (int i = 0; i < source.Count; i++)
-        {
-            var v = keyCol.Get(i);
-            if (v == null)
-            {
-                if (nullRow < 0) nullRow = i;
-                continue;
-            }
-
-            map.TryAdd(v, i);
-        }
-        return new RowLookup(map, nullRow);
-    }
-
-    private static bool TryFindRowByLookup(RowLookup lookup, object? keyValue, out int row)
-    {
-        if (keyValue == null)
-        {
-            if (lookup.NullRow >= 0)
-            {
-                row = lookup.NullRow;
-                return true;
-            }
-
-            row = -1;
-            return false;
-        }
-
-        return lookup.Map.TryGetValue(keyValue, out row);
-    }
-
     private static bool ContainsName(IReadOnlyList<string> list, string name)
     {
         for (int i = 0; i < list.Count; i++)
@@ -149,18 +116,5 @@ public partial class Record
             if (string.Equals(list[i], name, StringComparison.Ordinal)) return true;
         }
         return false;
-    }
-
-    private readonly struct RowLookup
-    {
-        public RowLookup(Dictionary<object, int> map, int nullRow)
-        {
-            this.Map = map;
-            this.NullRow = nullRow;
-        }
-
-        public Dictionary<object, int> Map { get; }
-
-        public int NullRow { get; }
     }
 }
