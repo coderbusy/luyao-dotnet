@@ -129,16 +129,16 @@
 
 `Merge` 与 `CopyFrom` 的核心区别在于对"目标列不存在"的处理方式：
 
-| 方法 | 目标列不存在时 | null 值处理 |
-|------|--------------|-------------|
-| `CopyFrom<T>(T)` | 静默跳过，不建列 | 会写入 null |
-| `Merge(RecordRow)` | 自动按来源列类型建列 | 会写入 null（覆盖已有值） |
-| `Merge<T>(T)` | 自动按属性类型建列 | 会写入 null（覆盖已有值） |
+| 方法              | 目标列不存在时         | 来源为 null 时             |
+|-------------------|----------------------|--------------------------|
+| `CopyFrom<T>(T)`  | 静默跳过，不建列       | 会写入 null 到已有目标列    |
+| `Merge(RecordRow)`| 自动按来源列类型建列   | 会写入 null（覆盖已有值）   |
+| `Merge<T>(T)`     | 自动按属性类型建列     | 会写入 null（覆盖已有值）   |
 
 `Merge<T>(T model)` 的额外规则：
 
 - 仅处理**可读属性**（`CanRead == true`）。
-- 属性类型须在支持白名单内（`bool`、各整数类型、`float`/`double`/`decimal`、`char`、`string`、`DateTime`、`DateTimeOffset`、`TimeSpan`、`Guid`、`byte[]`，以及上述类型的枚举/Nullable 形式）；不在白名单内的属性会被**静默跳过**，不会建列也不会抛出异常。
+- 属性类型须在支持白名单内（`bool`、`sbyte`/`byte`、`short`/`ushort`、`int`/`uint`、`long`/`ulong`、`float`/`double`/`decimal`、`char`、`string`、`DateTime`、`DateTimeOffset`、`TimeSpan`、`Guid`、`byte[]`，以及上述类型的枚举/Nullable 形式）；不在白名单内的属性会被**静默跳过**，不会建列也不会抛出异常。
 - `model` 为 `null` 时抛出 `ArgumentNullException`。
 
 `Merge(RecordRow other)` 的额外规则：
