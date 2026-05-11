@@ -6,13 +6,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LuYao.Data;
 
 /// <summary>
-/// ���� <see cref="RecordRow"/> �Ĺ��졢�ֶη��ʡ���ֵ�� dynamic ��Ϊ��
+/// 测试 <see cref="RecordRow"/> 的构造、字段访问、赋值与 dynamic 行为。
 /// </summary>
 [TestClass]
 public class RecordTableRowTests
 {
     /// <summary>
-    /// �����������͡��ַ����Ͳ����еĲ��Լ�¼��
+    /// 创建包含整型、字符串和布尔列的测试记录。
     /// </summary>
     private (RecordTable table, RecordColumn<int> intColumn, RecordColumn<string> stringColumn, RecordColumn<bool> boolColumn) CreateTestRecord()
     {
@@ -36,7 +36,7 @@ public class RecordTableRowTests
 
 
     /// <summary>
-    /// ʹ����Ч��������ʱ��Ӧ��ȷ��ʼ����¼���кš�
+    /// 使用有效参数构造时，应正确初始化记录与行号。
     /// </summary>
     [TestMethod]
     public void Constructor_ValidParameters_ShouldInitializeCorrectly()
@@ -53,7 +53,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ����¼Ϊ null ʱ��Ӧ�׳� <see cref="ArgumentNullException"/>��
+    /// 当记录为 null 时，应抛出 <see cref="ArgumentNullException"/>。
     /// </summary>
     [TestMethod]
     public void Constructor_NullRecord_ShouldThrowArgumentNullException()
@@ -63,7 +63,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������Ϊ����ʱ��Ӧ�׳� <see cref="ArgumentOutOfRangeException"/>��
+    /// 当行索引为负数时，应抛出 <see cref="ArgumentOutOfRangeException"/>。
     /// </summary>
     [TestMethod]
     public void Constructor_NegativeRowIndex_ShouldThrowArgumentOutOfRangeException()
@@ -76,7 +76,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������������¼��Χʱ��Ӧ�׳� <see cref="ArgumentOutOfRangeException"/>��
+    /// 当行索引超出记录范围时，应抛出 <see cref="ArgumentOutOfRangeException"/>。
     /// </summary>
     [TestMethod]
     public void Constructor_RowIndexOutOfRange_ShouldThrowArgumentOutOfRangeException()
@@ -92,7 +92,7 @@ public class RecordTableRowTests
 
 
     /// <summary>
-    /// <see cref="RecordRow.Table"/> Ӧ��������� <see cref="Record"/>��
+    /// <see cref="RecordRow.Record"/> 应返回所属的 <see cref="Record"/>。
     /// </summary>
     [TestMethod]
     public void Record_Property_ShouldReturnCorrectRecord()
@@ -109,7 +109,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.Row"/> Ӧ���ص�ǰ�кš�
+    /// <see cref="RecordRow.Row"/> 应返回当前行号。
     /// </summary>
     [TestMethod]
     public void Row_Property_ShouldReturnCorrectRowIndex()
@@ -128,7 +128,7 @@ public class RecordTableRowTests
 
 
     /// <summary>
-    /// ��ʽת��Ϊ <see cref="int"/> ʱ��Ӧ���ص�ǰ�кš�
+    /// 隐式转换为 <see cref="int"/> 时，应返回当前行号。
     /// </summary>
     [TestMethod]
     public void ImplicitConversion_ToInt_ShouldReturnRowIndex()
@@ -147,7 +147,7 @@ public class RecordTableRowTests
 
 
     /// <summary>
-    /// ��������ȡ�Ѵ��ڵĲ�����ʱ��Ӧ������ȷֵ��
+    /// 按列名读取已存在的布尔列时，应返回正确值。
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -164,7 +164,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������ȡ�����ڵĲ�����ʱ��Ӧ����Ĭ��ֵ��
+    /// 按列名读取不存在的布尔列时，应返回默认值。
     /// </summary>
     [TestMethod]
     public void GetBoolean_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -181,7 +181,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������ȡ�Ѵ��ڵ��ַ�����ʱ��Ӧ������ȷֵ��
+    /// 按列名读取已存在的字符串列时，应返回正确值。
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -198,7 +198,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������ȡ�����ڵ��ַ�����ʱ��Ӧ����Ĭ��ֵ��
+    /// 按列名读取不存在的字符串列时，应返回默认值。
     /// </summary>
     [TestMethod]
     public void GetString_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -215,7 +215,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������ȡ�Ѵ��ڵ�������ʱ��Ӧ������ȷֵ��
+    /// 按列名读取已存在的整型列时，应返回正确值。
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -232,7 +232,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������ȡ�����ڵ�������ʱ��Ӧ����Ĭ��ֵ��
+    /// 按列名读取不存在的整型列时，应返回默认值。
     /// </summary>
     [TestMethod]
     public void GetInt32_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -249,7 +249,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ���Ͱ�������ȡ�Ѵ�����ʱ��Ӧ������ȷֵ��
+    /// 泛型按列名读取已存在列时，应返回正确值。
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnExists_ShouldReturnCorrectValue()
@@ -266,7 +266,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ���Ͱ�������ȡ��������ʱ��Ӧ����Ĭ��ֵ��
+    /// 泛型按列名读取不存在列时，应返回默认值。
     /// </summary>
     [TestMethod]
     public void GetGeneric_ByName_ColumnNotExists_ShouldReturnDefault()
@@ -283,7 +283,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// Ӧ֧�ְ�������ȡ�ֽ�ֵ��
+    /// 应支持按列名读取字节值。
     /// </summary>
     [TestMethod]
     public void GetByte_ByName_ShouldWork()
@@ -303,7 +303,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// Ӧ֧�ְ�������ȡ˫���ȸ���ֵ��
+    /// 应支持按列名读取双精度浮点值。
     /// </summary>
     [TestMethod]
     public void GetDouble_ByName_ShouldWork()
@@ -323,7 +323,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// Ӧ֧�ְ�������ȡ����ʱ��ֵ��
+    /// 应支持按列名读取日期时间值。
     /// </summary>
     [TestMethod]
     public void GetDateTime_ByName_ShouldWork()
@@ -346,7 +346,7 @@ public class RecordTableRowTests
 
 
     /// <summary>
-    /// ������Ϊ��ʱ�������Ͷ�ȡ����Ӧ����Ĭ��ֵ��
+    /// 当列名为空时，各类型读取方法应返回默认值。
     /// </summary>
     [TestMethod]
     public void GetMethods_EmptyColumnName_ShouldReturnDefault()
@@ -362,7 +362,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// �ڶ������ݳ����£�Ӧ�ܶ�ȡ�����е���ȷֵ��
+    /// 在多行数据场景下，应能读取到各行的正确值。
     /// </summary>
     [TestMethod]
     public void GetMethods_MultipleRows_ShouldReturnCorrectValues()
@@ -396,7 +396,7 @@ public class RecordTableRowTests
 
 
     /// <summary>
-    /// ��η���ͬһ�ֶ�ʱ��Ӧ���ֽ��һ�¡�
+    /// 多次访问同一字段时，应保持结果一致。
     /// </summary>
     [TestMethod]
     public void GetMethods_RepeatedAccess_ShouldReturnConsistentResults()
@@ -417,7 +417,7 @@ public class RecordTableRowTests
 
 
     /// <summary>
-    /// ʹ�������������Ѵ��ڵ�������ʱ��Ӧд��ɹ���
+    /// 使用索引器更新已存在的整型列时，应写入成功。
     /// </summary>
     [TestMethod]
     public void Set_TypedColumn_ShouldUpdateValue()
@@ -434,7 +434,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ʹ�������������Ѵ��ڵ��ַ�����ʱ��Ӧд��ɹ���
+    /// 使用索引器更新已存在的字符串列时，应写入成功。
     /// </summary>
     [TestMethod]
     public void Set_StringColumn_ShouldUpdateValue()
@@ -451,7 +451,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ���в�����ʱ��<see cref="RecordRow.Set{T}(string, T)"/> Ӧ�Զ�������Ӧ�С�
+    /// 当列不存在时，<see cref="RecordRow.Set{T}(string, T)"/> 应自动创建对应列。
     /// </summary>
     [TestMethod]
     public void Set_ColumnNotExists_ShouldAutoCreateColumn()
@@ -473,7 +473,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// д����ٶ�ȡʱ��Ӧ�õ���д��һ�µ�ֵ��
+    /// 写入后再读取时，应得到与写入一致的值。
     /// </summary>
     [TestMethod]
     public void Set_ThenReadViaIndexer_ShouldBeConsistent()
@@ -492,7 +492,7 @@ public class RecordTableRowTests
 
 
     /// <summary>
-    /// dynamic ����Ա����ȡʱ��Ӧ������ȷֵ��
+    /// dynamic 按成员名读取时，应返回正确值。
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ShouldReturnCorrectValue()
@@ -509,7 +509,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// dynamic ����Ա��д��ʱ��Ӧ���µײ��¼ֵ��
+    /// dynamic 按成员名写入时，应更新底层记录值。
     /// </summary>
     [TestMethod]
     public void Dynamic_SetMember_ShouldUpdateValue()
@@ -527,7 +527,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// dynamic ����������ȡʱ��Ӧ������ȷֵ��
+    /// dynamic 按索引器读取时，应返回正确值。
     /// </summary>
     [TestMethod]
     public void Dynamic_GetIndex_ShouldReturnCorrectValue()
@@ -536,7 +536,7 @@ public class RecordTableRowTests
         var (table, intColumn, _, _) = CreateTestRecord();
         dynamic row = new RecordRow(table, 1);
 
-        // Act - dynamic ������ȡ
+        // Act - dynamic 索引读取
         var result = row["IntColumn"];
 
         // Assert
@@ -544,7 +544,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// dynamic ��������д��ʱ��Ӧ���µײ��¼ֵ��
+    /// dynamic 按索引器写入时，应更新底层记录值。
     /// </summary>
     [TestMethod]
     public void Dynamic_SetIndex_ShouldUpdateValue()
@@ -553,7 +553,7 @@ public class RecordTableRowTests
         var (table, intColumn, _, _) = CreateTestRecord();
         dynamic row = new RecordRow(table, 0);
 
-        // Act - dynamic ����д��
+        // Act - dynamic 索引写入
         row["IntColumn"] = 777;
 
         // Assert
@@ -562,7 +562,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// dynamic ��ȡ�����ڵĳ�Աʱ��Ӧ���� null��
+    /// dynamic 读取不存在的成员时，应返回 null。
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ColumnNotExists_ShouldReturnNull()
@@ -579,7 +579,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// dynamic д�벻���ڵĳ�Աʱ����Ӧ�׳��쳣��
+    /// dynamic 写入不存在的成员时，不应抛出异常。
     /// </summary>
     [TestMethod]
     public void Dynamic_SetMember_ColumnNotExists_ShouldNotThrow()
@@ -593,7 +593,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// dynamic ��Ա��ȡ���Ӧ����ʽ�����ֶζ�ȡ����һ�¡�
+    /// dynamic 成员读取结果应与显式调用字段读取方法一致。
     /// </summary>
     [TestMethod]
     public void Dynamic_GetMember_ShouldBeConsistentWithGetMethod()
@@ -609,7 +609,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������������ȡ�Ѵ�����ʱ��Ӧ���ض�Ӧ����ֵ��
+    /// 索引器按列名读取已存在列时，应返回对应对象值。
     /// </summary>
     [TestMethod]
     public void FieldObject_ByName_ColumnExists_ShouldReturnValue()
@@ -627,7 +627,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ��������ȡ��������ʱ��������Ӧ���� null��
+    /// 按列名读取不存在列时，索引器应返回 null。
     /// </summary>
     [TestMethod]
     public void FieldObject_ByName_ColumnNotExists_ShouldReturnNull()
@@ -644,7 +644,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.ToDictionary"/> Ӧ���ص�ǰ�е�ȫ�������Ӧֵ��
+    /// <see cref="RecordRow.ToDictionary"/> 应返回当前行的全部列与对应值。
     /// </summary>
     [TestMethod]
     public void ToDictionary_ShouldReturnAllColumnsWithCurrentRowValues()
@@ -664,7 +664,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.ToDictionary"/> ���� null ��ֵӦ���� null��
+    /// <see cref="RecordRow.ToDictionary"/> 对于 null 列值应保留 null。
     /// </summary>
     [TestMethod]
     public void ToDictionary_WhenColumnValueIsNull_ShouldKeepNullValue()
@@ -686,7 +686,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.ToString"/> Ӧ����к��Լ��ֵ������ֵ��Ϣ��
+    /// <see cref="RecordRow.ToString"/> 应输出行号以及字典风格的列值信息。
     /// </summary>
     [TestMethod]
     public void ToString_ShouldContainRowAndDictionaryLikeValues()
@@ -703,7 +703,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// <see cref="RecordRow.ToString"/> ���� null ֵӦ���������ͷ�������ֵ��
+    /// <see cref="RecordRow.ToString"/> 对于 null 值应按匿名类型风格输出空值。
     /// </summary>
     [TestMethod]
     public void ToString_WhenValueIsNull_ShouldRenderEmptyValue()
@@ -723,7 +723,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ������ת��Ϊ�ַ���ʱ�����д�������ֵ��Ӧ���ظ�ֵ���ַ�����ʾ��
+    /// 按列名转换为字符串时，若列存在且有值，应返回该值的字符串表示。
     /// </summary>
     [TestMethod]
     public void ToString_ByName_ColumnExistsWithValue_ShouldReturnStringRepresentation()
@@ -740,7 +740,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ������ת��Ϊ�ַ���ʱ��������Ϊ null��Ӧ���ؿ��ַ�����
+    /// 按列名转换为字符串时，若列名为 null，应返回空字符串。
     /// </summary>
     [TestMethod]
     public void ToString_ByName_NullColumnName_ShouldReturnEmptyString()
@@ -757,7 +757,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ������ת��Ϊ�ַ���ʱ��������Ϊ���ַ�����Ӧ���ؿ��ַ�����
+    /// 按列名转换为字符串时，若列名为空字符串，应返回空字符串。
     /// </summary>
     [TestMethod]
     public void ToString_ByName_EmptyColumnName_ShouldReturnEmptyString()
@@ -774,7 +774,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ������ת��Ϊ�ַ���ʱ���������������հ��ַ���Ӧ���ؿ��ַ�����
+    /// 按列名转换为字符串时，若列名仅包含空白字符，应返回空字符串。
     /// </summary>
     [TestMethod]
     public void ToString_ByName_WhitespaceColumnName_ShouldReturnEmptyString()
@@ -791,7 +791,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ������ת��Ϊ�ַ���ʱ�����в����ڣ�Ӧ���ؿ��ַ�����
+    /// 按列名转换为字符串时，若列不存在，应返回空字符串。
     /// </summary>
     [TestMethod]
     public void ToString_ByName_ColumnNotExists_ShouldReturnEmptyString()
@@ -808,7 +808,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ������ת��Ϊ�ַ���ʱ�����д��ڵ�ֵΪ null��Ӧ���ؿ��ַ�����
+    /// 按列名转换为字符串时，若列存在但值为 null，应返回空字符串。
     /// </summary>
     [TestMethod]
     public void ToString_ByName_ColumnExistsWithNullValue_ShouldReturnEmptyString()
@@ -828,7 +828,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ������ת��Ϊ�ַ���ʱ�����д�����Ϊ����ֵ��Ӧ��������ֵ���ַ�����ʾ��
+    /// 按列名转换为字符串时，若列存在且为整型值，应返回整型值的字符串表示。
     /// </summary>
     [TestMethod]
     public void ToString_ByName_IntColumnExists_ShouldReturnStringRepresentation()
@@ -845,7 +845,7 @@ public class RecordTableRowTests
     }
 
     /// <summary>
-    /// ������ת��Ϊ�ַ���ʱ�����д�����Ϊ����ֵ��Ӧ���ز���ֵ���ַ�����ʾ��
+    /// 按列名转换为字符串时，若列存在且为布尔值，应返回布尔值的字符串表示。
     /// </summary>
     [TestMethod]
     public void ToString_ByName_BoolColumnExists_ShouldReturnStringRepresentation()
