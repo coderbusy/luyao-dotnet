@@ -21,6 +21,22 @@ partial class Record
     }
 
     /// <summary>
+    /// 将当前 <see cref="Record"/> 的第一行转换为 <typeparamref name="T"/> 对象。
+    /// 如果 <see cref="Record"/> 没有任何行，则返回一个使用无参构造函数创建的默认实例。
+    /// </summary>
+    /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
+    /// <returns>转换后的对象实例。</returns>
+    public T To<T>() where T : class, new()
+    {
+        var ret = new T();
+        if (this.Count > 0)
+        {
+            XCopy<T>.CopyFrom(ret, this[0]);
+        }
+        return ret;
+    }
+
+    /// <summary>
     /// 根据对象集合创建一个 <see cref="Record"/>，自动推断列结构并将每个对象写入一行。
     /// </summary>
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
@@ -75,18 +91,22 @@ partial class Record
     }
 
     /// <summary>
-    /// 将当前 <see cref="Record"/> 的第一行转换为 <typeparamref name="T"/> 对象。
-    /// 如果 <see cref="Record"/> 没有任何行，则返回一个使用无参构造函数创建的默认实例。
+    /// 将当前 <see cref="Record"/> 转换为以第一列为键的字典。
+    /// 如果没有行或没有列，则返回空字典；键重复时后者覆盖前者。
     /// </summary>
-    /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
-    /// <returns>转换后的对象实例。</returns>
-    public T To<T>() where T : class, new()
+    /// <typeparam name="TKey">键类型，对应第一列的值类型。</typeparam>
+    /// <typeparam name="T">值类型，必须有无参构造函数。</typeparam>
+    /// <returns>以第一列值为键、行对象为值的字典。</returns>
+    public Dictionary<TKey, T> ToDictionary<TKey, T>() where T : class, new()
     {
-        var ret = new T();
-        if (this.Count > 0)
+        var dict = new Dictionary<TKey, T>();
+        if (this.Count == 0 || this.Columns.Count == 0) return dict;
+        var keyColumn = this.Columns[0];
+        foreach (var row in this)
         {
-            XCopy<T>.CopyFrom(ret, this[0]);
+            var key = keyColumn.To<TKey>(row.Row)!;
+            dict[key] = row.To<T>();
         }
-        return ret;
+        return dict;
     }
 }
