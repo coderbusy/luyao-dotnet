@@ -120,10 +120,7 @@ public partial class Record
                 continue;
             }
 
-            if (!map.ContainsKey(v))
-            {
-                map.Add(v, i);
-            }
+            map.TryAdd(v, i);
         }
         return new RowLookup(map, nullRow);
     }

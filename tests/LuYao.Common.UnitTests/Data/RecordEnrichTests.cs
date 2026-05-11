@@ -165,7 +165,8 @@ public class RecordEnrichTests
     public void Enrich_NullSharedColumn_ThrowsArgumentNullException()
     {
         var r = new Record();
-        Assert.Throws<ArgumentNullException>(() => r.Enrich(new Record(), null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => r.Enrich(new Record(), null!));
+        Assert.AreEqual("sharedColumn", ex.ParamName);
     }
 
     [TestMethod]
@@ -174,8 +175,11 @@ public class RecordEnrichTests
         var r = new Record();
         var source = new Record();
 
-        Assert.Throws<ArgumentNullException>(() => r.Enrich(source, null!, "Id"));
-        Assert.Throws<ArgumentNullException>(() => r.Enrich(source, "Id", null!));
+        var ex1 = Assert.Throws<ArgumentNullException>(() => r.Enrich(source, null!, "Id"));
+        Assert.AreEqual("selfColumn", ex1.ParamName);
+
+        var ex2 = Assert.Throws<ArgumentNullException>(() => r.Enrich(source, "Id", null!));
+        Assert.AreEqual("sourceColumn", ex2.ParamName);
     }
 
     [TestMethod]
