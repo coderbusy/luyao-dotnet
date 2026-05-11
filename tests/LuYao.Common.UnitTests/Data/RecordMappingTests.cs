@@ -45,6 +45,20 @@ public class RecordMappingTests
         Assert.AreEqual("Alice", table[0]["Name"]);
     }
 
+    [TestMethod]
+    public void From_WithOutParameter_ShouldCreateRecordAndReturnRow()
+    {
+        var model = new TestModel { Id = 99, Name = "Bob" };
+
+        var table = RecordTable.From(model, out var row);
+
+        Assert.AreEqual(1,     table.Count);
+        Assert.IsNotNull(row);
+        Assert.AreEqual(0,     row.Row);
+        Assert.AreEqual(99,    row["Id"]);
+        Assert.AreEqual("Bob", row["Name"]);
+    }
+
     // ── FromList<T> ───────────────────────────────────────────────────────────
 
     [TestMethod]
