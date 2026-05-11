@@ -104,6 +104,8 @@
 - `CopyTo<T>(T data)`：当前行写入已有对象
 - `CopyFrom<T>(T data)`：对象属性写入当前行
 - `To<T>()`：当前行转新对象
+- `Merge(RecordRow other)`：将另一行数据合并到当前行，同名列覆盖，新列追加
+- `Merge<T>(T model)`：将对象属性合并到当前行，同名列覆盖，新列追加
 - `ToString(string? name)`：按列名获取当前行该列的字符串值
 - `IDynamicMetaObjectProvider`：支持 `dynamic` 成员读写
 
