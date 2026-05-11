@@ -46,6 +46,42 @@ public partial class Record
     }
 
     /// <summary>
+    /// 在当前记录的所有数据行中，查找指定列与目标值（object 类型）匹配的第一行数据。
+    /// 如果指定的列名不存在，或者未找到匹配项，则直接返回 null。
+    /// </summary>
+    /// <param name="name">要查找的列名称。</param>
+    /// <param name="value">要匹配的目标值。</param>
+    /// <returns>符合条件的第一条 <see cref="RecordRow"/>，未找到则返回 null。</returns>
+    public RecordRow? Find(string name, object? value)
+    {
+        var col = this.Columns.Find(name);
+        if (col == null) return null;
+        for (int i = 0; i < this.Count; i++)
+        {
+            var val = col.Get(i);
+            if (Equals(val, value)) return new RecordRow(this, i);
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 在当前记录的所有数据行中，查找指定列与目标值（object 类型）匹配的所有行数据，并以可枚举的序列返回。
+    /// </summary>
+    /// <param name="name">要查找的列名称。</param>
+    /// <param name="value">要匹配的目标值。</param>
+    /// <returns>一个包含所有符合条件 <see cref="RecordRow"/> 的枚举器序列。</returns>
+    public IEnumerable<RecordRow> FindAll(string name, object? value)
+    {
+        var col = this.Columns.Find(name);
+        if (col == null) yield break;
+        for (int i = 0; i < this.Count; i++)
+        {
+            var val = col.Get(i);
+            if (Equals(val, value)) yield return new RecordRow(this, i);
+        }
+    }
+
+    /// <summary>
     /// 使用指定的条件筛选器，查找符合要求的第一条行数据。
     /// </summary>
     /// <param name="filter">用于筛选 <see cref="RecordRow"/> 数据行的条件委托。</param>

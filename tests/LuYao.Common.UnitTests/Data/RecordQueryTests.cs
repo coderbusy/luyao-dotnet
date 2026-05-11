@@ -170,4 +170,126 @@ public class RecordQueryTests
         Assert.AreEqual(1, results[0].To<int>("Id"));
         Assert.AreEqual(3, results[1].To<int>("Id"));
     }
+
+    [TestMethod]
+    public void Find_ObjectOverload_ReturnsFirstMatchingRow()
+    {
+        // Arrange
+        var record = CreateTestRecord();
+
+        // Act
+        var result = record.Find("Name", (object)"Bob");
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(2, result.Value.To<int>("Id"));
+    }
+
+    [TestMethod]
+    public void Find_ObjectOverload_ReturnsNullWhenColumnNotFound()
+    {
+        // Arrange
+        var record = CreateTestRecord();
+
+        // Act
+        var result = record.Find("NotExist", (object)1);
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    [TestMethod]
+    public void Find_ObjectOverload_ReturnsNullWhenNoMatch()
+    {
+        // Arrange
+        var record = CreateTestRecord();
+
+        // Act
+        var result = record.Find("Id", (object)99);
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    [TestMethod]
+    public void Find_ObjectOverload_SupportsNullValue()
+    {
+        // Arrange
+        var record = new Record();
+        var colName = record.Columns.Add<string>("Name");
+        var r1 = record.AddRow();
+        colName.SetValue(r1.Row, "Alice");
+        var r2 = record.AddRow();
+        colName.SetValue(r2.Row, null);
+
+        // Act
+        var result = record.Find("Name", (object?)null);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsNull(result.Value.To<string>("Name"));
+    }
+
+    [TestMethod]
+    public void FindAll_ObjectOverload_ReturnsAllMatchingRows()
+    {
+        // Arrange
+        var record = CreateTestRecord();
+
+        // Act
+        var results = record.FindAll("IsActive", (object)true).ToList();
+
+        // Assert
+        Assert.AreEqual(2, results.Count);
+        Assert.AreEqual(1, results[0].To<int>("Id"));
+        Assert.AreEqual(3, results[1].To<int>("Id"));
+    }
+
+    [TestMethod]
+    public void FindAll_ObjectOverload_ReturnsEmptyWhenColumnNotFound()
+    {
+        // Arrange
+        var record = CreateTestRecord();
+
+        // Act
+        var results = record.FindAll("NotExist", (object)1).ToList();
+
+        // Assert
+        Assert.AreEqual(0, results.Count);
+    }
+
+    [TestMethod]
+    public void FindAll_ObjectOverload_ReturnsEmptyWhenNoMatch()
+    {
+        // Arrange
+        var record = CreateTestRecord();
+
+        // Act
+        var results = record.FindAll("Id", (object)99).ToList();
+
+        // Assert
+        Assert.AreEqual(0, results.Count);
+    }
+
+    [TestMethod]
+    public void FindAll_ObjectOverload_SupportsNullValue()
+    {
+        // Arrange
+        var record = new Record();
+        var colName = record.Columns.Add<string>("Name");
+        var r1 = record.AddRow();
+        colName.SetValue(r1.Row, "Alice");
+        var r2 = record.AddRow();
+        colName.SetValue(r2.Row, null);
+        var r3 = record.AddRow();
+        colName.SetValue(r3.Row, null);
+
+        // Act
+        var results = record.FindAll("Name", (object?)null).ToList();
+
+        // Assert
+        Assert.AreEqual(2, results.Count);
+        Assert.IsNull(results[0].To<string>("Name"));
+        Assert.IsNull(results[1].To<string>("Name"));
+    }
 }
