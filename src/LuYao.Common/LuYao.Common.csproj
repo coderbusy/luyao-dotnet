@@ -20,10 +20,14 @@
 		<Compile Include="..\Assembly.cs" Link="Assembly.cs" />
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' or '$(TargetFramework)'=='netstandard2.1'">
+		<PackageReference Include="System.Text.Json" Version="8.0.5" />
+	</ItemGroup>
+
 	<ItemGroup>
 	  <PackageReference Update="ConfigureAwait.Fody" Version="3.4.0" />
 	  <PackageReference Update="Fody" Version="6.9.3">
-	    <PrivateAssets>all</PrivateAssets>
+		<PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
 	</ItemGroup>
 </Project>
