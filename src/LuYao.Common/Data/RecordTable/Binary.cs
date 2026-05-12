@@ -37,7 +37,7 @@ public partial class RecordTable
         writer.Write(this._pageSize);
         writer.Write(this._maxCount);
 
-        // Schema: column count + (name, type, isNullable) per column
+        // Schema: column count + (name, type, isNullable, arrayRank) per column
         writer.Write(this.Columns.Count);
         for (int c = 0; c < this.Columns.Count; c++)
         {
@@ -45,6 +45,7 @@ public partial class RecordTable
             writer.Write(col.Name);
             writer.Write((byte)col.ColumnType);
             writer.Write(col.IsNullable);
+            writer.Write((byte)col.ArrayRank);
         }
 
         // Row count
@@ -96,7 +97,8 @@ public partial class RecordTable
             string name = reader.ReadString();
             var columnType = (RecordColumnType)reader.ReadByte();
             bool isNullable = reader.ReadBoolean();
-            Type clrType = Helpers.GetClrType(columnType, isNullable);
+            int arrayRank = reader.ReadByte();
+            Type clrType = Helpers.GetClrType(columnType, isNullable, arrayRank);
             this.Columns.Add(name, clrType);
         }
 
@@ -167,7 +169,7 @@ public partial class RecordTable
 
     private static void WriteColumnData(BinaryWriter writer, RecordColumn col, int rowCount)
     {
-        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray;
+        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray || col.ArrayRank > 0;
 
         for (int r = 0; r < rowCount; r++)
         {
@@ -181,13 +183,21 @@ public partial class RecordTable
                 }
                 writer.Write(true);
             }
-            WritePrimitiveValue(writer, val!, col.ColumnType);
+
+            if (col.ArrayRank > 0)
+            {
+                WriteArrayValue(writer, (Array)val!, col.ColumnType);
+            }
+            else
+            {
+                WritePrimitiveValue(writer, val!, col.ColumnType);
+            }
         }
     }
 
     private static void ReadColumnData(BinaryReader reader, RecordColumn col, int rowCount)
     {
-        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray;
+        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray || col.ArrayRank > 0;
 
         for (int r = 0; r < rowCount; r++)
         {
@@ -196,8 +206,101 @@ public partial class RecordTable
                 bool hasValue = reader.ReadBoolean();
                 if (!hasValue) continue;
             }
-            var val = ReadPrimitiveValue(reader, col.ColumnType);
+
+            object val;
+            if (col.ArrayRank > 0)
+            {
+                val = ReadArrayValue(reader, col.ColumnType, col.ArrayRank);
+            }
+            else
+            {
+                val = ReadPrimitiveValue(reader, col.ColumnType);
+            }
             col.Set(r, val);
+        }
+    }
+
+    private static void WriteArrayValue(BinaryWriter writer, Array array, RecordColumnType elementType)
+    {
+        int rank = array.Rank;
+        writer.Write((byte)rank);
+
+        // 写入各维度长度
+        for (int i = 0; i < rank; i++)
+        {
+            writer.Write(array.GetLength(i));
+        }
+
+        // 写入元素（扁平化遍历）
+        int totalElements = array.Length;
+        int[] indices = new int[rank];
+
+        for (int flatIndex = 0; flatIndex < totalElements; flatIndex++)
+        {
+            GetMultiDimensionalIndices(flatIndex, array, indices);
+            var element = array.GetValue(indices);
+
+            // 元素可能为 null（如 int?[] 或 string[]）
+            if (element == null)
+            {
+                writer.Write(false);
+                continue;
+            }
+
+            writer.Write(true);
+            WritePrimitiveValue(writer, element, elementType);
+        }
+    }
+
+    private static Array ReadArrayValue(BinaryReader reader, RecordColumnType elementType, int expectedRank)
+    {
+        int rank = reader.ReadByte();
+        if (rank != expectedRank)
+        {
+            throw new InvalidOperationException($"数组维度不匹配：期望 {expectedRank}，实际 {rank}");
+        }
+
+        // 读取各维度长度
+        int[] lengths = new int[rank];
+        int totalElements = 1;
+        for (int i = 0; i < rank; i++)
+        {
+            lengths[i] = reader.ReadInt32();
+            totalElements *= lengths[i];
+        }
+
+        // 创建数组
+        Type clrType = Helpers.GetClrType(elementType, isNullable: false, arrayRank: 0);
+        Array array = rank == 1 
+            ? Array.CreateInstance(clrType, lengths[0])
+            : Array.CreateInstance(clrType, lengths);
+
+        // 读取元素
+        int[] indices = new int[rank];
+        for (int flatIndex = 0; flatIndex < totalElements; flatIndex++)
+        {
+            GetMultiDimensionalIndices(flatIndex, array, indices);
+
+            bool hasValue = reader.ReadBoolean();
+            if (!hasValue) continue;
+
+            var element = ReadPrimitiveValue(reader, elementType);
+            array.SetValue(element, indices);
+        }
+
+        return array;
+    }
+
+    private static void GetMultiDimensionalIndices(int flatIndex, Array array, int[] indices)
+    {
+        int rank = array.Rank;
+        int remaining = flatIndex;
+
+        for (int i = rank - 1; i >= 0; i--)
+        {
+            int length = array.GetLength(i);
+            indices[i] = remaining % length;
+            remaining /= length;
         }
     }
 

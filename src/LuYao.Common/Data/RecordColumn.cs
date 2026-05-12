@@ -28,6 +28,7 @@ public abstract class RecordColumn : IXProp
         this.Table = table ?? throw new ArgumentNullException(nameof(table));
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
         this._type = type ?? throw new ArgumentNullException(nameof(type));
+        this.ArrayRank = DetermineArrayRank(type);
         this.ColumnType = Helpers.GetColumnType(type);
         this.IsNullable = Helpers.IsNullableType(type);
     }
@@ -45,7 +46,7 @@ public abstract class RecordColumn : IXProp
     public Type Type => this._type;
 
     /// <summary>
-    /// 获取列的基础枚举类型标识（不含可空信息）。
+    /// 获取列的基础枚举类型标识（不含可空信息和数组维度）。
     /// </summary>
     public RecordColumnType ColumnType { get; }
 
@@ -53,6 +54,20 @@ public abstract class RecordColumn : IXProp
     /// 获取列是否为可空类型。
     /// </summary>
     public bool IsNullable { get; }
+
+    /// <summary>
+    /// 获取数组维度。0 表示非数组，1 表示一维数组（如 int[]），2 表示二维数组（如 int[,]），依此类推。
+    /// </summary>
+    public int ArrayRank { get; }
+
+    /// <summary>
+    /// 确定类型的数组维度。
+    /// </summary>
+    private static int DetermineArrayRank(Type type)
+    {
+        var effectiveType = Nullable.GetUnderlyingType(type) ?? type;
+        return effectiveType.IsArray ? effectiveType.GetArrayRank() : 0;
+    }
 
     /// <summary>
     /// 在指定行设置列的值。

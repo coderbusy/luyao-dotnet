@@ -226,6 +226,7 @@
 - `Name`
 - `ColumnType`
 - `IsNullable`
+- `ArrayRank`（0 表示非数组，1 表示一维数组，2 表示二维数组）
 - `Type`
 
 适用场景：
@@ -276,12 +277,16 @@
 | 二进制 | `byte[]` |
 | 可空值类型 | 上述值类型的 `Nullable<T>` |
 | 枚举 | `enum` 及 `Nullable<enum>` |
+| 数组 | 上述类型的一维或多维数组（如 `int[]`, `string[,]`） |
 
 说明：
 
 - 列类型白名单是封闭的。
 - `enum` 在内部会按其基础数值类型参与列类型映射。
 - 对象映射与自动建列都受该白名单限制。
+- **数组支持**：支持任意维度数组（一维 `int[]`、二维 `int[,]` 等），但 `Write(DataTable)` 时数组列会被跳过（`byte[]` 除外，因为 `DataTable` 原生支持）。
+- **数组元素可空性**：`int?[]`（可空元素数组）是合法类型，序列化时会保留每个元素的 null 状态。
+- **PostgreSQL 互操作**：从 PostgreSQL 的 `IDataReader` 读取数组列（如 `int[]`, `text[]`）时，Npgsql 驱动会自动映射为 CLR 数组类型，`RecordTable.Read(IDataReader)` 可以直接识别并创建对应的数组列。
 
 ---
 
@@ -316,6 +321,32 @@ record.Columns.Add<string>("Name");
 
 record.AddRowFromValues(1, "A");
 record.AddRowFromValues(2, "B", "Ignored");
+```
+
+**数组列示例：**
+
+```csharp
+var record = new Record("Products");
+
+// 添加数组列
+record.Columns.Add<string[]>("Tags");
+record.Columns.Add<int[]>("MonthlyScores");
+record.Columns.Add<decimal[,]>("PriceMatrix");
+
+var row = record.AddRow();
+row["Tags"] = new[] { "VIP", "Premium" };
+row["MonthlyScores"] = new[] { 85, 90, 88, 92 };
+row["PriceMatrix"] = new decimal[,] { { 1.1m, 2.2m }, { 3.3m, 4.4m } };
+
+// ToString() 输出 JSON 格式
+Console.WriteLine(row.ToString("Tags"));          // ["VIP", "Premium"]
+Console.WriteLine(row.ToString("MonthlyScores")); // [85, 90, 88, 92]
+Console.WriteLine(row.ToString("PriceMatrix"));   // [[1.1, 2.2], [3.3, 4.4]]
+
+// 序列化与反序列化
+byte[] data = record.ToBytes();
+var restored = RecordTable.FromBytes(data);
+string[] tags = restored[0].To<string[]>("Tags");
 ```
 
 ### 5.2 删除与清空

@@ -444,23 +444,36 @@ public partial class RecordTable : IEnumerable<RecordRow>
     /// </summary>
     /// <param name="dt">用于接收数据的 <see cref="DataTable"/> 实例。</param>
     /// <remarks>
-    /// 此方法会将当前记录的所有列结构和行数据写入到指定的 <see cref="DataTable"/> 中。
+    /// 此方法会将当前记录的列结构和行数据写入到指定的 <see cref="DataTable"/> 中。
+    /// 数组列（ArrayRank > 0）会被跳过，因为 DataTable 不支持除 byte[] 外的数组类型。
     /// 如果 <paramref name="dt"/> 为 null，则会抛出 <see cref="ArgumentNullException"/>。
     /// </remarks>
     public void Write(DataTable dt)
     {
         if (dt == null) throw new ArgumentNullException(nameof(dt));
+
+        // 只添加非数组列（byte[] 除外，因为 DataTable 支持）
+        var validColumns = new List<int>();
         foreach (RecordColumn col in this.Columns)
         {
+            if (col.ArrayRank > 0 && col.ColumnType != RecordColumnType.ByteArray)
+            {
+                // 跳过数组列（byte[] 除外）
+                continue;
+            }
             dt.Columns.Add(col.Name, col.Type);
+            validColumns.Add(this.Columns.IndexOf(col.Name));
         }
+
         for (int r = 0; r < this.Count; r++)
         {
             DataRow row = dt.Rows.Add();
-            for (int i = 0; i < this.Columns.Count; i++)
+            int dtColIndex = 0;
+            foreach (int colIndex in validColumns)
             {
-                var val = this.Columns[i].Get(r);
-                if (val is not null) row[i] = val;
+                var val = this.Columns[colIndex].Get(r);
+                if (val is not null) row[dtColIndex] = val;
+                dtColIndex++;
             }
         }
     }
@@ -598,7 +611,7 @@ public partial class RecordTable : IEnumerable<RecordRow>
         var columns = new List<RecordSchema.ColumnDef>(this.Columns.Count);
         foreach (RecordColumn col in this.Columns)
         {
-            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType, col.IsNullable));
+            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType, col.IsNullable, col.ArrayRank));
         }
         return new RecordSchema(columns);
     }

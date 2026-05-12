@@ -45,11 +45,18 @@ static class Helpers
     }
 
     /// <summary>
-    /// 从 CLR <see cref="Type"/> 获取基础 <see cref="RecordColumnType"/>（不含 Nullable 信息）。
+    /// 从 CLR <see cref="Type"/> 获取基础 <see cref="RecordColumnType"/>（不含 Nullable 信息和数组维度）。
     /// </summary>
     internal static RecordColumnType GetColumnType(Type type)
     {
         var lookup = NormalizeColumnLookupType(type);
+
+        // 剥离数组维度，只看元素类型
+        if (lookup.IsArray)
+        {
+            lookup = lookup.GetElementType()!;
+        }
+
         if (TypeToColumnType.TryGetValue(lookup, out var ct))
             return ct;
         throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型");
@@ -64,12 +71,22 @@ static class Helpers
     }
 
     /// <summary>
-    /// 从基础 <see cref="RecordColumnType"/> 和 <paramref name="isNullable"/> 还原 CLR <see cref="Type"/>。
+    /// 从基础 <see cref="RecordColumnType"/>、<paramref name="isNullable"/> 和 <paramref name="arrayRank"/> 还原 CLR <see cref="Type"/>。
     /// </summary>
-    internal static Type GetClrType(RecordColumnType columnType, bool isNullable)
+    internal static Type GetClrType(RecordColumnType columnType, bool isNullable, int arrayRank = 0)
     {
         if (!ColumnTypeToType.TryGetValue(columnType, out var baseType))
             throw new NotSupportedException($"未知列类型枚举值: {columnType}");
+
+        // 处理数组维度
+        if (arrayRank > 0)
+        {
+            baseType = (arrayRank == 1) 
+                ? baseType.MakeArrayType() 
+                : baseType.MakeArrayType(arrayRank);
+            return baseType;
+        }
+
         if (isNullable && baseType.IsValueType)
             return typeof(Nullable<>).MakeGenericType(baseType);
         return baseType;
@@ -80,7 +97,15 @@ static class Helpers
     internal static bool IsSupportedColumnType(Type type)
     {
         if (type == null) return false;
-        return TypeToColumnType.ContainsKey(NormalizeColumnLookupType(type));
+        var normalized = NormalizeColumnLookupType(type);
+
+        // 支持数组类型
+        if (normalized.IsArray)
+        {
+            normalized = normalized.GetElementType()!;
+        }
+
+        return TypeToColumnType.ContainsKey(normalized);
     }
 
     internal static bool IsSupportedForReading(IXProp p)
@@ -101,7 +126,7 @@ static class Helpers
     {
         if (!IsSupportedColumnType(type))
         {
-            throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型。支持的类型包括：bool, 整数类型, 浮点类型, char, string, DateTime, DateTimeOffset, TimeSpan, Guid, byte[]、枚举及其 Nullable 形式。");
+            throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型。支持的类型包括：bool, 整数类型, 浮点类型, char, string, DateTime, DateTimeOffset, TimeSpan, Guid, byte[]、枚举及其 Nullable 形式，以及上述类型的数组（如 int[], string[,]）。");
         }
     }
 

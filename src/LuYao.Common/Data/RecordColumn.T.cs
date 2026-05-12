@@ -75,7 +75,120 @@ public class RecordColumn<T> : RecordColumn
         OnGet(row);
         T value = _data[row];
         if (value is null) return string.Empty;
+
+        // 数组类型返回 JSON 格式
+        if (value is Array array)
+        {
+            return FormatArrayAsJson(array);
+        }
+
         return value.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// 将数组格式化为 JSON 字符串。
+    /// </summary>
+    private static string FormatArrayAsJson(Array array)
+    {
+        if (array.Length == 0)
+        {
+            return array.Rank == 1 ? "[]" : FormatMultiDimensionalArray(array);
+        }
+
+        if (array.Rank == 1)
+        {
+            return FormatOneDimensionalArray(array);
+        }
+
+        return FormatMultiDimensionalArray(array);
+    }
+
+    private static string FormatOneDimensionalArray(Array array)
+    {
+        var sb = new System.Text.StringBuilder("[");
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (i > 0) sb.Append(", ");
+            var element = array.GetValue(i);
+            AppendJsonValue(sb, element);
+        }
+        sb.Append("]");
+        return sb.ToString();
+    }
+
+    private static string FormatMultiDimensionalArray(Array array)
+    {
+        var sb = new System.Text.StringBuilder();
+        FormatMultiDimensionalArrayRecursive(sb, array, new int[array.Rank], 0);
+        return sb.ToString();
+    }
+
+    private static void FormatMultiDimensionalArrayRecursive(System.Text.StringBuilder sb, Array array, int[] indices, int dimension)
+    {
+        sb.Append('[');
+        int length = array.GetLength(dimension);
+        for (int i = 0; i < length; i++)
+        {
+            if (i > 0) sb.Append(", ");
+            indices[dimension] = i;
+
+            if (dimension == array.Rank - 1)
+            {
+                var element = array.GetValue(indices);
+                AppendJsonValue(sb, element);
+            }
+            else
+            {
+                FormatMultiDimensionalArrayRecursive(sb, array, indices, dimension + 1);
+            }
+        }
+        sb.Append(']');
+    }
+
+    private static void AppendJsonValue(System.Text.StringBuilder sb, object? value)
+    {
+        if (value is null)
+        {
+            sb.Append("null");
+        }
+        else if (value is string str)
+        {
+            sb.Append('"');
+            // 简单转义（JSON 字符串需要转义特殊字符）
+            foreach (char c in str)
+            {
+                switch (c)
+                {
+                    case '"': sb.Append("\\\""); break;
+                    case '\\': sb.Append("\\\\"); break;
+                    case '\n': sb.Append("\\n"); break;
+                    case '\r': sb.Append("\\r"); break;
+                    case '\t': sb.Append("\\t"); break;
+                    default: sb.Append(c); break;
+                }
+            }
+            sb.Append('"');
+        }
+        else if (value is bool b)
+        {
+            sb.Append(b ? "true" : "false");
+        }
+        else if (value is DateTime dt)
+        {
+            sb.Append('"').Append(dt.ToString("o")).Append('"');
+        }
+        else if (value is DateTimeOffset dto)
+        {
+            sb.Append('"').Append(dto.ToString("o")).Append('"');
+        }
+        else if (value is Guid guid)
+        {
+            sb.Append('"').Append(guid.ToString()).Append('"');
+        }
+        else
+        {
+            sb.Append(value.ToString());
+        }
     }
 
     internal override void Extend(int length)
