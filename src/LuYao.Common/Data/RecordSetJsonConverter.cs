@@ -11,6 +11,19 @@ namespace LuYao.Data;
 /// </summary>
 public class RecordSetJsonConverter : JsonConverter<RecordSet>
 {
+    private readonly RecordBinaryPayloadCodec _codec;
+
+    /// <summary>使用默认编解码器（GZip 压缩）创建转换器。</summary>
+    public RecordSetJsonConverter() : this(RecordBinaryPayloadCodec.Default) { }
+
+    /// <summary>使用指定编解码器创建转换器。</summary>
+    /// <param name="codec">编解码器实例。</param>
+    public RecordSetJsonConverter(RecordBinaryPayloadCodec codec)
+    {
+        if (codec == null) throw new ArgumentNullException(nameof(codec));
+        _codec = codec;
+    }
+
     /// <inheritdoc/>
     public override RecordSet? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -19,14 +32,14 @@ public class RecordSetJsonConverter : JsonConverter<RecordSet>
         {
             // 在分配字符串/字节数组前先检查 Base64 长度上限，防御超大输入引发的 OOM。
             long base64Length = reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length;
-            if (base64Length > RecordBinaryPayloadHelper.MaxBase64Length)
-                throw new JsonException($"RecordSet Base64 payload exceeds maximum allowed length {RecordBinaryPayloadHelper.MaxBase64Length}.");
+            if (base64Length > _codec.MaxBase64Length)
+                throw new JsonException($"RecordSet Base64 payload exceeds maximum allowed length {_codec.MaxBase64Length}.");
 
             var base64 = reader.GetString()!;
             try
             {
                 var bytes = Convert.FromBase64String(base64);
-                bytes = RecordBinaryPayloadHelper.Decode(bytes);
+                bytes = _codec.Decode(bytes);
                 return RecordSet.FromBytes(bytes);
             }
             catch (FormatException ex)
@@ -57,7 +70,7 @@ public class RecordSetJsonConverter : JsonConverter<RecordSet>
             writer.WriteNullValue();
             return;
         }
-        var bytes = RecordBinaryPayloadHelper.Encode(value.ToBytes());
+        var bytes = _codec.Encode(value.ToBytes());
         writer.WriteStringValue(Convert.ToBase64String(bytes));
     }
 }

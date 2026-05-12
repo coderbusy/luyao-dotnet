@@ -12,6 +12,19 @@ namespace LuYao.Data;
 /// </summary>
 public class RecordTableJsonConverter : JsonConverter<RecordTable>
 {
+    private readonly RecordBinaryPayloadCodec _codec;
+
+    /// <summary>使用默认编解码器（GZip 压缩）创建转换器。</summary>
+    public RecordTableJsonConverter() : this(RecordBinaryPayloadCodec.Default) { }
+
+    /// <summary>使用指定编解码器创建转换器。</summary>
+    /// <param name="codec">编解码器实例。</param>
+    public RecordTableJsonConverter(RecordBinaryPayloadCodec codec)
+    {
+        if (codec == null) throw new ArgumentNullException(nameof(codec));
+        _codec = codec;
+    }
+
     /// <inheritdoc/>
     public override RecordTable? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -20,14 +33,14 @@ public class RecordTableJsonConverter : JsonConverter<RecordTable>
         {
             // 在分配字符串/字节数组前先检查 Base64 长度上限，防御超大输入引发的 OOM。
             long base64Length = reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length;
-            if (base64Length > RecordBinaryPayloadHelper.MaxBase64Length)
-                throw new JsonException($"RecordTable Base64 payload exceeds maximum allowed length {RecordBinaryPayloadHelper.MaxBase64Length}.");
+            if (base64Length > _codec.MaxBase64Length)
+                throw new JsonException($"RecordTable Base64 payload exceeds maximum allowed length {_codec.MaxBase64Length}.");
 
             var base64 = reader.GetString()!;
             try
             {
                 var bytes = Convert.FromBase64String(base64);
-                bytes = RecordBinaryPayloadHelper.Decode(bytes);
+                bytes = _codec.Decode(bytes);
                 using var ms = new MemoryStream(bytes, writable: false);
                 using var br = new BinaryReader(ms, Encoding.UTF8, leaveOpen: true);
                 var record = new RecordTable();
@@ -69,9 +82,9 @@ public class RecordTableJsonConverter : JsonConverter<RecordTable>
 
         string base64;
         if (ms.TryGetBuffer(out ArraySegment<byte> buffer) && buffer.Array != null)
-            base64 = Convert.ToBase64String(RecordBinaryPayloadHelper.Encode(buffer.Array, buffer.Offset, (int)ms.Length));
+            base64 = Convert.ToBase64String(_codec.Encode(buffer.Array, buffer.Offset, (int)ms.Length));
         else
-            base64 = Convert.ToBase64String(RecordBinaryPayloadHelper.Encode(ms.ToArray()));
+            base64 = Convert.ToBase64String(_codec.Encode(ms.ToArray()));
         writer.WriteStringValue(base64);
     }
 }

@@ -196,8 +196,8 @@ public class RecordJsonConverterTests
 
     #region Security / Compatibility Tests
 
-    // 与 RecordBinaryPayloadHelper 内部头部保持一致：0xFE 'L' 'Y' 'Z' + 算法 ID。
-    private static readonly byte[] CompressedHeader = { 0xFE, (byte)'L', (byte)'Y', (byte)'Z', 0x01 };
+    // 版本 1 头部（6 字节）：0xFE 'L' 'Y' 'Z' + version=1 + algo=GZip=1
+    private static readonly byte[] CompressedHeader = { 0xFE, (byte)'L', (byte)'Y', (byte)'Z', 0x01, 0x01 };
 
     [TestMethod]
     public void RecordSetJsonConverter_WhenDeserializeUncompressedLegacyPayloadThenSucceeds()
@@ -337,9 +337,84 @@ public class RecordJsonConverterTests
         return sb.ToString();
     }
 
-    #endregion
+    [TestMethod]
+    public void RecordBinaryPayloadCodec_WhenNoCompressionThenRoundTripSucceeds()
+    {
+        var codec = new RecordBinaryPayloadCodec { Compression = RecordPayloadCompression.None };
+        var original = new byte[] { 1, 2, 3, 4, 5 };
+        var encoded = codec.Encode(original);
+        var decoded = codec.Decode(encoded);
+        CollectionAssert.AreEqual(original, decoded);
+    }
 
-    #region Helper Methods
+    [TestMethod]
+    public void RecordBinaryPayloadCodec_WhenGZipThenRoundTripSucceeds()
+    {
+        var codec = new RecordBinaryPayloadCodec { Compression = RecordPayloadCompression.GZip };
+        var original = new byte[] { 1, 2, 3, 4, 5 };
+        var encoded = codec.Encode(original);
+        var decoded = codec.Decode(encoded);
+        CollectionAssert.AreEqual(original, decoded);
+    }
+
+    [TestMethod]
+    public void RecordTableJsonConverter_WhenCustomNoCompressionCodecThenRoundTripSucceeds()
+    {
+        var codec = new RecordBinaryPayloadCodec { Compression = RecordPayloadCompression.None };
+        var original = CreateTestRecordTable();
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new RecordTableJsonConverter(codec));
+
+        var json = JsonSerializer.Serialize(original, options);
+        var deserialized = JsonSerializer.Deserialize<RecordTable>(json, options);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual("Orders", deserialized.Name);
+        Assert.AreEqual(2, deserialized.Count);
+    }
+
+    [TestMethod]
+    public void RecordSetJsonConverter_WhenCustomNoCompressionCodecThenRoundTripSucceeds()
+    {
+        var codec = new RecordBinaryPayloadCodec { Compression = RecordPayloadCompression.None };
+        var original = CreateTestRecordSet();
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new RecordSetJsonConverter(codec));
+
+        var json = JsonSerializer.Serialize(original, options);
+        var deserialized = JsonSerializer.Deserialize<RecordSet>(json, options);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual(2, deserialized.Count);
+    }
+
+    [TestMethod]
+    public void RecordBinaryPayloadCodec_WhenCustomDoSLimitExceededThenThrowsInvalidDataException()
+    {
+        var codec = new RecordBinaryPayloadCodec
+        {
+            Compression = RecordPayloadCompression.GZip,
+            MaxDecompressedBytes = 100
+        };
+
+        // 构造能解压出 >100 字节的 GZip 数据
+        byte[] encoded;
+        using (var ms = new MemoryStream())
+        {
+            ms.WriteByte(0xFE); ms.WriteByte((byte)'L'); ms.WriteByte((byte)'Y'); ms.WriteByte((byte)'Z');
+            ms.WriteByte(0x01); ms.WriteByte(0x01); // version=1, algo=GZip
+            using (var gz = new GZipStream(ms, CompressionLevel.Fastest, leaveOpen: true))
+            {
+                var chunk = new byte[200];
+                gz.Write(chunk, 0, chunk.Length);
+            }
+            encoded = ms.ToArray();
+        }
+
+        Assert.Throws<InvalidDataException>(() => codec.Decode(encoded));
+    }
+
+
 
     private static RecordTable CreateTestRecordTable()
     {
