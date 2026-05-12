@@ -210,7 +210,7 @@ public partial class RecordTable
             object val;
             if (col.ArrayRank > 0)
             {
-                val = ReadArrayValue(reader, col.ColumnType, col.ArrayRank);
+                val = ReadArrayValue(reader, col.ColumnType, col.ArrayRank, col.IsNullable);
             }
             else
             {
@@ -252,7 +252,7 @@ public partial class RecordTable
         }
     }
 
-    private static Array ReadArrayValue(BinaryReader reader, RecordColumnType elementType, int expectedRank)
+    private static Array ReadArrayValue(BinaryReader reader, RecordColumnType elementType, int expectedRank, bool isElementNullable)
     {
         int rank = reader.ReadByte();
         if (rank != expectedRank)
@@ -269,8 +269,8 @@ public partial class RecordTable
             totalElements *= lengths[i];
         }
 
-        // 创建数组
-        Type clrType = Helpers.GetClrType(elementType, isNullable: false, arrayRank: 0);
+        // 创建数组（考虑元素是否可空）
+        Type clrType = Helpers.GetClrType(elementType, isNullable: isElementNullable, arrayRank: 0);
         Array array = rank == 1 
             ? Array.CreateInstance(clrType, lengths[0])
             : Array.CreateInstance(clrType, lengths);

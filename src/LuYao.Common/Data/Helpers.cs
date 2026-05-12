@@ -51,10 +51,19 @@ static class Helpers
     {
         var lookup = NormalizeColumnLookupType(type);
 
+        // byte[] 特殊处理：作为独立类型而非数组
+        if (lookup == typeof(byte[]))
+        {
+            return RecordColumnType.ByteArray;
+        }
+
         // 剥离数组维度，只看元素类型
         if (lookup.IsArray)
         {
             lookup = lookup.GetElementType()!;
+            // 数组元素可能是可空类型（如 int?[]），需要再次规范化
+            lookup = Nullable.GetUnderlyingType(lookup) ?? lookup;
+            lookup = lookup.IsEnum ? Enum.GetUnderlyingType(lookup) : lookup;
         }
 
         if (TypeToColumnType.TryGetValue(lookup, out var ct))
@@ -63,10 +72,20 @@ static class Helpers
     }
 
     /// <summary>
-    /// 判断 CLR <see cref="Type"/> 是否为 Nullable 值类型。
+    /// 判断 CLR <see cref="Type"/> 是否为 Nullable 值类型，或其数组元素类型为 Nullable。
     /// </summary>
     internal static bool IsNullableType(Type type)
     {
+        // 检查数组元素类型
+        if (type.IsArray)
+        {
+            var elementType = type.GetElementType();
+            if (elementType != null)
+            {
+                return Nullable.GetUnderlyingType(elementType) != null;
+            }
+        }
+
         return Nullable.GetUnderlyingType(type) != null;
     }
 
@@ -81,6 +100,12 @@ static class Helpers
         // 处理数组维度
         if (arrayRank > 0)
         {
+            // 如果数组元素是可空的值类型，需要先构造可空类型再构造数组
+            if (isNullable && baseType.IsValueType)
+            {
+                baseType = typeof(Nullable<>).MakeGenericType(baseType);
+            }
+
             baseType = (arrayRank == 1) 
                 ? baseType.MakeArrayType() 
                 : baseType.MakeArrayType(arrayRank);
@@ -102,7 +127,10 @@ static class Helpers
         // 支持数组类型
         if (normalized.IsArray)
         {
-            normalized = normalized.GetElementType()!;
+            var elementType = normalized.GetElementType()!;
+            // 递归展开数组元素类型（处理 int?[] 等情况）
+            elementType = Nullable.GetUnderlyingType(elementType) ?? elementType;
+            normalized = elementType.IsEnum ? Enum.GetUnderlyingType(elementType) : elementType;
         }
 
         return TypeToColumnType.ContainsKey(normalized);

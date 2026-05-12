@@ -65,7 +65,15 @@ public class RecordColumn<T> : RecordColumn
         }
         else
         {
-            _data[row] = (T)Valid.To(value, this.Type);
+            // 数组类型特殊处理：尝试直接转换
+            if (typeof(T).IsArray && value is Array)
+            {
+                _data[row] = (T)value;
+            }
+            else
+            {
+                _data[row] = (T)Valid.To(value, this.Type);
+            }
         }
     }
 

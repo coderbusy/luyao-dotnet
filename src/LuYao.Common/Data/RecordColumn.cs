@@ -61,11 +61,18 @@ public abstract class RecordColumn : IXProp
     public int ArrayRank { get; }
 
     /// <summary>
-    /// 确定类型的数组维度。
+    /// 确定类型的数组维度。byte[] 被视为标量（ArrayRank=0）。
     /// </summary>
     private static int DetermineArrayRank(Type type)
     {
         var effectiveType = Nullable.GetUnderlyingType(type) ?? type;
+
+        // byte[] 特殊处理：作为独立类型（ByteArray），ArrayRank 为 0
+        if (effectiveType == typeof(byte[]))
+        {
+            return 0;
+        }
+
         return effectiveType.IsArray ? effectiveType.GetArrayRank() : 0;
     }
 
@@ -149,6 +156,13 @@ public abstract class RecordColumn : IXProp
         object? value = this.Get(row);
         if (value is null) return default;
         if (value is T direct) return direct;
+
+        // 数组类型无法通过 Convert.ChangeType 转换，但可能是兼容的数组类型
+        if (typeof(T).IsArray && value is Array)
+        {
+            return (T)value;
+        }
+
         return (T)Valid.To(value, typeof(T));
     }
 
