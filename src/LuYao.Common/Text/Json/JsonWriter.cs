@@ -228,6 +228,9 @@ public sealed class JsonWriter : IDisposable
     /// </summary>
     public void Flush()
     {
+        if (_disposed || _buffer is null)
+            return;
+
         if (_bufferPosition > 0)
         {
             _writer.Write(_buffer, 0, _bufferPosition);
