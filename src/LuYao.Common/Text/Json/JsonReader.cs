@@ -23,6 +23,12 @@ public sealed class JsonReader : IDisposable
 
     private const int DefaultBufferSize = 4096;
 
+    /// <summary>
+    /// 初始化 JsonReader 实例
+    /// </summary>
+    /// <param name="reader">要读取的 TextReader</param>
+    /// <param name="ownsReader">是否拥有并释放 TextReader</param>
+    /// <param name="bufferSize">缓冲区大小</param>
     public JsonReader(TextReader reader, bool ownsReader = false, int bufferSize = DefaultBufferSize)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
@@ -30,6 +36,10 @@ public sealed class JsonReader : IDisposable
         _buffer = new char[Math.Max(bufferSize, 64)];
     }
 
+    /// <summary>
+    /// 使用 JSON 字符串初始化 JsonReader 实例
+    /// </summary>
+    /// <param name="json">要解析的 JSON 字符串</param>
     public JsonReader(string json) : this(new StringReader(json), true)
     {
     }
@@ -393,6 +403,9 @@ public sealed class JsonReader : IDisposable
         (c >= 'A' && c <= 'F') ||
         (c >= 'a' && c <= 'f');
 
+    /// <summary>
+    /// 释放资源
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)
@@ -414,6 +427,16 @@ public sealed class JsonReader : IDisposable
 /// </summary>
 public class JsonException : Exception
 {
+    /// <summary>
+    /// 使用错误消息初始化 JsonException 实例
+    /// </summary>
+    /// <param name="message">错误消息</param>
     public JsonException(string message) : base(message) { }
+
+    /// <summary>
+    /// 使用错误消息和内部异常初始化 JsonException 实例
+    /// </summary>
+    /// <param name="message">错误消息</param>
+    /// <param name="innerException">内部异常</param>
     public JsonException(string message, Exception innerException) : base(message, innerException) { }
 }

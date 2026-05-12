@@ -100,74 +100,55 @@ public class RecordColumn<T> : RecordColumn
     /// </summary>
     private static string FormatArrayAsJson(Array array)
     {
-        if (array.Length == 0)
-        {
-            return array.Rank == 1 ? "[]" : FormatMultiDimensionalArray(array);
-        }
+        var sb = new System.Text.StringBuilder();
+        using var writer = new JsonWriter(sb, spaceAfterComma: true);
 
         if (array.Rank == 1)
         {
-            return FormatOneDimensionalArray(array);
+            WriteOneDimensionalArray(writer, array);
+        }
+        else
+        {
+            WriteMultiDimensionalArray(writer, array, new int[array.Rank], 0);
         }
 
-        return FormatMultiDimensionalArray(array);
+        writer.Flush();
+        return sb.ToString();
     }
 
-    private static string FormatOneDimensionalArray(Array array)
+    private static void WriteOneDimensionalArray(JsonWriter writer, Array array)
     {
-        var sb = new System.Text.StringBuilder("[");
-        using var writer = new JsonWriter(sb);
+        writer.WriteStartArray();
         for (int i = 0; i < array.Length; i++)
         {
-            if (i > 0)
-            {
-                writer.Flush();
-                sb.Append(", ");
-            }
             var element = array.GetValue(i);
-            AppendJsonValue(writer, element);
+            WriteJsonValue(writer, element);
         }
-        writer.Flush();
-        sb.Append("]");
-        return sb.ToString();
+        writer.WriteEndArray();
     }
 
-    private static string FormatMultiDimensionalArray(Array array)
+    private static void WriteMultiDimensionalArray(JsonWriter writer, Array array, int[] indices, int dimension)
     {
-        var sb = new System.Text.StringBuilder();
-        using var writer = new JsonWriter(sb);
-        FormatMultiDimensionalArrayRecursive(sb, writer, array, new int[array.Rank], 0);
-        return sb.ToString();
-    }
-
-    private static void FormatMultiDimensionalArrayRecursive(System.Text.StringBuilder sb, JsonWriter writer, Array array, int[] indices, int dimension)
-    {
-        sb.Append('[');
+        writer.WriteStartArray();
         int length = array.GetLength(dimension);
         for (int i = 0; i < length; i++)
         {
-            if (i > 0)
-            {
-                writer.Flush();
-                sb.Append(", ");
-            }
             indices[dimension] = i;
 
             if (dimension == array.Rank - 1)
             {
                 var element = array.GetValue(indices);
-                AppendJsonValue(writer, element);
+                WriteJsonValue(writer, element);
             }
             else
             {
-                FormatMultiDimensionalArrayRecursive(sb, writer, array, indices, dimension + 1);
+                WriteMultiDimensionalArray(writer, array, indices, dimension + 1);
             }
         }
-        writer.Flush();
-        sb.Append(']');
+        writer.WriteEndArray();
     }
 
-    private static void AppendJsonValue(JsonWriter writer, object? value)
+    private static void WriteJsonValue(JsonWriter writer, object? value)
     {
         if (value is null)
         {

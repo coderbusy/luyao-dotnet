@@ -71,6 +71,13 @@ public enum JsonTokenType
 /// </summary>
 public readonly struct JsonToken
 {
+    /// <summary>
+    /// 初始化 JsonToken 实例
+    /// </summary>
+    /// <param name="type">标记类型</param>
+    /// <param name="value">标记值</param>
+    /// <param name="startIndex">在源字符串中的起始位置</param>
+    /// <param name="length">标记长度</param>
     public JsonToken(JsonTokenType type, object? value = null, int startIndex = 0, int length = 0)
     {
         Type = type;
