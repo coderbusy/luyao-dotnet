@@ -7,13 +7,36 @@ namespace LuYao.Data;
 /// <summary>
 /// Record 二进制负载压缩辅助类。
 /// </summary>
+/// <remarks>
+/// 使用 5 字节 magic 头 (<c>0xFE 'L' 'Y' 'Z' &lt;algo&gt;</c>) 区分压缩负载与遗留无压缩负载，
+/// 避免与 <see cref="BinaryPayloadHeader"/> 的 marker (0xFF) 以及无头部遗留格式的版本号字节产生歧义。
+/// </remarks>
 internal static class RecordBinaryPayloadHelper
 {
-    private const int MaxDecompressedBytes = 64 * 1024 * 1024;
+    /// <summary>解压后允许的最大字节数，用于防御 zip bomb 等 DoS 攻击。</summary>
+    public const int MaxDecompressedBytes = 64 * 1024 * 1024;
+
+    /// <summary>压缩负载允许的最大字节数（解码 Base64 后），用于防御过大压缩输入。</summary>
+    public const int MaxCompressedBytes = 16 * 1024 * 1024;
+
+    /// <summary>
+    /// JSON 字符串中 Base64 文本允许的最大字符数；用于在解码前阻止过大输入。
+    /// 取 <see cref="MaxCompressedBytes"/> 对应的 Base64 长度上限并向上取整。
+    /// </summary>
+    public const int MaxBase64Length = ((MaxCompressedBytes + 2) / 3) * 4;
+
     private const int DecodeBufferSize = 16 * 1024;
-    private const byte CompressionGZip = 1;
-    private const byte GZipSignatureFirst = 0x1F;
-    private const byte GZipSignatureSecond = 0x8B;
+    private const int InitialOutputCapacity = 4 * 1024;
+
+    // Magic: 0xFE 'L' 'Y' 'Z' + 算法 ID。0xFE 与 BinaryPayloadHeader.Marker (0xFF) 及 BinaryFormatVersion (1) 都不冲突。
+    private const byte MagicByte0 = 0xFE;
+    private const byte MagicByte1 = (byte)'L';
+    private const byte MagicByte2 = (byte)'Y';
+    private const byte MagicByte3 = (byte)'Z';
+    private const int MagicLength = 4;
+    private const int HeaderLength = MagicLength + 1; // magic + algorithm id
+
+    private const byte AlgorithmGZip = 1;
 
     /// <summary>
     /// 压缩并写入头部。
@@ -39,8 +62,12 @@ internal static class RecordBinaryPayloadHelper
         if (offset < 0 || offset > payload.Length) throw new ArgumentOutOfRangeException(nameof(offset));
         if (count < 0 || payload.Length - offset < count) throw new ArgumentOutOfRangeException(nameof(count));
 
-        using var output = new MemoryStream(count + 16);
-        output.WriteByte(CompressionGZip);
+        using var output = new MemoryStream(count + HeaderLength + 16);
+        output.WriteByte(MagicByte0);
+        output.WriteByte(MagicByte1);
+        output.WriteByte(MagicByte2);
+        output.WriteByte(MagicByte3);
+        output.WriteByte(AlgorithmGZip);
         using (var gzip = new GZipStream(output, CompressionLevel.Fastest, leaveOpen: true))
         {
             gzip.Write(payload, offset, count);
@@ -49,23 +76,44 @@ internal static class RecordBinaryPayloadHelper
     }
 
     /// <summary>
-    /// 读取负载并按头部解压。
+    /// 读取负载并按头部解压；若负载不带本类型的压缩头则原样返回（向后兼容遗留无压缩格式）。
     /// </summary>
     /// <param name="payload">Base64 解码后的负载。</param>
     /// <returns>解压后的原始负载。</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="payload"/> 为 null。</exception>
+    /// <exception cref="InvalidDataException">压缩输入过大、解压结果超出限制、迭代次数异常或算法不支持。</exception>
     public static byte[] Decode(byte[] payload)
     {
         if (payload == null) throw new ArgumentNullException(nameof(payload));
-        if (!IsGZipPayload(payload)) return payload;
 
-        using var input = new MemoryStream(payload, 1, payload.Length - 1, writable: false);
+        // 入口长度硬上限：阻止解码后的超大压缩负载进入解压流程。
+        if (payload.Length > MaxCompressedBytes)
+            throw new InvalidDataException($"压缩负载超过限制：{MaxCompressedBytes} bytes.");
+
+        if (!HasCompressedHeader(payload)) return payload;
+
+        byte algorithm = payload[MagicLength];
+        if (algorithm != AlgorithmGZip)
+            throw new InvalidDataException($"不支持的压缩算法标识：0x{algorithm:X2}。");
+
+        int dataOffset = HeaderLength;
+        int dataLength = payload.Length - HeaderLength;
+
+        using var input = new MemoryStream(payload, dataOffset, dataLength, writable: false);
         using var gzip = new GZipStream(input, CompressionMode.Decompress, leaveOpen: false);
-        using var output = new MemoryStream(Math.Min(payload.Length * 4, MaxDecompressedBytes));
+        // 不信任攻击者控制的长度作为容量提示；固定小初始容量，让 MemoryStream 按需扩容。
+        using var output = new MemoryStream(InitialOutputCapacity);
         var buffer = new byte[DecodeBufferSize];
-        var total = 0;
+        long total = 0;
+        // 限制迭代次数，防御构造慢速 / 高迭代次数的负载。
+        const int maxIterations = (MaxDecompressedBytes / DecodeBufferSize) + 16;
+        int iterations = 0;
         while (true)
         {
-            var read = gzip.Read(buffer, 0, buffer.Length);
+            if (++iterations > maxIterations)
+                throw new InvalidDataException("解压迭代次数超过限制。");
+
+            int read = gzip.Read(buffer, 0, buffer.Length);
             if (read <= 0) break;
 
             if (total + read > MaxDecompressedBytes)
@@ -78,9 +126,10 @@ internal static class RecordBinaryPayloadHelper
         return output.ToArray();
     }
 
-    private static bool IsGZipPayload(byte[] payload) =>
-        payload.Length >= 3
-        && payload[0] == CompressionGZip
-        && payload[1] == GZipSignatureFirst
-        && payload[2] == GZipSignatureSecond;
+    private static bool HasCompressedHeader(byte[] payload) =>
+        payload.Length >= HeaderLength
+        && payload[0] == MagicByte0
+        && payload[1] == MagicByte1
+        && payload[2] == MagicByte2
+        && payload[3] == MagicByte3;
 }
