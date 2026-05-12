@@ -119,10 +119,15 @@ public class RecordColumn<T> : RecordColumn
         using var writer = new JsonWriter(sb);
         for (int i = 0; i < array.Length; i++)
         {
-            if (i > 0) sb.Append(", ");
+            if (i > 0)
+            {
+                writer.Flush();
+                sb.Append(", ");
+            }
             var element = array.GetValue(i);
             AppendJsonValue(writer, element);
         }
+        writer.Flush();
         sb.Append("]");
         return sb.ToString();
     }
@@ -141,7 +146,11 @@ public class RecordColumn<T> : RecordColumn
         int length = array.GetLength(dimension);
         for (int i = 0; i < length; i++)
         {
-            if (i > 0) sb.Append(", ");
+            if (i > 0)
+            {
+                writer.Flush();
+                sb.Append(", ");
+            }
             indices[dimension] = i;
 
             if (dimension == array.Rank - 1)
@@ -154,6 +163,7 @@ public class RecordColumn<T> : RecordColumn
                 FormatMultiDimensionalArrayRecursive(sb, writer, array, indices, dimension + 1);
             }
         }
+        writer.Flush();
         sb.Append(']');
     }
 
@@ -215,8 +225,6 @@ public class RecordColumn<T> : RecordColumn
         {
             writer.WriteValue(Convert.ToString(value, CultureInfo.InvariantCulture));
         }
-
-        writer.Flush();
     }
 
     internal override void Extend(int length)
