@@ -26,6 +26,7 @@ public sealed class JsonWriter : IDisposable
     // 格式化选项
     private readonly bool _indented;
     private readonly string _indentString;
+    private readonly bool _spaceAfterComma;
     private int _currentIndentLevel;
 
     /// <summary>
@@ -35,14 +36,16 @@ public sealed class JsonWriter : IDisposable
     /// <param name="ownsWriter">是否拥有并释放 TextWriter</param>
     /// <param name="indented">是否启用缩进格式化</param>
     /// <param name="indentString">缩进字符串</param>
+    /// <param name="spaceAfterComma">是否在逗号后添加空格(仅在非缩进模式下)</param>
     /// <param name="bufferSize">缓冲区大小</param>
     public JsonWriter(TextWriter writer, bool ownsWriter = false, bool indented = false,
-                     string indentString = "  ", int bufferSize = DefaultBufferSize)
+                     string indentString = "  ", bool spaceAfterComma = false, int bufferSize = DefaultBufferSize)
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         _ownsWriter = ownsWriter;
         _indented = indented;
         _indentString = indentString ?? "  ";
+        _spaceAfterComma = spaceAfterComma && !indented; // 缩进模式下忽略此选项
         _buffer = new char[Math.Max(bufferSize, 64)];
         _stateStack = new JsonWriteState[8]; // 初始栈大小
     }
@@ -53,8 +56,9 @@ public sealed class JsonWriter : IDisposable
     /// <param name="sb">要写入的 StringBuilder</param>
     /// <param name="indented">是否启用缩进格式化</param>
     /// <param name="indentString">缩进字符串</param>
-    public JsonWriter(StringBuilder sb, bool indented = false, string indentString = "  ")
-        : this(new StringWriter(sb), true, indented, indentString)
+    /// <param name="spaceAfterComma">是否在逗号后添加空格(仅在非缩进模式下)</param>
+    public JsonWriter(StringBuilder sb, bool indented = false, string indentString = "  ", bool spaceAfterComma = false)
+        : this(new StringWriter(sb), true, indented, indentString, spaceAfterComma)
     {
     }
 
@@ -324,7 +328,14 @@ public sealed class JsonWriter : IDisposable
             else if (currentState == JsonWriteState.Value)
             {
                 WriteChar(',');
-                if (_indented) WriteNewLine();
+                if (_indented)
+                {
+                    WriteNewLine();
+                }
+                else if (_spaceAfterComma)
+                {
+                    WriteChar(' ');
+                }
             }
             // Property 状态不需要逗号，只需要设置为 Value
             else if (currentState == JsonWriteState.Property)
