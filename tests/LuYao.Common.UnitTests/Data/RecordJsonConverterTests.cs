@@ -302,14 +302,7 @@ public class RecordJsonConverterTests
     [TestMethod]
     public void RecordSetJsonConverter_WhenBase64PayloadTooLargeThenThrowsJsonException()
     {
-        // 构造一个超过 MaxBase64Length 的字符串（内容无所谓，长度用 'A' 填充）。
-        // MaxBase64Length 来自 16MB 压缩上限，约 22.4MB Base64 字符。
-        const int oversize = 25 * 1024 * 1024;
-        var sb = new StringBuilder(oversize + 2);
-        sb.Append('"');
-        sb.Append('A', oversize);
-        sb.Append('"');
-        var json = sb.ToString();
+        var json = BuildOversizeBase64Json();
 
         var options = new JsonSerializerOptions { MaxDepth = 64 };
         options.Converters.Add(new RecordSetJsonConverter());
@@ -318,6 +311,30 @@ public class RecordJsonConverterTests
         // 在分配 byte[] 之前就被守卫拦截。无论命中守卫还是底层读取限制，都应是 JsonException。
         Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<RecordSet>(json, options));
+    }
+
+    [TestMethod]
+    public void RecordTableJsonConverter_WhenBase64PayloadTooLargeThenThrowsJsonException()
+    {
+        var json = BuildOversizeBase64Json();
+
+        var options = new JsonSerializerOptions { MaxDepth = 64 };
+        options.Converters.Add(new RecordTableJsonConverter());
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<RecordTable>(json, options));
+    }
+
+    private static string BuildOversizeBase64Json()
+    {
+        // 构造一个超过 MaxBase64Length 的字符串（内容无所谓，长度用 'A' 填充）。
+        // MaxBase64Length 来自 16MB 压缩上限，约 22.4MB Base64 字符。
+        const int oversize = 25 * 1024 * 1024;
+        var sb = new StringBuilder(oversize + 2);
+        sb.Append('"');
+        sb.Append('A', oversize);
+        sb.Append('"');
+        return sb.ToString();
     }
 
     #endregion

@@ -86,11 +86,13 @@ internal static class RecordBinaryPayloadHelper
     {
         if (payload == null) throw new ArgumentNullException(nameof(payload));
 
-        // 入口长度硬上限：阻止解码后的超大压缩负载进入解压流程。
+        // 不带本类型压缩头的负载（含遗留无压缩格式）原样透传，不做 16MB 限制：
+        // Converter 层的 Base64 长度守卫已经是入口总闸门。
+        if (!HasCompressedHeader(payload)) return payload;
+
+        // 仅对带压缩头、即将进入解压流程的负载施加输入上限，防止过大压缩输入引发的内存压力。
         if (payload.Length > MaxCompressedBytes)
             throw new InvalidDataException($"压缩负载超过限制：{MaxCompressedBytes} bytes.");
-
-        if (!HasCompressedHeader(payload)) return payload;
 
         byte algorithm = payload[MagicLength];
         if (algorithm != AlgorithmGZip)
@@ -105,14 +107,10 @@ internal static class RecordBinaryPayloadHelper
         using var output = new MemoryStream(InitialOutputCapacity);
         var buffer = new byte[DecodeBufferSize];
         long total = 0;
-        // 限制迭代次数，防御构造慢速 / 高迭代次数的负载。
-        const int maxIterations = (MaxDecompressedBytes / DecodeBufferSize) + 16;
-        int iterations = 0;
         while (true)
         {
-            if (++iterations > maxIterations)
-                throw new InvalidDataException("解压迭代次数超过限制。");
-
+            // 注意：Stream.Read 允许返回少于 count 的字节数，因此不能基于"调用次数"做迭代上限，
+            // 否则可能误杀合法但分块较小的解压流。退出条件以 read <= 0 为准。
             int read = gzip.Read(buffer, 0, buffer.Length);
             if (read <= 0) break;
 
