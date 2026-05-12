@@ -116,11 +116,12 @@ public class RecordColumn<T> : RecordColumn
     private static string FormatOneDimensionalArray(Array array)
     {
         var sb = new System.Text.StringBuilder("[");
+        using var writer = new JsonWriter(sb);
         for (int i = 0; i < array.Length; i++)
         {
             if (i > 0) sb.Append(", ");
             var element = array.GetValue(i);
-            AppendJsonValue(sb, element);
+            AppendJsonValue(writer, element);
         }
         sb.Append("]");
         return sb.ToString();
@@ -129,11 +130,12 @@ public class RecordColumn<T> : RecordColumn
     private static string FormatMultiDimensionalArray(Array array)
     {
         var sb = new System.Text.StringBuilder();
-        FormatMultiDimensionalArrayRecursive(sb, array, new int[array.Rank], 0);
+        using var writer = new JsonWriter(sb);
+        FormatMultiDimensionalArrayRecursive(sb, writer, array, new int[array.Rank], 0);
         return sb.ToString();
     }
 
-    private static void FormatMultiDimensionalArrayRecursive(System.Text.StringBuilder sb, Array array, int[] indices, int dimension)
+    private static void FormatMultiDimensionalArrayRecursive(System.Text.StringBuilder sb, JsonWriter writer, Array array, int[] indices, int dimension)
     {
         sb.Append('[');
         int length = array.GetLength(dimension);
@@ -145,19 +147,18 @@ public class RecordColumn<T> : RecordColumn
             if (dimension == array.Rank - 1)
             {
                 var element = array.GetValue(indices);
-                AppendJsonValue(sb, element);
+                AppendJsonValue(writer, element);
             }
             else
             {
-                FormatMultiDimensionalArrayRecursive(sb, array, indices, dimension + 1);
+                FormatMultiDimensionalArrayRecursive(sb, writer, array, indices, dimension + 1);
             }
         }
         sb.Append(']');
     }
 
-    private static void AppendJsonValue(System.Text.StringBuilder sb, object? value)
+    private static void AppendJsonValue(JsonWriter writer, object? value)
     {
-        using var writer = new JsonWriter(sb);
         if (value is null)
         {
             writer.WriteNull();
@@ -196,7 +197,7 @@ public class RecordColumn<T> : RecordColumn
         }
         else if (value is double d)
         {
-            writer.WriteValue(d);
+            writer.WriteRaw(double.IsNaN(d) || double.IsInfinity(d) ? "null" : d.ToString("R", CultureInfo.InvariantCulture));
         }
         else if (value is decimal dec)
         {
@@ -214,6 +215,8 @@ public class RecordColumn<T> : RecordColumn
         {
             writer.WriteValue(Convert.ToString(value, CultureInfo.InvariantCulture));
         }
+
+        writer.Flush();
     }
 
     internal override void Extend(int length)
