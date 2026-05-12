@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using LuYao.Text.Json;
 
 namespace LuYao.Data;
 
@@ -155,47 +157,62 @@ public class RecordColumn<T> : RecordColumn
 
     private static void AppendJsonValue(System.Text.StringBuilder sb, object? value)
     {
+        using var writer = new JsonWriter(sb);
         if (value is null)
         {
-            sb.Append("null");
+            writer.WriteNull();
         }
         else if (value is string str)
         {
-            sb.Append('"');
-            // 简单转义（JSON 字符串需要转义特殊字符）
-            foreach (char c in str)
-            {
-                switch (c)
-                {
-                    case '"': sb.Append("\\\""); break;
-                    case '\\': sb.Append("\\\\"); break;
-                    case '\n': sb.Append("\\n"); break;
-                    case '\r': sb.Append("\\r"); break;
-                    case '\t': sb.Append("\\t"); break;
-                    default: sb.Append(c); break;
-                }
-            }
-            sb.Append('"');
+            writer.WriteValue(str);
+        }
+        else if (value is char ch)
+        {
+            writer.WriteValue(ch.ToString());
         }
         else if (value is bool b)
         {
-            sb.Append(b ? "true" : "false");
+            writer.WriteValue(b);
         }
         else if (value is DateTime dt)
         {
-            sb.Append('"').Append(dt.ToString("o")).Append('"');
+            writer.WriteValue(dt.ToString("o", CultureInfo.InvariantCulture));
         }
         else if (value is DateTimeOffset dto)
         {
-            sb.Append('"').Append(dto.ToString("o")).Append('"');
+            writer.WriteValue(dto.ToString("o", CultureInfo.InvariantCulture));
+        }
+        else if (value is TimeSpan ts)
+        {
+            writer.WriteValue(ts.ToString("c", CultureInfo.InvariantCulture));
         }
         else if (value is Guid guid)
         {
-            sb.Append('"').Append(guid.ToString()).Append('"');
+            writer.WriteValue(guid.ToString());
+        }
+        else if (value is float f)
+        {
+            writer.WriteRaw(float.IsNaN(f) || float.IsInfinity(f) ? "null" : f.ToString("R", CultureInfo.InvariantCulture));
+        }
+        else if (value is double d)
+        {
+            writer.WriteValue(d);
+        }
+        else if (value is decimal dec)
+        {
+            writer.WriteRaw(dec.ToString(CultureInfo.InvariantCulture));
+        }
+        else if (value is sbyte or byte or short or ushort or int or uint or long or ulong)
+        {
+            writer.WriteRaw(Convert.ToString(value, CultureInfo.InvariantCulture)!);
+        }
+        else if (value is Enum)
+        {
+            writer.WriteValue(value.ToString());
         }
         else
         {
-            sb.Append(value.ToString());
+            writer.WriteValue(Convert.ToString(value, CultureInfo.InvariantCulture));
         }
     }
 

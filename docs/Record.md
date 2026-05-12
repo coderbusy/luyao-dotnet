@@ -6,10 +6,10 @@
 
 - 轻量表结构数据处理
 - 对象列表与表结构之间转换
-- 与 ADO.NET 的 `IDataReader` / `DataTable` / `DataSet` 互操作
+- 与 ADO.NET 的 `IDataReader` 互操作
 - 需要按列存储、按行访问的业务代码
 
-`RecordSet` 是多个 `Record` 的命名集合，用于统一管理多张内存表，并提供与 `DataSet` 的双向互操作。
+`RecordSet` 是多个 `Record` 的命名集合，用于统一管理多张内存表。
 
 设计重点：
 
@@ -283,7 +283,7 @@
 - 列类型白名单是封闭的。
 - `enum` 在内部会按其基础数值类型参与列类型映射。
 - 对象映射与自动建列都受该白名单限制。
-- **数组支持**：支持任意维度数组（一维 `int[]`、二维 `int[,]` 等），但 `Write(DataTable)` 时数组列会被跳过（`byte[]` 除外，因为 `DataTable` 原生支持）。
+- **数组支持**：支持任意维度数组（一维 `int[]`、二维 `int[,]` 等），`ToString()` 会以 JSON 风格输出数组值。
 - **数组元素可空性**：`int?[]`（可空元素数组）是合法类型，序列化时会保留每个元素的 null 状态。
 - **PostgreSQL 互操作**：从 PostgreSQL 的 `IDataReader` 读取数组列（如 `int[]`, `text[]`）时，Npgsql 驱动会自动映射为 CLR 数组类型，`RecordTable.Read(IDataReader)` 可以直接识别并创建对应的数组列。
 
@@ -780,7 +780,7 @@ RecordSet copy = RecordSet.FromBytes(bytes);
 特别说明：
 
 - `Group*` 缺少列时不会返回空字典，而是使用默认键把现有行分组。
-- `Write(DataTable dt)` / `WriteTo(DataSet ds)` 通常应写入空目标对象，避免名称或列结构冲突。
+- `Read(IDataReader)` 会按当前结果集字段自动建列并逐行读取数据。
 
 ---
 
@@ -829,16 +829,18 @@ record.AddRowFrom(dto);
 - `AddRowFrom` 不自动补齐缺失列
 - DTO 中有属性但表中缺列时，该值会被忽略
 
-### 10.4 与 ADO.NET 互操作时尽量使用新对象
+### 10.4 与 ADO.NET 互操作时优先明确结果集 schema
 
 ```csharp
-DataTable dt = record.ToDataTable();
-DataSet ds = set.ToDataSet();
+using var reader = command.ExecuteReader();
+var record = new Record();
+record.Read(reader);
 ```
 
 要点：
 
-- 这样最不容易与已有列名、表名发生冲突
+- `Read(IDataReader)` 会根据结果集字段名与字段类型建列
+- 读取前先确认查询返回的字段顺序与名称，便于后续按列访问
 
 ---
 

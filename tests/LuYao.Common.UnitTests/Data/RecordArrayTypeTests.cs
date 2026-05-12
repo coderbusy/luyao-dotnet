@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace LuYao.Data;
@@ -454,6 +455,42 @@ public class RecordArrayTypeTests
 
         var str = row.ToString("Messages");
         Assert.AreEqual("[\"Hello \\\"World\\\"\", \"Line1\\nLine2\", \"Tab\\tSeparated\"]", str);
+    }
+
+    [TestMethod]
+    public void WhenToStringOnStringArrayWithControlCharactersThenEscaped()
+    {
+        var table = new RecordTable("Test");
+        table.Columns.Add<string[]>("Messages");
+
+        var row = table.AddRow();
+        row["Messages"] = new[] { "Back\bSpace", "Form\fFeed", "\u0001" };
+
+        var str = row.ToString("Messages");
+        Assert.AreEqual("[\"Back\\bSpace\", \"Form\\fFeed\", \"\\u0001\"]", str);
+    }
+
+    [TestMethod]
+    public void WhenToStringOnDecimalArrayWithDifferentCultureThenUsesInvariantCulture()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            var table = new RecordTable("Test");
+            table.Columns.Add<decimal[]>("Amounts");
+
+            var row = table.AddRow();
+            row["Amounts"] = new[] { 1.5m, 2.75m };
+
+            var str = row.ToString("Amounts");
+            Assert.AreEqual("[1.5, 2.75]", str);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
     }
 
     #endregion
