@@ -30,7 +30,6 @@ static class Helpers
         [typeof(DateTimeOffset)] = RecordColumnType.DateTimeOffset,
         [typeof(TimeSpan)] = RecordColumnType.TimeSpan,
         [typeof(Guid)] = RecordColumnType.Guid,
-        [typeof(byte[])] = RecordColumnType.ByteArray,
     };
 
     private static readonly Dictionary<RecordColumnType, Type> ColumnTypeToType;
@@ -50,12 +49,6 @@ static class Helpers
     internal static RecordColumnType GetColumnType(Type type)
     {
         var lookup = NormalizeColumnLookupType(type);
-
-        // byte[] 特殊处理：作为独立类型而非数组
-        if (lookup == typeof(byte[]))
-        {
-            return RecordColumnType.ByteArray;
-        }
 
         // 剥离数组维度，只看元素类型
         if (lookup.IsArray)

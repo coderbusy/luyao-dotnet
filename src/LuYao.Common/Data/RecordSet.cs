@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -101,7 +100,7 @@ public partial class RecordSet : IEnumerable<RecordTable>
     /// 尝试按名称获取 Record。
     /// </summary>
     /// <param name="name">Record 的名称。</param>
-    /// <param name="record">如果找到则返回对应的 <see cref="Record"/> 实例，否则为 null。</param>
+    /// <param name="table">如果找到则返回对应的 <see cref="RecordTable"/> 实例，否则为 null。</param>
     /// <returns>如果找到则返回 true，否则返回 false。</returns>
 
 #if NETCOREAPP2_0_OR_GREATER
@@ -163,51 +162,6 @@ public partial class RecordSet : IEnumerable<RecordTable>
     public void Clear()
     {
         _records.Clear();
-    }
-
-    /// <summary>
-    /// 从 <see cref="DataSet"/> 创建 <see cref="RecordSet"/>。
-    /// </summary>
-    /// <param name="ds">源 <see cref="DataSet"/> 实例。</param>
-    /// <returns>包含所有表数据的 <see cref="RecordSet"/> 实例。</returns>
-    /// <exception cref="ArgumentNullException">当 <paramref name="ds"/> 为 null 时抛出。</exception>
-    public static RecordSet FromDataSet(DataSet ds)
-    {
-        if (ds == null) throw new ArgumentNullException(nameof(ds));
-        var set = new RecordSet();
-        foreach (DataTable dt in ds.Tables)
-        {
-            var table = RecordTable.Read(dt);
-            set.Add(dt.TableName, table);
-        }
-        return set;
-    }
-
-    /// <summary>
-    /// 将当前 <see cref="RecordSet"/> 导出为 <see cref="DataSet"/>。
-    /// </summary>
-    /// <returns>包含所有 Record 数据的 <see cref="DataSet"/> 实例。</returns>
-    public DataSet ToDataSet()
-    {
-        var ds = new DataSet();
-        WriteTo(ds);
-        return ds;
-    }
-
-    /// <summary>
-    /// 将当前内容写入指定的 <see cref="DataSet"/>。
-    /// </summary>
-    /// <param name="ds">目标 <see cref="DataSet"/> 实例。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="ds"/> 为 null 时抛出。</exception>
-    public void WriteTo(DataSet ds)
-    {
-        if (ds == null) throw new ArgumentNullException(nameof(ds));
-        foreach (var kvp in _records)
-        {
-            var dt = new DataTable(kvp.Key);
-            kvp.Value.Write(dt);
-            ds.Tables.Add(dt);
-        }
     }
 
     /// <inheritdoc/>

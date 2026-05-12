@@ -36,7 +36,7 @@
 - 分组：单字段、多字段字符串分组，以及 2/3 字段元组分组
 - 数据补全：`Enrich` 按关联键从另一个 `Record` 追加当前不存在的列并填充值
 - 对象映射：对象/对象集合与 `Record` 之间转换
-- ADO.NET 互操作：`IDataReader`、`DataTable`、`DataSet`
+- ADO.NET 互操作：`IDataReader`
 - 二进制序列化：`Record` / `RecordSet` 都支持字节流读写
 - 服务端翻页元数据：`Page`、`PageSize`、`MaxCount`、`MaxPage`
 
@@ -46,7 +46,6 @@
 
 - 按名称管理多个 `Record`
 - 名称比较器可配置
-- 与 `DataSet` 双向互操作
 - 二进制序列化
 
 ### 2.3 非目标
@@ -671,56 +670,21 @@ record.AddRowFrom(dto);
 
 ## 7. ADO.NET 互操作
 
-### 7.1 `Record` 与 `IDataReader` / `DataTable`
-
-提供：
+`Record` 提供与 `IDataReader` 的互操作：
 
 - `void Read(IDataReader dr)`
-- `static Record Read(DataTable dt)`
-- `void Write(DataTable dt)`
-- `DataTable ToDataTable()`
 
 行为说明：
 
 - `Read(IDataReader)` 会先 `Columns.Clear()`，然后根据 reader 的字段结构重建整张表
 - `Read(IDataReader)` 读取到 `DBNull.Value` 时会跳过赋值，目标列保持默认值
-- `Write(DataTable dt)` 会把当前列结构和所有行写入到传入 `DataTable`
-- `ToDataTable()` 会创建新表，表名取 `Record.Name`
 
 示例：
 
 ```csharp
 var record = new Record();
 record.Read(dataReader);
-
-var fromTable = Record.Read(dataTable);
-DataTable table = fromTable.ToDataTable();
 ```
-
-补充说明：
-
-- `Write(DataTable dt)` 是向目标表追加列和行，通常应传入空表。
-
-### 7.2 `RecordSet` 与 `DataSet`
-
-提供：
-
-- `RecordSet.FromDataSet(DataSet ds)`
-- `ToDataSet()`
-- `WriteTo(DataSet ds)`
-
-示例：
-
-```csharp
-var set = RecordSet.FromDataSet(dataSet);
-DataSet ds = set.ToDataSet();
-```
-
-行为说明：
-
-- `FromDataSet` 会把每个 `DataTable` 转成 `Record`
-- `WriteTo(DataSet ds)` 会把每个 `Record` 作为新表追加到目标 `DataSet`
-- 目标 `DataSet` 中表名冲突时，`DataSet.Tables.Add` 会抛异常，因此通常应传入空 `DataSet` 或自行保证不重名
 
 ---
 

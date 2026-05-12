@@ -169,7 +169,7 @@ public partial class RecordTable
 
     private static void WriteColumnData(BinaryWriter writer, RecordColumn col, int rowCount)
     {
-        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray || col.ArrayRank > 0;
+        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ArrayRank > 0;
 
         for (int r = 0; r < rowCount; r++)
         {
@@ -197,7 +197,7 @@ public partial class RecordTable
 
     private static void ReadColumnData(BinaryReader reader, RecordColumn col, int rowCount)
     {
-        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ColumnType == RecordColumnType.ByteArray || col.ArrayRank > 0;
+        bool needsNullCheck = col.IsNullable || col.ColumnType == RecordColumnType.String || col.ArrayRank > 0;
 
         for (int r = 0; r < rowCount; r++)
         {
@@ -335,11 +335,6 @@ public partial class RecordTable
                 break;
             case RecordColumnType.TimeSpan: writer.Write(((TimeSpan)value).Ticks); break;
             case RecordColumnType.Guid: writer.Write(((Guid)value).ToByteArray()); break;
-            case RecordColumnType.ByteArray:
-                var bytes = (byte[])value;
-                writer.Write(bytes.Length);
-                writer.Write(bytes);
-                break;
             default:
                 throw new NotSupportedException($"不支持的列类型: {columnType}");
         }
@@ -370,9 +365,6 @@ public partial class RecordTable
                 return new DateTimeOffset(ticks, TimeSpan.FromMinutes(offsetMinutes));
             case RecordColumnType.TimeSpan: return new TimeSpan(reader.ReadInt64());
             case RecordColumnType.Guid: return new Guid(reader.ReadBytes(16));
-            case RecordColumnType.ByteArray:
-                int len = reader.ReadInt32();
-                return reader.ReadBytes(len);
             default:
                 throw new NotSupportedException($"不支持的列类型: {columnType}");
         }

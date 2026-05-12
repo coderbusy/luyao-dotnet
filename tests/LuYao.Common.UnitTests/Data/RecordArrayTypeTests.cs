@@ -458,61 +458,6 @@ public class RecordArrayTypeTests
 
     #endregion
 
-    #region DataTable 互操作测试
-
-    [TestMethod]
-    public void WhenWriteToDataTableWithArrayColumnsThenArrayColumnsSkipped()
-    {
-        var table = new RecordTable("Test");
-        table.Columns.Add<int>("Id");
-        table.Columns.Add<string>("Name");
-        table.Columns.Add<int[]>("Scores");
-        table.Columns.Add<string[]>("Tags");
-
-        var row = table.AddRow();
-        row["Id"] = 1;
-        row["Name"] = "Test";
-        row["Scores"] = new[] { 85, 90 };
-        row["Tags"] = new[] { "VIP" };
-
-        var dt = new System.Data.DataTable();
-        table.Write(dt);
-
-        // 只有非数组列被写入
-        Assert.AreEqual(2, dt.Columns.Count);
-        Assert.AreEqual("Id", dt.Columns[0].ColumnName);
-        Assert.AreEqual("Name", dt.Columns[1].ColumnName);
-
-        Assert.AreEqual(1, dt.Rows.Count);
-        Assert.AreEqual(1, dt.Rows[0]["Id"]);
-        Assert.AreEqual("Test", dt.Rows[0]["Name"]);
-    }
-
-    [TestMethod]
-    public void WhenWriteToDataTableWithByteArrayColumnThenByteArrayNotSkipped()
-    {
-        var table = new RecordTable("Test");
-        table.Columns.Add<int>("Id");
-        table.Columns.Add<byte[]>("Data");
-
-        var row = table.AddRow();
-        row["Id"] = 1;
-        row["Data"] = new byte[] { 1, 2, 3 };
-
-        var dt = new System.Data.DataTable();
-        table.Write(dt);
-
-        // byte[] 应该被保留
-        Assert.AreEqual(2, dt.Columns.Count);
-        Assert.AreEqual("Id", dt.Columns[0].ColumnName);
-        Assert.AreEqual("Data", dt.Columns[1].ColumnName);
-
-        var data = (byte[])dt.Rows[0]["Data"];
-        CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, data);
-    }
-
-    #endregion
-
     #region RecordSchema 测试
 
     [TestMethod]
