@@ -17,6 +17,11 @@ public class RecordSetJsonConverter : JsonConverter<RecordSet>
         if (reader.TokenType == JsonTokenType.Null) return null;
         if (reader.TokenType == JsonTokenType.String)
         {
+            // 在分配字符串/字节数组前先检查 Base64 长度上限，防御超大输入引发的 OOM。
+            long base64Length = reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length;
+            if (base64Length > RecordBinaryPayloadHelper.MaxBase64Length)
+                throw new JsonException($"RecordSet Base64 payload exceeds maximum allowed length {RecordBinaryPayloadHelper.MaxBase64Length}.");
+
             var base64 = reader.GetString()!;
             try
             {

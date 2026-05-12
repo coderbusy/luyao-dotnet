@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Text.Json;
 
 namespace LuYao.Data;
@@ -187,6 +190,151 @@ public class RecordJsonConverterTests
 
         Assert.IsNotNull(deserialized);
         Assert.AreEqual(0, deserialized.Count);
+    }
+
+    #endregion
+
+    #region Security / Compatibility Tests
+
+    // 与 RecordBinaryPayloadHelper 内部头部保持一致：0xFE 'L' 'Y' 'Z' + 算法 ID。
+    private static readonly byte[] CompressedHeader = { 0xFE, (byte)'L', (byte)'Y', (byte)'Z', 0x01 };
+
+    [TestMethod]
+    public void RecordSetJsonConverter_WhenDeserializeUncompressedLegacyPayloadThenSucceeds()
+    {
+        // 旧的无压缩 RecordSet.ToBytes() 直接 Base64，应当走 passthrough 分支。
+        var original = CreateTestRecordSet();
+        var rawBytes = original.ToBytes();
+        var json = "\"" + Convert.ToBase64String(rawBytes) + "\"";
+
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new RecordSetJsonConverter());
+
+        var deserialized = JsonSerializer.Deserialize<RecordSet>(json, options);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual(2, deserialized.Count);
+        Assert.IsTrue(deserialized.Contains("Orders"));
+        Assert.IsTrue(deserialized.Contains("Products"));
+    }
+
+    [TestMethod]
+    public void RecordTableJsonConverter_WhenDeserializeUncompressedLegacyPayloadThenSucceeds()
+    {
+        // 旧的无压缩 RecordTable 二进制（直接 WriteTo），应当走 passthrough 分支。
+        var original = CreateTestRecordTable();
+        byte[] rawBytes;
+        using (var ms = new MemoryStream())
+        using (var bw = new BinaryWriter(ms, Encoding.UTF8, leaveOpen: true))
+        {
+            original.WriteTo(bw);
+            bw.Flush();
+            rawBytes = ms.ToArray();
+        }
+        var json = "\"" + Convert.ToBase64String(rawBytes) + "\"";
+
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new RecordTableJsonConverter());
+
+        var deserialized = JsonSerializer.Deserialize<RecordTable>(json, options);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual("Orders", deserialized.Name);
+        Assert.AreEqual(2, deserialized.Count);
+    }
+
+    [TestMethod]
+    public void RecordSetJsonConverter_WhenPayloadHasCompressionMarkerButInvalidGZipThenThrowsJsonException()
+    {
+        // 头部正确，但 gzip 主体为乱码，应当被包装为 JsonException。
+        var bad = new byte[CompressedHeader.Length + 16];
+        Buffer.BlockCopy(CompressedHeader, 0, bad, 0, CompressedHeader.Length);
+        for (int i = CompressedHeader.Length; i < bad.Length; i++) bad[i] = 0xAB;
+        var json = "\"" + Convert.ToBase64String(bad) + "\"";
+
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new RecordSetJsonConverter());
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<RecordSet>(json, options));
+    }
+
+    [TestMethod]
+    public void RecordTableJsonConverter_WhenPayloadHasCompressionMarkerButInvalidGZipThenThrowsJsonException()
+    {
+        var bad = new byte[CompressedHeader.Length + 16];
+        Buffer.BlockCopy(CompressedHeader, 0, bad, 0, CompressedHeader.Length);
+        for (int i = CompressedHeader.Length; i < bad.Length; i++) bad[i] = 0xAB;
+        var json = "\"" + Convert.ToBase64String(bad) + "\"";
+
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new RecordTableJsonConverter());
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<RecordTable>(json, options));
+    }
+
+    [TestMethod]
+    public void RecordSetJsonConverter_WhenDecompressedSizeExceedsLimitThenThrowsJsonException()
+    {
+        // 构造 zip bomb：极小压缩输入，解压后远超 64MB 上限。
+        byte[] compressed;
+        using (var ms = new MemoryStream())
+        {
+            ms.Write(CompressedHeader, 0, CompressedHeader.Length);
+            using (var gz = new GZipStream(ms, CompressionLevel.Optimal, leaveOpen: true))
+            {
+                var chunk = new byte[64 * 1024]; // 全零块，压缩比极高
+                // 写入 ~80MB，超过 64MB 上限
+                for (int i = 0; i < 1280; i++) gz.Write(chunk, 0, chunk.Length);
+            }
+            compressed = ms.ToArray();
+        }
+
+        var json = "\"" + Convert.ToBase64String(compressed) + "\"";
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new RecordSetJsonConverter());
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<RecordSet>(json, options));
+    }
+
+    [TestMethod]
+    public void RecordSetJsonConverter_WhenBase64PayloadTooLargeThenThrowsJsonException()
+    {
+        var json = BuildOversizeBase64Json();
+
+        var options = new JsonSerializerOptions { MaxDepth = 64 };
+        options.Converters.Add(new RecordSetJsonConverter());
+
+        // System.Text.Json 默认对单个 token 的字符串长度也有上限，但这里我们关心的是
+        // 在分配 byte[] 之前就被守卫拦截。无论命中守卫还是底层读取限制，都应是 JsonException。
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<RecordSet>(json, options));
+    }
+
+    [TestMethod]
+    public void RecordTableJsonConverter_WhenBase64PayloadTooLargeThenThrowsJsonException()
+    {
+        var json = BuildOversizeBase64Json();
+
+        var options = new JsonSerializerOptions { MaxDepth = 64 };
+        options.Converters.Add(new RecordTableJsonConverter());
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<RecordTable>(json, options));
+    }
+
+    private static string BuildOversizeBase64Json()
+    {
+        // 构造一个超过 MaxBase64Length 的字符串（内容无所谓，长度用 'A' 填充）。
+        // MaxBase64Length 来自 16MB 压缩上限，约 22.4MB Base64 字符。
+        const int oversize = 25 * 1024 * 1024;
+        var sb = new StringBuilder(oversize + 2);
+        sb.Append('"');
+        sb.Append('A', oversize);
+        sb.Append('"');
+        return sb.ToString();
     }
 
     #endregion
