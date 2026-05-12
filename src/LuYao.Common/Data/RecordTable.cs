@@ -437,75 +437,6 @@ public partial class RecordTable : IEnumerable<RecordRow>
         }
     }
 
-    #region DataTable
-
-    /// <summary>
-    /// 将当前 <see cref="RecordTable"/> 实例的数据写入指定的 <see cref="DataTable"/>。
-    /// </summary>
-    /// <param name="dt">用于接收数据的 <see cref="DataTable"/> 实例。</param>
-    /// <remarks>
-    /// 此方法会将当前记录的所有列结构和行数据写入到指定的 <see cref="DataTable"/> 中。
-    /// 如果 <paramref name="dt"/> 为 null，则会抛出 <see cref="ArgumentNullException"/>。
-    /// </remarks>
-    public void Write(DataTable dt)
-    {
-        if (dt == null) throw new ArgumentNullException(nameof(dt));
-        foreach (RecordColumn col in this.Columns)
-        {
-            dt.Columns.Add(col.Name, col.Type);
-        }
-        for (int r = 0; r < this.Count; r++)
-        {
-            DataRow row = dt.Rows.Add();
-            for (int i = 0; i < this.Columns.Count; i++)
-            {
-                var val = this.Columns[i].Get(r);
-                if (val is not null) row[i] = val;
-            }
-        }
-    }
-
-    /// <summary>
-    /// 从指定的 <see cref="DataTable"/> 读取数据并返回一个新的 <see cref="RecordTable"/> 实例。
-    /// </summary>
-    /// <param name="dt">用于读取数据的 <see cref="DataTable"/> 实例。</param>
-    /// <returns>读取到的 <see cref="RecordTable"/> 实例。</returns>
-    public static RecordTable Read(DataTable dt)
-    {
-        var ret = new RecordTable(dt.TableName, dt.Rows.Count);
-        foreach (DataColumn col in dt.Columns)
-        {
-            ret.Columns.Add(col.ColumnName, col.DataType);
-        }
-        foreach (DataRow row in dt.Rows)
-        {
-            RecordRow recordRow = ret.AddRow();
-            for (int i = 0; i < dt.Columns.Count; i++)
-            {
-                var col = ret.Columns[i];
-                if (row.IsNull(i)) continue;
-                col.Set(recordRow, row[i]);
-            }
-        }
-        return ret;
-    }
-
-    /// <summary>
-    /// 将当前 <see cref="RecordTable"/> 实例转换为 <see cref="DataTable"/>。
-    /// </summary>
-    /// <returns>包含当前记录所有数据的 <see cref="DataTable"/> 实例。</returns>
-    /// <remarks>
-    /// 此方法会创建一个新的 <see cref="DataTable"/>，表名与当前记录名称一致，并将所有列结构和行数据写入到该表中。
-    /// </remarks>
-    public DataTable ToDataTable()
-    {
-        var dt = new DataTable(this.Name);
-        this.Write(dt);
-        return dt;
-    }
-
-    #endregion
-
     #region Schema Operations
 
     /// <summary>
@@ -598,7 +529,7 @@ public partial class RecordTable : IEnumerable<RecordRow>
         var columns = new List<RecordSchema.ColumnDef>(this.Columns.Count);
         foreach (RecordColumn col in this.Columns)
         {
-            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType, col.IsNullable));
+            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType, col.IsNullable, col.ArrayRank));
         }
         return new RecordSchema(columns);
     }

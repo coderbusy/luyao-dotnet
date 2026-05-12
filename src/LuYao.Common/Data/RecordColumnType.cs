@@ -59,7 +59,4 @@ public enum RecordColumnType : byte
 
     /// <summary>全局唯一标识符 (<see cref="System.Guid"/>)。</summary>
     Guid = 18,
-
-    /// <summary>字节数组 (<see cref="T:byte[]"/>)。</summary>
-    ByteArray = 19,
 }

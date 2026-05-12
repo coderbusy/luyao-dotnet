@@ -93,13 +93,21 @@ public class RecordSerializationTests
     {
         var table = new RecordTable("Binary", 1);
         var col = table.Columns.Add<byte[]>("Data");
+
+        // byte[] 现在作为一维数组处理
+        Assert.AreEqual(1, col.ArrayRank);
+        Assert.AreEqual(RecordColumnType.Byte, col.ColumnType);
+
         var row = table.AddRow();
         col.SetValue(row.Row, new byte[] { 1, 2, 3, 4, 5 });
 
         var bytes = table.ToBytes();
         var deserialized = RecordTable.FromBytes(bytes);
 
-        var data = deserialized.Columns.Find<byte[]>("Data")!.GetValue(0);
+        var deserializedCol = deserialized.Columns.Find<byte[]>("Data")!;
+        Assert.AreEqual(1, deserializedCol.ArrayRank);
+
+        var data = deserializedCol.GetValue(0);
         CollectionAssert.AreEqual(new byte[] { 1, 2, 3, 4, 5 }, data);
     }
 

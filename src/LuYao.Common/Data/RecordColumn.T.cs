@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using LuYao.Text.Json;
 
 namespace LuYao.Data;
 
@@ -65,7 +67,15 @@ public class RecordColumn<T> : RecordColumn
         }
         else
         {
-            _data[row] = (T)Valid.To(value, this.Type);
+            // 数组类型特殊处理：尝试直接转换
+            if (typeof(T).IsArray && value is Array)
+            {
+                _data[row] = (T)value;
+            }
+            else
+            {
+                _data[row] = (T)Valid.To(value, this.Type);
+            }
         }
     }
 
@@ -75,7 +85,146 @@ public class RecordColumn<T> : RecordColumn
         OnGet(row);
         T value = _data[row];
         if (value is null) return string.Empty;
+
+        // 数组类型返回 JSON 格式
+        if (value is Array array)
+        {
+            return FormatArrayAsJson(array);
+        }
+
         return value.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// 将数组格式化为 JSON 字符串。
+    /// </summary>
+    private static string FormatArrayAsJson(Array array)
+    {
+        if (array.Length == 0)
+        {
+            return array.Rank == 1 ? "[]" : FormatMultiDimensionalArray(array);
+        }
+
+        if (array.Rank == 1)
+        {
+            return FormatOneDimensionalArray(array);
+        }
+
+        return FormatMultiDimensionalArray(array);
+    }
+
+    private static string FormatOneDimensionalArray(Array array)
+    {
+        var sb = new System.Text.StringBuilder("[");
+        using var writer = new JsonWriter(sb);
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (i > 0)
+            {
+                writer.Flush();
+                sb.Append(", ");
+            }
+            var element = array.GetValue(i);
+            AppendJsonValue(writer, element);
+        }
+        writer.Flush();
+        sb.Append("]");
+        return sb.ToString();
+    }
+
+    private static string FormatMultiDimensionalArray(Array array)
+    {
+        var sb = new System.Text.StringBuilder();
+        using var writer = new JsonWriter(sb);
+        FormatMultiDimensionalArrayRecursive(sb, writer, array, new int[array.Rank], 0);
+        return sb.ToString();
+    }
+
+    private static void FormatMultiDimensionalArrayRecursive(System.Text.StringBuilder sb, JsonWriter writer, Array array, int[] indices, int dimension)
+    {
+        sb.Append('[');
+        int length = array.GetLength(dimension);
+        for (int i = 0; i < length; i++)
+        {
+            if (i > 0)
+            {
+                writer.Flush();
+                sb.Append(", ");
+            }
+            indices[dimension] = i;
+
+            if (dimension == array.Rank - 1)
+            {
+                var element = array.GetValue(indices);
+                AppendJsonValue(writer, element);
+            }
+            else
+            {
+                FormatMultiDimensionalArrayRecursive(sb, writer, array, indices, dimension + 1);
+            }
+        }
+        writer.Flush();
+        sb.Append(']');
+    }
+
+    private static void AppendJsonValue(JsonWriter writer, object? value)
+    {
+        if (value is null)
+        {
+            writer.WriteNull();
+        }
+        else if (value is string str)
+        {
+            writer.WriteValue(str);
+        }
+        else if (value is char ch)
+        {
+            writer.WriteValue(ch.ToString());
+        }
+        else if (value is bool b)
+        {
+            writer.WriteValue(b);
+        }
+        else if (value is DateTime dt)
+        {
+            writer.WriteValue(dt.ToString("o", CultureInfo.InvariantCulture));
+        }
+        else if (value is DateTimeOffset dto)
+        {
+            writer.WriteValue(dto.ToString("o", CultureInfo.InvariantCulture));
+        }
+        else if (value is TimeSpan ts)
+        {
+            writer.WriteValue(ts.ToString("c", CultureInfo.InvariantCulture));
+        }
+        else if (value is Guid guid)
+        {
+            writer.WriteValue(guid.ToString());
+        }
+        else if (value is float f)
+        {
+            writer.WriteRaw(float.IsNaN(f) || float.IsInfinity(f) ? "null" : f.ToString("R", CultureInfo.InvariantCulture));
+        }
+        else if (value is double d)
+        {
+            writer.WriteRaw(double.IsNaN(d) || double.IsInfinity(d) ? "null" : d.ToString("R", CultureInfo.InvariantCulture));
+        }
+        else if (value is decimal dec)
+        {
+            writer.WriteRaw(dec.ToString(CultureInfo.InvariantCulture));
+        }
+        else if (value is sbyte or byte or short or ushort or int or uint or long or ulong)
+        {
+            writer.WriteRaw(Convert.ToString(value, CultureInfo.InvariantCulture)!);
+        }
+        else if (value is Enum)
+        {
+            writer.WriteValue(value.ToString());
+        }
+        else
+        {
+            writer.WriteValue(Convert.ToString(value, CultureInfo.InvariantCulture));
+        }
     }
 
     internal override void Extend(int length)

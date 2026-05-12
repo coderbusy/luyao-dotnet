@@ -6,10 +6,10 @@
 
 - 轻量表结构数据处理
 - 对象列表与表结构之间转换
-- 与 ADO.NET 的 `IDataReader` / `DataTable` / `DataSet` 互操作
+- 与 ADO.NET 的 `IDataReader` 互操作
 - 需要按列存储、按行访问的业务代码
 
-`RecordSet` 是多个 `Record` 的命名集合，用于统一管理多张内存表，并提供与 `DataSet` 的双向互操作。
+`RecordSet` 是多个 `Record` 的命名集合，用于统一管理多张内存表。
 
 设计重点：
 
@@ -36,7 +36,7 @@
 - 分组：单字段、多字段字符串分组，以及 2/3 字段元组分组
 - 数据补全：`Enrich` 按关联键从另一个 `Record` 追加当前不存在的列并填充值
 - 对象映射：对象/对象集合与 `Record` 之间转换
-- ADO.NET 互操作：`IDataReader`、`DataTable`、`DataSet`
+- ADO.NET 互操作：`IDataReader`
 - 二进制序列化：`Record` / `RecordSet` 都支持字节流读写
 - 服务端翻页元数据：`Page`、`PageSize`、`MaxCount`、`MaxPage`
 
@@ -46,7 +46,6 @@
 
 - 按名称管理多个 `Record`
 - 名称比较器可配置
-- 与 `DataSet` 双向互操作
 - 二进制序列化
 
 ### 2.3 非目标
@@ -226,6 +225,7 @@
 - `Name`
 - `ColumnType`
 - `IsNullable`
+- `ArrayRank`（0 表示非数组，1 表示一维数组，2 表示二维数组）
 - `Type`
 
 适用场景：
@@ -276,12 +276,16 @@
 | 二进制 | `byte[]` |
 | 可空值类型 | 上述值类型的 `Nullable<T>` |
 | 枚举 | `enum` 及 `Nullable<enum>` |
+| 数组 | 上述类型的一维或多维数组（如 `int[]`, `string[,]`） |
 
 说明：
 
 - 列类型白名单是封闭的。
 - `enum` 在内部会按其基础数值类型参与列类型映射。
 - 对象映射与自动建列都受该白名单限制。
+- **数组支持**：支持任意维度数组（一维 `int[]`、二维 `int[,]` 等），`ToString()` 会以 JSON 风格输出数组值。
+- **数组元素可空性**：`int?[]`（可空元素数组）是合法类型，序列化时会保留每个元素的 null 状态。
+- **PostgreSQL 互操作**：从 PostgreSQL 的 `IDataReader` 读取数组列（如 `int[]`, `text[]`）时，Npgsql 驱动会自动映射为 CLR 数组类型，`RecordTable.Read(IDataReader)` 可以直接识别并创建对应的数组列。
 
 ---
 
@@ -316,6 +320,32 @@ record.Columns.Add<string>("Name");
 
 record.AddRowFromValues(1, "A");
 record.AddRowFromValues(2, "B", "Ignored");
+```
+
+**数组列示例：**
+
+```csharp
+var record = new Record("Products");
+
+// 添加数组列
+record.Columns.Add<string[]>("Tags");
+record.Columns.Add<int[]>("MonthlyScores");
+record.Columns.Add<decimal[,]>("PriceMatrix");
+
+var row = record.AddRow();
+row["Tags"] = new[] { "VIP", "Premium" };
+row["MonthlyScores"] = new[] { 85, 90, 88, 92 };
+row["PriceMatrix"] = new decimal[,] { { 1.1m, 2.2m }, { 3.3m, 4.4m } };
+
+// ToString() 输出 JSON 格式
+Console.WriteLine(row.ToString("Tags"));          // ["VIP", "Premium"]
+Console.WriteLine(row.ToString("MonthlyScores")); // [85, 90, 88, 92]
+Console.WriteLine(row.ToString("PriceMatrix"));   // [[1.1, 2.2], [3.3, 4.4]]
+
+// 序列化与反序列化
+byte[] data = record.ToBytes();
+var restored = RecordTable.FromBytes(data);
+string[] tags = restored[0].To<string[]>("Tags");
 ```
 
 ### 5.2 删除与清空
@@ -640,56 +670,21 @@ record.AddRowFrom(dto);
 
 ## 7. ADO.NET 互操作
 
-### 7.1 `Record` 与 `IDataReader` / `DataTable`
-
-提供：
+`Record` 提供与 `IDataReader` 的互操作：
 
 - `void Read(IDataReader dr)`
-- `static Record Read(DataTable dt)`
-- `void Write(DataTable dt)`
-- `DataTable ToDataTable()`
 
 行为说明：
 
 - `Read(IDataReader)` 会先 `Columns.Clear()`，然后根据 reader 的字段结构重建整张表
 - `Read(IDataReader)` 读取到 `DBNull.Value` 时会跳过赋值，目标列保持默认值
-- `Write(DataTable dt)` 会把当前列结构和所有行写入到传入 `DataTable`
-- `ToDataTable()` 会创建新表，表名取 `Record.Name`
 
 示例：
 
 ```csharp
 var record = new Record();
 record.Read(dataReader);
-
-var fromTable = Record.Read(dataTable);
-DataTable table = fromTable.ToDataTable();
 ```
-
-补充说明：
-
-- `Write(DataTable dt)` 是向目标表追加列和行，通常应传入空表。
-
-### 7.2 `RecordSet` 与 `DataSet`
-
-提供：
-
-- `RecordSet.FromDataSet(DataSet ds)`
-- `ToDataSet()`
-- `WriteTo(DataSet ds)`
-
-示例：
-
-```csharp
-var set = RecordSet.FromDataSet(dataSet);
-DataSet ds = set.ToDataSet();
-```
-
-行为说明：
-
-- `FromDataSet` 会把每个 `DataTable` 转成 `Record`
-- `WriteTo(DataSet ds)` 会把每个 `Record` 作为新表追加到目标 `DataSet`
-- 目标 `DataSet` 中表名冲突时，`DataSet.Tables.Add` 会抛异常，因此通常应传入空 `DataSet` 或自行保证不重名
 
 ---
 
@@ -785,7 +780,7 @@ RecordSet copy = RecordSet.FromBytes(bytes);
 特别说明：
 
 - `Group*` 缺少列时不会返回空字典，而是使用默认键把现有行分组。
-- `Write(DataTable dt)` / `WriteTo(DataSet ds)` 通常应写入空目标对象，避免名称或列结构冲突。
+- `Read(IDataReader)` 会按当前结果集字段自动建列并逐行读取数据。
 
 ---
 
@@ -834,16 +829,18 @@ record.AddRowFrom(dto);
 - `AddRowFrom` 不自动补齐缺失列
 - DTO 中有属性但表中缺列时，该值会被忽略
 
-### 10.4 与 ADO.NET 互操作时尽量使用新对象
+### 10.4 与 ADO.NET 互操作时优先明确结果集 schema
 
 ```csharp
-DataTable dt = record.ToDataTable();
-DataSet ds = set.ToDataSet();
+using var reader = command.ExecuteReader();
+var record = new Record();
+record.Read(reader);
 ```
 
 要点：
 
-- 这样最不容易与已有列名、表名发生冲突
+- `Read(IDataReader)` 会根据结果集字段名与字段类型建列
+- 读取前先确认查询返回的字段顺序与名称，便于后续按列访问
 
 ---
 
