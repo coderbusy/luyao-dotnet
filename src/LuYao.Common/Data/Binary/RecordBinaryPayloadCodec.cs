@@ -1,3 +1,4 @@
+#if !NET45 && !NET461
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -208,3 +209,4 @@ public sealed class RecordBinaryPayloadCodec
         }
     }
 }
+#endif
