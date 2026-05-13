@@ -6,6 +6,17 @@ partial struct RecordRow
 {
     /// <summary>
     /// 将当前行的列值填充到已有对象 <paramref name="data"/> 的对应属性中。
+    /// 使用运行时实际类型，派生类新增属性会被正确处理。
+    /// </summary>
+    /// <param name="data">要被填充的对象实例，不可为 null。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
+    public void CopyTo(object data)
+    {
+        XCopy.CopyFrom(data, this);
+    }
+
+    /// <summary>
+    /// 将当前行的列值填充到已有对象 <paramref name="data"/> 的对应属性中。
     /// </summary>
     /// <typeparam name="T">目标对象类型。</typeparam>
     /// <param name="data">要被填充的对象实例。</param>

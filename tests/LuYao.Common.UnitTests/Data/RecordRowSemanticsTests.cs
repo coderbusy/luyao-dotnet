@@ -106,6 +106,83 @@ public class RecordRowSemanticsTests
         Assert.AreEqual(7, table[0].To<int>("Id"));
     }
 
+    // ── CopyTo(object) 非泛型重载 ────────────────────────────────────────────
+
+    private class CopyToBase
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+    }
+
+    private class CopyToDerived : CopyToBase
+    {
+        public double Score { get; set; }
+    }
+
+    [TestMethod]
+    public void CopyTo_NonGeneric_FillsBaseProps()
+    {
+        var table = new RecordTable();
+        table.Columns.Add<int>("Id");
+        table.Columns.Add<string>("Name");
+        var row = table.AddRow();
+        table.Columns.Get("Id").Set(row, 10);
+        table.Columns.Get("Name").Set(row, "Alice");
+
+        var obj = new CopyToBase();
+        row.CopyTo((object)obj);
+
+        Assert.AreEqual(10, obj.Id);
+        Assert.AreEqual("Alice", obj.Name);
+    }
+
+    [TestMethod]
+    public void CopyTo_NonGeneric_FillsDerivedPropsViaBaseRef()
+    {
+        var table = new RecordTable();
+        table.Columns.Add<int>("Id");
+        table.Columns.Add<double>("Score");
+        var row = table.AddRow();
+        table.Columns.Get("Id").Set(row, 20);
+        table.Columns.Get("Score").Set(row, 9.9);
+
+        // 以基类引用持有派生类实例，运行时类型应被正确识别
+        CopyToBase obj = new CopyToDerived();
+        row.CopyTo((object)obj);
+
+        Assert.AreEqual(20, obj.Id);
+        Assert.AreEqual(9.9, ((CopyToDerived)obj).Score);
+    }
+
+    [TestMethod]
+    public void CopyTo_NonGeneric_MissingColumn_SilentlySkips()
+    {
+        var table = new RecordTable();
+        table.Columns.Add<int>("Id");
+        var row = table.AddRow();
+        table.Columns.Get("Id").Set(row, 5);
+
+        var obj = new CopyToBase { Name = "original" };
+        row.CopyTo((object)obj);
+
+        Assert.AreEqual(5, obj.Id);
+        Assert.AreEqual("original", obj.Name); // Name 列不存在，保持原值
+    }
+
+    [TestMethod]
+    public void CopyTo_NonGeneric_NullData_ThrowsArgumentNullException()
+    {
+        var table = new RecordTable();
+        var row = table.AddRow();
+
+        try
+        {
+            row.CopyTo((object)null!);
+            Assert.Fail("Expected ArgumentNullException");
+        }
+        catch (ArgumentNullException) { }
+    }
+
     [TestMethod]
     public void Mapping_CopyFromObject_DoesNotAutoCreateColumns()
     {

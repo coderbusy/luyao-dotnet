@@ -1,72 +1,133 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace LuYao.Data.Meta;
 
 /// <summary>
+/// 提供在对象与 <see cref="RecordRow"/> 之间进行属性双向复制的静态工具类。
+/// 以运行时实际类型为键缓存属性列表，天然支持派生类的新增属性。
+/// </summary>
+public static class XCopy
+{
+    private static readonly ConcurrentDictionary<Type, IReadOnlyList<XProp>> _readableCache
+        = new ConcurrentDictionary<Type, IReadOnlyList<XProp>>();
+    private static readonly ConcurrentDictionary<Type, IReadOnlyList<XProp>> _writableCache
+        = new ConcurrentDictionary<Type, IReadOnlyList<XProp>>();
+
+    internal static IReadOnlyList<XProp> GetReadableProps(Type runtimeType)
+        => _readableCache.GetOrAdd(runtimeType, t =>
+        {
+            var all = XProp.GetAll(t);
+            var list = new List<XProp>(all.Count);
+            foreach (var p in all)
+            {
+                if (Helpers.IsSupportedForReading(p)) list.Add(p);
+            }
+            return list.AsReadOnly();
+        });
+
+    internal static IReadOnlyList<XProp> GetWritableProps(Type runtimeType)
+        => _writableCache.GetOrAdd(runtimeType, t =>
+        {
+            var all = XProp.GetAll(t);
+            var list = new List<XProp>(all.Count);
+            foreach (var p in all)
+            {
+                if (Helpers.IsSupportedForWriting(p)) list.Add(p);
+            }
+            return list.AsReadOnly();
+        });
+
+    #region RecordRow
+    /// <summary>
+    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
+    /// 使用运行时实际类型扫描属性，派生类新增属性会被正确处理。
+    /// </summary>
+    /// <param name="data">数据来源对象，不可为 null。</param>
+    /// <param name="target">目标行；若列不存在则静默跳过，<b>不会自动建列</b>。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
+    public static void CopyTo(object data, RecordRow target)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        var cols = target.Table.Columns;
+        foreach (var prop in GetReadableProps(data.GetType()))
+        {
+            var col = cols.Find(prop.Name);
+            if (col == null) continue;
+            col.Set(target, prop.GetValue(data));
+        }
+    }
+
+    /// <summary>
+    /// 将 <paramref name="source"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
+    /// 使用运行时实际类型扫描属性，派生类新增属性会被正确处理。
+    /// </summary>
+    /// <param name="data">目标对象，不可为 null。</param>
+    /// <param name="source">数据来源行。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
+    public static void CopyFrom(object data, RecordRow source)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        var cols = source.Table.Columns;
+        foreach (var prop in GetWritableProps(data.GetType()))
+        {
+            var col = cols.Find(prop.Name);
+            if (col == null) continue;
+            prop.SetValue(data, col.Get(source));
+        }
+    }
+
+    /// <summary>
+    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
+    /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
+    /// 使用运行时实际类型扫描属性，派生类新增属性会被正确处理。
+    /// </summary>
+    /// <param name="data">数据来源对象，不可为 null。</param>
+    /// <param name="target">目标行。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
+    public static void WriteTo(object data, RecordRow target)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        var cols = target.Table.Columns;
+        foreach (var prop in GetReadableProps(data.GetType()))
+        {
+            var col = cols.Find(prop.Name) ?? cols.Add(prop.Name, prop.Type);
+            col.Set(target, prop.GetValue(data));
+        }
+    }
+    #endregion
+}
+
+/// <summary>
 /// 提供在强类型对象与 <see cref="RecordRow"/> 之间进行属性双向复制的静态工具类。
+/// 为 <see cref="XCopy"/> 的泛型薄封装，提供编译期类型约束，逻辑委托给 <see cref="XCopy"/>。
 /// </summary>
 /// <typeparam name="T">要映射的对象类型，必须为引用类型。</typeparam>
 public static class XCopy<T> where T : class
 {
-    // 预先过滤，避免每次调用重复遍历和判断
-    private static readonly IReadOnlyList<XProp> _readableProps = BuildReadableProps();
-    private static readonly IReadOnlyList<XProp> _writableProps = BuildWritableProps();
-
-    private static IReadOnlyList<XProp> BuildReadableProps()
-    {
-        var all = XProp.GetAll(typeof(T));
-        var list = new List<XProp>(all.Count);
-        foreach (var p in all)
-        {
-            if (Helpers.IsSupportedForReading(p)) list.Add(p);
-        }
-        return list.AsReadOnly();
-    }
-
-    private static IReadOnlyList<XProp> BuildWritableProps()
-    {
-        var all = XProp.GetAll(typeof(T));
-        var list = new List<XProp>(all.Count);
-        foreach (var p in all)
-        {
-            if (Helpers.IsSupportedForWriting(p)) list.Add(p);
-        }
-        return list.AsReadOnly();
-    }
-
     #region RecordRow
     /// <summary>
-    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="row"/> 对应的列。
+    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
     /// </summary>
     /// <param name="data">数据来源对象。</param>
-    /// <param name="row">目标行；仅写入类型受支持的可读属性。Mapping 路径下若列不存在则静默跳过，<b>不会自动建列</b>。</param>
-    public static void CopyTo(T data, RecordRow row)
-    {
-        var cols = row.Table.Columns;
-        foreach (var prop in _readableProps)
-        {
-            var col = cols.Find(prop.Name);
-            if (col == null) continue;
-            col.Set(row, prop.GetValue(data));
-        }
-    }
+    /// <param name="target">目标行；若列不存在则静默跳过，<b>不会自动建列</b>。</param>
+    public static void CopyTo(T data, RecordRow target) => XCopy.CopyTo(data, target);
 
     /// <summary>
-    /// 将 <paramref name="row"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
+    /// 将 <paramref name="source"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
     /// </summary>
-    /// <param name="data">目标对象；仅更新类型受支持且行中存在对应列的可写属性。</param>
-    /// <param name="row">数据来源行。</param>
-    public static void CopyFrom(T data, RecordRow row)
-    {
-        var cols = row.Table.Columns;
-        foreach (var prop in _writableProps)
-        {
-            var col = cols.Find(prop.Name);
-            if (col == null) continue;
-            prop.SetValue(data, col.Get(row));
-        }
-    }
+    /// <param name="data">目标对象。</param>
+    /// <param name="source">数据来源行。</param>
+    public static void CopyFrom(T data, RecordRow source) => XCopy.CopyFrom(data, source);
+
+    /// <summary>
+    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
+    /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
+    /// </summary>
+    /// <param name="data">数据来源对象。</param>
+    /// <param name="target">目标行。</param>
+    public static void WriteTo(T data, RecordRow target) => XCopy.WriteTo(data, target);
     #endregion
 }
 
