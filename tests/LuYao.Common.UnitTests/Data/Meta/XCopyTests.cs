@@ -175,10 +175,13 @@ namespace LuYao.Data.Meta
             var row = table.AddRow();
             var obj = new Derived { Id = 5, Name = "Frank", Score = 3.14 };
 
+            // XCopy<Base> 使用编译期类型 typeof(Base)，仅复制 Base 的属性
             XCopy<Base>.CopyTo(obj, row);
 
             Assert.AreEqual(5, table.Columns.Get("Id").Get(row));
-            Assert.AreEqual(3.14, table.Columns.Get("Score").Get(row));
+            Assert.AreEqual("Frank", table.Columns.Get("Name").Get(row));
+            // Score 属于 Derived，不在 typeof(Base) 范围内，保持默认值
+            Assert.AreEqual(0.0, table.Columns.Get("Score").Get(row));
         }
 
         [TestMethod]
@@ -190,10 +193,12 @@ namespace LuYao.Data.Meta
             table.Columns.Get("Score").Set(row, 1.23);
 
             var obj = new Derived();
+            // XCopy<Base> 使用编译期类型 typeof(Base)，仅写回 Base 的属性
             XCopy<Base>.CopyFrom(obj, row);
 
             Assert.AreEqual(99, obj.Id);
-            Assert.AreEqual(1.23, obj.Score);
+            // Score 属于 Derived，不在 typeof(Base) 范围内，保持默认值
+            Assert.AreEqual(0.0, obj.Score);
         }
 
         // ── WriteTo ──────────────────────────────────────────────────────────
@@ -288,10 +293,144 @@ namespace LuYao.Data.Meta
             var row = table.AddRow();
             var obj = new Derived { Id = 7, Name = "Frank", Score = 3.14 };
 
+            // XCopy<Base> 使用编译期类型 typeof(Base)，仅创建 Base 的属性列
             XCopy<Base>.WriteTo(obj, row);
 
-            Assert.IsNotNull(table.Columns.Find("Score"));
-            Assert.AreEqual(3.14, table.Columns.Get("Score").Get(row));
+            Assert.AreEqual(7, table.Columns.Get("Id").Get(row));
+            Assert.AreEqual("Frank", table.Columns.Get("Name").Get(row));
+            // Score 属于 Derived，不在 typeof(Base) 范围内，不应创建该列
+            Assert.IsNull(table.Columns.Find("Score"));
+        }
+
+        // ── CopyTo(Type, ...) 显式类型重载 ───────────────────────────────────
+
+        [TestMethod]
+        public void CopyTo_ExplicitBaseType_OnlyWritesBaseProps()
+        {
+            var table = BuildTable();
+            var row = table.AddRow();
+            var obj = new Derived { Id = 10, Name = "Grace", Score = 5.0 };
+
+            // 显式指定 Base 类型，Score 属性不应被写入
+            XCopy.CopyTo(typeof(Base), obj, row);
+
+            Assert.AreEqual(10, table.Columns.Get("Id").Get(row));
+            Assert.AreEqual("Grace", table.Columns.Get("Name").Get(row));
+            Assert.AreEqual(0.0, table.Columns.Get("Score").Get(row));
+        }
+
+        [TestMethod]
+        public void CopyTo_NullType_ThrowsArgumentNullException()
+        {
+            var table = BuildTable();
+            var row = table.AddRow();
+
+            try { XCopy.CopyTo(null!, new Base(), row); Assert.Fail("Expected ArgumentNullException"); }
+            catch (ArgumentNullException) { }
+        }
+
+        [TestMethod]
+        public void CopyTo_ExplicitType_NullData_ThrowsArgumentNullException()
+        {
+            var table = BuildTable();
+            var row = table.AddRow();
+
+            try { XCopy.CopyTo(typeof(Base), null!, row); Assert.Fail("Expected ArgumentNullException"); }
+            catch (ArgumentNullException) { }
+        }
+
+        // ── CopyFrom(Type, ...) 显式类型重载 ─────────────────────────────────
+
+        [TestMethod]
+        public void CopyFrom_ExplicitBaseType_OnlyReadsBaseProps()
+        {
+            var table = BuildTable();
+            var row = table.AddRow();
+            table.Columns.Get("Id").Set(row, 20);
+            table.Columns.Get("Name").Set(row, "Hank");
+            table.Columns.Get("Score").Set(row, 4.5);
+
+            var obj = new Derived();
+            // 显式指定 Base 类型，Score 属性不应被写回
+            XCopy.CopyFrom(typeof(Base), obj, row);
+
+            Assert.AreEqual(20, obj.Id);
+            Assert.AreEqual("Hank", obj.Name);
+            Assert.AreEqual(0.0, obj.Score);
+        }
+
+        [TestMethod]
+        public void CopyFrom_NullType_ThrowsArgumentNullException()
+        {
+            var table = BuildTable();
+            var row = table.AddRow();
+
+            try { XCopy.CopyFrom(null!, new Base(), row); Assert.Fail("Expected ArgumentNullException"); }
+            catch (ArgumentNullException) { }
+        }
+
+        [TestMethod]
+        public void CopyFrom_ExplicitType_NullData_ThrowsArgumentNullException()
+        {
+            var table = BuildTable();
+            var row = table.AddRow();
+
+            try { XCopy.CopyFrom(typeof(Base), null!, row); Assert.Fail("Expected ArgumentNullException"); }
+            catch (ArgumentNullException) { }
+        }
+
+        // ── WriteTo(Type, ...) 显式类型重载 ──────────────────────────────────
+
+        [TestMethod]
+        public void WriteTo_ExplicitBaseType_OnlyCreatesBaseColumns()
+        {
+            var table = new RecordTable();
+            var row = table.AddRow();
+            var obj = new Derived { Id = 30, Name = "Ivy", Score = 2.0 };
+
+            // 显式指定 Base 类型，Score 列不应被创建
+            XCopy.WriteTo(typeof(Base), obj, row);
+
+            Assert.AreEqual(30, table.Columns.Get("Id").Get(row));
+            Assert.AreEqual("Ivy", table.Columns.Get("Name").Get(row));
+            Assert.IsNull(table.Columns.Find("Score"));
+        }
+
+        [TestMethod]
+        public void WriteTo_NullType_ThrowsArgumentNullException()
+        {
+            var table = new RecordTable();
+            var row = table.AddRow();
+
+            try { XCopy.WriteTo(null!, new Base(), row); Assert.Fail("Expected ArgumentNullException"); }
+            catch (ArgumentNullException) { }
+        }
+
+        [TestMethod]
+        public void WriteTo_ExplicitType_NullData_ThrowsArgumentNullException()
+        {
+            var table = new RecordTable();
+            var row = table.AddRow();
+
+            try { XCopy.WriteTo(typeof(Base), null!, row); Assert.Fail("Expected ArgumentNullException"); }
+            catch (ArgumentNullException) { }
+        }
+
+        // ── 缓存一致性 ────────────────────────────────────────────────────────
+
+        [TestMethod]
+        public void CopyTo_CalledTwice_ProducesConsistentResults()
+        {
+            var table = BuildTable();
+            var row1 = table.AddRow();
+            var row2 = table.AddRow();
+            var obj = new Base { Id = 40, Name = "Jack" };
+
+            XCopy.CopyTo(obj, row1);
+            XCopy.CopyTo(obj, row2);
+
+            Assert.AreEqual(40, table.Columns.Get("Id").Get(row1));
+            Assert.AreEqual(40, table.Columns.Get("Id").Get(row2));
         }
     }
 }

@@ -50,8 +50,24 @@ public static class XCopy
     public static void CopyTo(object data, RecordRow target)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
+        CopyTo(data.GetType(), data, target);
+    }
+
+    /// <summary>
+    /// 将 <paramref name="data"/> 中由 <paramref name="type"/> 指定类型的可读属性值写入 <paramref name="target"/> 对应的列。
+    /// 适用于需要按声明类型（而非运行时类型）扫描属性的场景。
+    /// 若目标行所在表中不存在对应列，则静默跳过，<b>不会自动建列</b>。
+    /// </summary>
+    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
+    /// <param name="data">数据来源对象，不可为 null。</param>
+    /// <param name="target">目标行。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="type"/> 或 <paramref name="data"/> 为 null 时抛出。</exception>
+    public static void CopyTo(Type type, object data, RecordRow target)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
         var cols = target.Table.Columns;
-        foreach (var prop in GetReadableProps(data.GetType()))
+        foreach (var prop in GetReadableProps(type))
         {
             var col = cols.Find(prop.Name);
             if (col == null) continue;
@@ -69,8 +85,22 @@ public static class XCopy
     public static void CopyFrom(object data, RecordRow source)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
+        CopyFrom(data.GetType(), data, source);
+    }
+    /// <summary>
+    /// 将 <paramref name="source"/> 中与由 <paramref name="type"/> 指定类型属性同名的列值写回对象 <paramref name="data"/>。
+    /// 适用于需要按声明类型（而非运行时类型）扫描属性的场景。
+    /// </summary>
+    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
+    /// <param name="data">目标对象，不可为 null。</param>
+    /// <param name="source">数据来源行。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="type"/> 或 <paramref name="data"/> 为 null 时抛出。</exception>
+    public static void CopyFrom(Type type, object data, RecordRow source)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
         var cols = source.Table.Columns;
-        foreach (var prop in GetWritableProps(data.GetType()))
+        foreach (var prop in GetWritableProps(type))
         {
             var col = cols.Find(prop.Name);
             if (col == null) continue;
@@ -89,8 +119,23 @@ public static class XCopy
     public static void WriteTo(object data, RecordRow target)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
+        WriteTo(data.GetType(), data, target);
+    }
+    /// <summary>
+    /// 将 <paramref name="data"/> 中由 <paramref name="type"/> 指定类型的可读属性值写入 <paramref name="target"/> 对应的列。
+    /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
+    /// 适用于需要按声明类型（而非运行时类型）扫描属性的场景。
+    /// </summary>
+    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
+    /// <param name="data">数据来源对象，不可为 null。</param>
+    /// <param name="target">目标行。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="type"/> 或 <paramref name="data"/> 为 null 时抛出。</exception>
+    public static void WriteTo(Type type, object data, RecordRow target)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
         var cols = target.Table.Columns;
-        foreach (var prop in GetReadableProps(data.GetType()))
+        foreach (var prop in GetReadableProps(type))
         {
             var col = cols.Find(prop.Name) ?? cols.Add(prop.Name, prop.Type);
             col.Set(target, prop.GetValue(data));
@@ -101,7 +146,8 @@ public static class XCopy
 
 /// <summary>
 /// 提供在强类型对象与 <see cref="RecordRow"/> 之间进行属性双向复制的静态工具类。
-/// 为 <see cref="XCopy"/> 的泛型薄封装，提供编译期类型约束，逻辑委托给 <see cref="XCopy"/>。
+/// 为 <see cref="XCopy"/> 的泛型薄封装，固定按编译期类型 <typeparamref name="T"/> 扫描属性，
+/// 逻辑委托给 <see cref="XCopy"/> 的显式 <see cref="Type"/> 重载。
 /// </summary>
 /// <typeparam name="T">要映射的对象类型，必须为引用类型。</typeparam>
 public static class XCopy<T> where T : class
@@ -109,25 +155,31 @@ public static class XCopy<T> where T : class
     #region RecordRow
     /// <summary>
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
+    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
+    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
     /// </summary>
     /// <param name="data">数据来源对象。</param>
     /// <param name="target">目标行；若列不存在则静默跳过，<b>不会自动建列</b>。</param>
-    public static void CopyTo(T data, RecordRow target) => XCopy.CopyTo(data, target);
+    public static void CopyTo(T data, RecordRow target) => XCopy.CopyTo(typeof(T), data, target);
 
     /// <summary>
     /// 将 <paramref name="source"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
+    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
+    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
     /// </summary>
     /// <param name="data">目标对象。</param>
     /// <param name="source">数据来源行。</param>
-    public static void CopyFrom(T data, RecordRow source) => XCopy.CopyFrom(data, source);
+    public static void CopyFrom(T data, RecordRow source) => XCopy.CopyFrom(typeof(T), data, source);
 
     /// <summary>
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
     /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
+    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
+    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
     /// </summary>
     /// <param name="data">数据来源对象。</param>
     /// <param name="target">目标行。</param>
-    public static void WriteTo(T data, RecordRow target) => XCopy.WriteTo(data, target);
+    public static void WriteTo(T data, RecordRow target) => XCopy.WriteTo(typeof(T), data, target);
     #endregion
 }
 
