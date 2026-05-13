@@ -135,28 +135,34 @@ var val = XData<MyClass>.Get(obj, "Name");
 
 在**对象**与 **`RecordRow`** 之间进行属性双向复制的核心工具类。
 
-以运行时实际类型（`data.GetType()`）为缓存键，**天然支持派生类**——无论对象声明类型是基类还是派生类，派生类新增的属性均能被正确处理。
+默认重载按运行时实际类型（`data.GetType()`）扫描属性，派生类新增属性会被一并处理；显式 `Type` 重载按指定声明类型扫描属性，可只处理基类属性。
 
 ```csharp
-// 非泛型版本（推荐直接使用，无需指定类型参数）
+// 非泛型版本：默认按运行时类型扫描
 XCopy.CopyTo(obj, row);    // 对象 → 行
 XCopy.CopyFrom(obj, row);  // 行 → 对象
+
+// 显式指定属性扫描类型
+XCopy.CopyTo(typeof(Base), obj, row);
+XCopy.CopyFrom(typeof(Base), obj, row);
+XCopy.WriteTo(typeof(Base), obj, row);
 ```
 
-**泛型薄封装（`XCopy<T>`）** 提供编译期类型约束，逻辑完全委托给非泛型 `XCopy`：
+**泛型薄封装（`XCopy<T>`）** 固定按编译期类型 `typeof(T)` 扫描属性；当传入派生类实例时，仅处理 `T` 声明的属性：
 
 ```csharp
 XCopy<MyClass>.CopyTo(obj, row);
 XCopy<MyClass>.CopyFrom(obj, row);
 ```
 
-两者使用**全局唯一**的 `ConcurrentDictionary<Type, IReadOnlyList<XProp>>` 缓存，不同泛型闭合类型（`XCopy<Base>`、`XCopy<Derived>`）共享同一份缓存，不会重复构建。
+相关重载共享按扫描类型缓存的 `ConcurrentDictionary<Type, IReadOnlyList<XProp>>`，同一类型的属性列表只构建一次。
 
 **规则：**
 - 仅处理类型受支持（见 `Helpers.IsSupportedForReading` / `IsSupportedForWriting`）的公共实例属性
 - `CopyTo` / `CopyFrom` 在列不存在时静默跳过，**不自动建列**
 - `WriteTo` 在目标列不存在时会自动创建列并写入
-- `data` 为 `null` 时抛 `ArgumentNullException`
+- 显式 `Type` 重载在 `type` 或 `data` 为 `null` 时抛 `ArgumentNullException`
+- 泛型 `XCopy<T>` 等价于调用对应的 `XCopy.CopyTo(typeof(T), ...)` / `CopyFrom(typeof(T), ...)` / `WriteTo(typeof(T), ...)`
 
 ---
 

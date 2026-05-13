@@ -146,7 +146,8 @@ public static class XCopy
 
 /// <summary>
 /// 提供在强类型对象与 <see cref="RecordRow"/> 之间进行属性双向复制的静态工具类。
-/// 为 <see cref="XCopy"/> 的泛型薄封装，提供编译期类型约束，逻辑委托给 <see cref="XCopy"/>。
+/// 为 <see cref="XCopy"/> 的泛型薄封装，固定按编译期类型 <typeparamref name="T"/> 扫描属性，
+/// 逻辑委托给 <see cref="XCopy"/> 的显式 <see cref="Type"/> 重载。
 /// </summary>
 /// <typeparam name="T">要映射的对象类型，必须为引用类型。</typeparam>
 public static class XCopy<T> where T : class
@@ -154,6 +155,8 @@ public static class XCopy<T> where T : class
     #region RecordRow
     /// <summary>
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
+    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
+    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
     /// </summary>
     /// <param name="data">数据来源对象。</param>
     /// <param name="target">目标行；若列不存在则静默跳过，<b>不会自动建列</b>。</param>
@@ -161,6 +164,8 @@ public static class XCopy<T> where T : class
 
     /// <summary>
     /// 将 <paramref name="source"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
+    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
+    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
     /// </summary>
     /// <param name="data">目标对象。</param>
     /// <param name="source">数据来源行。</param>
@@ -169,6 +174,8 @@ public static class XCopy<T> where T : class
     /// <summary>
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
     /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
+    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
+    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
     /// </summary>
     /// <param name="data">数据来源对象。</param>
     /// <param name="target">目标行。</param>
