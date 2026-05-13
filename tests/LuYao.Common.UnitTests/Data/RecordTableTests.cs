@@ -1141,6 +1141,38 @@ public class RecordTableTests
     }
 
     [TestMethod]
+    public void AddRow_NoColumns_CountIncreases()
+    {
+        // Arrange
+        var table = new RecordTable();
+
+        // Act
+        var row = table.AddRow();
+
+        // Assert
+        Assert.AreEqual(1, table.Count);
+        Assert.AreEqual(0, row.Row);
+    }
+
+    [TestMethod]
+    public void AddRow_NoColumns_MultipleRows_CountIncreases()
+    {
+        // Arrange
+        var table = new RecordTable();
+
+        // Act
+        var row0 = table.AddRow();
+        var row1 = table.AddRow();
+        var row2 = table.AddRow();
+
+        // Assert
+        Assert.AreEqual(3, table.Count);
+        Assert.AreEqual(0, row0.Row);
+        Assert.AreEqual(1, row1.Row);
+        Assert.AreEqual(2, row2.Row);
+    }
+
+    [TestMethod]
     public void AddRowFromValues_NoColumns_CreatesRowWithoutErrors()
     {
         // Arrange
