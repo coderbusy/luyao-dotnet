@@ -154,7 +154,8 @@ XCopy<MyClass>.CopyFrom(obj, row);
 
 **规则：**
 - 仅处理类型受支持（见 `Helpers.IsSupportedForReading` / `IsSupportedForWriting`）的公共实例属性
-- 列不存在时静默跳过，**不自动建列**
+- `CopyTo` / `CopyFrom` 在列不存在时静默跳过，**不自动建列**
+- `WriteTo` 在目标列不存在时会自动创建列并写入
 - `data` 为 `null` 时抛 `ArgumentNullException`
 
 ---
