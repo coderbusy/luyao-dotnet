@@ -173,6 +173,6 @@ public class RecordRowMergeTests
         var row1 = r1.AddRow();
 
         // Act & Assert
-        Assert.Throws<System.ArgumentNullException>(() => row1.Merge<PersonModel>(null!));
+        Assert.Throws<System.ArgumentNullException>(() => row1.Merge(null!));
     }
 }
