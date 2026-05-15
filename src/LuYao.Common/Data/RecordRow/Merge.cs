@@ -25,14 +25,14 @@ partial struct RecordRow
 
     /// <summary>
     /// 将对象 <paramref name="model"/> 的可读属性合并到当前行：同名列直接覆盖，当前行不存在的列则追加。
+    /// 使用运行时实际类型，派生类新增属性会被正确处理。
     /// </summary>
-    /// <typeparam name="T">数据来源对象类型。</typeparam>
-    /// <param name="model">属性值的来源对象。</param>
+    /// <param name="model">属性值的来源对象，不可为 null。</param>
     /// <exception cref="ArgumentNullException">当 <paramref name="model"/> 为 null 时抛出。</exception>
-    public void Merge<T>(T model) where T : class
+    public void Merge(object model)
     {
         if (model == null) throw new ArgumentNullException(nameof(model));
-        var props = XProp.GetAll(typeof(T));
+        var props = XProp.GetAll(model.GetType());
         foreach (var prop in props)
         {
             if (!prop.CanRead) continue;
