@@ -3,34 +3,38 @@ using System;
 namespace LuYao.Data.Meta;
 
 /// <summary>
-/// 封装单次映射任务的执行上下文，持有 <see cref="RecordMappingOptions"/> 并集中实现
-/// DTO ↔ <see cref="RecordRow"/> 的全部映射逻辑。
+/// Encapsulates the execution context for a single mapping operation.
+/// Holds a <see cref="RecordMappingOptions"/> instance and centralises all
+/// DTO ↔ <see cref="RecordRow"/> mapping logic.
 /// </summary>
 /// <remarks>
-/// 所有 <see cref="XCopy"/> 重载最终均委托给此类执行，避免逻辑分散。
-/// 实例化时即调用 <see cref="RecordMappingOptions.MakeReadOnly"/>，冻结选项。
+/// All <see cref="XCopy"/> overloads ultimately delegate to this class,
+/// keeping the logic in one place.
+/// The options are frozen via <see cref="RecordMappingOptions.MakeReadOnly"/>
+/// at construction time.
 /// </remarks>
 internal sealed class RecordMappingContext
 {
     private readonly RecordMappingOptions _options;
 
     /// <summary>
-    /// 使用指定选项创建映射上下文，并立即将选项冻结。
+    /// Creates a mapping context with the specified options and immediately freezes them.
     /// </summary>
-    /// <param name="options">映射选项，不可为 null。</param>
+    /// <param name="options">Mapping options; must not be null.</param>
     internal RecordMappingContext(RecordMappingOptions options)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _options.MakeReadOnly();
     }
 
-    // ─── DTO → RecordRow（写入已有列，不自动建列）────────────────────────────────
+    // ─── DTO → RecordRow (map to existing columns, no auto-create) ───────────────
 
     /// <summary>
-    /// 将 <paramref name="data"/> 中 <paramref name="type"/> 类型的可读属性值写入
-    /// <paramref name="target"/> 对应的列。若列不存在则静默跳过，不会自动建列。
+    /// Maps readable properties of <paramref name="type"/> on <paramref name="data"/>
+    /// into the corresponding columns of <paramref name="target"/>.
+    /// Columns that do not exist are silently skipped; no columns are created.
     /// </summary>
-    internal void CopyDtoToRow(Type type, object data, RecordRow target)
+    internal void MapDtoToRow(Type type, object data, RecordRow target)
     {
         var cols = target.Table.Columns;
         foreach (var prop in XProp.GetAll(type))
@@ -47,7 +51,7 @@ internal sealed class RecordMappingContext
                 continue;
             }
 
-            // 非原生支持：需转换器（属性类型 → 列类型）
+            // Not natively supported: a converter (property type → column type) is required.
             var converter = ResolveWriteConverter(prop, col.Type);
             if (converter == null)
             {
@@ -58,11 +62,12 @@ internal sealed class RecordMappingContext
         }
     }
 
-    // ─── DTO → RecordRow（自动建列）───────────────────────────────────────────────
+    // ─── DTO → RecordRow (auto-create columns) ───────────────────────────────────
 
     /// <summary>
-    /// 将 <paramref name="data"/> 中 <paramref name="type"/> 类型的可读属性值写入
-    /// <paramref name="target"/> 对应的列。若列不存在则自动创建后再写入。
+    /// Writes readable properties of <paramref name="type"/> on <paramref name="data"/>
+    /// into the corresponding columns of <paramref name="target"/>.
+    /// Missing columns are created automatically before writing.
     /// </summary>
     internal void WriteDtoToRow(Type type, object data, RecordRow target)
     {
@@ -79,7 +84,7 @@ internal sealed class RecordMappingContext
                 continue;
             }
 
-            // 非原生支持：确定列类型
+            // Not natively supported: determine the target column type.
             var colType = ResolveColumnType(prop);
             if (colType == null)
             {
@@ -98,12 +103,13 @@ internal sealed class RecordMappingContext
         }
     }
 
-    // ─── RecordRow → DTO ──────────────────────────────────────────────────────────
+    // ─── RecordRow → DTO ─────────────────────────────────────────────────────────
 
     /// <summary>
-    /// 将 <paramref name="source"/> 行中对应列的值写回 <paramref name="data"/> 的可写属性。
+    /// Maps column values from <paramref name="source"/> into the writable properties
+    /// of <paramref name="data"/>. Columns that do not exist are silently skipped.
     /// </summary>
-    internal void CopyRowToDto(Type type, object data, RecordRow source)
+    internal void MapRowToDto(Type type, object data, RecordRow source)
     {
         var cols = source.Table.Columns;
         foreach (var prop in XProp.GetAll(type))
@@ -122,7 +128,8 @@ internal sealed class RecordMappingContext
                 continue;
             }
 
-            // 列类型与属性类型不同，或属性类型不在原生支持列表：需转换器（列类型 → 属性类型）
+            // Column type differs from property type, or property type is not natively
+            // supported: a converter (column type → property type) is required.
             var converter = _options.FindConverter(col.Type, prop.Type)
                          ?? (DefaultRecordConverter.Instance.CanConvert(col.Type, prop.Type)
                              ? DefaultRecordConverter.Instance : null);
@@ -131,7 +138,7 @@ internal sealed class RecordMappingContext
             {
                 HandleConversionFailure(
                     new NotSupportedException(
-                        $"属性 '{prop.Name}' 的类型 '{prop.Type.FullName}' 不受支持，且未注册自定义转换器。"));
+                        $"Property '{prop.Name}' has type '{prop.Type.FullName}' which is not supported and no custom converter is registered."));
                 continue;
             }
 
@@ -139,16 +146,18 @@ internal sealed class RecordMappingContext
         }
     }
 
-    // ─── 建列（AddFrom）──────────────────────────────────────────────────────────
+    // ─── AddFrom (column definition) ─────────────────────────────────────────────
 
     /// <summary>
-    /// 按 <typeparamref name="T"/> 的可读属性向 <paramref name="columns"/> 追加列定义。
+    /// Appends column definitions to <paramref name="columns"/> based on the readable
+    /// properties of <typeparamref name="T"/>.
     /// </summary>
     internal void AddColumnsFrom<T>(RecordColumnCollection columns) where T : class
         => AddColumnsFrom(typeof(T), columns);
 
     /// <summary>
-    /// 按 <paramref name="type"/> 的可读属性向 <paramref name="columns"/> 追加列定义。
+    /// Appends column definitions to <paramref name="columns"/> based on the readable
+    /// properties of <paramref name="type"/>.
     /// </summary>
     internal void AddColumnsFrom(Type type, RecordColumnCollection columns)
     {
@@ -180,12 +189,12 @@ internal sealed class RecordMappingContext
         }
     }
 
-    // ─── 私有：列类型与转换器解析 ─────────────────────────────────────────────────
+    // ─── Private: column-type and converter resolution ───────────────────────────
 
     /// <summary>
-    /// 为非原生支持属性确定目标列类型。
-    /// 优先级：[RecordColumnStorage] Attribute > UnsupportedTypeHandling（ConvertToString/Bytes）。
-    /// 若均不适用（Skip/Throw）则返回 null。
+    /// Determines the target column type for a property that is not natively supported.
+    /// Priority: <see cref="RecordColumnStorageAttribute"/> &gt; <see cref="UnsupportedTypeHandling"/>
+    /// (ConvertToString / ConvertToBytes). Returns <see langword="null"/> when Skip or Throw applies.
     /// </summary>
     private Type? ResolveColumnType(XProp prop)
     {
@@ -209,8 +218,8 @@ internal sealed class RecordMappingContext
     }
 
     /// <summary>
-    /// 查找写方向（属性类型 → 列类型）的转换器。
-    /// 优先级：options 注册 > DefaultRecordConverter。
+    /// Resolves a write-direction converter (property type → column type).
+    /// Priority: options-registered converter &gt; <see cref="DefaultRecordConverter"/>.
     /// </summary>
     private RecordConverter? ResolveWriteConverter(XProp prop, Type colType)
     {
@@ -234,7 +243,8 @@ internal sealed class RecordMappingContext
     }
 
     /// <summary>
-    /// 调用转换器后再赋值；转换或赋值期间的任何异常均遵循 <see cref="ConversionFailureHandling"/> 策略。
+    /// Invokes the converter then assigns the result; any exception during conversion or
+    /// assignment is handled according to the <see cref="ConversionFailureHandling"/> policy.
     /// </summary>
     private void TryConvertAndSetValue(object data, XProp prop, Type sourceType, Type targetType, object? value, RecordConverter converter)
     {
@@ -253,21 +263,21 @@ internal sealed class RecordMappingContext
     {
         if (_options.UnsupportedTypeHandling == UnsupportedTypeHandling.Throw)
             throw new NotSupportedException(
-                $"属性 '{prop.Name}' 的类型 '{prop.Type.FullName}' 不受支持，无法写入 RecordTable。");
-        // Skip：静默忽略
+                $"Property '{prop.Name}' has type '{prop.Type.FullName}' which is not supported and cannot be written to a RecordTable.");
+        // Skip: silently ignore
     }
 
     private void HandleConversionFailure(Exception inner)
     {
         if (_options.ConversionFailureHandling == ConversionFailureHandling.Throw)
             throw inner;
-        // Skip：静默忽略
+        // Skip: silently ignore
     }
 
     private static void ThrowMissingConverter(XProp prop, Type colType)
     {
         throw new InvalidOperationException(
-            $"属性 '{prop.Name}'（类型 '{prop.Type.FullName}'）声明存储为 '{colType.Name}'，" +
-            $"但未在 RecordMappingOptions 中注册对应的 RecordConverter，也不在默认转换器支持范围内。");
+            $"Property '{prop.Name}' (type '{prop.Type.FullName}') is declared to be stored as '{colType.Name}', " +
+            $"but no matching RecordConverter is registered in RecordMappingOptions and it is not covered by the default converter.");
     }
 }

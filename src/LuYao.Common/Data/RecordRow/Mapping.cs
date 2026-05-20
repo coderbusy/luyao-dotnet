@@ -6,63 +6,67 @@ namespace LuYao.Data;
 partial struct RecordRow
 {
     /// <summary>
-    /// 将当前行的列值填充到已有对象 <paramref name="data"/> 的对应属性中。
-    /// 使用运行时实际类型，派生类新增属性会被正确处理。
+    /// Maps column values from the current row into the corresponding properties of
+    /// <paramref name="data"/>. Uses the runtime type; derived-class properties are handled correctly.
     /// </summary>
-    /// <param name="data">要被填充的对象实例，不可为 null。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
-    public void CopyTo(object data)
+    /// <param name="data">The object instance to populate; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
+    public void MapTo(object data)
     {
-        XCopy.CopyFrom(data, this);
+        XCopy.MapFrom(data, this);
     }
 
     /// <summary>
-    /// 将当前行的列值填充到已有对象 <paramref name="data"/> 的对应属性中，使用指定的映射选项。
+    /// Maps column values from the current row into the corresponding properties of
+    /// <paramref name="data"/> using the specified options.
     /// </summary>
-    /// <param name="data">要被填充的对象实例，不可为 null。</param>
-    /// <param name="options">映射选项，不可为 null。</param>
-    public void CopyTo(object data, RecordMappingOptions options)
+    /// <param name="data">The object instance to populate; must not be null.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    public void MapTo(object data, RecordMappingOptions options)
     {
-        XCopy.CopyFrom(data, this, options);
+        XCopy.MapFrom(data, this, options);
     }
 
     /// <summary>
-    /// 将对象 <paramref name="data"/> 的可读属性值写入当前行对应的列。
-    /// 使用运行时实际类型，派生类新增属性会被正确处理。
+    /// Maps readable properties of <paramref name="data"/> into the corresponding columns of
+    /// the current row. Uses the runtime type; derived-class properties are handled correctly.
     /// </summary>
-    /// <param name="data">属性值的来源对象，不可为 null。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
-    public void CopyFrom(object data) => XCopy.CopyTo(data, this);
+    /// <param name="data">The source object; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
+    public void MapFrom(object data) => XCopy.MapTo(data, this);
 
     /// <summary>
-    /// 将对象 <paramref name="data"/> 的可读属性值写入当前行对应的列，使用指定的映射选项。
+    /// Maps readable properties of <paramref name="data"/> into the corresponding columns of
+    /// the current row using the specified options.
     /// </summary>
-    /// <param name="data">属性值的来源对象，不可为 null。</param>
-    /// <param name="options">映射选项，不可为 null。</param>
-    public void CopyFrom(object data, RecordMappingOptions options) => XCopy.CopyTo(data, this, options);
+    /// <param name="data">The source object; must not be null.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    public void MapFrom(object data, RecordMappingOptions options) => XCopy.MapTo(data, this, options);
 
     /// <summary>
-    /// 创建一个新的 <typeparamref name="T"/> 实例，并将当前行的列值填充到其属性中。
+    /// Creates a new <typeparamref name="T"/> instance and populates its properties
+    /// from the current row's column values.
     /// </summary>
-    /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
-    /// <returns>已填充属性的新对象实例。</returns>
+    /// <typeparam name="T">Target object type; must have a parameterless constructor.</typeparam>
+    /// <returns>A new object instance populated with column values.</returns>
     public T To<T>() where T : class, new()
     {
         var ret = new T();
-        this.CopyTo(ret);
+        this.MapTo(ret);
         return ret;
     }
 
     /// <summary>
-    /// 创建一个新的 <typeparamref name="T"/> 实例，并将当前行的列值填充到其属性中，使用指定的映射选项。
+    /// Creates a new <typeparamref name="T"/> instance and populates its properties
+    /// from the current row's column values using the specified options.
     /// </summary>
-    /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
-    /// <param name="options">映射选项，不可为 null。</param>
-    /// <returns>已填充属性的新对象实例。</returns>
+    /// <typeparam name="T">Target object type; must have a parameterless constructor.</typeparam>
+    /// <param name="options">Mapping options; must not be null.</param>
+    /// <returns>A new object instance populated with column values.</returns>
     public T To<T>(RecordMappingOptions options) where T : class, new()
     {
         var ret = new T();
-        this.CopyTo(ret, options);
+        this.MapTo(ret, options);
         return ret;
     }
 }
