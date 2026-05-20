@@ -1,6 +1,7 @@
+using LuYao.Data.Meta;
 using System;
 
-namespace LuYao.Data.Meta;
+namespace LuYao.Data.Mapping;
 
 /// <summary>
 /// Encapsulates the execution context for a single mapping operation.

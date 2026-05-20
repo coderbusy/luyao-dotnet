@@ -1,4 +1,5 @@
 ﻿using LuYao.Collections.Generic;
+using LuYao.Data.Mapping;
 using LuYao.Data.Meta;
 using System;
 using System.Collections;

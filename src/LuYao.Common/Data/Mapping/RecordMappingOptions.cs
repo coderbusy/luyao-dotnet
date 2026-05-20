@@ -1,6 +1,6 @@
 using System;
 
-namespace LuYao.Data;
+namespace LuYao.Data.Mapping;
 
 /// <summary>
 /// 控制 <see cref="RecordTable"/> 与 DTO 之间映射行为的选项类。
