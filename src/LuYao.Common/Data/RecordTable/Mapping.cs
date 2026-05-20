@@ -47,6 +47,22 @@ partial class RecordTable
     }
 
     /// <summary>
+    /// 根据单个对象创建一个 <see cref="RecordTable"/>，使用指定的映射选项，自动推断列结构并写入一行数据，同时返回该行的引用。
+    /// </summary>
+    /// <typeparam name="T">数据来源的对象类型。</typeparam>
+    /// <param name="data">用于初始化列结构和行数据的对象实例。</param>
+    /// <param name="options">映射选项，不可为 null。</param>
+    /// <param name="row">返回新添加的行引用。</param>
+    /// <returns>包含一行数据的新 <see cref="RecordTable"/>。</returns>
+    public static RecordTable From<T>(T data, RecordMappingOptions options, out RecordRow row) where T : class
+    {
+        var re = new RecordTable();
+        re.Columns.AddFrom<T>(options);
+        row = re.AddRowFrom(data, options);
+        return re;
+    }
+
+    /// <summary>
     /// 将当前 <see cref="RecordTable"/> 的第一行转换为 <typeparamref name="T"/> 对象。
     /// 如果 <see cref="RecordTable"/> 没有任何行，则返回一个使用无参构造函数创建的默认实例。
     /// </summary>

@@ -231,12 +231,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <typeparam name="T">提供列定义的对象类型。</typeparam>
     public void AddFrom<T>() where T : class
     {
-        var props = XProp.GetAll(typeof(T));
-        foreach (var p in props)
-        {
-            if (!Helpers.IsSupportedForReading(p)) continue;
-            this.Add(p.Name, p.Type);
-        }
+        AddFrom<T>(RecordMappingOptions.Default);
     }
 
     /// <summary>
@@ -252,21 +247,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     public void AddFrom<T>(RecordMappingOptions options) where T : class
     {
         if (options == null) throw new ArgumentNullException(nameof(options));
-        options.MakeReadOnly();
-        var props = XProp.GetAll(typeof(T));
-        foreach (var p in props)
-        {
-            if (!p.CanRead) continue;
-            if (!Helpers.IsSupportedForReading(p))
-            {
-                if (options.UnsupportedTypeHandling == UnsupportedTypeHandling.Throw)
-                    throw new NotSupportedException(
-                        $"属性 '{p.Name}' 的类型 '{p.Type.FullName}' 不受支持，无法作为 RecordTable 列。");
-                continue;
-            }
-            var colName = ColumnNameResolver.Resolve(p, options);
-            this.Add(colName, p.Type);
-        }
+        new RecordMappingContext(options).AddColumnsFrom<T>(this);
     }
 
     /// <summary>
