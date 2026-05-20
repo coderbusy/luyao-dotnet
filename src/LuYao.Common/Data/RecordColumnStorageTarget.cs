@@ -9,17 +9,5 @@ public enum RecordColumnStorageTarget
     /// <summary>
     /// 跳过该属性，不在 RecordTable 中创建对应的列。
     /// </summary>
-    Skip = 0,
-
-    /// <summary>
-    /// 将属性值转换为 <see cref="string"/> 后存储。
-    /// 必须在 <see cref="RecordMappingOptions"/> 中注册该属性类型对应的 <see cref="RecordConverter"/>，否则将抛出异常。
-    /// </summary>
-    String = 1,
-
-    /// <summary>
-    /// 将属性值转换为 <see cref="byte"/>[] 后存储。
-    /// 必须在 <see cref="RecordMappingOptions"/> 中注册该属性类型对应的 <see cref="RecordConverter"/>，否则将抛出异常。
-    /// </summary>
-    Bytes = 2,
+    Skip = 0
 }

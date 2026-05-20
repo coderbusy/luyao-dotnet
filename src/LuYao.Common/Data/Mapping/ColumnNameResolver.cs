@@ -1,6 +1,8 @@
+using LuYao.Data.Attributes;
+using LuYao.Data.Meta;
 using System.Reflection;
 
-namespace LuYao.Data.Meta;
+namespace LuYao.Data.Mapping;
 
 /// <summary>
 /// 根据 <see cref="RecordMappingOptions"/> 解析属性对应的列名。

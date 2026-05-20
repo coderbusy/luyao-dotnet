@@ -1,7 +1,7 @@
+using LuYao.Data.Attributes;
 using System;
-using System.Collections.Generic;
 
-namespace LuYao.Data;
+namespace LuYao.Data.Mapping;
 
 /// <summary>
 /// 控制 <see cref="RecordTable"/> 与 DTO 之间映射行为的选项类。
@@ -81,41 +81,5 @@ public sealed class RecordMappingOptions
     {
         get => _conversionFailureHandling;
         set { ThrowIfReadOnly(); _conversionFailureHandling = value; }
-    }
-
-    // ─── 自定义类型转换器 ──────────────────────────────────────────────────────────
-
-    private List<RecordConverter>? _converters;
-
-    /// <summary>
-    /// 注册自定义双向转换器。
-    /// 转换器同时用于 DTO → Table（写）和 Table → DTO（读）两个方向。
-    /// </summary>
-    /// <param name="converter">转换器实例，不可为 null。</param>
-    /// <exception cref="ArgumentNullException"><paramref name="converter"/> 为 null。</exception>
-    /// <exception cref="InvalidOperationException">实例已被冻结时抛出。</exception>
-    public void AddConverter(RecordConverter converter)
-    {
-        if (converter == null) throw new ArgumentNullException(nameof(converter));
-        ThrowIfReadOnly();
-        if (_converters == null) _converters = new List<RecordConverter>();
-        _converters.Add(converter);
-    }
-
-    /// <summary>
-    /// 查找支持从 <paramref name="sourceType"/> 到 <paramref name="targetType"/> 转换的已注册转换器。
-    /// 不包含托底转换器 <see cref="Meta.DefaultRecordConverter"/>。
-    /// </summary>
-    /// <param name="sourceType">来源类型。</param>
-    /// <param name="targetType">目标类型。</param>
-    /// <returns>匹配的转换器；未找到则返回 <see langword="null"/>。</returns>
-    internal RecordConverter? FindConverter(Type sourceType, Type targetType)
-    {
-        if (_converters == null) return null;
-        foreach (var c in _converters)
-        {
-            if (c.CanConvert(sourceType, targetType)) return c;
-        }
-        return null;
     }
 }

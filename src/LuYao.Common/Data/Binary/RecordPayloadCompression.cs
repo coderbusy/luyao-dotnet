@@ -1,4 +1,4 @@
-namespace LuYao.Data;
+namespace LuYao.Data.Binary;
 
 /// <summary>
 /// 指定 <see cref="RecordBinaryPayloadCodec"/> 序列化时使用的压缩算法。

@@ -1,6 +1,6 @@
 using System;
 
-namespace LuYao.Data;
+namespace LuYao.Data.Attributes;
 
 /// <summary>
 /// 用于标记 Record 映射行为的特性基类。

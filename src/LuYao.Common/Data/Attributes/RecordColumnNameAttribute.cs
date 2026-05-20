@@ -1,6 +1,6 @@
 using System;
 
-namespace LuYao.Data;
+namespace LuYao.Data.Attributes;
 
 /// <summary>
 /// 标记属性对应的列名称，优先级高于 <see cref="RecordNamingPolicy"/>。

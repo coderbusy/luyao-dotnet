@@ -1,6 +1,7 @@
+using LuYao.Data.Meta;
 using System;
 
-namespace LuYao.Data.Meta;
+namespace LuYao.Data.Mapping;
 
 /// <summary>
 /// Encapsulates the execution context for a single mapping operation.
@@ -51,14 +52,7 @@ internal sealed class RecordMappingContext
                 continue;
             }
 
-            // Not natively supported: a converter (property type → column type) is required.
-            var converter = ResolveWriteConverter(prop, col.Type);
-            if (converter == null)
-            {
-                HandleUnsupportedTypeForWrite(prop);
-                continue;
-            }
-            col.Set(target, converter.Convert(prop.Type, col.Type, prop.GetValue(data)));
+            HandleUnsupportedTypeForWrite(prop);
         }
     }
 
@@ -84,22 +78,7 @@ internal sealed class RecordMappingContext
                 continue;
             }
 
-            // Not natively supported: determine the target column type.
-            var colType = ResolveColumnType(prop);
-            if (colType == null)
-            {
-                HandleUnsupportedTypeForWrite(prop);
-                continue;
-            }
-            var converter = ResolveWriteConverter(prop, colType);
-            if (converter == null)
-            {
-                ThrowMissingConverter(prop, colType);
-                continue;
-            }
-            var name = ColumnNameResolver.Resolve(prop, _options);
-            var destCol = cols.Find(name) ?? cols.Add(name, colType);
-            destCol.Set(target, converter.Convert(prop.Type, colType, prop.GetValue(data)));
+            HandleUnsupportedTypeForWrite(prop);
         }
     }
 
@@ -128,21 +107,9 @@ internal sealed class RecordMappingContext
                 continue;
             }
 
-            // Column type differs from property type, or property type is not natively
-            // supported: a converter (column type → property type) is required.
-            var converter = _options.FindConverter(col.Type, prop.Type)
-                         ?? (DefaultRecordConverter.Instance.CanConvert(col.Type, prop.Type)
-                             ? DefaultRecordConverter.Instance : null);
-
-            if (converter == null)
-            {
-                HandleConversionFailure(
-                    new NotSupportedException(
-                        $"Property '{prop.Name}' has type '{prop.Type.FullName}' which is not supported and no custom converter is registered."));
-                continue;
-            }
-
-            TryConvertAndSetValue(data, prop, col.Type, prop.Type, rawValue, converter);
+            HandleConversionFailure(
+                new NotSupportedException(
+                    $"Property '{prop.Name}' has type '{prop.Type.FullName}' which is not supported."));
         }
     }
 
@@ -172,62 +139,8 @@ internal sealed class RecordMappingContext
                 continue;
             }
 
-            var colType = ResolveColumnType(prop);
-            if (colType == null)
-            {
-                HandleUnsupportedTypeForWrite(prop);
-                continue;
-            }
-            var converter = ResolveWriteConverter(prop, colType);
-            if (converter == null)
-            {
-                ThrowMissingConverter(prop, colType);
-                continue;
-            }
-            var name = ColumnNameResolver.Resolve(prop, _options);
-            columns.Add(name, colType);
+            HandleUnsupportedTypeForWrite(prop);
         }
-    }
-
-    // ─── Private: column-type and converter resolution ───────────────────────────
-
-    /// <summary>
-    /// Determines the target column type for a property that is not natively supported.
-    /// Priority: <see cref="RecordColumnStorageAttribute"/> &gt; <see cref="UnsupportedTypeHandling"/>
-    /// (ConvertToString / ConvertToBytes). Returns <see langword="null"/> when Skip or Throw applies.
-    /// </summary>
-    private Type? ResolveColumnType(XProp prop)
-    {
-        var attr = prop.GetCustomAttribute<RecordColumnStorageAttribute>();
-        if (attr != null)
-        {
-            return attr.Target switch
-            {
-                RecordColumnStorageTarget.String => typeof(string),
-                RecordColumnStorageTarget.Bytes  => typeof(byte[]),
-                _                                => null, // Skip
-            };
-        }
-
-        return _options.UnsupportedTypeHandling switch
-        {
-            UnsupportedTypeHandling.ConvertToString => typeof(string),
-            UnsupportedTypeHandling.ConvertToBytes  => typeof(byte[]),
-            _                                       => null,
-        };
-    }
-
-    /// <summary>
-    /// Resolves a write-direction converter (property type → column type).
-    /// Priority: options-registered converter &gt; <see cref="DefaultRecordConverter"/>.
-    /// </summary>
-    private RecordConverter? ResolveWriteConverter(XProp prop, Type colType)
-    {
-        var converter = _options.FindConverter(prop.Type, colType);
-        if (converter != null) return converter;
-        if (DefaultRecordConverter.Instance.CanConvert(prop.Type, colType))
-            return DefaultRecordConverter.Instance;
-        return null;
     }
 
     private void TrySetValue(object data, XProp prop, object? value)
@@ -235,23 +148,6 @@ internal sealed class RecordMappingContext
         try
         {
             prop.SetValue(data, value);
-        }
-        catch (Exception ex) when (_options.ConversionFailureHandling == ConversionFailureHandling.Skip)
-        {
-            _ = ex;
-        }
-    }
-
-    /// <summary>
-    /// Invokes the converter then assigns the result; any exception during conversion or
-    /// assignment is handled according to the <see cref="ConversionFailureHandling"/> policy.
-    /// </summary>
-    private void TryConvertAndSetValue(object data, XProp prop, Type sourceType, Type targetType, object? value, RecordConverter converter)
-    {
-        try
-        {
-            var converted = converter.Convert(sourceType, targetType, value);
-            prop.SetValue(data, converted);
         }
         catch (Exception ex) when (_options.ConversionFailureHandling == ConversionFailureHandling.Skip)
         {
@@ -274,10 +170,5 @@ internal sealed class RecordMappingContext
         // Skip: silently ignore
     }
 
-    private static void ThrowMissingConverter(XProp prop, Type colType)
-    {
-        throw new InvalidOperationException(
-            $"Property '{prop.Name}' (type '{prop.Type.FullName}') is declared to be stored as '{colType.Name}', " +
-            $"but no matching RecordConverter is registered in RecordMappingOptions and it is not covered by the default converter.");
-    }
+
 }
