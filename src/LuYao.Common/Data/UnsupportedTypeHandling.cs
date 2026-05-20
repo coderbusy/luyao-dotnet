@@ -10,16 +10,4 @@ public enum UnsupportedTypeHandling
 
     /// <summary>抛出 <see cref="System.NotSupportedException"/>。</summary>
     Throw = 1,
-
-    /// <summary>
-    /// 将属性值转换为 <see cref="string"/> 后存入列。
-    /// 必须在 <see cref="RecordMappingOptions"/> 中注册该属性类型对应的 <see cref="RecordConverter"/>，否则将抛出异常。
-    /// </summary>
-    ConvertToString = 2,
-
-    /// <summary>
-    /// 将属性值转换为 <see cref="byte"/>[] 后存入列。
-    /// 必须在 <see cref="RecordMappingOptions"/> 中注册该属性类型对应的 <see cref="RecordConverter"/>，否则将抛出异常。
-    /// </summary>
-    ConvertToBytes = 3,
 }
