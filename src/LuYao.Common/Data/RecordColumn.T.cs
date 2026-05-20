@@ -1,20 +1,20 @@
-ï»¿using System;
+using System;
 
 namespace LuYao.Data;
 
 /// <summary>
-/// æ³›å‹åˆ—
+/// ·ºĞÍÁĞ
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class RecordColumn<T> : RecordColumn
 {
     /// <summary>
-    /// æ•°æ®å­˜å‚¨æ•°ç»„
+    /// Êı¾İ´æ´¢Êı×é
     /// </summary>
     protected internal T[] _data;
 
     /// <summary>
-    /// åˆ›å»ºä¸€ä¸ªæ³›å‹åˆ—
+    /// ´´½¨Ò»¸ö·ºĞÍÁĞ
     /// </summary>
     public RecordColumn(RecordTable table, string name, Type type)
         : base(table, name, type)
@@ -65,7 +65,7 @@ public class RecordColumn<T> : RecordColumn
         }
         else
         {
-            _data[row] = (T)Valid.To(value, this.Type);
+            _data[row] = (T)TypeConvert.ChangeType(value, this.Type);
         }
     }
 

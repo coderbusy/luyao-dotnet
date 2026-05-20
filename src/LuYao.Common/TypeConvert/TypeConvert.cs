@@ -3,9 +3,9 @@
 namespace LuYao
 {
     /// <summary>
-    /// 数据类型转换，转换行为和 <see cref="System.Convert"/> 一致。
+    /// Type conversion utilities. Behavior is consistent with <see cref="System.Convert"/> with additional null-safe overloads.
     /// </summary>
-    public static partial class Valid
+    public static partial class TypeConvert
     {
 
         #region from Boolean?

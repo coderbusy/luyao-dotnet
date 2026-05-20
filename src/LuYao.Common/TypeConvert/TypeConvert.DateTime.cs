@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace LuYao;
 
-partial class Valid
+partial class TypeConvert
 {
     /// <summary>
     /// 将值转换为字符串。

@@ -2,7 +2,7 @@
 
 namespace LuYao;
 
-partial class Valid
+partial class TypeConvert
 {
     /// <inheritdoc/>
     public static Boolean ToBoolean(String? value)
