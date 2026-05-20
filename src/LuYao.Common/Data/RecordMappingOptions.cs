@@ -85,44 +85,37 @@ public sealed class RecordMappingOptions
 
     // ─── 自定义类型转换器 ──────────────────────────────────────────────────────────
 
-    private Dictionary<Type, Func<object?, object?>>? _converters;
+    private List<RecordConverter>? _converters;
 
     /// <summary>
-    /// 注册 RecordTable → DTO 方向的自定义类型转换器。
+    /// 注册自定义双向转换器。
+    /// 转换器同时用于 DTO → Table（写）和 Table → DTO（读）两个方向。
     /// </summary>
-    /// <param name="targetType">目标属性类型。</param>
-    /// <param name="converter">转换函数，输入为列原始值，输出为目标类型值。</param>
-    /// <exception cref="ArgumentNullException"><paramref name="targetType"/> 或 <paramref name="converter"/> 为 null。</exception>
+    /// <param name="converter">转换器实例，不可为 null。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="converter"/> 为 null。</exception>
     /// <exception cref="InvalidOperationException">实例已被冻结时抛出。</exception>
-    public void AddConverter(Type targetType, Func<object?, object?> converter)
+    public void AddConverter(RecordConverter converter)
     {
-        if (targetType == null) throw new ArgumentNullException(nameof(targetType));
         if (converter == null) throw new ArgumentNullException(nameof(converter));
         ThrowIfReadOnly();
-        if (_converters == null) _converters = new Dictionary<Type, Func<object?, object?>>();
-        _converters[targetType] = converter;
+        if (_converters == null) _converters = new List<RecordConverter>();
+        _converters.Add(converter);
     }
 
     /// <summary>
-    /// 注册 RecordTable → DTO 方向的自定义类型转换器（泛型重载）。
+    /// 查找支持从 <paramref name="sourceType"/> 到 <paramref name="targetType"/> 转换的已注册转换器。
+    /// 不包含托底转换器 <see cref="Meta.DefaultRecordConverter"/>。
     /// </summary>
-    /// <typeparam name="T">目标属性类型。</typeparam>
-    /// <param name="converter">转换函数，输入为列原始值，输出为目标类型值。</param>
-    public void AddConverter<T>(Func<object?, T?> converter)
-    {
-        if (converter == null) throw new ArgumentNullException(nameof(converter));
-        AddConverter(typeof(T), v => converter(v));
-    }
-
-    /// <summary>
-    /// 查找已注册的自定义转换器。
-    /// </summary>
-    /// <param name="targetType">目标属性类型。</param>
-    /// <returns>转换函数；如未注册则返回 <see langword="null"/>。</returns>
-    internal Func<object?, object?>? GetConverter(Type targetType)
+    /// <param name="sourceType">来源类型。</param>
+    /// <param name="targetType">目标类型。</param>
+    /// <returns>匹配的转换器；未找到则返回 <see langword="null"/>。</returns>
+    internal RecordConverter? FindConverter(Type sourceType, Type targetType)
     {
         if (_converters == null) return null;
-        _converters.TryGetValue(targetType, out var converter);
-        return converter;
+        foreach (var c in _converters)
+        {
+            if (c.CanConvert(sourceType, targetType)) return c;
+        }
+        return null;
     }
 }

@@ -36,15 +36,25 @@ internal sealed class RecordMappingContext
         foreach (var prop in XProp.GetAll(type))
         {
             if (!prop.CanRead) continue;
-            if (!Helpers.IsSupportedForReading(prop))
-            {
-                HandleUnsupportedType(prop);
-                continue;
-            }
+
             var colName = ColumnNameResolver.Resolve(prop, _options);
             var col = cols.Find(colName);
             if (col == null) continue;
-            col.Set(target, prop.GetValue(data));
+
+            if (Helpers.IsSupportedForReading(prop))
+            {
+                col.Set(target, prop.GetValue(data));
+                continue;
+            }
+
+            // 非原生支持：需转换器（属性类型 → 列类型）
+            var converter = ResolveWriteConverter(prop, col.Type);
+            if (converter == null)
+            {
+                HandleUnsupportedTypeForWrite(prop);
+                continue;
+            }
+            col.Set(target, converter.Convert(prop.Type, col.Type, prop.GetValue(data)));
         }
     }
 
@@ -60,14 +70,31 @@ internal sealed class RecordMappingContext
         foreach (var prop in XProp.GetAll(type))
         {
             if (!prop.CanRead) continue;
-            if (!Helpers.IsSupportedForReading(prop))
+
+            if (Helpers.IsSupportedForReading(prop))
             {
-                HandleUnsupportedType(prop);
+                var colName = ColumnNameResolver.Resolve(prop, _options);
+                var col = cols.Find(colName) ?? cols.Add(colName, prop.Type);
+                col.Set(target, prop.GetValue(data));
                 continue;
             }
-            var colName = ColumnNameResolver.Resolve(prop, _options);
-            var col = cols.Find(colName) ?? cols.Add(colName, prop.Type);
-            col.Set(target, prop.GetValue(data));
+
+            // 非原生支持：确定列类型
+            var colType = ResolveColumnType(prop);
+            if (colType == null)
+            {
+                HandleUnsupportedTypeForWrite(prop);
+                continue;
+            }
+            var converter = ResolveWriteConverter(prop, colType);
+            if (converter == null)
+            {
+                ThrowMissingConverter(prop, colType);
+                continue;
+            }
+            var name = ColumnNameResolver.Resolve(prop, _options);
+            var destCol = cols.Find(name) ?? cols.Add(name, colType);
+            destCol.Set(target, converter.Convert(prop.Type, colType, prop.GetValue(data)));
         }
     }
 
@@ -87,27 +114,28 @@ internal sealed class RecordMappingContext
             var col = cols.Find(colName);
             if (col == null) continue;
 
-            // 优先使用自定义转换器
-            var converter = _options.GetConverter(prop.Type);
-            if (converter == null && !Helpers.IsSupportedForWriting(prop))
+            var rawValue = col.Get(source);
+
+            if (Helpers.IsSupportedForWriting(prop) && col.Type == prop.Type)
             {
-                // 无转换器且类型不支持——按失败策略处理
+                TrySetValue(data, prop, rawValue);
+                continue;
+            }
+
+            // 列类型与属性类型不同，或属性类型不在原生支持列表：需转换器（列类型 → 属性类型）
+            var converter = _options.FindConverter(col.Type, prop.Type)
+                         ?? (DefaultRecordConverter.Instance.CanConvert(col.Type, prop.Type)
+                             ? DefaultRecordConverter.Instance : null);
+
+            if (converter == null)
+            {
                 HandleConversionFailure(
                     new NotSupportedException(
                         $"属性 '{prop.Name}' 的类型 '{prop.Type.FullName}' 不受支持，且未注册自定义转换器。"));
                 continue;
             }
 
-            try
-            {
-                var rawValue = col.Get(source);
-                prop.SetValue(data, converter != null ? converter(rawValue) : rawValue);
-            }
-            catch (Exception ex) when (_options.ConversionFailureHandling == ConversionFailureHandling.Skip)
-            {
-                // Skip：静默跳过，属性保持默认值
-                _ = ex;
-            }
+            TryConvertAndSetValue(data, prop, col.Type, prop.Type, rawValue, converter);
         }
     }
 
@@ -127,30 +155,119 @@ internal sealed class RecordMappingContext
         foreach (var prop in XProp.GetAll(type))
         {
             if (!prop.CanRead) continue;
-            if (!Helpers.IsSupportedForReading(prop))
+
+            if (Helpers.IsSupportedForReading(prop))
             {
-                HandleUnsupportedType(prop);
+                var colName = ColumnNameResolver.Resolve(prop, _options);
+                columns.Add(colName, prop.Type);
                 continue;
             }
-            var colName = ColumnNameResolver.Resolve(prop, _options);
-            columns.Add(colName, prop.Type);
+
+            var colType = ResolveColumnType(prop);
+            if (colType == null)
+            {
+                HandleUnsupportedTypeForWrite(prop);
+                continue;
+            }
+            var converter = ResolveWriteConverter(prop, colType);
+            if (converter == null)
+            {
+                ThrowMissingConverter(prop, colType);
+                continue;
+            }
+            var name = ColumnNameResolver.Resolve(prop, _options);
+            columns.Add(name, colType);
         }
     }
 
-    // ─── 私有辅助 ────────────────────────────────────────────────────────────────
+    // ─── 私有：列类型与转换器解析 ─────────────────────────────────────────────────
 
-    private void HandleUnsupportedType(XProp prop)
+    /// <summary>
+    /// 为非原生支持属性确定目标列类型。
+    /// 优先级：[RecordColumnStorage] Attribute > UnsupportedTypeHandling（ConvertToString/Bytes）。
+    /// 若均不适用（Skip/Throw）则返回 null。
+    /// </summary>
+    private Type? ResolveColumnType(XProp prop)
+    {
+        var attr = prop.GetCustomAttribute<RecordColumnStorageAttribute>();
+        if (attr != null)
+        {
+            return attr.Target switch
+            {
+                RecordColumnStorageTarget.String => typeof(string),
+                RecordColumnStorageTarget.Bytes  => typeof(byte[]),
+                _                                => null, // Skip
+            };
+        }
+
+        return _options.UnsupportedTypeHandling switch
+        {
+            UnsupportedTypeHandling.ConvertToString => typeof(string),
+            UnsupportedTypeHandling.ConvertToBytes  => typeof(byte[]),
+            _                                       => null,
+        };
+    }
+
+    /// <summary>
+    /// 查找写方向（属性类型 → 列类型）的转换器。
+    /// 优先级：options 注册 > DefaultRecordConverter。
+    /// </summary>
+    private RecordConverter? ResolveWriteConverter(XProp prop, Type colType)
+    {
+        var converter = _options.FindConverter(prop.Type, colType);
+        if (converter != null) return converter;
+        if (DefaultRecordConverter.Instance.CanConvert(prop.Type, colType))
+            return DefaultRecordConverter.Instance;
+        return null;
+    }
+
+    private void TrySetValue(object data, XProp prop, object? value)
+    {
+        try
+        {
+            prop.SetValue(data, value);
+        }
+        catch (Exception ex) when (_options.ConversionFailureHandling == ConversionFailureHandling.Skip)
+        {
+            _ = ex;
+        }
+    }
+
+    /// <summary>
+    /// 调用转换器后再赋值；转换或赋值期间的任何异常均遵循 <see cref="ConversionFailureHandling"/> 策略。
+    /// </summary>
+    private void TryConvertAndSetValue(object data, XProp prop, Type sourceType, Type targetType, object? value, RecordConverter converter)
+    {
+        try
+        {
+            var converted = converter.Convert(sourceType, targetType, value);
+            prop.SetValue(data, converted);
+        }
+        catch (Exception ex) when (_options.ConversionFailureHandling == ConversionFailureHandling.Skip)
+        {
+            _ = ex;
+        }
+    }
+
+    private void HandleUnsupportedTypeForWrite(XProp prop)
     {
         if (_options.UnsupportedTypeHandling == UnsupportedTypeHandling.Throw)
             throw new NotSupportedException(
                 $"属性 '{prop.Name}' 的类型 '{prop.Type.FullName}' 不受支持，无法写入 RecordTable。");
-        // UnsupportedTypeHandling.Skip：静默忽略
+        // Skip：静默忽略
     }
 
     private void HandleConversionFailure(Exception inner)
     {
         if (_options.ConversionFailureHandling == ConversionFailureHandling.Throw)
             throw inner;
-        // ConversionFailureHandling.Skip：静默忽略
+        // Skip：静默忽略
+    }
+
+    private static void ThrowMissingConverter(XProp prop, Type colType)
+    {
+        throw new InvalidOperationException(
+            $"属性 '{prop.Name}'（类型 '{prop.Type.FullName}'）声明存储为 '{colType.Name}'，" +
+            $"但未在 RecordMappingOptions 中注册对应的 RecordConverter，也不在默认转换器支持范围内。");
     }
 }

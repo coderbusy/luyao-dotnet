@@ -201,8 +201,7 @@ public class RecordMappingOptionsTests
         table.Columns.Find("Price")!.Set(row, "3.14");
 
         var options = new RecordMappingOptions();
-        options.AddConverter<decimal>(v => v == null ? 0m : decimal.Parse(v.ToString()!));
-
+        // DefaultRecordConverter 已支持 string → decimal，无需手动注册
         var dto = table.To<DtoWithDecimal>(options);
         Assert.AreEqual(3.14m, dto.Price);
     }
@@ -295,6 +294,134 @@ public class RecordMappingOptionsTests
         RecordTable.From(new PersonDto { Id = 1 }, options);
         Assert.IsTrue(options.IsReadOnly);
         Assert.Throws<InvalidOperationException>(() =>
-            options.AddConverter(typeof(decimal), v => v));
+            options.AddConverter(new NoopStringConverter()));
+    }
+
+    // ─── RecordColumnStorageAttribute / UnsupportedTypeHandling 扩展 ─────────────
+
+    private class DtoWithComplexProp
+    {
+        public string Name { get; set; } = "";
+
+        [RecordColumnStorage(RecordColumnStorageTarget.String)]
+        public ComplexTag Tag { get; set; } = new();
+    }
+
+    private class ComplexTag
+    {
+        public string Value { get; set; } = "default";
+        public override string ToString() => Value;
+    }
+
+    private sealed class ComplexTagToStringConverter : RecordConverter
+    {
+        public override bool CanConvert(Type sourceType, Type targetType)
+            => sourceType == typeof(ComplexTag) && targetType == typeof(string);
+
+        public override object? Convert(Type sourceType, Type targetType, object? value)
+            => value?.ToString();
+    }
+
+    [TestMethod]
+    public void StorageAttribute_String_WritesAsString()
+    {
+        // 属性上标注 [RecordColumnStorage(String)]，注册对应转换器
+        var options = new RecordMappingOptions();
+        options.AddConverter(new ComplexTagToStringConverter());
+
+        var dto = new DtoWithComplexProp { Name = "Alice", Tag = new ComplexTag { Value = "vip" } };
+        var table = RecordTable.From(dto, options);
+
+        Assert.AreEqual(1, table.Count);
+        var row = table[0];
+        Assert.AreEqual("Alice", table.Columns.Find("Name")!.Get(row));
+        Assert.AreEqual("vip", table.Columns.Find("Tag")!.Get(row));
+    }
+
+    [TestMethod]
+    public void StorageAttribute_Skip_SkipsProperty()
+    {
+        // 属性上标注 [RecordColumnStorage(Skip)] 时，该列不应被创建
+        var dto = new DtoWithSkipTag { Name = "Bob", Secret = new ComplexTag { Value = "hidden" } };
+        var table = RecordTable.From(dto);
+        Assert.IsNull(table.Columns.Find("Secret"));
+        Assert.IsNotNull(table.Columns.Find("Name"));
+    }
+
+    private class DtoWithSkipTag
+    {
+        public string Name { get; set; } = "";
+
+        [RecordColumnStorage(RecordColumnStorageTarget.Skip)]
+        public ComplexTag Secret { get; set; } = new();
+    }
+
+    [TestMethod]
+    public void UnsupportedTypeHandling_ConvertToString_WritesAsString()
+    {
+        // 全局配置 ConvertToString，需注册转换器
+        var options = new RecordMappingOptions
+        {
+            UnsupportedTypeHandling = UnsupportedTypeHandling.ConvertToString
+        };
+        options.AddConverter(new ComplexTagToStringConverter());
+
+        var dto = new DtoNoAttr { Name = "Charlie", Tag = new ComplexTag { Value = "gold" } };
+        var table = RecordTable.From(dto, options);
+
+        Assert.AreEqual("gold", table.Columns.Find("Tag")!.Get(table[0]));
+    }
+
+    [TestMethod]
+    public void UnsupportedTypeHandling_ConvertToString_ThrowsWhenNoConverter()
+    {
+        var options = new RecordMappingOptions
+        {
+            UnsupportedTypeHandling = UnsupportedTypeHandling.ConvertToString
+            // 未注册 ComplexTag → string 的转换器
+        };
+        var dto = new DtoNoAttr { Name = "Dave", Tag = new ComplexTag { Value = "x" } };
+        Assert.Throws<InvalidOperationException>(() => RecordTable.From(dto, options));
+    }
+
+    [TestMethod]
+    public void UnsupportedTypeHandling_ConvertToBytes_WritesAsBytes()
+    {
+        var options = new RecordMappingOptions
+        {
+            UnsupportedTypeHandling = UnsupportedTypeHandling.ConvertToBytes
+        };
+        options.AddConverter(new ComplexTagToBytesConverter());
+
+        var dto = new DtoNoAttr { Name = "Eve", Tag = new ComplexTag { Value = "ok" } };
+        var table = RecordTable.From(dto, options);
+
+        var bytes = table.Columns.Find("Tag")!.Get(table[0]) as byte[];
+        Assert.IsNotNull(bytes);
+        Assert.AreEqual("ok", System.Text.Encoding.UTF8.GetString(bytes!));
+    }
+
+    private class DtoNoAttr
+    {
+        public string Name { get; set; } = "";
+        public ComplexTag Tag { get; set; } = new();
+    }
+
+    private sealed class ComplexTagToBytesConverter : RecordConverter
+    {
+        public override bool CanConvert(Type sourceType, Type targetType)
+            => sourceType == typeof(ComplexTag) && targetType == typeof(byte[]);
+
+        public override object? Convert(Type sourceType, Type targetType, object? value)
+            => value == null ? null : System.Text.Encoding.UTF8.GetBytes(value.ToString()!);
+    }
+
+    // ─── 辅助类型 ─────────────────────────────────────────────────────────────────
+
+    /// <summary>用于测试冻结行为的最简转换器。</summary>
+    private sealed class NoopStringConverter : RecordConverter
+    {
+        public override bool CanConvert(Type sourceType, Type targetType) => false;
+        public override object? Convert(Type sourceType, Type targetType, object? value) => value;
     }
 }
