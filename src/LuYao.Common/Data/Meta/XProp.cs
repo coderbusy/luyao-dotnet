@@ -114,4 +114,12 @@ public class XProp : IXProp
         if (_setter is null) throw new InvalidOperationException($"属性 {Name} 不可写。");
         _setter(instance, value);
     }
+
+    /// <summary>
+    /// 获取属性上标记的指定类型特性；若未标记则返回 <see langword="null"/>。
+    /// </summary>
+    /// <typeparam name="T">要查找的特性类型。</typeparam>
+    /// <returns>特性实例，或 <see langword="null"/>。</returns>
+    public T? GetCustomAttribute<T>() where T : Attribute
+        => _property.GetCustomAttribute<T>(inherit: true);
 }

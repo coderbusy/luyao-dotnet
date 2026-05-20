@@ -21,6 +21,17 @@ partial class RecordTable
     }
 
     /// <summary>
+    /// 根据单个对象创建一个 <see cref="RecordTable"/>，使用指定的映射选项，自动推断列结构并写入一行数据。
+    /// </summary>
+    public static RecordTable From<T>(T data, RecordMappingOptions options) where T : class
+    {
+        var re = new RecordTable();
+        re.Columns.AddFrom<T>(options);
+        re.AddRowFrom(data, options);
+        return re;
+    }
+
+    /// <summary>
     /// 根据单个对象创建一个 <see cref="RecordTable"/>，自动推断列结构并写入一行数据，同时返回该行的引用。
     /// </summary>
     /// <typeparam name="T">数据来源的对象类型。</typeparam>
@@ -52,6 +63,19 @@ partial class RecordTable
     }
 
     /// <summary>
+    /// 将当前 <see cref="RecordTable"/> 的第一行转换为 <typeparamref name="T"/> 对象，使用指定的映射选项。
+    /// </summary>
+    public T To<T>(RecordMappingOptions options) where T : class, new()
+    {
+        var ret = new T();
+        if (this.Count > 0)
+        {
+            XCopy<T>.CopyFrom(ret, this[0], options);
+        }
+        return ret;
+    }
+
+    /// <summary>
     /// 根据对象集合创建一个 <see cref="RecordTable"/>，自动推断列结构并将每个对象写入一行。
     /// </summary>
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
@@ -62,6 +86,17 @@ partial class RecordTable
         var re = new RecordTable();
         re.Columns.AddFrom<T>();
         re.AddRowsFromList(items);
+        return re;
+    }
+
+    /// <summary>
+    /// 根据对象集合创建一个 <see cref="RecordTable"/>，使用指定的映射选项，自动推断列结构并将每个对象写入一行。
+    /// </summary>
+    public static RecordTable FromList<T>(IEnumerable<T> items, RecordMappingOptions options) where T : class
+    {
+        var re = new RecordTable();
+        re.Columns.AddFrom<T>(options);
+        re.AddRowsFromList(items, options);
         return re;
     }
 
@@ -80,6 +115,17 @@ partial class RecordTable
     }
 
     /// <summary>
+    /// 向当前 <see cref="RecordTable"/> 追加一行，使用指定的映射选项写入 <paramref name="item"/> 的属性值。
+    /// </summary>
+    public RecordRow AddRowFrom<T>(T item, RecordMappingOptions options) where T : class
+    {
+        if (item == null) throw new ArgumentNullException(nameof(item));
+        var ret = this.AddRow();
+        ret.CopyFrom(item, options);
+        return ret;
+    }
+
+    /// <summary>
     /// 向当前 <see cref="RecordTable"/> 批量追加行，每个 <paramref name="items"/> 元素对应一行。
     /// </summary>
     /// <typeparam name="T">集合元素的对象类型。</typeparam>
@@ -87,6 +133,14 @@ partial class RecordTable
     public void AddRowsFromList<T>(IEnumerable<T> items) where T : class
     {
         foreach (var item in items) this.AddRowFrom(item);
+    }
+
+    /// <summary>
+    /// 向当前 <see cref="RecordTable"/> 批量追加行，使用指定的映射选项。
+    /// </summary>
+    public void AddRowsFromList<T>(IEnumerable<T> items, RecordMappingOptions options) where T : class
+    {
+        foreach (var item in items) this.AddRowFrom(item, options);
     }
 
     /// <summary>
@@ -100,6 +154,20 @@ partial class RecordTable
         foreach (var row in this)
         {
             var item = row.To<T>();
+            list.Add(item);
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// 将当前 <see cref="RecordTable"/> 的所有行转换为 <typeparamref name="T"/> 对象列表，使用指定的映射选项。
+    /// </summary>
+    public List<T> ToList<T>(RecordMappingOptions options) where T : class, new()
+    {
+        var list = new List<T>();
+        foreach (var row in this)
+        {
+            var item = row.To<T>(options);
             list.Add(item);
         }
         return list;
@@ -126,4 +194,23 @@ partial class RecordTable
         }
         return dict;
     }
+
+    /// <summary>
+    /// 将当前 <see cref="RecordTable"/> 转换为以第一列为键的字典，使用指定的映射选项。
+    /// </summary>
+    public Dictionary<TKey, T> ToDictionary<TKey, T>(RecordMappingOptions options)
+        where TKey : notnull
+        where T : class, new()
+    {
+        var dict = new Dictionary<TKey, T>();
+        if (this.Count == 0 || this.Columns.Count == 0) return dict;
+        var keyColumn = this.Columns[0];
+        foreach (var row in this)
+        {
+            var key = keyColumn.To<TKey>(row.Row)!;
+            dict[key] = row.To<T>(options);
+        }
+        return dict;
+    }
 }
+

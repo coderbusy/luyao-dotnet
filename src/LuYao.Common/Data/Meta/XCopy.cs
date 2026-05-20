@@ -76,6 +76,51 @@ public static class XCopy
     }
 
     /// <summary>
+    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列，使用指定的映射选项。
+    /// </summary>
+    public static void CopyTo(object data, RecordRow target, RecordMappingOptions options)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        CopyTo(data.GetType(), data, target, options);
+    }
+
+    /// <summary>
+    /// 将 <paramref name="data"/> 中由 <paramref name="type"/> 指定类型的可读属性值写入 <paramref name="target"/> 对应的列，使用指定的映射选项。
+    /// </summary>
+    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
+    /// <param name="data">数据来源对象，不可为 null。</param>
+    /// <param name="target">目标行；若列不存在则静默跳过，<b>不会自动建列</b>。</param>
+    /// <param name="options">映射选项，不可为 null。</param>
+    /// <exception cref="ArgumentNullException">任一参数为 null 时抛出。</exception>
+    /// <exception cref="NotSupportedException">
+    /// <paramref name="options"/> 的 <see cref="RecordMappingOptions.UnsupportedTypeHandling"/> 为
+    /// <see cref="UnsupportedTypeHandling.Throw"/> 且属性类型不受支持时抛出。
+    /// </exception>
+    public static void CopyTo(Type type, object data, RecordRow target, RecordMappingOptions options)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        options.MakeReadOnly();
+        var cols = target.Table.Columns;
+        foreach (var prop in XProp.GetAll(type))
+        {
+            if (!prop.CanRead) continue;
+            if (!Helpers.IsSupportedForReading(prop))
+            {
+                if (options.UnsupportedTypeHandling == UnsupportedTypeHandling.Throw)
+                    throw new NotSupportedException(
+                        $"属性 '{prop.Name}' 的类型 '{prop.Type.FullName}' 不受支持，无法写入 RecordTable。");
+                continue;
+            }
+            var colName = ColumnNameResolver.Resolve(prop, options);
+            var col = cols.Find(colName);
+            if (col == null) continue;
+            col.Set(target, prop.GetValue(data));
+        }
+    }
+
+    /// <summary>
     /// 将 <paramref name="source"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
     /// 使用运行时实际类型扫描属性，派生类新增属性会被正确处理。
     /// </summary>
@@ -87,6 +132,7 @@ public static class XCopy
         if (data == null) throw new ArgumentNullException(nameof(data));
         CopyFrom(data.GetType(), data, source);
     }
+
     /// <summary>
     /// 将 <paramref name="source"/> 中与由 <paramref name="type"/> 指定类型属性同名的列值写回对象 <paramref name="data"/>。
     /// 适用于需要按声明类型（而非运行时类型）扫描属性的场景。
@@ -109,6 +155,61 @@ public static class XCopy
     }
 
     /// <summary>
+    /// 将 <paramref name="source"/> 中的列值写回对象 <paramref name="data"/>，使用指定的映射选项。
+    /// </summary>
+    public static void CopyFrom(object data, RecordRow source, RecordMappingOptions options)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        CopyFrom(data.GetType(), data, source, options);
+    }
+
+    /// <summary>
+    /// 将 <paramref name="source"/> 中与由 <paramref name="type"/> 指定类型属性对应的列值写回对象 <paramref name="data"/>，
+    /// 使用指定的映射选项（支持自定义转换器与列名策略）。
+    /// </summary>
+    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
+    /// <param name="data">目标对象，不可为 null。</param>
+    /// <param name="source">数据来源行。</param>
+    /// <param name="options">映射选项，不可为 null。</param>
+    /// <exception cref="ArgumentNullException">任一参数为 null 时抛出。</exception>
+    public static void CopyFrom(Type type, object data, RecordRow source, RecordMappingOptions options)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        options.MakeReadOnly();
+        var cols = source.Table.Columns;
+        foreach (var prop in XProp.GetAll(type))
+        {
+            if (!prop.CanWrite) continue;
+            var colName = ColumnNameResolver.Resolve(prop, options);
+            var col = cols.Find(colName);
+            if (col == null) continue;
+
+            var converter = options.GetConverter(prop.Type);
+            if (converter == null && !Helpers.IsSupportedForWriting(prop))
+            {
+                if (options.ConversionFailureHandling == ConversionFailureHandling.Throw)
+                    throw new NotSupportedException(
+                        $"属性 '{prop.Name}' 的类型 '{prop.Type.FullName}' 不受支持，且未注册自定义转换器。");
+                continue;
+            }
+
+            try
+            {
+                if (converter != null)
+                    prop.SetValue(data, converter(col.Get(source)));
+                else
+                    prop.SetValue(data, col.Get(source));
+            }
+            catch (Exception) when (options.ConversionFailureHandling == ConversionFailureHandling.Skip)
+            {
+                // 转换失败时跳过，属性保持默认值
+            }
+        }
+    }
+
+    /// <summary>
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
     /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
     /// 使用运行时实际类型扫描属性，派生类新增属性会被正确处理。
@@ -121,6 +222,7 @@ public static class XCopy
         if (data == null) throw new ArgumentNullException(nameof(data));
         WriteTo(data.GetType(), data, target);
     }
+
     /// <summary>
     /// 将 <paramref name="data"/> 中由 <paramref name="type"/> 指定类型的可读属性值写入 <paramref name="target"/> 对应的列。
     /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
@@ -138,6 +240,46 @@ public static class XCopy
         foreach (var prop in GetReadableProps(type))
         {
             var col = cols.Find(prop.Name) ?? cols.Add(prop.Name, prop.Type);
+            col.Set(target, prop.GetValue(data));
+        }
+    }
+
+    /// <summary>
+    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列（自动建列），使用指定的映射选项。
+    /// </summary>
+    public static void WriteTo(object data, RecordRow target, RecordMappingOptions options)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        WriteTo(data.GetType(), data, target, options);
+    }
+
+    /// <summary>
+    /// 将 <paramref name="data"/> 中由 <paramref name="type"/> 指定类型的可读属性值写入 <paramref name="target"/> 对应的列（自动建列），
+    /// 使用指定的映射选项。
+    /// </summary>
+    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
+    /// <param name="data">数据来源对象，不可为 null。</param>
+    /// <param name="target">目标行。</param>
+    /// <param name="options">映射选项，不可为 null。</param>
+    public static void WriteTo(Type type, object data, RecordRow target, RecordMappingOptions options)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        options.MakeReadOnly();
+        var cols = target.Table.Columns;
+        foreach (var prop in XProp.GetAll(type))
+        {
+            if (!prop.CanRead) continue;
+            if (!Helpers.IsSupportedForReading(prop))
+            {
+                if (options.UnsupportedTypeHandling == UnsupportedTypeHandling.Throw)
+                    throw new NotSupportedException(
+                        $"属性 '{prop.Name}' 的类型 '{prop.Type.FullName}' 不受支持，无法写入 RecordTable。");
+                continue;
+            }
+            var colName = ColumnNameResolver.Resolve(prop, options);
+            var col = cols.Find(colName) ?? cols.Add(colName, prop.Type);
             col.Set(target, prop.GetValue(data));
         }
     }
@@ -162,6 +304,9 @@ public static class XCopy<T> where T : class
     /// <param name="target">目标行；若列不存在则静默跳过，<b>不会自动建列</b>。</param>
     public static void CopyTo(T data, RecordRow target) => XCopy.CopyTo(typeof(T), data, target);
 
+    /// <summary>将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列，使用指定的映射选项。</summary>
+    public static void CopyTo(T data, RecordRow target, RecordMappingOptions options) => XCopy.CopyTo(typeof(T), data, target, options);
+
     /// <summary>
     /// 将 <paramref name="source"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
     /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
@@ -170,6 +315,9 @@ public static class XCopy<T> where T : class
     /// <param name="data">目标对象。</param>
     /// <param name="source">数据来源行。</param>
     public static void CopyFrom(T data, RecordRow source) => XCopy.CopyFrom(typeof(T), data, source);
+
+    /// <summary>将 <paramref name="source"/> 中的列值写回对象 <paramref name="data"/>，使用指定的映射选项。</summary>
+    public static void CopyFrom(T data, RecordRow source, RecordMappingOptions options) => XCopy.CopyFrom(typeof(T), data, source, options);
 
     /// <summary>
     /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
@@ -180,6 +328,9 @@ public static class XCopy<T> where T : class
     /// <param name="data">数据来源对象。</param>
     /// <param name="target">目标行。</param>
     public static void WriteTo(T data, RecordRow target) => XCopy.WriteTo(typeof(T), data, target);
+
+    /// <summary>将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列（自动建列），使用指定的映射选项。</summary>
+    public static void WriteTo(T data, RecordRow target, RecordMappingOptions options) => XCopy.WriteTo(typeof(T), data, target, options);
     #endregion
 }
 

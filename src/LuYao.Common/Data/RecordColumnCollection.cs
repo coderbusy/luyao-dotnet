@@ -240,6 +240,36 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     }
 
     /// <summary>
+    /// 按照类型 <typeparamref name="T"/> 的可读属性向当前集合追加对应的列定义，使用指定的映射选项。
+    /// </summary>
+    /// <typeparam name="T">提供列定义的对象类型。</typeparam>
+    /// <param name="options">映射选项，不可为 null。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> 为 null 时抛出。</exception>
+    /// <exception cref="NotSupportedException">
+    /// <paramref name="options"/> 的 <see cref="RecordMappingOptions.UnsupportedTypeHandling"/> 为
+    /// <see cref="UnsupportedTypeHandling.Throw"/> 且存在不受支持的属性类型时抛出。
+    /// </exception>
+    public void AddFrom<T>(RecordMappingOptions options) where T : class
+    {
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        options.MakeReadOnly();
+        var props = XProp.GetAll(typeof(T));
+        foreach (var p in props)
+        {
+            if (!p.CanRead) continue;
+            if (!Helpers.IsSupportedForReading(p))
+            {
+                if (options.UnsupportedTypeHandling == UnsupportedTypeHandling.Throw)
+                    throw new NotSupportedException(
+                        $"属性 '{p.Name}' 的类型 '{p.Type.FullName}' 不受支持，无法作为 RecordTable 列。");
+                continue;
+            }
+            var colName = ColumnNameResolver.Resolve(p, options);
+            this.Add(colName, p.Type);
+        }
+    }
+
+    /// <summary>
     /// 根据对象实例（例如匿名类型实例）的可读属性向当前集合追加对应的列定义。
     /// </summary>
     /// <typeparam name="T">提供列定义的对象类型。</typeparam>
