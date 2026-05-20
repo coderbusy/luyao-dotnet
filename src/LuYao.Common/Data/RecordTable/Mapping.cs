@@ -7,11 +7,12 @@ namespace LuYao.Data;
 partial class RecordTable
 {
     /// <summary>
-    /// 根据单个对象创建一个 <see cref="RecordTable"/>，自动推断列结构并写入一行数据。
+    /// Creates a <see cref="RecordTable"/> from a single object, inferring the column structure
+    /// automatically and writing one row of data.
     /// </summary>
-    /// <typeparam name="T">数据来源的对象类型。</typeparam>
-    /// <param name="data">用于初始化列结构和行数据的对象实例。</param>
-    /// <returns>包含一行数据的新 <see cref="RecordTable"/>。</returns>
+    /// <typeparam name="T">The source object type.</typeparam>
+    /// <param name="data">The object used to infer columns and populate the row.</param>
+    /// <returns>A new <see cref="RecordTable"/> containing one row.</returns>
     public static RecordTable From<T>(T data) where T : class
     {
         var re = new RecordTable();
@@ -21,12 +22,25 @@ partial class RecordTable
     }
 
     /// <summary>
-    /// 根据单个对象创建一个 <see cref="RecordTable"/>，自动推断列结构并写入一行数据，同时返回该行的引用。
+    /// Creates a <see cref="RecordTable"/> from a single object using the specified mapping options,
+    /// inferring the column structure automatically and writing one row of data.
     /// </summary>
-    /// <typeparam name="T">数据来源的对象类型。</typeparam>
-    /// <param name="data">用于初始化列结构和行数据的对象实例。</param>
-    /// <param name="row">返回新添加的行引用。</param>
-    /// <returns>包含一行数据的新 <see cref="RecordTable"/>。</returns>
+    public static RecordTable From<T>(T data, RecordMappingOptions options) where T : class
+    {
+        var re = new RecordTable();
+        re.Columns.AddFrom<T>(options);
+        re.AddRowFrom(data, options);
+        return re;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="RecordTable"/> from a single object, inferring the column structure
+    /// automatically, writing one row, and returning a reference to that row.
+    /// </summary>
+    /// <typeparam name="T">The source object type.</typeparam>
+    /// <param name="data">The object used to infer columns and populate the row.</param>
+    /// <param name="row">Returns a reference to the newly added row.</param>
+    /// <returns>A new <see cref="RecordTable"/> containing one row.</returns>
     public static RecordTable From<T>(T data, out RecordRow row) where T : class
     {
         var re = new RecordTable();
@@ -36,27 +50,59 @@ partial class RecordTable
     }
 
     /// <summary>
-    /// 将当前 <see cref="RecordTable"/> 的第一行转换为 <typeparamref name="T"/> 对象。
-    /// 如果 <see cref="RecordTable"/> 没有任何行，则返回一个使用无参构造函数创建的默认实例。
+    /// Creates a <see cref="RecordTable"/> from a single object using the specified mapping options,
+    /// inferring the column structure automatically, writing one row, and returning a reference to that row.
     /// </summary>
-    /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
-    /// <returns>转换后的对象实例。</returns>
+    /// <typeparam name="T">The source object type.</typeparam>
+    /// <param name="data">The object used to infer columns and populate the row.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    /// <param name="row">Returns a reference to the newly added row.</param>
+    /// <returns>A new <see cref="RecordTable"/> containing one row.</returns>
+    public static RecordTable From<T>(T data, RecordMappingOptions options, out RecordRow row) where T : class
+    {
+        var re = new RecordTable();
+        re.Columns.AddFrom<T>(options);
+        row = re.AddRowFrom(data, options);
+        return re;
+    }
+
+    /// <summary>
+    /// Converts the first row of the current <see cref="RecordTable"/> to a <typeparamref name="T"/> object.
+    /// If the table has no rows, a default instance created by the parameterless constructor is returned.
+    /// </summary>
+    /// <typeparam name="T">Target object type; must have a parameterless constructor.</typeparam>
+    /// <returns>The converted object instance.</returns>
     public T To<T>() where T : class, new()
     {
         var ret = new T();
         if (this.Count > 0)
         {
-            XCopy<T>.CopyFrom(ret, this[0]);
+            XCopy<T>.MapFrom(ret, this[0]);
         }
         return ret;
     }
 
     /// <summary>
-    /// 根据对象集合创建一个 <see cref="RecordTable"/>，自动推断列结构并将每个对象写入一行。
+    /// Converts the first row of the current <see cref="RecordTable"/> to a <typeparamref name="T"/> object
+    /// using the specified mapping options.
     /// </summary>
-    /// <typeparam name="T">集合元素的对象类型。</typeparam>
-    /// <param name="items">用于填充行数据的对象集合。</param>
-    /// <returns>包含与集合等量行数据的新 <see cref="RecordTable"/>。</returns>
+    public T To<T>(RecordMappingOptions options) where T : class, new()
+    {
+        var ret = new T();
+        if (this.Count > 0)
+        {
+            XCopy<T>.MapFrom(ret, this[0], options);
+        }
+        return ret;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="RecordTable"/> from a collection of objects, inferring the column
+    /// structure automatically and writing each object as one row.
+    /// </summary>
+    /// <typeparam name="T">The collection element type.</typeparam>
+    /// <param name="items">The collection of objects used to populate the rows.</param>
+    /// <returns>A new <see cref="RecordTable"/> with the same number of rows as elements in the collection.</returns>
     public static RecordTable FromList<T>(IEnumerable<T> items) where T : class
     {
         var re = new RecordTable();
@@ -66,34 +112,68 @@ partial class RecordTable
     }
 
     /// <summary>
-    /// 向当前 <see cref="RecordTable"/> 追加一行，并将 <paramref name="item"/> 的属性值写入该行。
+    /// Creates a <see cref="RecordTable"/> from a collection of objects using the specified mapping options,
+    /// inferring the column structure automatically and writing each object as one row.
     /// </summary>
-    /// <typeparam name="T">数据来源的对象类型。</typeparam>
-    /// <param name="item">要追加的对象实例，不能为 <see langword="null"/>。</param>
-    /// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <see langword="null"/>。</exception>
+    public static RecordTable FromList<T>(IEnumerable<T> items, RecordMappingOptions options) where T : class
+    {
+        var re = new RecordTable();
+        re.Columns.AddFrom<T>(options);
+        re.AddRowsFromList(items, options);
+        return re;
+    }
+
+    /// <summary>
+    /// Appends a new row to the current <see cref="RecordTable"/> and writes the properties of
+    /// <paramref name="item"/> into it.
+    /// </summary>
+    /// <typeparam name="T">The source object type.</typeparam>
+    /// <param name="item">The object to append; must not be <see langword="null"/>.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="item"/> is <see langword="null"/>.</exception>
     public RecordRow AddRowFrom<T>(T item) where T : class
     {
         if (item == null) throw new ArgumentNullException(nameof(item));
         var ret = this.AddRow();
-        ret.CopyFrom(item);
+        ret.MapFrom(item);
         return ret;
     }
 
     /// <summary>
-    /// 向当前 <see cref="RecordTable"/> 批量追加行，每个 <paramref name="items"/> 元素对应一行。
+    /// Appends a new row to the current <see cref="RecordTable"/> and writes the properties of
+    /// <paramref name="item"/> into it using the specified mapping options.
     /// </summary>
-    /// <typeparam name="T">集合元素的对象类型。</typeparam>
-    /// <param name="items">要批量追加的对象集合。</param>
+    public RecordRow AddRowFrom<T>(T item, RecordMappingOptions options) where T : class
+    {
+        if (item == null) throw new ArgumentNullException(nameof(item));
+        var ret = this.AddRow();
+        ret.MapFrom(item, options);
+        return ret;
+    }
+
+    /// <summary>
+    /// Appends one row per element in <paramref name="items"/> to the current <see cref="RecordTable"/>.
+    /// </summary>
+    /// <typeparam name="T">The collection element type.</typeparam>
+    /// <param name="items">The objects to append.</param>
     public void AddRowsFromList<T>(IEnumerable<T> items) where T : class
     {
         foreach (var item in items) this.AddRowFrom(item);
     }
 
     /// <summary>
-    /// 将当前 <see cref="RecordTable"/> 的所有行转换为 <typeparamref name="T"/> 对象列表。
+    /// Appends one row per element in <paramref name="items"/> to the current <see cref="RecordTable"/>
+    /// using the specified mapping options.
     /// </summary>
-    /// <typeparam name="T">目标对象类型，必须有无参构造函数。</typeparam>
-    /// <returns>与行数等量的对象列表。</returns>
+    public void AddRowsFromList<T>(IEnumerable<T> items, RecordMappingOptions options) where T : class
+    {
+        foreach (var item in items) this.AddRowFrom(item, options);
+    }
+
+    /// <summary>
+    /// Converts all rows in the current <see cref="RecordTable"/> to a list of <typeparamref name="T"/> objects.
+    /// </summary>
+    /// <typeparam name="T">Target object type; must have a parameterless constructor.</typeparam>
+    /// <returns>A list with the same number of elements as rows.</returns>
     public List<T> ToList<T>() where T : class, new()
     {
         var list = new List<T>();
@@ -106,12 +186,28 @@ partial class RecordTable
     }
 
     /// <summary>
-    /// 将当前 <see cref="RecordTable"/> 转换为以第一列为键的字典。
-    /// 如果没有行或没有列，则返回空字典；键重复时后者覆盖前者。
+    /// Converts all rows in the current <see cref="RecordTable"/> to a list of <typeparamref name="T"/> objects
+    /// using the specified mapping options.
     /// </summary>
-    /// <typeparam name="TKey">键类型，对应第一列的值类型。</typeparam>
-    /// <typeparam name="T">值类型，必须有无参构造函数。</typeparam>
-    /// <returns>以第一列值为键、行对象为值的字典。</returns>
+    public List<T> ToList<T>(RecordMappingOptions options) where T : class, new()
+    {
+        var list = new List<T>();
+        foreach (var row in this)
+        {
+            var item = row.To<T>(options);
+            list.Add(item);
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// Converts the current <see cref="RecordTable"/> to a dictionary keyed by the first column.
+    /// Returns an empty dictionary when there are no rows or no columns.
+    /// Duplicate keys are overwritten by the later occurrence.
+    /// </summary>
+    /// <typeparam name="TKey">Key type; corresponds to the value type of the first column.</typeparam>
+    /// <typeparam name="T">Value type; must have a parameterless constructor.</typeparam>
+    /// <returns>A dictionary keyed by the first column's value with row objects as values.</returns>
     public Dictionary<TKey, T> ToDictionary<TKey, T>()
         where TKey : notnull
         where T : class, new()
@@ -126,4 +222,24 @@ partial class RecordTable
         }
         return dict;
     }
+
+    /// <summary>
+    /// Converts the current <see cref="RecordTable"/> to a dictionary keyed by the first column,
+    /// using the specified mapping options.
+    /// </summary>
+    public Dictionary<TKey, T> ToDictionary<TKey, T>(RecordMappingOptions options)
+        where TKey : notnull
+        where T : class, new()
+    {
+        var dict = new Dictionary<TKey, T>();
+        if (this.Count == 0 || this.Columns.Count == 0) return dict;
+        var keyColumn = this.Columns[0];
+        foreach (var row in this)
+        {
+            var key = keyColumn.To<TKey>(row.Row)!;
+            dict[key] = row.To<T>(options);
+        }
+        return dict;
+    }
 }
+

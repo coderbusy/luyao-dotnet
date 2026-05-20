@@ -231,12 +231,23 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     /// <typeparam name="T">提供列定义的对象类型。</typeparam>
     public void AddFrom<T>() where T : class
     {
-        var props = XProp.GetAll(typeof(T));
-        foreach (var p in props)
-        {
-            if (!Helpers.IsSupportedForReading(p)) continue;
-            this.Add(p.Name, p.Type);
-        }
+        AddFrom<T>(RecordMappingOptions.Default);
+    }
+
+    /// <summary>
+    /// 按照类型 <typeparamref name="T"/> 的可读属性向当前集合追加对应的列定义，使用指定的映射选项。
+    /// </summary>
+    /// <typeparam name="T">提供列定义的对象类型。</typeparam>
+    /// <param name="options">映射选项，不可为 null。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> 为 null 时抛出。</exception>
+    /// <exception cref="NotSupportedException">
+    /// <paramref name="options"/> 的 <see cref="RecordMappingOptions.UnsupportedTypeHandling"/> 为
+    /// <see cref="UnsupportedTypeHandling.Throw"/> 且存在不受支持的属性类型时抛出。
+    /// </exception>
+    public void AddFrom<T>(RecordMappingOptions options) where T : class
+    {
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        new RecordMappingContext(options).AddColumnsFrom<T>(this);
     }
 
     /// <summary>

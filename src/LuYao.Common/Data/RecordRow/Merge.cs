@@ -32,18 +32,20 @@ partial struct RecordRow
     public void Merge(object model)
     {
         if (model == null) throw new ArgumentNullException(nameof(model));
-        var props = XProp.GetAll(model.GetType());
-        foreach (var prop in props)
-        {
-            if (!prop.CanRead) continue;
-            if (!Helpers.IsSupportedForReading(prop)) continue;
-            var value = prop.GetValue(model);
-            var col = this.Table.Columns.Find(prop.Name);
-            if (col == null)
-            {
-                col = this.Table.Columns.Add(prop.Name, prop.Type);
-            }
-            col.Set(this, value);
-        }
+        Merge(model, RecordMappingOptions.Default);
+    }
+
+    /// <summary>
+    /// 将对象 <paramref name="model"/> 的可读属性合并到当前行：同名列直接覆盖，当前行不存在的列则追加。
+    /// 使用运行时实际类型，派生类新增属性会被正确处理。
+    /// </summary>
+    /// <param name="model">属性值的来源对象，不可为 null。</param>
+    /// <param name="options">映射选项，不可为 null。</param>
+    /// <exception cref="ArgumentNullException">任一参数为 null 时抛出。</exception>
+    public void Merge(object model, RecordMappingOptions options)
+    {
+        if (model == null) throw new ArgumentNullException(nameof(model));
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        new RecordMappingContext(options).WriteDtoToRow(model.GetType(), model, this);
     }
 }

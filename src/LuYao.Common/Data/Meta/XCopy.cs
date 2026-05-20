@@ -5,9 +5,13 @@ using System.Collections.Generic;
 namespace LuYao.Data.Meta;
 
 /// <summary>
-/// 提供在对象与 <see cref="RecordRow"/> 之间进行属性双向复制的静态工具类。
-/// 以运行时实际类型为键缓存属性列表，天然支持派生类的新增属性。
+/// Static utility class for bidirectional property mapping between objects and <see cref="RecordRow"/>.
+/// Property lists are cached keyed by runtime type, so derived-class properties are handled naturally.
 /// </summary>
+/// <remarks>
+/// All mapping logic is delegated to <see cref="RecordMappingContext"/>.
+/// Overloads without options are equivalent to using <see cref="RecordMappingOptions.Default"/>.
+/// </remarks>
 public static class XCopy
 {
     private static readonly ConcurrentDictionary<Type, IReadOnlyList<XProp>> _readableCache
@@ -40,158 +44,253 @@ public static class XCopy
         });
 
     #region RecordRow
+
     /// <summary>
-    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
-    /// 使用运行时实际类型扫描属性，派生类新增属性会被正确处理。
+    /// Maps readable properties of <paramref name="data"/> into the corresponding columns of
+    /// <paramref name="target"/>. Uses the runtime type to scan properties.
+    /// Columns that do not exist are silently skipped; no columns are created.
     /// </summary>
-    /// <param name="data">数据来源对象，不可为 null。</param>
-    /// <param name="target">目标行；若列不存在则静默跳过，<b>不会自动建列</b>。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
-    public static void CopyTo(object data, RecordRow target)
+    /// <param name="data">Source object; must not be null.</param>
+    /// <param name="target">Target row.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
+    public static void MapTo(object data, RecordRow target)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
-        CopyTo(data.GetType(), data, target);
+        MapTo(data.GetType(), data, target, RecordMappingOptions.Default);
     }
 
     /// <summary>
-    /// 将 <paramref name="data"/> 中由 <paramref name="type"/> 指定类型的可读属性值写入 <paramref name="target"/> 对应的列。
-    /// 适用于需要按声明类型（而非运行时类型）扫描属性的场景。
-    /// 若目标行所在表中不存在对应列，则静默跳过，<b>不会自动建列</b>。
+    /// Maps readable properties of the <paramref name="type"/>-declared members on <paramref name="data"/>
+    /// into the corresponding columns of <paramref name="target"/>.
+    /// Columns that do not exist are silently skipped; no columns are created.
     /// </summary>
-    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
-    /// <param name="data">数据来源对象，不可为 null。</param>
-    /// <param name="target">目标行。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="type"/> 或 <paramref name="data"/> 为 null 时抛出。</exception>
-    public static void CopyTo(Type type, object data, RecordRow target)
+    /// <param name="type">Declared type used to scan properties; must not be null.</param>
+    /// <param name="data">Source object; must not be null.</param>
+    /// <param name="target">Target row.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> or <paramref name="data"/> is null.</exception>
+    public static void MapTo(Type type, object data, RecordRow target)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));
         if (data == null) throw new ArgumentNullException(nameof(data));
-        var cols = target.Table.Columns;
-        foreach (var prop in GetReadableProps(type))
-        {
-            var col = cols.Find(prop.Name);
-            if (col == null) continue;
-            col.Set(target, prop.GetValue(data));
-        }
+        MapTo(type, data, target, RecordMappingOptions.Default);
     }
 
     /// <summary>
-    /// 将 <paramref name="source"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
-    /// 使用运行时实际类型扫描属性，派生类新增属性会被正确处理。
+    /// Maps readable properties of <paramref name="data"/> into the corresponding columns of
+    /// <paramref name="target"/> using the specified options.
+    /// Columns that do not exist are silently skipped; no columns are created.
     /// </summary>
-    /// <param name="data">目标对象，不可为 null。</param>
-    /// <param name="source">数据来源行。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
-    public static void CopyFrom(object data, RecordRow source)
+    /// <param name="data">Source object; must not be null.</param>
+    /// <param name="target">Target row.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+    public static void MapTo(object data, RecordRow target, RecordMappingOptions options)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
-        CopyFrom(data.GetType(), data, source);
+        MapTo(data.GetType(), data, target, options);
     }
+
     /// <summary>
-    /// 将 <paramref name="source"/> 中与由 <paramref name="type"/> 指定类型属性同名的列值写回对象 <paramref name="data"/>。
-    /// 适用于需要按声明类型（而非运行时类型）扫描属性的场景。
+    /// Maps readable properties of the <paramref name="type"/>-declared members on <paramref name="data"/>
+    /// into the corresponding columns of <paramref name="target"/> using the specified options.
+    /// Columns that do not exist are silently skipped; no columns are created.
     /// </summary>
-    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
-    /// <param name="data">目标对象，不可为 null。</param>
-    /// <param name="source">数据来源行。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="type"/> 或 <paramref name="data"/> 为 null 时抛出。</exception>
-    public static void CopyFrom(Type type, object data, RecordRow source)
+    /// <param name="type">Declared type used to scan properties; must not be null.</param>
+    /// <param name="data">Source object; must not be null.</param>
+    /// <param name="target">Target row.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+    public static void MapTo(Type type, object data, RecordRow target, RecordMappingOptions options)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));
         if (data == null) throw new ArgumentNullException(nameof(data));
-        var cols = source.Table.Columns;
-        foreach (var prop in GetWritableProps(type))
-        {
-            var col = cols.Find(prop.Name);
-            if (col == null) continue;
-            prop.SetValue(data, col.Get(source));
-        }
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        new RecordMappingContext(options).MapDtoToRow(type, data, target);
     }
 
     /// <summary>
-    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
-    /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
-    /// 使用运行时实际类型扫描属性，派生类新增属性会被正确处理。
+    /// Maps column values from <paramref name="source"/> that correspond to object properties
+    /// into <paramref name="data"/>. Uses the runtime type to scan properties.
     /// </summary>
-    /// <param name="data">数据来源对象，不可为 null。</param>
-    /// <param name="target">目标行。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
+    /// <param name="data">Target object; must not be null.</param>
+    /// <param name="source">Source row.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
+    public static void MapFrom(object data, RecordRow source)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        MapFrom(data.GetType(), data, source, RecordMappingOptions.Default);
+    }
+
+    /// <summary>
+    /// Maps column values from <paramref name="source"/> that correspond to
+    /// <paramref name="type"/>-declared properties into <paramref name="data"/>.
+    /// </summary>
+    /// <param name="type">Declared type used to scan properties; must not be null.</param>
+    /// <param name="data">Target object; must not be null.</param>
+    /// <param name="source">Source row.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> or <paramref name="data"/> is null.</exception>
+    public static void MapFrom(Type type, object data, RecordRow source)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        MapFrom(type, data, source, RecordMappingOptions.Default);
+    }
+
+    /// <summary>
+    /// Maps column values from <paramref name="source"/> into <paramref name="data"/>
+    /// using the specified options.
+    /// </summary>
+    /// <param name="data">Target object; must not be null.</param>
+    /// <param name="source">Source row.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+    public static void MapFrom(object data, RecordRow source, RecordMappingOptions options)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        MapFrom(data.GetType(), data, source, options);
+    }
+
+    /// <summary>
+    /// Maps column values from <paramref name="source"/> that correspond to
+    /// <paramref name="type"/>-declared properties into <paramref name="data"/>
+    /// using the specified options (supports custom converters and column-name strategies).
+    /// </summary>
+    /// <param name="type">Declared type used to scan properties; must not be null.</param>
+    /// <param name="data">Target object; must not be null.</param>
+    /// <param name="source">Source row.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+    public static void MapFrom(Type type, object data, RecordRow source, RecordMappingOptions options)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        new RecordMappingContext(options).MapRowToDto(type, data, source);
+    }
+
+    /// <summary>
+    /// Writes readable properties of <paramref name="data"/> into the corresponding columns of
+    /// <paramref name="target"/>, creating missing columns automatically.
+    /// Uses the runtime type to scan properties.
+    /// </summary>
+    /// <param name="data">Source object; must not be null.</param>
+    /// <param name="target">Target row.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
     public static void WriteTo(object data, RecordRow target)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
-        WriteTo(data.GetType(), data, target);
+        WriteTo(data.GetType(), data, target, RecordMappingOptions.Default);
     }
+
     /// <summary>
-    /// 将 <paramref name="data"/> 中由 <paramref name="type"/> 指定类型的可读属性值写入 <paramref name="target"/> 对应的列。
-    /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
-    /// 适用于需要按声明类型（而非运行时类型）扫描属性的场景。
+    /// Writes readable properties of the <paramref name="type"/>-declared members on <paramref name="data"/>
+    /// into the corresponding columns of <paramref name="target"/>, creating missing columns automatically.
     /// </summary>
-    /// <param name="type">用于扫描属性的声明类型，不可为 null。</param>
-    /// <param name="data">数据来源对象，不可为 null。</param>
-    /// <param name="target">目标行。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="type"/> 或 <paramref name="data"/> 为 null 时抛出。</exception>
+    /// <param name="type">Declared type used to scan properties; must not be null.</param>
+    /// <param name="data">Source object; must not be null.</param>
+    /// <param name="target">Target row.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> or <paramref name="data"/> is null.</exception>
     public static void WriteTo(Type type, object data, RecordRow target)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));
         if (data == null) throw new ArgumentNullException(nameof(data));
-        var cols = target.Table.Columns;
-        foreach (var prop in GetReadableProps(type))
-        {
-            var col = cols.Find(prop.Name) ?? cols.Add(prop.Name, prop.Type);
-            col.Set(target, prop.GetValue(data));
-        }
+        WriteTo(type, data, target, RecordMappingOptions.Default);
     }
+
+    /// <summary>
+    /// Writes readable properties of <paramref name="data"/> into the corresponding columns of
+    /// <paramref name="target"/> (auto-creating columns), using the specified options.
+    /// </summary>
+    /// <param name="data">Source object; must not be null.</param>
+    /// <param name="target">Target row.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+    public static void WriteTo(object data, RecordRow target, RecordMappingOptions options)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        WriteTo(data.GetType(), data, target, options);
+    }
+
+    /// <summary>
+    /// Writes readable properties of the <paramref name="type"/>-declared members on <paramref name="data"/>
+    /// into the corresponding columns of <paramref name="target"/> (auto-creating columns),
+    /// using the specified options.
+    /// </summary>
+    /// <param name="type">Declared type used to scan properties; must not be null.</param>
+    /// <param name="data">Source object; must not be null.</param>
+    /// <param name="target">Target row.</param>
+    /// <param name="options">Mapping options; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+    public static void WriteTo(Type type, object data, RecordRow target, RecordMappingOptions options)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        new RecordMappingContext(options).WriteDtoToRow(type, data, target);
+    }
+
     #endregion
 }
 
 /// <summary>
-/// 提供在强类型对象与 <see cref="RecordRow"/> 之间进行属性双向复制的静态工具类。
-/// 为 <see cref="XCopy"/> 的泛型薄封装，固定按编译期类型 <typeparamref name="T"/> 扫描属性，
-/// 逻辑委托给 <see cref="XCopy"/> 的显式 <see cref="Type"/> 重载。
+/// Generic thin wrapper over <see cref="XCopy"/> that fixes the scan type to the
+/// compile-time type <typeparamref name="T"/>. All logic is delegated to the explicit
+/// <see cref="Type"/> overloads of <see cref="XCopy"/>.
 /// </summary>
-/// <typeparam name="T">要映射的对象类型，必须为引用类型。</typeparam>
+/// <typeparam name="T">The object type to map; must be a reference type.</typeparam>
 public static class XCopy<T> where T : class
 {
     #region RecordRow
     /// <summary>
-    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
-    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
-    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
+    /// Maps readable properties of <paramref name="data"/> into the corresponding columns of
+    /// <paramref name="target"/>. Always scans using the compile-time type <typeparamref name="T"/>;
+    /// derived-class properties are not processed even if the runtime type is a subclass.
     /// </summary>
-    /// <param name="data">数据来源对象。</param>
-    /// <param name="target">目标行；若列不存在则静默跳过，<b>不会自动建列</b>。</param>
-    public static void CopyTo(T data, RecordRow target) => XCopy.CopyTo(typeof(T), data, target);
+    /// <param name="data">Source object.</param>
+    /// <param name="target">Target row; columns that do not exist are silently skipped, <b>no columns are created</b>.</param>
+    public static void MapTo(T data, RecordRow target) => XCopy.MapTo(typeof(T), data, target);
+
+    /// <summary>Maps readable properties of <paramref name="data"/> into the corresponding columns of <paramref name="target"/> using the specified options.</summary>
+    public static void MapTo(T data, RecordRow target, RecordMappingOptions options) => XCopy.MapTo(typeof(T), data, target, options);
 
     /// <summary>
-    /// 将 <paramref name="source"/> 中与对象属性同名的列值写回对象 <paramref name="data"/>。
-    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
-    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
+    /// Maps column values from <paramref name="source"/> that match object properties
+    /// into <paramref name="data"/>. Always scans using the compile-time type <typeparamref name="T"/>;
+    /// derived-class properties are not processed even if the runtime type is a subclass.
     /// </summary>
-    /// <param name="data">目标对象。</param>
-    /// <param name="source">数据来源行。</param>
-    public static void CopyFrom(T data, RecordRow source) => XCopy.CopyFrom(typeof(T), data, source);
+    /// <param name="data">Target object.</param>
+    /// <param name="source">Source row.</param>
+    public static void MapFrom(T data, RecordRow source) => XCopy.MapFrom(typeof(T), data, source);
+
+    /// <summary>Maps column values from <paramref name="source"/> into <paramref name="data"/> using the specified options.</summary>
+    public static void MapFrom(T data, RecordRow source, RecordMappingOptions options) => XCopy.MapFrom(typeof(T), data, source, options);
 
     /// <summary>
-    /// 将对象 <paramref name="data"/> 的可读属性值写入 <paramref name="target"/> 对应的列。
-    /// 若目标行所在表中不存在对应列，则<b>自动创建列</b>后再写入。
-    /// 固定按编译期类型 <typeparamref name="T"/> 扫描属性，
-    /// 即使 <paramref name="data"/> 的运行时类型为派生类，也不会处理派生类新增属性。
+    /// Writes readable properties of <paramref name="data"/> into the corresponding columns of
+    /// <paramref name="target"/>, creating missing columns automatically.
+    /// Always scans using the compile-time type <typeparamref name="T"/>;
+    /// derived-class properties are not processed even if the runtime type is a subclass.
     /// </summary>
-    /// <param name="data">数据来源对象。</param>
-    /// <param name="target">目标行。</param>
+    /// <param name="data">Source object.</param>
+    /// <param name="target">Target row.</param>
     public static void WriteTo(T data, RecordRow target) => XCopy.WriteTo(typeof(T), data, target);
+
+    /// <summary>Writes readable properties of <paramref name="data"/> into the corresponding columns of <paramref name="target"/> (auto-creating columns) using the specified options.</summary>
+    public static void WriteTo(T data, RecordRow target, RecordMappingOptions options) => XCopy.WriteTo(typeof(T), data, target, options);
+
     #endregion
 }
 
 /// <summary>
-/// 提供在两种强类型对象之间按属性名称进行浅拷贝的静态工具类。
-/// 仅复制源类型与目标类型中同名、类型相同且均受支持的可读/可写属性。
+/// Static utility class for shallow-copying between two strongly-typed objects by property name.
+/// Only properties that exist in both types with the same name, the same type, and are supported
+/// for reading/writing are copied.
 /// </summary>
-/// <typeparam name="TSource">数据来源对象类型。</typeparam>
-/// <typeparam name="TTarget">数据目标对象类型，必须具有无参构造函数。</typeparam>
+/// <typeparam name="TSource">The source object type.</typeparam>
+/// <typeparam name="TTarget">The target object type; must have a parameterless constructor.</typeparam>
 public static class XCopy<TSource, TTarget> where TSource : class where TTarget : class, new()
 {
-    // 预先构建源→目标属性映射对，避免每次调用重复查找。
+    // Pre-build the source→target property-pair map to avoid repeated lookups on every call.
     private static readonly IReadOnlyList<PropPair> _map = BuildMap();
 
     private readonly struct PropPair
@@ -216,7 +315,7 @@ public static class XCopy<TSource, TTarget> where TSource : class where TTarget 
         var sourceProps = XProp.GetAll(typeof(TSource));
         var targetProps = XProp.GetAll(typeof(TTarget));
 
-        // 以目标属性名建立快速查找字典
+        // Build a fast-lookup index keyed by target property name.
         var targetIndex = new Dictionary<string, IXProp>(StringComparer.Ordinal);
         foreach (var tp in targetProps)
         {
@@ -228,7 +327,7 @@ public static class XCopy<TSource, TTarget> where TSource : class where TTarget 
         {
             if (!sp.CanRead) continue;
             if (!targetIndex.TryGetValue(sp.Name, out var tp)) continue;
-            // 仅当属性类型完全一致时才映射
+            // Only map properties whose types match exactly.
             if (sp.Type != tp.Type) continue;
             map.Add(new PropPair(sp, tp));
         }
@@ -237,12 +336,12 @@ public static class XCopy<TSource, TTarget> where TSource : class where TTarget 
     }
 
     /// <summary>
-    /// 创建一个新的 <typeparamref name="TTarget"/> 实例，并将 <paramref name="source"/> 中
-    /// 与目标类型同名、类型相同且均受支持的属性值复制过去。
+    /// Creates a new <typeparamref name="TTarget"/> instance and copies the properties from
+    /// <paramref name="source"/> that share the same name, same type, and are supported.
     /// </summary>
-    /// <param name="source">数据来源对象，不可为 null。</param>
-    /// <returns>填充了来源属性值的新目标对象。</returns>
-    /// <exception cref="ArgumentNullException">当 <paramref name="source"/> 为 null 时抛出。</exception>
+    /// <param name="source">Source object; must not be null.</param>
+    /// <returns>A new target object populated with values from the source.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is null.</exception>
     public static TTarget Copy(TSource source)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
@@ -252,11 +351,12 @@ public static class XCopy<TSource, TTarget> where TSource : class where TTarget 
     }
 
     /// <summary>
-    /// 将 <paramref name="source"/> 中支持的属性值复制到已有的 <paramref name="target"/> 实例。
+    /// Copies supported property values from <paramref name="source"/> into an existing
+    /// <paramref name="target"/> instance.
     /// </summary>
-    /// <param name="source">数据来源对象，不可为 null。</param>
-    /// <param name="target">数据目标对象，不可为 null。</param>
-    /// <exception cref="ArgumentNullException">当任一参数为 null 时抛出。</exception>
+    /// <param name="source">Source object; must not be null.</param>
+    /// <param name="target">Target object; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
     public static void CopyTo(TSource source, TTarget target)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
