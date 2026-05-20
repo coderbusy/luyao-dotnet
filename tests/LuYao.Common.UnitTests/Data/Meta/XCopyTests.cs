@@ -1,4 +1,5 @@
 ﻿using LuYao.Data;
+using LuYao.Data.Mapping;
 using LuYao.Data.Meta;
 
 namespace LuYao.Data.Meta

@@ -1,8 +1,10 @@
-﻿using System;
+using LuYao.Data;
+using LuYao.Data.Meta;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace LuYao.Data.Meta;
+namespace LuYao.Data.Mapping;
 
 /// <summary>
 /// Static utility class for bidirectional property mapping between objects and <see cref="RecordRow"/>.
@@ -290,7 +292,7 @@ public static class XCopy<T> where T : class
 /// <typeparam name="TTarget">The target object type; must have a parameterless constructor.</typeparam>
 public static class XCopy<TSource, TTarget> where TSource : class where TTarget : class, new()
 {
-    // Pre-build the source→target property-pair map to avoid repeated lookups on every call.
+    // Pre-build the source->target property-pair map to avoid repeated lookups on every call.
     private static readonly IReadOnlyList<PropPair> _map = BuildMap();
 
     private readonly struct PropPair

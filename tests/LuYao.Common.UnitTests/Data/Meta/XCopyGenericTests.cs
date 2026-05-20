@@ -1,3 +1,5 @@
+using LuYao.Data.Mapping;
+
 namespace LuYao.Data.Meta;
 
 [TestClass]
