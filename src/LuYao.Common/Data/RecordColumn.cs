@@ -28,7 +28,6 @@ public abstract class RecordColumn : IXProp
         this.Table = table ?? throw new ArgumentNullException(nameof(table));
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
         this._type = type ?? throw new ArgumentNullException(nameof(type));
-        this.ArrayRank = DetermineArrayRank(type);
         this.ColumnType = Helpers.GetColumnType(type);
         this.IsNullable = Helpers.IsNullableType(type);
     }
@@ -55,19 +54,6 @@ public abstract class RecordColumn : IXProp
     /// </summary>
     public bool IsNullable { get; }
 
-    /// <summary>
-    /// 获取数组维度。0 表示非数组，1 表示一维数组（如 int[]），2 表示二维数组（如 int[,]），依此类推。
-    /// </summary>
-    public int ArrayRank { get; }
-
-    /// <summary>
-    /// 确定类型的数组维度。
-    /// </summary>
-    private static int DetermineArrayRank(Type type)
-    {
-        var effectiveType = Nullable.GetUnderlyingType(type) ?? type;
-        return effectiveType.IsArray ? effectiveType.GetArrayRank() : 0;
-    }
 
     /// <summary>
     /// 在指定行设置列的值。
@@ -149,12 +135,6 @@ public abstract class RecordColumn : IXProp
         object? value = this.Get(row);
         if (value is null) return default;
         if (value is T direct) return direct;
-
-        // 数组类型无法通过 Convert.ChangeType 转换，但可能是兼容的数组类型
-        if (typeof(T).IsArray && value is Array)
-        {
-            return (T)value;
-        }
 
         return (T)Valid.To(value, typeof(T));
     }

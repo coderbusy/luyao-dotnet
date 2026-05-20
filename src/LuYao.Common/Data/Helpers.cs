@@ -30,6 +30,7 @@ static class Helpers
         [typeof(DateTimeOffset)] = RecordColumnType.DateTimeOffset,
         [typeof(TimeSpan)] = RecordColumnType.TimeSpan,
         [typeof(Guid)] = RecordColumnType.Guid,
+        [typeof(byte[])] = RecordColumnType.Binary,
     };
 
     private static readonly Dictionary<RecordColumnType, Type> ColumnTypeToType;
@@ -44,20 +45,17 @@ static class Helpers
     }
 
     /// <summary>
-    /// 从 CLR <see cref="Type"/> 获取基础 <see cref="RecordColumnType"/>（不含 Nullable 信息和数组维度）。
+    /// From CLR <see cref="Type"/> get the base <see cref="RecordColumnType"/> (excluding Nullable and array info).
     /// </summary>
     internal static RecordColumnType GetColumnType(Type type)
     {
-        var lookup = NormalizeColumnLookupType(type);
-
-        // 剥离数组维度，只看元素类型
-        if (lookup.IsArray)
+        // byte[] maps directly to Binary
+        if (type == typeof(byte[]))
         {
-            lookup = lookup.GetElementType()!;
-            // 数组元素可能是可空类型（如 int?[]），需要再次规范化
-            lookup = Nullable.GetUnderlyingType(lookup) ?? lookup;
-            lookup = lookup.IsEnum ? Enum.GetUnderlyingType(lookup) : lookup;
+            return RecordColumnType.Binary;
         }
+
+        var lookup = NormalizeColumnLookupType(type);
 
         if (TypeToColumnType.TryGetValue(lookup, out var ct))
             return ct;
@@ -69,41 +67,19 @@ static class Helpers
     /// </summary>
     internal static bool IsNullableType(Type type)
     {
-        // 检查数组元素类型
-        if (type.IsArray)
-        {
-            var elementType = type.GetElementType();
-            if (elementType != null)
-            {
-                return Nullable.GetUnderlyingType(elementType) != null;
-            }
-        }
-
         return Nullable.GetUnderlyingType(type) != null;
     }
 
     /// <summary>
     /// 从基础 <see cref="RecordColumnType"/>、<paramref name="isNullable"/> 和 <paramref name="arrayRank"/> 还原 CLR <see cref="Type"/>。
     /// </summary>
-    internal static Type GetClrType(RecordColumnType columnType, bool isNullable, int arrayRank = 0)
+    internal static Type GetClrType(RecordColumnType columnType, bool isNullable)
     {
+        if (columnType == RecordColumnType.Binary)
+            return typeof(byte[]);
+
         if (!ColumnTypeToType.TryGetValue(columnType, out var baseType))
             throw new NotSupportedException($"未知列类型枚举值: {columnType}");
-
-        // 处理数组维度
-        if (arrayRank > 0)
-        {
-            // 如果数组元素是可空的值类型，需要先构造可空类型再构造数组
-            if (isNullable && baseType.IsValueType)
-            {
-                baseType = typeof(Nullable<>).MakeGenericType(baseType);
-            }
-
-            baseType = (arrayRank == 1) 
-                ? baseType.MakeArrayType() 
-                : baseType.MakeArrayType(arrayRank);
-            return baseType;
-        }
 
         if (isNullable && baseType.IsValueType)
             return typeof(Nullable<>).MakeGenericType(baseType);
@@ -115,17 +91,11 @@ static class Helpers
     internal static bool IsSupportedColumnType(Type type)
     {
         if (type == null) return false;
+
+        // byte[] is directly supported as Binary
+        if (type == typeof(byte[])) return true;
+
         var normalized = NormalizeColumnLookupType(type);
-
-        // 支持数组类型
-        if (normalized.IsArray)
-        {
-            var elementType = normalized.GetElementType()!;
-            // 递归展开数组元素类型（处理 int?[] 等情况）
-            elementType = Nullable.GetUnderlyingType(elementType) ?? elementType;
-            normalized = elementType.IsEnum ? Enum.GetUnderlyingType(elementType) : elementType;
-        }
-
         return TypeToColumnType.ContainsKey(normalized);
     }
 

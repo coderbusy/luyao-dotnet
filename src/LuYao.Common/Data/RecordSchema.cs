@@ -41,21 +41,15 @@ public sealed class RecordSchema
         public bool IsNullable { get; }
 
         /// <summary>
-        /// 数组维度。0 表示非数组，1 表示一维数组，2 表示二维数组，依此类推。
-        /// </summary>
-        public int ArrayRank { get; }
-
-        /// <summary>
         /// 列的 CLR 数据类型。
         /// </summary>
-        public Type Type => Helpers.GetClrType(ColumnType, IsNullable, ArrayRank);
+        public Type Type => Helpers.GetClrType(ColumnType, IsNullable);
 
-        internal ColumnDef(string name, RecordColumnType columnType, bool isNullable, int arrayRank = 0)
+        internal ColumnDef(string name, RecordColumnType columnType, bool isNullable)
         {
             Name = name;
             ColumnType = columnType;
             IsNullable = isNullable;
-            ArrayRank = arrayRank;
         }
     }
 }
