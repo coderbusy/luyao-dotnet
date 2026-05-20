@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 
 namespace LuYao.Data;
@@ -94,9 +94,8 @@ public class RecordSerializationTests
         var table = new RecordTable("Binary", 1);
         var col = table.Columns.Add<byte[]>("Data");
 
-        // byte[] 现在作为一维数组处理
-        Assert.AreEqual(1, col.ArrayRank);
-        Assert.AreEqual(RecordColumnType.Byte, col.ColumnType);
+        Assert.AreEqual(RecordColumnType.Binary, col.ColumnType);
+        Assert.AreEqual(typeof(byte[]), col.Type);
 
         var row = table.AddRow();
         col.SetValue(row.Row, new byte[] { 1, 2, 3, 4, 5 });
@@ -105,7 +104,7 @@ public class RecordSerializationTests
         var deserialized = RecordTable.FromBytes(bytes);
 
         var deserializedCol = deserialized.Columns.Find<byte[]>("Data")!;
-        Assert.AreEqual(1, deserializedCol.ArrayRank);
+        Assert.AreEqual(RecordColumnType.Binary, deserializedCol.ColumnType);
 
         var data = deserializedCol.GetValue(0);
         CollectionAssert.AreEqual(new byte[] { 1, 2, 3, 4, 5 }, data);

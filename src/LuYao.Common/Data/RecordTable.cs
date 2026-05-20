@@ -529,7 +529,7 @@ public partial class RecordTable : IEnumerable<RecordRow>
         var columns = new List<RecordSchema.ColumnDef>(this.Columns.Count);
         foreach (RecordColumn col in this.Columns)
         {
-            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType, col.IsNullable, col.ArrayRank));
+            columns.Add(new RecordSchema.ColumnDef(col.Name, col.ColumnType, col.IsNullable));
         }
         return new RecordSchema(columns);
     }
