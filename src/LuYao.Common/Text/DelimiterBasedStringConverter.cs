@@ -132,13 +132,13 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
     /// 添加布尔类型属性的序列化与反序列化方法。
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
-    public DelimiterBasedStringConverter<T> Add(Expression<Func<T, bool>> propertySelector) => Add(propertySelector, TypeConvert.ToString, TypeConvert.ToBoolean);
+    public DelimiterBasedStringConverter<T> Add(Expression<Func<T, bool>> propertySelector) => Add(propertySelector, static v => Convert.ToString(v) ?? string.Empty, static s => ParseBoolean(s));
 
     /// <summary>
     /// 添加整型属性的序列化与反序列化方法。
     /// </summary>
     /// <param name="propertySelector">属性选择表达式。</param>
-    public DelimiterBasedStringConverter<T> Add(Expression<Func<T, int>> propertySelector) => Add(propertySelector, TypeConvert.ToString, TypeConvert.ToInt32);
+    public DelimiterBasedStringConverter<T> Add(Expression<Func<T, int>> propertySelector) => Add(propertySelector, static v => Convert.ToString(v) ?? string.Empty, static s => Convert.ToInt32(s));
 
     /// <summary>
     /// 返回 T 的类型名称以及所有已添加的属性名称。
@@ -152,5 +152,16 @@ public partial class DelimiterBasedStringConverter<T> where T : class, new()
         string properties = string.Join(", ", propertyNames);
         // 返回格式化字符串
         return $"类型: {typeName}, 属性: [{properties}]";
+    }
+
+    private static bool ParseBoolean(string? value)
+    {
+        if (value is null) return default;
+        switch (value.ToLowerInvariant())
+        {
+            case "0": case "f": case "n": case "no": case "false": return false;
+            case "1": case "t": case "y": case "yes": case "true": return true;
+        }
+        return Convert.ToBoolean(value);
     }
 }

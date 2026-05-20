@@ -1,4 +1,5 @@
 using System;
+using LuYao.Data.Internal;
 
 namespace LuYao.Data;
 
@@ -65,7 +66,7 @@ public class RecordColumn<T> : RecordColumn
         }
         else
         {
-            _data[row] = (T)TypeConvert.ChangeType(value, this.Type);
+            _data[row] = (T)DataConvert.ChangeType(value, this.Type);
         }
     }
 
@@ -77,10 +78,7 @@ public class RecordColumn<T> : RecordColumn
         if (value is null) return string.Empty;
 
         // byte[] columns return Base64 string
-        if (value is byte[] bytes)
-        {
-            return Convert.ToBase64String(bytes);
-        }
+        if (value is byte[] bytes) return Convert.ToBase64String(bytes);
 
         return value.ToString() ?? string.Empty;
     }

@@ -40,7 +40,7 @@ public static class Arrays
             if (idx++ < start) continue;
             object v = ienum.Current;
             if (count > 0) sb.Append(spacer);
-            sb.Append(TypeConvert.ToString(v));
+            sb.Append(v?.ToString() ?? string.Empty);
             count++;
         }
         return sb.ToString();

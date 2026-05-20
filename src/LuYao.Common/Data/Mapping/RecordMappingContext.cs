@@ -1,6 +1,6 @@
+using LuYao.Data.Internal;
 using LuYao.Data.Meta;
 using System;
-using LuYao;
 
 namespace LuYao.Data.Mapping;
 
@@ -181,7 +181,7 @@ internal sealed class RecordMappingContext
                 return;
             }
 
-            prop.SetValue(data, TypeConvert.ChangeType(value, prop.Type));
+            prop.SetValue(data, DataConvert.ChangeType(value, prop.Type));
         }
         catch (Exception ex)
         {

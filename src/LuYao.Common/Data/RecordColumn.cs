@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LuYao.Data.Internal;
 using LuYao.Data.Meta;
 
 namespace LuYao.Data;
@@ -136,7 +137,7 @@ public abstract class RecordColumn : IXProp
         if (value is null) return default;
         if (value is T direct) return direct;
 
-        return (T)TypeConvert.ChangeType(value, typeof(T));
+        return (T)DataConvert.ChangeType(value, typeof(T));
     }
 
     /// <summary>

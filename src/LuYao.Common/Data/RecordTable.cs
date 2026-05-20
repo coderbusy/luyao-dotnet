@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using LuYao.Data.Internal;
 
 namespace LuYao.Data;
 
@@ -470,7 +471,7 @@ public partial class RecordTable : IEnumerable<RecordRow>
             var val = oldCol.Get(r);
             if (val is not null)
             {
-                newCol.Set(r, TypeConvert.ChangeType(val, newType));
+                newCol.Set(r, DataConvert.ChangeType(val, newType));
             }
         }
 
