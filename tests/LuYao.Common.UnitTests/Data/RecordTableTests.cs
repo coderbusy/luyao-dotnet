@@ -1385,4 +1385,142 @@ public class RecordTableTests
         // Act & Assert
         Assert.Throws<InvalidCastException>(() => col.ToList<int>());
     }
+
+    #region Nullable value type column tests
+
+    [TestMethod]
+    public void NullableColumn_IsNullable_ShouldBeTrue()
+    {
+        // Arrange
+        var table = new RecordTable();
+        var col = table.Columns.Add<int?>("NullableInt");
+
+        // Act & Assert
+        Assert.IsTrue(col.IsNullable);
+        Assert.AreEqual(typeof(int?), col.Type);
+        Assert.AreEqual(RecordColumnType.Int32, col.ColumnType);
+    }
+
+    [TestMethod]
+    public void NonNullableColumn_IsNullable_ShouldBeFalse()
+    {
+        // Arrange
+        var table = new RecordTable();
+        var col = table.Columns.Add<int>("IntCol");
+
+        // Act & Assert
+        Assert.IsFalse(col.IsNullable);
+    }
+
+    [TestMethod]
+    public void NullableColumn_SetAndGetNullValue_ShouldReturnNull()
+    {
+        // Arrange
+        var table = new RecordTable();
+        var col = table.Columns.Add<int?>("NullableInt");
+        table.AddRow();
+
+        // Act
+        col.Set(0, null);
+
+        // Assert
+        Assert.IsNull(col.Get(0));
+        Assert.IsNull(col.To<int?>(0));
+    }
+
+    [TestMethod]
+    public void NullableColumn_SetAndGetValue_ShouldReturnValue()
+    {
+        // Arrange
+        var table = new RecordTable();
+        var col = table.Columns.Add<int?>("NullableInt");
+        table.AddRow();
+
+        // Act
+        col.Set(0, (int?)42);
+
+        // Assert
+        int? result = col.To<int?>(0);
+        Assert.AreEqual(42, result);
+    }
+
+    [TestMethod]
+    public void NullableColumn_SetNullThenValue_ShouldUpdateCorrectly()
+    {
+        // Arrange
+        var table = new RecordTable();
+        var col = table.Columns.Add<int?>("NullableInt");
+        table.AddRow();
+
+        // Act
+        col.Set(0, null);
+        Assert.IsNull(col.To<int?>(0));
+
+        col.Set(0, (int?)99);
+        Assert.AreEqual(99, col.To<int?>(0));
+    }
+
+    [TestMethod]
+    public void NullableBoolColumn_SetAndGet_ShouldWork()
+    {
+        // Arrange
+        var table = new RecordTable();
+        var col = table.Columns.Add<bool?>("NullableBool");
+        table.AddRow();
+        table.AddRow();
+
+        // Act
+        col.Set(0, (bool?)true);
+        col.Set(1, null);
+
+        // Assert
+        Assert.AreEqual(true, col.To<bool?>(0));
+        Assert.IsNull(col.To<bool?>(1));
+    }
+
+    [TestMethod]
+    public void NullableDateTimeColumn_SetAndGet_ShouldWork()
+    {
+        // Arrange
+        var table = new RecordTable();
+        var col = table.Columns.Add<DateTime?>("NullableDate");
+        table.AddRow();
+        table.AddRow();
+
+        var now = new DateTime(2024, 6, 1, 12, 0, 0);
+
+        // Act
+        col.Set(0, (DateTime?)now);
+        col.Set(1, null);
+
+        // Assert
+        Assert.AreEqual(now, col.To<DateTime?>(0));
+        Assert.IsNull(col.To<DateTime?>(1));
+    }
+
+    [TestMethod]
+    public void NullableColumn_ToList_ShouldContainNullAndValues()
+    {
+        // Arrange
+        var table = new RecordTable();
+        var col = table.Columns.Add<int?>("NullableInt");
+        table.AddRow();
+        table.AddRow();
+        table.AddRow();
+
+        col.Set(0, (int?)1);
+        col.Set(1, null);
+        col.Set(2, (int?)3);
+
+        // Act
+        var list = col.ToList<int?>();
+
+        // Assert
+        Assert.AreEqual(3, list.Count);
+        Assert.AreEqual(1, list[0]);
+        Assert.IsNull(list[1]);
+        Assert.AreEqual(3, list[2]);
+    }
+
+    #endregion
 }
