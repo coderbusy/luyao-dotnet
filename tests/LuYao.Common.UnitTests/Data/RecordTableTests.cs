@@ -693,7 +693,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(-1));
-        Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -706,7 +706,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(1));
-        Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -719,7 +719,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Get(5));
-        Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -732,7 +732,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(-1, (object)"test"));
-        Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -745,7 +745,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(1, (object)"test"));
-        Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -758,7 +758,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.Set(5, (object)"test"));
-        Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -771,7 +771,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(-1, true));
-        Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -784,7 +784,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(1, true));
-        Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -797,7 +797,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.SetValue(5, 42));
-        Assert.IsTrue(exception.Message.Contains("行索引 5 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -810,7 +810,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<Boolean>(-1));
-        Assert.IsTrue(exception.Message.Contains("行索引 -1 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -823,7 +823,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<Int32>(1));
-        Assert.IsTrue(exception.Message.Contains("行索引 1 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
@@ -836,7 +836,7 @@ public class RecordTableTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => col.To<String>(10));
-        Assert.IsTrue(exception.Message.Contains("行索引 10 超出有效范围"));
+        Assert.AreEqual("row", exception.ParamName);
     }
 
     [TestMethod]
