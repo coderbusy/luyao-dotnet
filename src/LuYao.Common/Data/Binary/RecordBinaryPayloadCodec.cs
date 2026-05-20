@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 
-namespace LuYao.Data;
+namespace LuYao.Data.Binary;
 
 /// <summary>
 /// Record 二进制负载编解码器。

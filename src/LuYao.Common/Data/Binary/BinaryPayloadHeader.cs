@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace LuYao.Data;
+namespace LuYao.Data.Binary;
 
 internal enum BinaryPayloadType : byte
 {

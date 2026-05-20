@@ -1,3 +1,4 @@
+using LuYao.Data.Attributes;
 using System;
 
 namespace LuYao.Data.Mapping;

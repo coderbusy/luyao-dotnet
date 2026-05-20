@@ -1,7 +1,7 @@
 using LuYao.Data.Mapping;
 using System;
 
-namespace LuYao.Data;
+namespace LuYao.Data.Attributes;
 
 /// <summary>
 /// 声明属性在 <see cref="RecordTable"/> 中的列存储类型，优先级高于 <see cref="RecordMappingOptions"/> 的全局策略。

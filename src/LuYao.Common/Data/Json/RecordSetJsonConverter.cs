@@ -1,10 +1,11 @@
 #if !NET45 && !NET461
+using LuYao.Data.Binary;
 using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace LuYao.Data;
+namespace LuYao.Data.Json;
 
 /// <summary>
 /// 将 <see cref="RecordSet"/> 以 Base64 二进制格式进行 JSON 序列化/反序列化。
