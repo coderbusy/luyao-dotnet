@@ -1,4 +1,4 @@
-﻿namespace LuYao.IO.Hosts;
+namespace LuYao.IO.Hosts;
 
 [TestClass]
 public class HostFileTests

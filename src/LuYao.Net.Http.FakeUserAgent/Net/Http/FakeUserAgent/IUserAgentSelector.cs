@@ -1,4 +1,4 @@
-﻿namespace LuYao.Net.Http.FakeUserAgent;
+namespace LuYao.Net.Http.FakeUserAgent;
 
 /// <summary>
 /// 提供从嵌入式数据集中选择随机用户代理的功能。

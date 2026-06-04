@@ -1,4 +1,4 @@
-﻿namespace LuYao.Data;
+namespace LuYao.Data;
 
 /// <summary>
 /// 定义 <see cref="RecordColumn"/> 支持的所有基础列数据类型。

@@ -1,4 +1,4 @@
-﻿namespace LuYao.IO.Hosts;
+namespace LuYao.IO.Hosts;
 
 /// <summary>
 /// 表示主机文件中的一行类型。

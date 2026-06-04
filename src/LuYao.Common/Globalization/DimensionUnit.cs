@@ -1,4 +1,4 @@
-﻿namespace LuYao.Globalization;
+namespace LuYao.Globalization;
 
 /// <summary>
 /// 长度单位

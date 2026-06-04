@@ -1,4 +1,4 @@
-﻿namespace LuYao.IO.Hashing;
+namespace LuYao.IO.Hashing;
 
 /// <summary>
 /// 提供常用哈希算法的静态实例。

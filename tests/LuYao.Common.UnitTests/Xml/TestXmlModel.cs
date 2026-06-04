@@ -1,4 +1,4 @@
-﻿namespace LuYao.Xml;
+namespace LuYao.Xml;
 
 public class TestXmlModel : TranslatableXmlModel<TestXmlModel>
 {

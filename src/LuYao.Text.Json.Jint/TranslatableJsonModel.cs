@@ -1,4 +1,4 @@
-﻿using Jint;
+using Jint;
 using Jint.Native;
 using Jint.Native.Array;
 using Jint.Native.Object;

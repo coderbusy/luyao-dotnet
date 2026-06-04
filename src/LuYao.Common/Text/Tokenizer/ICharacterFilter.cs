@@ -1,4 +1,4 @@
-﻿namespace LuYao.Text.Tokenizer;
+namespace LuYao.Text.Tokenizer;
 
 /// <summary>
 /// 字符过滤器接口，用于对输入文本进行字符级别的预处理。

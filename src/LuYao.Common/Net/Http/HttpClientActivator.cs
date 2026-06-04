@@ -1,4 +1,4 @@
-﻿using LuYao.Threading;
+using LuYao.Threading;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;

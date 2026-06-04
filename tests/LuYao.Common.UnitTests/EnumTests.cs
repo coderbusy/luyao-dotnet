@@ -1,4 +1,4 @@
-﻿namespace LuYao;
+namespace LuYao;
 
 public enum TestEnum
 {
