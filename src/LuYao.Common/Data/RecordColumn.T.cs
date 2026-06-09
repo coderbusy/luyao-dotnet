@@ -4,18 +4,18 @@ using LuYao.Data.Internal;
 namespace LuYao.Data;
 
 /// <summary>
-/// ·ºĞÍÁĞ
+/// æ³›å‹åˆ—
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class RecordColumn<T> : RecordColumn
 {
     /// <summary>
-    /// Êı¾İ´æ´¢Êı×é
+    /// æ•°æ®å­˜å‚¨æ•°ç»„
     /// </summary>
     protected internal T[] _data;
 
     /// <summary>
-    /// ´´½¨Ò»¸ö·ºĞÍÁĞ
+    /// åˆ›å»ºä¸€ä¸ªæ³›å‹åˆ—
     /// </summary>
     public RecordColumn(RecordTable table, string name, Type type)
         : base(table, name, type)
