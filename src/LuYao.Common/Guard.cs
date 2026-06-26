@@ -17,10 +17,11 @@ public static class Guard
     /// <param name="when">An optional predicate to determine whether an exception should be handled.</param>
     /// <param name="rethrow">If <see langword="true"/>, rethrows handled exceptions after invoking <paramref name="onError"/>.</param>
     /// <returns><see langword="true"/> when execution succeeds; otherwise <see langword="false"/> for handled exceptions.</returns>
-    public static bool TryRun(Action action, Action<Exception>? onError = null, Func<Exception, bool>? when = null, bool rethrow = false)
-    {
-        try
-        {
+public static bool TryRun(Action action, Action<Exception>? onError = null, Func<Exception, bool>? when = null, bool rethrow = false)
+{
+    if (action == null) throw new ArgumentNullException(nameof(action));
+
+    try
             action();
             return true;
         }
