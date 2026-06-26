@@ -17,11 +17,12 @@ public static class Guard
     /// <param name="when">An optional predicate to determine whether an exception should be handled.</param>
     /// <param name="rethrow">If <see langword="true"/>, rethrows handled exceptions after invoking <paramref name="onError"/>.</param>
     /// <returns><see langword="true"/> when execution succeeds; otherwise <see langword="false"/> for handled exceptions.</returns>
-public static bool TryRun(Action action, Action<Exception>? onError = null, Func<Exception, bool>? when = null, bool rethrow = false)
-{
-    if (action == null) throw new ArgumentNullException(nameof(action));
+    public static bool TryRun(Action action, Action<Exception>? onError = null, Func<Exception, bool>? when = null, bool rethrow = false)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
 
-    try
+        try
+        {
             action();
             return true;
         }
@@ -66,11 +67,12 @@ public static bool TryRun(Action action, Action<Exception>? onError = null, Func
     /// <param name="when">An optional predicate to determine whether an exception should be handled.</param>
     /// <param name="rethrow">If <see langword="true"/>, rethrows handled exceptions after invoking <paramref name="onError"/>.</param>
     /// <returns>The function result when successful; otherwise <paramref name="fallback"/> for handled exceptions.</returns>
-public static T TryGet<T>(Func<T> func, T fallback = default!, Action<Exception>? onError = null, Func<Exception, bool>? when = null, bool rethrow = false)
-{
-    if (func == null) throw new ArgumentNullException(nameof(func));
+    public static T TryGet<T>(Func<T> func, T fallback = default!, Action<Exception>? onError = null, Func<Exception, bool>? when = null, bool rethrow = false)
+    {
+        if (func == null) throw new ArgumentNullException(nameof(func));
 
-    try
+        try
+        {
             return func();
         }
         catch (Exception ex) when (CanHandle(ex, when))
@@ -92,11 +94,12 @@ public static T TryGet<T>(Func<T> func, T fallback = default!, Action<Exception>
     /// <param name="when">An optional predicate to determine whether an exception should be handled.</param>
     /// <param name="rethrow">If <see langword="true"/>, rethrows handled exceptions after invoking <paramref name="onError"/>.</param>
     /// <returns>A task that returns the function result when successful; otherwise <paramref name="fallback"/> for handled exceptions.</returns>
-public static async Task<T> TryGetAsync<T>(Func<Task<T>> func, T fallback = default!, Action<Exception>? onError = null, Func<Exception, bool>? when = null, bool rethrow = false)
-{
-    if (func == null) throw new ArgumentNullException(nameof(func));
+    public static async Task<T> TryGetAsync<T>(Func<Task<T>> func, T fallback = default!, Action<Exception>? onError = null, Func<Exception, bool>? when = null, bool rethrow = false)
+    {
+        if (func == null) throw new ArgumentNullException(nameof(func));
 
-    try
+        try
+        {
             return await func();
         }
         catch (Exception ex) when (CanHandle(ex, when))
