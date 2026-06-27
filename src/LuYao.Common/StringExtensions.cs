@@ -170,4 +170,5 @@ public static class StringExtensions
         var len = endIndex - startIndex;
         return str.Substring(startIndex, len);
     }
+
 }
