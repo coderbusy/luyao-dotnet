@@ -126,6 +126,26 @@ using (await asyncLock.LockAsync())
 }
 ```
 
+##### 13. 单实例管理器
+```csharp
+using LuYao.Threading;
+
+// 在应用程序启动时调用，确保只有一个实例在运行。
+// 若检测到已有实例，则向已有实例发送激活请求后退出当前进程。
+SingleInstanceManager.EnsureSingleInstance();
+
+// 订阅激活事件，在收到其他实例的激活请求时触发（例如将窗口提到前台）
+SingleInstanceManager.ActivateWindowRequested += (sender, args) =>
+{
+    // 将主窗口激活并置于前台
+    mainWindow.Activate();
+    mainWindow.WindowState = WindowState.Normal;
+};
+
+// 如需手动释放锁（请谨慎使用）
+SingleInstanceManager.ReleaseLock();
+```
+
 ##### 6. 字符串压缩
 ```csharp
 using LuYao.Encoders;
