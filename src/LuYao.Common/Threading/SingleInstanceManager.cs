@@ -82,21 +82,35 @@ public static class SingleInstanceManager
     {
         while (true)
         {
-            using (var server = new NamedPipeServerStream(pipeName))
+            try
             {
-#if NETFRAMEWORK
-                await Task.Run(() => server.WaitForConnection());
-#else
-                await server.WaitForConnectionAsync();
-#endif
-                using (var reader = new StreamReader(server))
+                using (var server = new NamedPipeServerStream(pipeName))
                 {
-                    var command = await reader.ReadLineAsync();
-                    if (command == Command_ActivateWindow)
+#if NETFRAMEWORK
+                    await Task.Run(() => server.WaitForConnection());
+#else
+                    await server.WaitForConnectionAsync();
+#endif
+                    using (var reader = new StreamReader(server))
                     {
-                        ActivateWindowRequested?.Invoke(null, EventArgs.Empty);
+                        var command = await reader.ReadLineAsync();
+                        if (command == Command_ActivateWindow)
+                        {
+                            try
+                            {
+                                ActivateWindowRequested?.Invoke(null, EventArgs.Empty);
+                            }
+                            catch
+                            {
+                                // Prevent a subscriber exception from terminating the server loop.
+                            }
+                        }
                     }
                 }
+            }
+            catch
+            {
+                // Prevent a pipe I/O error from terminating the server loop.
             }
         }
     }
