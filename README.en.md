@@ -126,6 +126,28 @@ using (await asyncLock.LockAsync())
 }
 ```
 
+##### 13. Single Instance Manager
+```csharp
+using LuYao.Threading;
+
+// Call at application startup to ensure only one instance is running.
+// If another instance is already running, sends an activation request to it
+// and exits the current process.
+SingleInstanceManager.EnsureSingleInstance();
+
+// Subscribe to the activation event to bring your window to the foreground
+// when another instance tries to start.
+SingleInstanceManager.ActivateWindowRequested += (sender, args) =>
+{
+    // Bring the main window to the front
+    mainWindow.Activate();
+    mainWindow.WindowState = WindowState.Normal;
+};
+
+// Release the lock manually if needed (use with caution)
+SingleInstanceManager.ReleaseLock();
+```
+
 ##### 6. String Compression
 ```csharp
 using LuYao.Encoders;
