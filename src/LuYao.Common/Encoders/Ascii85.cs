@@ -9,7 +9,7 @@ namespace LuYao.Encoders;
 /// 基于 http://www.stillhq.com/cgi-bin/cvsweb/ascii85/ 的 C 代码。
 /// </summary>
 /// <remarks>
-/// Jeff Atwood
+/// 杰夫·阿特伍德
 /// http://www.codinghorror.com/blog/archives/000410.html
 /// </remarks>
 public class Ascii85
@@ -87,7 +87,7 @@ public class Ascii85
             }
         }
 
-        // strip prefix and suffix if present
+        // 去除前缀和后缀（如果存在）
         if (s.StartsWith(PrefixMark))
         {
             s = s.Substring(PrefixMark.Length);
@@ -153,7 +153,7 @@ public class Ascii85
             }
         }
 
-        // if we have some bytes left over at the end..
+        // 如果我们最后还剩下一些字节..
         if (count != 0)
         {
             if (count == 1)
@@ -214,7 +214,7 @@ public class Ascii85
             }
         }
 
-        // if we have some bytes left over at the end..
+        // 如果我们最后还剩下一些字节..
         if (count > 0)
         {
             EncodeBlock(count + 1, sb);

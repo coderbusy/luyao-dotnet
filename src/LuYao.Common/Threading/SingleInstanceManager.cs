@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 namespace LuYao.Threading;
 
 /// <summary>
-/// Provides single-instance process management. Ensures only one instance of the
-/// application runs at a time, and allows the new instance to signal the existing
-/// one to activate its window via a named pipe.
+/// 提供单实例进程管理，确保应用程序每次只有一个实例运行，
+/// 并允许新实例通过命名管道通知现有实例激活窗口。
 /// </summary>
 public static class SingleInstanceManager
 {
@@ -20,16 +19,14 @@ public static class SingleInstanceManager
     private static bool _hasLock;
 
     /// <summary>
-    /// Raised when another instance of the application requests that the current
-    /// instance activates its main window.
+    /// 当应用程序的另一个实例请求当前实例激活主窗口时触发。
     /// </summary>
     public static event EventHandler? ActivateWindowRequested;
 
     /// <summary>
-    /// Ensures that only one instance of the application is running.
-    /// If this is the first instance, it starts listening on a named pipe for
-    /// activation requests. If another instance is already running, it sends an
-    /// activation request to the existing instance and terminates the current process.
+    /// 确保应用程序只有一个实例正在运行。
+    /// 如果当前进程是第一个实例，则开始通过命名管道侦听激活请求；
+    /// 如果已有实例正在运行，则向现有实例发送激活请求并终止当前进程。
     /// </summary>
     public static void EnsureSingleInstance()
     {
@@ -49,9 +46,9 @@ public static class SingleInstanceManager
     }
 
     /// <summary>
-    /// Releases the single-instance lock held by the current process.
+    /// 释放当前进程持有的单实例锁。
     /// </summary>
-    /// <remarks>Use with caution — releasing the lock allows another instance to become the primary instance.</remarks>
+    /// <remarks>谨慎使用——释放锁允许另一个实例成为主实例。</remarks>
     public static void ReleaseLock()
     {
         if (_processLock != null && _hasLock)
@@ -102,7 +99,7 @@ public static class SingleInstanceManager
                             }
                             catch
                             {
-                                // Prevent a subscriber exception from terminating the server loop.
+                                // 防止订阅者异常终止服务器循环。
                             }
                         }
                     }
@@ -110,7 +107,7 @@ public static class SingleInstanceManager
             }
             catch
             {
-                // Prevent a pipe I/O error from terminating the server loop.
+                // 防止管道 I/O 错误终止服务器循环。
             }
         }
     }

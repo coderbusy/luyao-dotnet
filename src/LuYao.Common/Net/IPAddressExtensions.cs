@@ -4,7 +4,7 @@ using System.Net.Sockets;
 namespace LuYao.Net;
 
 /// <summary>
-/// Provides extension methods for the <see cref="IPAddress"/> class.
+/// 为 <see cref="IPAddress"/> 类提供扩展方法。
 /// </summary>
 public static class IPAddressExtensions
 {

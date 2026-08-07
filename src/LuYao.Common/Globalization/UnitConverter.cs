@@ -359,7 +359,7 @@ public class UnitConverter
         AddUnit("miles", category, 1609.344m, 0m);
         AddUnit("nautical_miles", category, 1852m, 0m);
 
-        // Additional length units from amazon_units.csv
+        // 来自 amazon_units.csv 的其他长度单位
         AddUnit("angstrom", category, 0.0000000001m, 0m); // 埃 (Angstrom)
         AddUnit("nanometer", category, 0.000000001m, 0m); // 纳米
         AddUnit("nanometers", category, 0.000000001m, 0m);
@@ -381,7 +381,7 @@ public class UnitConverter
         AddUnit("pounds", category, 0.45359237m, 0m);
         AddUnit("ounces", category, 0.028349523125m, 0m);
 
-        // Additional mass units from amazon_units.csv
+        // 来自 amazon_units.csv 的其他质量单位
         AddUnit("micrograms", category, 0.000000001m, 0m); // 微克
         AddUnit("tons", category, 907.185m, 0m); // 美制吨
         AddUnit("metric_tons", category, 1000m, 0m); // 公吨
@@ -455,7 +455,7 @@ public class UnitConverter
         AddUnit("gigabytes", category, 1024m * 1024m * 1024m, 0m); // 1024^3
         AddUnit("terabytes", category, 1024m * 1024m * 1024m * 1024m, 0m); // 1024^4
 
-        // Additional data storage units from amazon_units.csv
+        // amazon_units.csv 中的其他数据存储单位
         AddUnit("bits", category, 0.125m, 0m); // 比特
         AddUnit("kilobyte", category, 1024m, 0m); // 单数形式
         AddUnit("kb", category, 1024m, 0m); // 简写

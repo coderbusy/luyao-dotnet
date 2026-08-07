@@ -96,11 +96,11 @@ public class Murmur128 : HashAlgorithm
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void Tail(byte[] tail, int start, int remaining)
     {
-        // create our keys and initialize to 0
+        // 创建我们的密钥并初始化为 0
         ulong k1 = 0,
             k2 = 0;
 
-        // determine how many bytes we have left to work with based on length
+        // 根据长度确定我们还剩下多少字节可以使用
         switch (remaining)
         {
             case 15:

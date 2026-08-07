@@ -184,7 +184,6 @@ public sealed class Crc32 : HashAlgorithm
     )
     {
         var hash = seed;
-        //if (refIn) hash = reflect(hash, 32);
 
         if (refIn)
         {
@@ -228,7 +227,7 @@ public sealed class Crc32 : HashAlgorithm
     /// <returns>反射后的数值。</returns>
     public static uint reflect(uint crc, int bitnum)
     {
-        // reflects the lower 'bitnum' bits of 'crc'
+        // 反映“crc”的较低“bitnum”位
 
         uint i,
             j = 1,
