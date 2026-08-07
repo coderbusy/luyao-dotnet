@@ -42,7 +42,7 @@ static class Helpers
     }
 
     /// <summary>
-    /// From CLR <see cref="Type"/> get the base <see cref="RecordColumnType"/> (excluding Nullable and array info).
+    /// From CLR <see cref="Type"/> get its <see cref="RecordColumnType"/>.
     /// </summary>
     internal static RecordColumnType GetColumnType(Type type)
     {
@@ -57,15 +57,7 @@ static class Helpers
         throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型");
     }
 
-    /// <summary>
-    /// 判断 CLR <see cref="Type"/> 是否为 Nullable 值类型，或其数组元素类型为 Nullable。
-    /// </summary>
-    internal static bool IsNullableType(Type type) => false;
-
-    /// <summary>
-    /// 从基础 <see cref="RecordColumnType"/>、<paramref name="isNullable"/> 和 <paramref name="arrayRank"/> 还原 CLR <see cref="Type"/>。
-    /// </summary>
-    internal static Type GetClrType(RecordColumnType columnType, bool isNullable)
+    internal static Type GetClrType(RecordColumnType columnType)
     {
         if (columnType == RecordColumnType.Binary)
             return typeof(byte[]);
@@ -93,18 +85,10 @@ static class Helpers
     {
         if (!IsSupportedColumnType(type))
         {
-            throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型。支持的类型包括：bool, 整数类型, 浮点类型, char, string, DateTime, DateTimeOffset, TimeSpan, Guid, byte[]、枚举及其 Nullable 形式，以及上述类型的数组（如 int[], string[,]）。");
+            throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型。支持类型由 RecordColumnType 定义；byte[] 作为 Binary 支持，其他数组、Nullable 和枚举不受支持。");
         }
     }
 
-    /// <summary>
-    /// 规范化列类型查找目标：先展开 Nullable，再将枚举转换为其基础数值类型。
-    /// </summary>
-    private static Type NormalizeColumnLookupType(Type type)
-    {
-        var effective = Nullable.GetUnderlyingType(type) ?? type;
-        return effective.IsEnum ? Enum.GetUnderlyingType(effective) : effective;
-    }
     public static RecordColumn MakeRecordColumn<T>(RecordTable table, string name)
     {
         return MakeRecordColumn(table, name, typeof(T));
@@ -123,7 +107,7 @@ static class Helpers
 
     internal static RecordColumn MakeRecordColumn(RecordTable table, string name, RecordColumnType columnType, Type? clrType = null)
     {
-        var type = clrType ?? GetClrType(columnType, false);
+        var type = clrType ?? GetClrType(columnType);
         return columnType switch
         {
             RecordColumnType.Boolean => new RecordColumn<bool>(table, name, type),

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace LuYao.Data;
 
 /// <summary>
-/// 表示 Record 的列定义信息（列名 + 类型），用于序列化、传输或 Schema 比较。
+/// 表示 Record 的列定义信息（列名 + 类型），用于 Schema 比较。
 /// </summary>
 public sealed class RecordSchema
 {
@@ -31,25 +31,19 @@ public sealed class RecordSchema
         public string Name { get; }
 
         /// <summary>
-        /// 列的基础枚举类型标识（不含可空信息和数组维度）。
+        /// 列的枚举类型标识。
         /// </summary>
         public RecordColumnType ColumnType { get; }
 
         /// <summary>
-        /// 列是否为可空类型。
-        /// </summary>
-        public bool IsNullable { get; }
-
-        /// <summary>
         /// 列的 CLR 数据类型。
         /// </summary>
-        public Type Type => Helpers.GetClrType(ColumnType, IsNullable);
+        public Type Type => Helpers.GetClrType(ColumnType);
 
-        internal ColumnDef(string name, RecordColumnType columnType, bool isNullable)
+        internal ColumnDef(string name, RecordColumnType columnType)
         {
             Name = name;
             ColumnType = columnType;
-            IsNullable = isNullable;
         }
     }
 }

@@ -199,7 +199,7 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
     public RecordColumn Add(string name, RecordColumnType type)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
-        var clrType = Helpers.GetClrType(type, false);
+        var clrType = Helpers.GetClrType(type);
         var existing = Find(name);
         if (existing != null)
         {

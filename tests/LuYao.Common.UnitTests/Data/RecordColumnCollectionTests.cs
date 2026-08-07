@@ -155,4 +155,32 @@ public class RecordColumnCollectionTests
         var names = table.Columns.Select(c => c.Name).ToArray();
         CollectionAssert.AreEqual(new[] { "A", "B", "C" }, names);
     }
+
+    [TestMethod]
+    public void Add_NullableType_ThrowsNotSupportedException()
+    {
+        var table = new RecordTable();
+        Assert.Throws<NotSupportedException>(() => table.Columns.Add<int?>("Value"));
+    }
+
+    [TestMethod]
+    public void Add_ArrayType_ThrowsNotSupportedException()
+    {
+        var table = new RecordTable();
+        Assert.Throws<NotSupportedException>(() => table.Columns.Add<int[]>("Values"));
+    }
+
+    [TestMethod]
+    public void Add_EnumType_ThrowsNotSupportedException()
+    {
+        var table = new RecordTable();
+        Assert.Throws<NotSupportedException>(() => table.Columns.Add<DayOfWeek>("Day"));
+    }
+
+    [TestMethod]
+    public void Add_UnknownRecordColumnType_ThrowsNotSupportedException()
+    {
+        var table = new RecordTable();
+        Assert.Throws<NotSupportedException>(() => table.Columns.Add("Value", (RecordColumnType)byte.MaxValue));
+    }
 }
