@@ -5,20 +5,20 @@ using System.Diagnostics;
 namespace LuYao;
 
 /// <summary>
-/// Provides a collection of static methods for argument validation.
-/// Validates arguments to reduce boilerplate parameter checking code.
+/// 提供一组用于参数验证的静态方法。
+/// 验证参数以减少样板参数检查代码。
 /// </summary>
 [DebuggerStepThrough]
 public static class Check
 {
     /// <summary>
-    /// Checks if the provided value is not null and throws an <see cref="ArgumentNullException"/> if it is.
+    /// 检查提供的值是否不为 null，如果是则抛出 <see cref="ArgumentNullException"/>。
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check for null.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated value if not null.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null.</exception>
+    /// <typeparam name="T">要检查的值的类型。</typeparam>
+    /// <param name="value">要检查是否为 null 的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>验证值（如果不为空）。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="value"/> 为 null 时抛出。</exception>
     public static T NotNull<T>(T? value, string parameterName)
     {
         if (value == null)
@@ -30,14 +30,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided value is not null and throws an <see cref="ArgumentNullException"/> with a custom message if it is.
+    /// 检查提供的值是否不为 null，如果是，则抛出 <see cref="ArgumentNullException"/> 和自定义消息。
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check for null.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="message">The custom error message.</param>
-    /// <returns>The validated value if not null.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null.</exception>
+    /// <typeparam name="T">要检查的值的类型。</typeparam>
+    /// <param name="value">要检查是否为 null 的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="message">自定义错误消息。</param>
+    /// <returns>验证值（如果不为空）。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="value"/> 为 null 时抛出。</exception>
     public static T NotNull<T>(T? value, string parameterName, string message)
     {
         if (value == null)
@@ -49,14 +49,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided string is not null and validates its length constraints.
+    /// 检查提供的字符串是否不为空并验证其长度限制。
     /// </summary>
-    /// <param name="value">The string value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="maxLength">The maximum allowed length of the string. Defaults to <see cref="int.MaxValue"/>.</param>
-    /// <param name="minLength">The minimum allowed length of the string. Defaults to 0.</param>
-    /// <returns>The validated string if valid.</returns>
-    /// <exception cref="ArgumentException">Thrown when the string is null, exceeds maxLength, or is shorter than minLength.</exception>
+    /// <param name="value">要检查的字符串值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="maxLength">字符串允许的最大长度。默认为 <see cref="int.MaxValue"/>。</param>
+    /// <param name="minLength">字符串允许的最小长度。默认为 0。</param>
+    /// <returns>已验证的字符串（如果有效）。</returns>
+    /// <exception cref="ArgumentException">当字符串为 null、超过 maxLength 或短于 minLength 时抛出。</exception>
     public static string NotNull(
         string? value,
         string parameterName,
@@ -82,14 +82,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided string is not null, empty, or whitespace and validates its length constraints.
+    /// 检查提供的字符串是否不为 null、空或空格，并验证其长度限制。
     /// </summary>
-    /// <param name="value">The string value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="maxLength">The maximum allowed length of the string. Defaults to <see cref="int.MaxValue"/>.</param>
-    /// <param name="minLength">The minimum allowed length of the string. Defaults to 0.</param>
-    /// <returns>The validated string if valid.</returns>
-    /// <exception cref="ArgumentException">Thrown when the string is null, empty, whitespace, exceeds maxLength, or is shorter than minLength.</exception>
+    /// <param name="value">要检查的字符串值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="maxLength">字符串允许的最大长度。默认为 <see cref="int.MaxValue"/>。</param>
+    /// <param name="minLength">字符串允许的最小长度。默认为 0。</param>
+    /// <returns>已验证的字符串（如果有效）。</returns>
+    /// <exception cref="ArgumentException">当字符串为 null、空、空白、超过 maxLength 或短于 minLength 时抛出。</exception>
     public static string NotNullOrWhiteSpace(
         string? value,
         string parameterName,
@@ -115,14 +115,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided string is not null or empty and validates its length constraints.
+    /// 检查提供的字符串是否不为 null 或空并验证其长度约束。
     /// </summary>
-    /// <param name="value">The string value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="maxLength">The maximum allowed length of the string. Defaults to <see cref="int.MaxValue"/>.</param>
-    /// <param name="minLength">The minimum allowed length of the string. Defaults to 0.</param>
-    /// <returns>The validated string if valid.</returns>
-    /// <exception cref="ArgumentException">Thrown when the string is null, empty, exceeds maxLength, or is shorter than minLength.</exception>
+    /// <param name="value">要检查的字符串值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="maxLength">字符串允许的最大长度。默认为 <see cref="int.MaxValue"/>。</param>
+    /// <param name="minLength">字符串允许的最小长度。默认为 0。</param>
+    /// <returns>已验证的字符串（如果有效）。</returns>
+    /// <exception cref="ArgumentException">当字符串为 null、空、超过 maxLength 或短于 minLength 时抛出。</exception>
     public static string NotNullOrEmpty(
         string? value,
         string parameterName,
@@ -148,13 +148,13 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided collection is not null or empty.
+    /// 检查提供的集合是否不为 null 或为空。
     /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated collection if not null or empty.</returns>
-    /// <exception cref="ArgumentException">Thrown when the collection is null or empty.</exception>
+    /// <typeparam name="T">集合中项目的类型。</typeparam>
+    /// <param name="value">要检查的集合。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>已验证的集合（如果不为 null 或为空）。</returns>
+    /// <exception cref="ArgumentException">当集合为 null 或为空时抛出。</exception>
     public static ICollection<T> NotNullOrEmpty<T>(
         ICollection<T>? value,
         string parameterName)
@@ -168,14 +168,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided type is assignable to the specified base type.
+    /// 检查提供的类型是否可分配给指定的基类型。
     /// </summary>
-    /// <typeparam name="TBaseType">The base type to check assignability against.</typeparam>
-    /// <param name="type">The type to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated type if assignable.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> is null.</exception>
-    /// <exception cref="ArgumentException">Thrown when the type is not assignable to <typeparamref name="TBaseType"/>.</exception>
+    /// <typeparam name="TBaseType">用于检查可分配性的基本类型。</typeparam>
+    /// <param name="type">要检查的类型。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>已验证的类型（如果可分配）。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="type"/> 为 null 时抛出。</exception>
+    /// <exception cref="ArgumentException">当类型不可分配给 <typeparamref name="TBaseType"/> 时抛出。</exception>
     public static Type AssignableTo<TBaseType>(
         Type type,
         string parameterName)
@@ -191,15 +191,15 @@ public static class Check
     }
 
     /// <summary>
-    /// Validates the length of a string with optional minimum and maximum constraints.
-    /// Allows null values unless minLength is greater than 0.
+    /// 使用可选的最小和最大约束验证字符串的长度。
+    /// 允许空值，除非 minLength 大于 0。
     /// </summary>
-    /// <param name="value">The string value to check. Can be null if minLength is 0.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="maxLength">The maximum allowed length of the string.</param>
-    /// <param name="minLength">The minimum allowed length of the string. Defaults to 0.</param>
-    /// <returns>The validated string if valid.</returns>
-    /// <exception cref="ArgumentException">Thrown when the string violates the length constraints.</exception>
+    /// <param name="value">要检查的字符串值。如果 minLength 为 0，则可以为 null。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="maxLength">字符串允许的最大长度。</param>
+    /// <param name="minLength">字符串允许的最小长度。默认为 0。</param>
+    /// <returns>已验证的字符串（如果有效）。</returns>
+    /// <exception cref="ArgumentException">当字符串违反长度限制时抛出。</exception>
     public static string? Length(
         string? value,
         string parameterName,
@@ -228,12 +228,12 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided 16-bit signed integer is positive (greater than zero).
+    /// 检查提供的 16 位有符号整数是否为正（大于零）。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated value if positive.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is zero or negative.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>验证值（如果为正）。</returns>
+    /// <exception cref="ArgumentException">当值为零或负数时抛出。</exception>
     public static Int16 Positive(
         Int16 value,
         string parameterName)
@@ -250,12 +250,12 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided 32-bit signed integer is positive (greater than zero).
+    /// 检查提供的 32 位有符号整数是否为正（大于零）。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated value if positive.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is zero or negative.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>验证值（如果为正）。</returns>
+    /// <exception cref="ArgumentException">当值为零或负数时抛出。</exception>
     public static Int32 Positive(
         Int32 value,
         string parameterName)
@@ -272,12 +272,12 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided 64-bit signed integer is positive (greater than zero).
+    /// 检查提供的 64 位有符号整数是否为正（大于零）。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated value if positive.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is zero or negative.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>验证值（如果为正）。</returns>
+    /// <exception cref="ArgumentException">当值为零或负数时抛出。</exception>
     public static Int64 Positive(
         Int64 value,
         string parameterName)
@@ -294,12 +294,12 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided single-precision floating-point number is positive (greater than zero).
+    /// 检查提供的单精度浮点数是否为正（大于零）。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated value if positive.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is zero or negative.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>验证值（如果为正）。</returns>
+    /// <exception cref="ArgumentException">当值为零或负数时抛出。</exception>
     public static float Positive(
         float value,
         string parameterName)
@@ -316,12 +316,12 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided double-precision floating-point number is positive (greater than zero).
+    /// 检查提供的双精度浮点数是否为正（大于零）。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated value if positive.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is zero or negative.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>验证值（如果为正）。</returns>
+    /// <exception cref="ArgumentException">当值为零或负数时抛出。</exception>
     public static double Positive(
         double value,
         string parameterName)
@@ -338,12 +338,12 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided decimal number is positive (greater than zero).
+    /// 检查提供的十进制数是否为正数（大于零）。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The validated value if positive.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is zero or negative.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>验证值（如果为正）。</returns>
+    /// <exception cref="ArgumentException">当值为零或负数时抛出。</exception>
     public static decimal Positive(
         decimal value,
         string parameterName)
@@ -360,14 +360,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided 16-bit signed integer is within the specified range.
+    /// 检查提供的 16 位有符号整数是否在指定范围内。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="minimumValue">The minimum allowed value (inclusive).</param>
-    /// <param name="maximumValue">The maximum allowed value (inclusive). Defaults to <see cref="Int16.MaxValue"/>.</param>
-    /// <returns>The validated value if within range.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is outside the specified range.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="minimumValue">允许的最小值（含）。</param>
+    /// <param name="maximumValue">最大允许值（含）。默认为 <see cref="Int16.MaxValue"/>。</param>
+    /// <returns>验证值（如果在范围内）。</returns>
+    /// <exception cref="ArgumentException">当值超出指定范围时抛出。</exception>
     public static Int16 Range(
         Int16 value,
         string parameterName,
@@ -383,14 +383,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided 32-bit signed integer is within the specified range.
+    /// 检查提供的 32 位有符号整数是否在指定范围内。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="minimumValue">The minimum allowed value (inclusive).</param>
-    /// <param name="maximumValue">The maximum allowed value (inclusive). Defaults to <see cref="Int32.MaxValue"/>.</param>
-    /// <returns>The validated value if within range.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is outside the specified range.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="minimumValue">允许的最小值（含）。</param>
+    /// <param name="maximumValue">最大允许值（含）。默认为 <see cref="Int32.MaxValue"/>。</param>
+    /// <returns>验证值（如果在范围内）。</returns>
+    /// <exception cref="ArgumentException">当值超出指定范围时抛出。</exception>
     public static Int32 Range(
         Int32 value,
         string parameterName,
@@ -406,14 +406,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided 64-bit signed integer is within the specified range.
+    /// 检查提供的 64 位有符号整数是否在指定范围内。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="minimumValue">The minimum allowed value (inclusive).</param>
-    /// <param name="maximumValue">The maximum allowed value (inclusive). Defaults to <see cref="Int64.MaxValue"/>.</param>
-    /// <returns>The validated value if within range.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is outside the specified range.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="minimumValue">允许的最小值（含）。</param>
+    /// <param name="maximumValue">最大允许值（含）。默认为 <see cref="Int64.MaxValue"/>。</param>
+    /// <returns>验证值（如果在范围内）。</returns>
+    /// <exception cref="ArgumentException">当值超出指定范围时抛出。</exception>
     public static Int64 Range(
         Int64 value,
         string parameterName,
@@ -429,14 +429,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided single-precision floating-point number is within the specified range.
+    /// 检查提供的单精度浮点数是否在指定范围内。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="minimumValue">The minimum allowed value (inclusive).</param>
-    /// <param name="maximumValue">The maximum allowed value (inclusive). Defaults to <see cref="float.MaxValue"/>.</param>
-    /// <returns>The validated value if within range.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is outside the specified range.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="minimumValue">允许的最小值（含）。</param>
+    /// <param name="maximumValue">最大允许值（含）。默认为 <see cref="float.MaxValue"/>。</param>
+    /// <returns>验证值（如果在范围内）。</returns>
+    /// <exception cref="ArgumentException">当值超出指定范围时抛出。</exception>
     public static float Range(
         float value,
         string parameterName,
@@ -451,14 +451,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided double-precision floating-point number is within the specified range.
+    /// 检查提供的双精度浮点数是否在指定范围内。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="minimumValue">The minimum allowed value (inclusive).</param>
-    /// <param name="maximumValue">The maximum allowed value (inclusive). Defaults to <see cref="double.MaxValue"/>.</param>
-    /// <returns>The validated value if within range.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is outside the specified range.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="minimumValue">允许的最小值（含）。</param>
+    /// <param name="maximumValue">最大允许值（含）。默认为 <see cref="double.MaxValue"/>。</param>
+    /// <returns>验证值（如果在范围内）。</returns>
+    /// <exception cref="ArgumentException">当值超出指定范围时抛出。</exception>
     public static double Range(
         double value,
         string parameterName,
@@ -474,14 +474,14 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided decimal number is within the specified range.
+    /// 检查提供的十进制数是否在指定范围内。
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <param name="minimumValue">The minimum allowed value (inclusive).</param>
-    /// <param name="maximumValue">The maximum allowed value (inclusive). Defaults to <see cref="decimal.MaxValue"/>.</param>
-    /// <returns>The validated value if within range.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is outside the specified range.</exception>
+    /// <param name="value">要检查的值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <param name="minimumValue">允许的最小值（含）。</param>
+    /// <param name="maximumValue">最大允许值（含）。默认为 <see cref="decimal.MaxValue"/>。</param>
+    /// <returns>验证值（如果在范围内）。</returns>
+    /// <exception cref="ArgumentException">当值超出指定范围时抛出。</exception>
     public static decimal Range(
         decimal value,
         string parameterName,
@@ -497,13 +497,13 @@ public static class Check
     }
 
     /// <summary>
-    /// Checks if the provided nullable struct value is not null and not equal to its default value.
+    /// 检查提供的可为 null 的结构体值是否不为 null 且不等于其默认值。
     /// </summary>
-    /// <typeparam name="T">The struct type of the value to check.</typeparam>
-    /// <param name="value">The nullable value to check.</param>
-    /// <param name="parameterName">The name of the parameter being checked.</param>
-    /// <returns>The non-null struct value if valid.</returns>
-    /// <exception cref="ArgumentException">Thrown when the value is null or equals the default value for the struct.</exception>
+    /// <typeparam name="T">要检查的值的结构类型。</typeparam>
+    /// <param name="value">要检查的可为空值。</param>
+    /// <param name="parameterName">正在检查的参数的名称。</param>
+    /// <returns>非空结构值（如果有效）。</returns>
+    /// <exception cref="ArgumentException">当值为 null 或等于结构体的默认值时抛出。</exception>
     public static T NotDefaultOrNull<T>(
         T? value,
         string parameterName)

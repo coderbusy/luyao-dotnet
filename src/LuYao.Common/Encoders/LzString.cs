@@ -366,13 +366,13 @@ public class LzString
                     context_numBits++;
                 }
 
-                //Add wc to the dictionary
+                // 将 wc 添加到字典中
                 context_dictionary[context_wc] = context_dictSize++;
                 context_w = context_c;
             }
         }
 
-        //Output the code for w
+        // 输出 w 的代码
         if (context_w != string.Empty)
         {
             if (context_dictionaryToCreate.ContainsKey(context_w))
@@ -489,7 +489,7 @@ public class LzString
             }
         }
 
-        //Mark the end of the stream
+        // 标记流的结尾
         value = 2;
         for (i = 0; i < context_numBits; i++)
         {
@@ -508,7 +508,7 @@ public class LzString
             value = value >> 1;
         }
 
-        //Flush the last char
+        // 写出最后一个字符
         while (true)
         {
             context_data_val = context_data_val << 1;
@@ -731,7 +731,7 @@ public class LzString
 
             result.Append(entry);
 
-            //Add w+entry[0] to the dictionary.
+            // 将 w + entry[0] 添加到字典中。
             dictionary[dictSize++] = w + entry[0];
             enlargeIn--;
             w = entry;

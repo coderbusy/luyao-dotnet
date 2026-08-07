@@ -14,11 +14,11 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 class Build : NukeBuild
 {
-    /// Support plugins are available for:
-    ///   - JetBrains ReSharper        https://nuke.build/resharper
-    ///   - JetBrains Rider            https://nuke.build/rider
-    ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
-    ///   - Microsoft VSCode           https://nuke.build/vscode
+    /// 可使用以下支持插件：
+    /// - JetBrains ReSharper        https://nuke.build/resharper
+    /// - JetBrains Rider            https://nuke.build/rider
+    /// - Microsoft Visual Studio    https://nuke.build/visualstudio
+    /// - Microsoft VS Code          https://nuke.build/vscode
 
     public static int Main() => Execute<Build>(x => x.Compile);
 
@@ -69,7 +69,7 @@ class Build : NukeBuild
                 .SetProject(Solution)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(OutputDirectory)
-                .SetVersion(PackageVersion) // �������ð汾
+                .SetVersion(PackageVersion) // 这里设置版本
                 .EnableNoBuild());
         });
 

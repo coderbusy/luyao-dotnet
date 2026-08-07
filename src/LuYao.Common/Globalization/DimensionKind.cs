@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LuYao.Globalization;
 
 /// <summary>
-/// Specifies the type of dimension represented, such as length, width, or height.
+/// 指定所表示尺寸的类型，例如长度、宽度或高度。
 /// </summary>
 public enum DimensionKind
 {

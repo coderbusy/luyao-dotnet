@@ -3,12 +3,12 @@ using System;
 namespace LuYao.Data.Internal;
 
 /// <summary>
-/// Internal type conversion helper for the Data layer.
+/// 数据层的内部类型转换助手。
 /// </summary>
 internal static class DataConvert
 {
     /// <summary>
-    /// Converts the specified value to the specified type, with Nullable support.
+    /// 将指定值转换为指定类型，并支持 Nullable。
     /// </summary>
     public static object ChangeType(object value, Type type)
     {

@@ -398,18 +398,18 @@ public partial class RecordTable : IEnumerable<RecordRow>
     /// </summary>
     static bool IsWide(char c)
     {
-        // CJK Unified Ideographs, CJK Extension A, Compatibility Ideographs
+        // CJK 统一表意文字、CJK 扩展 A、兼容性表意文字
         if (c >= 0x4E00 && c <= 0x9FFF) return true;
         if (c >= 0x3400 && c <= 0x4DBF) return true;
         if (c >= 0xF900 && c <= 0xFAFF) return true;
         // Fullwidth Forms (全角 ASCII、全角标点)
         if (c >= 0xFF01 && c <= 0xFF60) return true;
         if (c >= 0xFFE0 && c <= 0xFFE6) return true;
-        // CJK Symbols and Punctuation, Hiragana, Katakana, Bopomofo
+        // CJK 符号和标点符号、平假名、片假名、Bopomofo
         if (c >= 0x3000 && c <= 0x33FF) return true;
-        // Hangul Syllables
+        // 韩文音节
         if (c >= 0xAC00 && c <= 0xD7AF) return true;
-        // CJK Unified Ideographs Extension B+ (surrogates, treat high surrogate range)
+        // CJK统一表意文字扩展B+（代理，处理高代理范围）
         if (c >= 0xD800 && c <= 0xDFFF) return true;
         return false;
     }

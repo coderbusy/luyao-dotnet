@@ -77,7 +77,7 @@ public class RecordColumn<T> : RecordColumn
         T value = _data[row];
         if (value is null) return string.Empty;
 
-        // byte[] columns return Base64 string
+        // byte[] 列返回 Base64 字符串
         if (value is byte[] bytes) return Convert.ToBase64String(bytes);
 
         return value.ToString() ?? string.Empty;

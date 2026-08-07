@@ -42,11 +42,11 @@ static class Helpers
     }
 
     /// <summary>
-    /// From CLR <see cref="Type"/> get its <see cref="RecordColumnType"/>.
+    /// 从 CLR <see cref="Type"/> 获取其 <see cref="RecordColumnType"/>。
     /// </summary>
     internal static RecordColumnType GetColumnType(Type type)
     {
-        // byte[] maps directly to Binary
+        // byte[] 直接映射到 Binary
         if (type == typeof(byte[]))
         {
             return RecordColumnType.Binary;
@@ -74,7 +74,7 @@ static class Helpers
     {
         if (type == null) return false;
 
-        // byte[] is directly supported as Binary
+        // byte[] 直接支持二进制
         if (type == typeof(byte[])) return true;
 
         return TypeToColumnType.ContainsKey(type);
