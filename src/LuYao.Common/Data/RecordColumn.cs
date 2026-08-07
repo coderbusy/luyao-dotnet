@@ -29,7 +29,7 @@ public abstract class RecordColumn
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
         this._type = type ?? throw new ArgumentNullException(nameof(type));
         this.ColumnType = Helpers.GetColumnType(type);
-        this.IsNullable = Helpers.IsNullableType(type);
+        this.IsNullable = false;
     }
     private Type _type;
     /// <summary>
@@ -165,3 +165,4 @@ public abstract class RecordColumn
     #endregion
 
 }
+

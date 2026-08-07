@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace LuYao.Data;
 
@@ -54,9 +52,7 @@ static class Helpers
             return RecordColumnType.Binary;
         }
 
-        var lookup = NormalizeColumnLookupType(type);
-
-        if (TypeToColumnType.TryGetValue(lookup, out var ct))
+        if (TypeToColumnType.TryGetValue(type, out var ct))
             return ct;
         throw new NotSupportedException($"类型 '{type.FullName}' 不是支持的列类型");
     }
@@ -64,10 +60,7 @@ static class Helpers
     /// <summary>
     /// 判断 CLR <see cref="Type"/> 是否为 Nullable 值类型，或其数组元素类型为 Nullable。
     /// </summary>
-    internal static bool IsNullableType(Type type)
-    {
-        return Nullable.GetUnderlyingType(type) != null;
-    }
+    internal static bool IsNullableType(Type type) => false;
 
     /// <summary>
     /// 从基础 <see cref="RecordColumnType"/>、<paramref name="isNullable"/> 和 <paramref name="arrayRank"/> 还原 CLR <see cref="Type"/>。
@@ -80,8 +73,6 @@ static class Helpers
         if (!ColumnTypeToType.TryGetValue(columnType, out var baseType))
             throw new NotSupportedException($"未知列类型枚举值: {columnType}");
 
-        if (isNullable && baseType.IsValueType)
-            return typeof(Nullable<>).MakeGenericType(baseType);
         return baseType;
     }
 
@@ -94,8 +85,7 @@ static class Helpers
         // byte[] is directly supported as Binary
         if (type == typeof(byte[])) return true;
 
-        var normalized = NormalizeColumnLookupType(type);
-        return TypeToColumnType.ContainsKey(normalized);
+        return TypeToColumnType.ContainsKey(type);
     }
 
     /// 验证列类型是否在白名单内，不在则抛出异常。
@@ -115,41 +105,9 @@ static class Helpers
         var effective = Nullable.GetUnderlyingType(type) ?? type;
         return effective.IsEnum ? Enum.GetUnderlyingType(effective) : effective;
     }
-    private static readonly ConcurrentDictionary<Type, Func<RecordTable, string, Type, RecordColumn>> _cache = new();
-
-    private static Func<RecordTable, string, Type, RecordColumn> GetConstructor(Type type)
-    {
-        return _cache.GetOrAdd(type, static t =>
-        {
-            // 创建泛型类型
-            var genericType = typeof(RecordColumn<>).MakeGenericType(t);
-
-            // 获取构造函数
-            var ctor = genericType.GetConstructor(new[] {
-                typeof(RecordTable),
-                typeof(string),
-                typeof(Type)
-            }) ?? throw new InvalidOperationException($"Constructor not found for {genericType}");
-
-            // 定义参数表达式
-            var pRecord = Expression.Parameter(typeof(RecordTable), "table");
-            var pName = Expression.Parameter(typeof(string), "name");
-            var pType = Expression.Parameter(typeof(Type), "type");
-
-            // 创建构造函数调用表达式
-            var newExpr = Expression.New(ctor, pRecord, pName, pType);
-
-            // 编译表达式树为委托
-            return Expression.Lambda<Func<RecordTable, string, Type, RecordColumn>>(
-                newExpr, pRecord, pName, pType).Compile();
-        });
-    }
-
     public static RecordColumn MakeRecordColumn<T>(RecordTable table, string name)
     {
-        // 使用泛型方法优化，避免运行时查找类型
-        var ctor = GetConstructor(typeof(T));
-        return ctor.Invoke(table, name, typeof(T));
+        return MakeRecordColumn(table, name, typeof(T));
     }
 
     public static RecordColumn MakeRecordColumn(RecordTable table, string name, Type type)
@@ -160,8 +118,36 @@ static class Helpers
 
         ValidateColumnType(type);
 
-        var ctor = GetConstructor(type);
-        return ctor.Invoke(table, name, type);
+        return MakeRecordColumn(table, name, GetColumnType(type), type);
+    }
+
+    internal static RecordColumn MakeRecordColumn(RecordTable table, string name, RecordColumnType columnType, Type? clrType = null)
+    {
+        var type = clrType ?? GetClrType(columnType, false);
+        return columnType switch
+        {
+            RecordColumnType.Boolean => new RecordColumn<bool>(table, name, type),
+            RecordColumnType.SByte => new RecordColumn<sbyte>(table, name, type),
+            RecordColumnType.Int16 => new RecordColumn<short>(table, name, type),
+            RecordColumnType.Int32 => new RecordColumn<int>(table, name, type),
+            RecordColumnType.Int64 => new RecordColumn<long>(table, name, type),
+            RecordColumnType.Byte => new RecordColumn<byte>(table, name, type),
+            RecordColumnType.UInt16 => new RecordColumn<ushort>(table, name, type),
+            RecordColumnType.UInt32 => new RecordColumn<uint>(table, name, type),
+            RecordColumnType.UInt64 => new RecordColumn<ulong>(table, name, type),
+            RecordColumnType.Single => new RecordColumn<float>(table, name, type),
+            RecordColumnType.Double => new RecordColumn<double>(table, name, type),
+            RecordColumnType.Decimal => new RecordColumn<decimal>(table, name, type),
+            RecordColumnType.Char => new RecordColumn<char>(table, name, type),
+            RecordColumnType.String => new RecordColumn<string>(table, name, type),
+            RecordColumnType.DateTime => new RecordColumn<DateTime>(table, name, type),
+            RecordColumnType.DateTimeOffset => new RecordColumn<DateTimeOffset>(table, name, type),
+            RecordColumnType.TimeSpan => new RecordColumn<TimeSpan>(table, name, type),
+            RecordColumnType.Guid => new RecordColumn<Guid>(table, name, type),
+            RecordColumnType.Binary => new RecordColumn<byte[]>(table, name, type),
+            _ => throw new NotSupportedException($"未知列类型: {columnType}")
+        };
     }
 }
+
 

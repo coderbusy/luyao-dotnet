@@ -195,6 +195,22 @@ public class RecordColumnCollection : IReadOnlyList<RecordColumn>
         return col;
     }
 
+    /// <summary>根据封闭的 RecordColumnType 类型添加列。</summary>
+    public RecordColumn Add(string name, RecordColumnType type)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name), "列名不能为空");
+        var clrType = Helpers.GetClrType(type, false);
+        var existing = Find(name);
+        if (existing != null)
+        {
+            if (existing.ColumnType != type) throw new InvalidOperationException($"列 '{name}' 类型不匹配。");
+            return existing;
+        }
+        var col = Helpers.MakeRecordColumn(Table, name, type, clrType);
+        _items.Add(col);
+        return col;
+    }
+
     /// <summary>
     /// 添加指定泛型类型的列。
     /// </summary>
