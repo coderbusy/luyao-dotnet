@@ -1,4 +1,3 @@
-using LuYao.Data.Meta;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -99,20 +98,7 @@ static class Helpers
         return TypeToColumnType.ContainsKey(normalized);
     }
 
-    internal static bool IsSupportedForReading(IXProp p)
-    {
-        if (p != null && p.CanRead && IsSupportedColumnType(p.Type)) return true;
-        return false;
-    }
-    internal static bool IsSupportedForWriting(IXProp p)
-    {
-        if (p != null && p.CanWrite && IsSupportedColumnType(p.Type)) return true;
-        return false;
-    }
-
-    /// <summary>
     /// 验证列类型是否在白名单内，不在则抛出异常。
-    /// </summary>
     internal static void ValidateColumnType(Type type)
     {
         if (!IsSupportedColumnType(type))
@@ -178,3 +164,4 @@ static class Helpers
         return ctor.Invoke(table, name, type);
     }
 }
+

@@ -8,7 +8,7 @@ namespace LuYao.Data;
 /// <summary>
 /// 代表一行数据，提供对列存储数据集合中特定行数据的访问。
 /// </summary>
-public partial struct RecordRow : IDynamicMetaObjectProvider
+public partial struct RecordRow
 {
     /// <summary>
     /// 初始化 <see cref="RecordRow"/> 结构体的新实例。
@@ -35,12 +35,6 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
     /// </summary>
     /// <value>从零开始的行索引。</value>
     public int Row { get; }
-
-    /// <summary>
-    /// 返回 <see cref="DynamicMetaObject"/>，支持动态成员访问。
-    /// </summary>
-    public readonly DynamicMetaObject GetMetaObject(System.Linq.Expressions.Expression parameter)
-        => new RecordRowMetaObject(parameter, this);
 
     /// <summary>
     /// 定义从 <see cref="RecordRow"/> 到 <see cref="int"/> 的隐式转换。
@@ -139,3 +133,4 @@ public partial struct RecordRow : IDynamicMetaObjectProvider
         return col.ToString(this.Row);
     }
 }
+
