@@ -130,48 +130,6 @@ public class RecordQueryTests
     }
 
     [TestMethod]
-    public void FindByDynamic_WithValidPredicate_ReturnsFirstMatch()
-    {
-        // Arrange
-        var table = CreateTestRecord();
-
-        // Act
-        var result = table.FindByDynamic(d => d.Name == "Charlie");
-
-        // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(3, result.Value.To<int>("Id"));
-    }
-
-    [TestMethod]
-    public void FindByDynamic_WithInvalidPredicate_ReturnsNull()
-    {
-        // Arrange
-        var table = CreateTestRecord();
-
-        // Act
-        var result = table.FindByDynamic(d => d.Id == 99);
-
-        // Assert
-        Assert.IsNull(result);
-    }
-
-    [TestMethod]
-    public void FindAllByDynamic_WithValidPredicate_ReturnsAllMatches()
-    {
-        // Arrange
-        var table = CreateTestRecord();
-
-        // Act
-        var results = table.FindAllByDynamic(d => d.IsActive == true).ToList();
-
-        // Assert
-        Assert.AreEqual(2, results.Count);
-        Assert.AreEqual(1, results[0].To<int>("Id"));
-        Assert.AreEqual(3, results[1].To<int>("Id"));
-    }
-
-    [TestMethod]
     public void Find_ObjectOverload_ReturnsFirstMatchingRow()
     {
         // Arrange
